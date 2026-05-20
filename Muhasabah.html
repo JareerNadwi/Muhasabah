@@ -864,7 +864,7 @@ async function openQuranReader(){
       qrPdfDoc = await pdfjsLib.getDocument(QR_PDF_PATH).promise;
     }catch(e){
       document.getElementById('qrLoading').textContent =
-        '⚠ Could Not Load PDF — Make Sure Imdadia-Hafezi-Quran.pdf Is In The Same Folder As This HTML File';
+        '⚠ Could Not Load Quran PDF — Google Drive may be blocking the request. Try opening the file locally or hosting on GitHub Pages.';
       return;
     }
   }

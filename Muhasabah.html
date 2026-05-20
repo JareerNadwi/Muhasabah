@@ -559,6 +559,8 @@ canvas#qrCanvas{
         <button class="yn-btn yes" data-key="surahWaqiah" data-val="yes" onclick="setYN('surahWaqiah','yes')">Yes</button>
         <button class="yn-btn no"  data-key="surahWaqiah" data-val="no"  onclick="setYN('surahWaqiah','no')">No</button>
       </div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahWaqiah')">📜 Open Surah Al-Waqiah Reader</button>
+      <div class="qr-session-badge" id="surahWaqiahSessionBadge" style="display:none;"></div>
     </div>
 
     <!-- Surah Al-Mulk 5% -->
@@ -571,6 +573,8 @@ canvas#qrCanvas{
         <button class="yn-btn yes" data-key="surahMulk" data-val="yes" onclick="setYN('surahMulk','yes')">Yes</button>
         <button class="yn-btn no"  data-key="surahMulk" data-val="no"  onclick="setYN('surahMulk','no')">No</button>
       </div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahMulk')">📜 Open Surah Al-Mulk Reader</button>
+      <div class="qr-session-badge" id="surahMulkSessionBadge" style="display:none;"></div>
     </div>
 
   </div><!-- /ibadah -->
@@ -1046,6 +1050,11 @@ async function closeQuranReader(){
   _cache[currentDateKey] = dayData;
   await setStore(currentDateKey, dayData);
 
+  // If last page reached, reset global position so next open starts from page 1
+  if(qrCurPage >= QR_LAST_PAGE){
+    await setQrLastPage(null);
+  }
+
   // Show today's total in badge
   const badge = document.getElementById('quranSessionBadge');
   badge.style.display = 'block';
@@ -1143,6 +1152,26 @@ const PDF_READER_CONFIG = {
     idbKey:           '_pdf_lastpage_zikrBook', // global key, not per-day
     autoCompleteOnClose: false,
     globalResume:     true,    // does NOT reset each day
+  },
+  surahWaqiah: {
+    pdfPath:          'Surah%20Al-Waqiah.pdf',
+    title:            '📜 Surah Al-Waqiah',
+    resume:           true,    // per-day resume (resets each day)
+    goalKey:          'surahWaqiah',
+    badgeId:          'surahWaqiahSessionBadge',
+    idbKey:           '_pdf_lastpage_surahWaqiah',
+    autoCompleteOnClose: false,
+    globalResume:     false,
+  },
+  surahMulk: {
+    pdfPath:          'Surah%20Al-Mulk.pdf',
+    title:            '📜 Surah Al-Mulk',
+    resume:           true,    // per-day resume (resets each day)
+    goalKey:          'surahMulk',
+    badgeId:          'surahMulkSessionBadge',
+    idbKey:           '_pdf_lastpage_surahMulk',
+    autoCompleteOnClose: false,
+    globalResume:     false,
   },
 };
 
@@ -1342,6 +1371,11 @@ async function closePdfReader(){
     data[type + '_bonusRatio']  = bonusRatio;
     _cache[currentDateKey] = data;
     await setStore(currentDateKey, data);
+
+    // If last page reached, reset global position so next open starts from page 1
+    if(reachedEnd && cfg.idbKey){
+      await setPdfLastPage(cfg.idbKey, null);
+    }
 
     const badge = document.getElementById(cfg.badgeId);
     if(badge){
@@ -1558,7 +1592,13 @@ function scoreDay(data){
   const zeRatio = data['zikrEvening_pdfRatio'];
   core += zeRatio !== undefined ? Math.min(zeRatio * 5, 5) : (data.zikrEvening==='yes'?5:0);
 
-  yn('surahWaqiah',5); yn('surahMulk',5);
+  // surahWaqiah 5% — proportional if PDF used, else yes/no
+  const swRatio = data['surahWaqiah_pdfRatio'];
+  core += swRatio !== undefined ? Math.min(swRatio * 5, 5) : (data.surahWaqiah==='yes'?5:0);
+
+  // surahMulk 5% — proportional if PDF used, else yes/no
+  const smRatio = data['surahMulk_pdfRatio'];
+  core += smRatio !== undefined ? Math.min(smRatio * 5, 5) : (data.surahMulk==='yes'?5:0);
   yn('exercise',5); yn('books',5); yn('language',5);
   yn('writingLinkedin',2.5); yn('writingFacebook',2.5);
   yn('netConnected',2.5); yn('netCommented',2.5);
@@ -1635,8 +1675,14 @@ function goalScore(data,key){
       const r = data['zikrEvening_pdfRatio'];
       return r !== undefined ? Math.min(Math.round(r * 100), 100) : (data.zikrEvening==='yes'?100:0);
     }
-    case 'surahWaqiah': return data.surahWaqiah==='yes'?100:0;
-    case 'surahMulk':   return data.surahMulk==='yes'?100:0;
+    case 'surahWaqiah': {
+      const r = data['surahWaqiah_pdfRatio'];
+      return r !== undefined ? Math.min(Math.round(r * 100), 100) : (data.surahWaqiah==='yes'?100:0);
+    }
+    case 'surahMulk': {
+      const r = data['surahMulk_pdfRatio'];
+      return r !== undefined ? Math.min(Math.round(r * 100), 100) : (data.surahMulk==='yes'?100:0);
+    }
     case 'exercise':    return data.exercise==='yes'?100:0;
     case 'books':       return data.books==='yes'?100:0;
     case 'language':    return data.language==='yes'?100:0;
@@ -1791,7 +1837,7 @@ function loadDayData(dk){
   }
 
   // Show zikr reader badges (Morning and Evening only — Zikr is reference-only)
-  ['zikrMorning','zikrEvening'].forEach(type => {
+  ['zikrMorning','zikrEvening','surahWaqiah','surahMulk'].forEach(type => {
     const cfg = PDF_READER_CONFIG[type];
     const b = document.getElementById(cfg.badgeId);
     if(!b) return;

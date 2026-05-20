@@ -814,13 +814,76 @@ let currentDateKey=null;
    30 juzz × ~20.4 pages each
 ══════════════════════════════════════════════════════════ */
 const QR_PDF_PATH    = 'Imdadia%20Hafezi%20Quran.pdf';
-const QR_FIRST_PAGE  = 2;   // PDF page index of Quran page 1
-const QR_LAST_PAGE   = 613; // PDF page index of last Quran page
-const QR_TOTAL_QURAN = 612; // total Quran content pages
-const PAGES_PER_JUZZ = QR_TOTAL_QURAN / 30; // ~20.4
+const QR_FIRST_PAGE  = 1;   // PDF page 1 = Fatiha
+const QR_LAST_PAGE   = 610; // last page of Quran
+const QR_TOTAL_QURAN = 610; // total pages
+
+/* Exact juzz page ranges [startPage, endPage] inclusive */
+const JUZZ_RANGES = [
+  null,          // index 0 unused
+  [1,21],        // Juzz 1
+  [22,41],       // Juzz 2
+  [42,61],       // Juzz 3
+  [62,81],       // Juzz 4
+  [82,101],      // Juzz 5
+  [102,121],     // Juzz 6
+  [122,141],     // Juzz 7
+  [142,161],     // Juzz 8
+  [162,181],     // Juzz 9
+  [182,201],     // Juzz 10
+  [202,221],     // Juzz 11
+  [222,241],     // Juzz 12
+  [242,261],     // Juzz 13
+  [262,281],     // Juzz 14
+  [282,301],     // Juzz 15
+  [302,321],     // Juzz 16
+  [322,341],     // Juzz 17
+  [342,361],     // Juzz 18
+  [362,381],     // Juzz 19
+  [382,401],     // Juzz 20
+  [402,421],     // Juzz 21
+  [422,441],     // Juzz 22
+  [442,461],     // Juzz 23
+  [462,481],     // Juzz 24
+  [482,501],     // Juzz 25
+  [502,521],     // Juzz 26
+  [522,541],     // Juzz 27
+  [542,561],     // Juzz 28
+  [562,585],     // Juzz 29 (24 pages)
+  [586,610],     // Juzz 30 (25 pages)
+];
+
+/* Get juzz number (1-30) for a given page */
+function pageToJuzz(page){
+  for(let j=1;j<=30;j++){
+    const [s,e]=JUZZ_RANGES[j];
+    if(page>=s&&page<=e) return j;
+  }
+  return 30;
+}
+
+/* Convert pages read into juzz fraction using exact ranges.
+   Handles sessions that may span multiple juzz. */
+function pagesReadToJuzz(pagesRead, startPage){
+  if(!startPage) startPage = qrStartPage || QR_FIRST_PAGE;
+  let remaining = pagesRead;
+  let juzzAccum = 0;
+  let curPage   = startPage;
+  while(remaining > 0 && curPage <= QR_LAST_PAGE){
+    const j = pageToJuzz(curPage);
+    const [s,e] = JUZZ_RANGES[j];
+    const juzzPages = e - s + 1;
+    const pagesLeftInJuzz = e - curPage + 1;
+    const consume = Math.min(remaining, pagesLeftInJuzz);
+    juzzAccum += consume / juzzPages;
+    remaining -= consume;
+    curPage   += consume;
+  }
+  return Math.round(juzzAccum * 4) / 4; // nearest quarter
+}
 
 let qrPdfDoc     = null;
-let qrCurPage    = 2;    // current PDF page number
+let qrCurPage    = 1;    // current PDF page number
 let qrStartPage  = null; // PDF page at session open
 let qrRendering  = false;
 let qrScale      = 1.5;
@@ -828,14 +891,8 @@ let qrScale      = 1.5;
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-/* Convert PDF page number → Quran page number (1-based) */
-function pdfToQuranPage(pdfPage){ return pdfPage - 1; }
-
-/* Map pages read → juzz fraction (rounded to nearest 0.25) */
-function pagesReadToJuzz(pagesRead){
-  const raw = pagesRead / PAGES_PER_JUZZ;
-  return Math.round(raw * 4) / 4; // nearest quarter
-}
+/* PDF page = Quran page (no offset) */
+function pdfToQuranPage(pdfPage){ return pdfPage; }
 
 /* Find the nearest option in quranQuarter select */
 function nearestQuarterOption(val){
@@ -896,11 +953,11 @@ async function qrRenderPage(pdfPageNum){
     document.getElementById('qrLoading').style.display='none';
 
     const qPage = pdfToQuranPage(pdfPageNum);
-    const juzz  = Math.ceil(qPage / PAGES_PER_JUZZ);
+    const juzz  = pageToJuzz(qPage);
     document.getElementById('qrPageDisplay').textContent =
-      `Page ${qPage} / 612  ·  Juzz ${juzz}`;
+      `Page ${qPage} / 610  ·  Juzz ${juzz}`;
     document.getElementById('qrInfoBar').textContent =
-      `Emdadia Hafezi  ·  Quran Page ${qPage}  ·  Juzz ${Math.max(1,juzz)}`;
+      `Emdadia Hafezi  ·  Quran Page ${qPage}  ·  Juzz ${juzz}`;
 
     document.getElementById('qrPrev').disabled = pdfPageNum <= QR_FIRST_PAGE;
     document.getElementById('qrNext').disabled = pdfPageNum >= QR_LAST_PAGE;
@@ -925,7 +982,7 @@ function updateSessionInfo(){
   const pagesRead = Math.max(0, qrCurPage - qrStartPage);
   const el = document.getElementById('qrSessionInfo');
   if(pagesRead > 0){
-    const juzzRead = pagesReadToJuzz(pagesRead);
+    const juzzRead = pagesReadToJuzz(pagesRead, qrStartPage);
     el.textContent = `This Session: ${pagesRead} page${pagesRead!==1?'s':''} read  ·  ≈ ${juzzRead.toFixed(2)} Juzz`;
   } else {
     el.textContent = 'Session started — start reading';
@@ -942,7 +999,7 @@ async function closeQuranReader(){
   if(pagesRead === 0) return;
 
   // Convert pages to juzz fraction and auto-fill the Quran goal
-  const juzzRead = pagesReadToJuzz(pagesRead);
+  const juzzRead = pagesReadToJuzz(pagesRead, qrStartPage);
   const startQuranPage = pdfToQuranPage(qrStartPage);
   const endQuranPage   = pdfToQuranPage(qrCurPage);
   const startJuzz = Math.ceil(startQuranPage / PAGES_PER_JUZZ);

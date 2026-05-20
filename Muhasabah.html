@@ -879,7 +879,7 @@ function pagesReadToJuzz(pagesRead, startPage){
     remaining -= consume;
     curPage   += consume;
   }
-  return Math.round(juzzAccum * 4) / 4; // nearest quarter
+  return Math.round(juzzAccum * 1000) / 1000; // store precise value, round only for display
 }
 
 let qrPdfDoc     = null;
@@ -979,7 +979,7 @@ async function qrChangePage(delta){
 
 function updateSessionInfo(){
   if(!qrStartPage) return;
-  const pagesRead = Math.max(0, qrCurPage - qrStartPage);
+  const pagesRead = Math.max(0, qrCurPage - qrStartPage + 1);
   const el = document.getElementById('qrSessionInfo');
   if(pagesRead > 0){
     const juzzRead = pagesReadToJuzz(pagesRead, qrStartPage);
@@ -995,7 +995,7 @@ async function closeQuranReader(){
 
   if(!qrStartPage || !currentDateKey) return;
 
-  const pagesRead = Math.max(0, qrCurPage - qrStartPage);
+  const pagesRead = Math.max(0, qrCurPage - qrStartPage + 1);
   if(pagesRead === 0) return;
 
   const juzzRead = pagesReadToJuzz(pagesRead, qrStartPage);

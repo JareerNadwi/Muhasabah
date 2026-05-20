@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muhasabah — Daily Tracker 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root {
+  --bg:#0d0f0e; --surface:#141714; --surface2:#1c1f1c; --border:#2a2e2a;
+  --gold:#c8a96e; --gold-dim:#8a7048;
+  --green:#4a7c59; --green-bright:#6aab7a;
+  --red:#8b3a3a; --purple:#6a4a8a; --purple-bright:#9a6abf;
+  --text:#e8e4dc; --text-dim:#7a7870; --text-muted:#4a4845;
+  --radius:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;}
+
+/* ── Contact Banner ── */
+.contact-banner{
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#1a1200,#0f1a0f,#1a1200);
+  border:1px solid var(--gold-dim);border-radius:8px;
+  padding:10px 20px;position:relative;overflow:hidden;
+  animation:bannerGlow 3s ease-in-out infinite;
+  min-width:0;flex:1;margin:0 24px;
+}
+@keyframes bannerGlow{
+  0%,100%{box-shadow:0 0 8px rgba(200,169,110,.15),inset 0 0 20px rgba(200,169,110,.03);}
+  50%{box-shadow:0 0 20px rgba(200,169,110,.35),inset 0 0 30px rgba(200,169,110,.08);}
+}
+.contact-banner::before{
+  content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(200,169,110,.08),transparent);
+  animation:shimmer 4s ease-in-out infinite;
+}
+@keyframes shimmer{0%{left:-100%;}100%{left:200%;}}
+.contact-inner{display:flex;align-items:center;gap:10px;}
+.contact-pulse{
+  width:7px;height:7px;border-radius:50%;background:var(--green-bright);flex-shrink:0;
+  box-shadow:0 0 6px var(--green-bright);
+  animation:pulse 1.8s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.7);}}
+.contact-text{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;}
+.contact-line1,.contact-line2{font-size:11px;color:var(--text-dim);letter-spacing:.4px;white-space:nowrap;}
+.contact-sep{color:var(--text-muted);font-size:11px;}
+.contact-num{
+  font-family:'DM Mono',monospace;font-size:12px;font-weight:500;
+  color:var(--gold);letter-spacing:.5px;
+  text-decoration:none;
+  text-shadow:0 0 12px rgba(200,169,110,.5);
+  animation:numGlow 2.5s ease-in-out infinite;
+}
+@keyframes numGlow{
+  0%,100%{text-shadow:0 0 8px rgba(200,169,110,.4);}
+  50%{text-shadow:0 0 18px rgba(200,169,110,.9),0 0 30px rgba(200,169,110,.3);}
+}
+a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
+@media(max-width:900px){.contact-banner{margin:0 12px;padding:8px 12px;}.contact-sep{display:none;}.contact-text{flex-direction:column;gap:4px;align-items:flex-start;}}
+@media(max-width:600px){.contact-banner{display:none;}}
+.header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100;}
+.header-title{font-family:'Amiri',serif;font-size:22px;color:var(--gold);}
+.header-sub{font-size:10px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.header-right{display:flex;gap:10px;align-items:center;}
+.back-btn,.reset-btn{border:1px solid var(--border);color:var(--text-dim);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;transition:all .2s;background:var(--surface2);}
+.back-btn{display:none;}
+.back-btn:hover{color:var(--text);border-color:var(--gold-dim);}
+.back-btn.visible{display:block;}
+.reset-btn{color:#8b3a3a;border-color:#3a1a1a;}
+.reset-btn:hover{color:#c05050;border-color:var(--red);background:#1a0a0a;}
+.export-btn{background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;transition:all .2s;}
+.export-btn:hover{background:#1a1500;border-color:var(--gold);}
+.import-btn{background:var(--surface2);border:1px solid var(--purple);color:var(--purple-bright);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;transition:all .2s;}
+.import-btn:hover{background:#1a102a;border-color:var(--purple-bright);}
+
+/* ── Modal ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:999;align-items:center;justify-content:center;}
+.modal-overlay.active{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--red);border-radius:10px;padding:32px;max-width:380px;width:90%;text-align:center;}
+.modal h3{font-family:'Instrument Serif',serif;font-size:22px;color:#c05050;margin-bottom:10px;}
+.modal p{font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:24px;}
+.modal-btns{display:flex;gap:10px;}
+.modal-cancel{flex:1;padding:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;}
+.modal-cancel:hover{border-color:var(--gold-dim);color:var(--text);}
+.modal-confirm{flex:1;padding:10px;background:#3a1010;border:1px solid var(--red);color:#c05050;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1px;}
+.modal-confirm:hover{background:#5a1515;color:#e07070;}
+/* Support Modal */
+.support-modal{border-color:var(--gold-dim);}
+.support-modal h3{color:var(--gold);}
+.support-bkash{background:var(--surface2);border:1px solid var(--gold-dim);border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;font-family:'DM Mono',monospace;}
+.support-bkash .num{font-size:16px;color:var(--gold);letter-spacing:1px;text-shadow:0 0 12px rgba(200,169,110,.5);}
+.support-bkash .lbl{font-size:10px;color:var(--text-muted);margin-top:4px;letter-spacing:1px;}
+.support-btns{display:flex;flex-direction:column;gap:8px;}
+.btn-donate{padding:12px;background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid var(--gold);color:var(--gold);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1px;transition:all .2s;}
+.btn-donate:hover{background:linear-gradient(135deg,#2a2000,#3a3000);box-shadow:0 0 16px rgba(200,169,110,.2);}
+.btn-later{padding:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;transition:all .2s;}
+.btn-later:hover{border-color:var(--gold-dim);color:var(--text);}
+.btn-never{padding:8px;background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-decoration:underline;opacity:.6;}
+.btn-never:hover{opacity:1;color:var(--text-dim);}
+.import-drop{border:2px dashed var(--border);border-radius:var(--radius);padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px;color:var(--text-dim);font-size:12px;line-height:1.8;}
+.import-drop:hover,.import-drop.dragover{border-color:var(--purple-bright);background:#1a102a;color:var(--purple-bright);}
+.import-meta{font-size:11px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;background:var(--surface2);padding:10px 12px;border-radius:4px;display:none;}
+.import-meta.visible{display:block;}
+
+/* ── Views ── */
+.view{display:none;padding:32px;max-width:1260px;margin:0 auto;}
+.view.active{display:block;}
+
+/* ── Calendar ── */
+.year-label{font-family:'Instrument Serif',serif;font-size:48px;color:var(--text-dim);margin-bottom:24px;letter-spacing:-2px;}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;}
+.stat-num{font-family:'Instrument Serif',serif;font-size:32px;color:var(--gold);}
+.stat-num.green{color:var(--green-bright);}
+.stat-num.purple{color:var(--purple-bright);}
+.stat-label{font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
+
+.months-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+.month-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;}
+.month-name{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.day-header{text-align:center;font-size:9px;color:var(--text-muted);letter-spacing:1px;padding-bottom:6px;}
+.day-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;transition:all .15s;position:relative;background:var(--surface2);border:1px solid transparent;}
+.day-cell:hover{border-color:var(--gold-dim);background:#252925;}
+.day-cell.empty{background:transparent;cursor:default;border:none;}
+.day-cell.today{border-color:var(--gold)!important;box-shadow:0 0 0 1px var(--gold-dim);}
+.day-cell.future{opacity:.3;cursor:not-allowed;}
+.day-cell.perfect{background:#182a1c;border-color:var(--green)!important;}
+.day-cell.perfect .day-num{color:var(--green-bright);}
+.day-cell.best-day{background:#2a1e0a;border-color:var(--gold)!important;}
+.day-cell.best-day .day-num{color:var(--gold);}
+.day-num{font-size:12px;color:var(--text-dim);line-height:1;font-weight:600;letter-spacing:.3px;}
+.day-pct{
+  font-size:10px;font-weight:700;margin-top:4px;line-height:1;letter-spacing:.3px;
+  color:var(--text-muted);
+}
+.day-pct.pct-low{color:#5a4f38;font-size:9px;}
+.day-pct.pct-mid{color:#c8a96e;}
+.day-pct.pct-high{color:#6aab7a;}
+.day-pct.pct-full{color:#8be0a0;text-shadow:0 0 8px rgba(106,171,122,.7);}
+
+/* ── Daily View ── */
+.daily-header{display:flex;align-items:baseline;gap:16px;margin-bottom:8px;flex-wrap:wrap;}
+.daily-date{font-family:'Instrument Serif',serif;font-size:36px;color:var(--text);letter-spacing:-1px;}
+.daily-pct-display{font-size:16px;color:var(--gold);}
+.daily-bonus-display{font-size:13px;color:var(--purple-bright);}
+.daily-total-display{font-size:13px;color:#888;margin-left:2px;}
+.progress-track{height:5px;background:var(--surface2);border-radius:3px;margin-bottom:6px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold));border-radius:3px;transition:width .4s ease;}
+.bonus-track{height:3px;background:var(--surface2);border-radius:2px;margin-bottom:4px;overflow:hidden;}
+.bonus-fill{height:100%;background:var(--purple-bright);border-radius:2px;transition:width .3s ease;}
+.track-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);margin-bottom:24px;}
+.track-labels .bonus-side{color:var(--purple-bright);}
+
+/* ── Section Labels ── */
+.section-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;margin-top:28px;padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.bonus-tag{font-size:8px;letter-spacing:1px;color:var(--purple-bright);background:#1a102a;border:1px solid var(--purple);padding:2px 8px;border-radius:10px;}
+
+/* ── Goal Cards ── */
+.goals-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.goal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;transition:border-color .2s;}
+.goal-card.completed{border-color:var(--green);}
+.goal-card.partial{border-color:var(--gold-dim);}
+.goal-card.bonus-card{border-color:#2a1a3a;}
+.goal-card.bonus-active{border-color:var(--purple)!important;}
+.goal-card.full{grid-column:1/-1;}
+.goal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.goal-name{font-size:12px;color:var(--text);letter-spacing:.5px;}
+.weight-hint{font-size:9px;color:var(--text-muted);font-weight:300;margin-left:4px;}
+.goal-pct-badge{font-size:10px;color:var(--text-muted);background:var(--surface2);padding:2px 7px;border-radius:3px;white-space:nowrap;}
+.goal-pct-badge.done{color:var(--green-bright);}
+.goal-pct-badge.bonus{color:var(--purple-bright);background:#1a102a;}
+
+/* ── Inputs ── */
+input[type="number"],input[type="text"],textarea,select{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius);padding:8px 11px;font-family:'DM Mono',monospace;font-size:12px;outline:none;width:100%;transition:border-color .2s;}
+input:focus,textarea:focus,select:focus{border-color:var(--gold-dim);}
+select option{background:#1c1f1c;}
+
+/* ── Yes/No ── */
+.yn-group{display:flex;gap:8px;}
+.yn-btn{flex:1;padding:9px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;text-align:center;transition:all .15s;}
+.yn-btn:hover{border-color:var(--gold-dim);}
+.yn-btn.yes.active{background:#1a3020;border-color:var(--green-bright);color:var(--green-bright);}
+.yn-btn.no.active{background:#2a1515;border-color:var(--red);color:#c05050;}
+
+/* ── Salah ── */
+.salah-hint{font-size:9px;color:var(--text-muted);margin-bottom:10px;line-height:1.6;background:var(--surface2);padding:7px 10px;border-radius:4px;}
+.salah-grid{display:flex;flex-direction:column;gap:9px;}
+.salah-row{display:flex;align-items:center;gap:8px;}
+.salah-name{width:72px;font-size:11px;color:var(--text-dim);flex-shrink:0;}
+.salah-options{display:flex;gap:6px;flex:1;}
+.salah-opt{flex:1;padding:8px 4px;text-align:center;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.3px;transition:all .15s;}
+.salah-opt:hover{border-color:var(--gold-dim);}
+.salah-opt.jamaah.active  {background:#1a3020;border-color:var(--green-bright);color:var(--green-bright);}
+.salah-opt.munfarid.active{background:#1a2818;border-color:var(--green);color:#7ab88a;}
+.salah-opt.qaza.active    {background:#2a2010;border-color:#8a6030;color:#c09050;}
+.salah-opt.missed.active  {background:#2a1515;border-color:var(--red);color:#c05050;}
+
+/* ── Layout Helpers ── */
+.num-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.num-row input{flex:1;}
+.of-label{font-size:11px;color:var(--text-muted);white-space:nowrap;}
+.sub-label{font-size:10px;color:var(--text-muted);margin-top:6px;line-height:1.6;}
+.quran-row{display:flex;gap:8px;margin-bottom:6px;}
+.quran-row select{flex:1;}
+.net-sub{display:flex;flex-direction:column;gap:9px;}
+.net-sub-row{display:flex;align-items:center;gap:8px;}
+.net-sub-label{font-size:11px;color:var(--text-dim);flex:1;}
+.yn-mini{display:flex;gap:6px;width:130px;flex-shrink:0;}
+.yn-mini .yn-btn{padding:7px 4px;font-size:10px;}
+
+/* ── Save ── */
+.save-btn{margin-top:28px;width:100%;padding:15px;background:var(--green);border:none;border-radius:var(--radius);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.save-btn:hover{background:var(--green-bright);color:#0d0f0e;}
+#savedToast{display:none;text-align:center;margin-top:10px;font-size:11px;color:var(--green-bright);letter-spacing:1px;}
+
+/* ── Responsive ── */
+@media(max-width:900px){.months-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.months-grid{grid-template-columns:1fr;}.goals-grid{grid-template-columns:1fr;}.stats-row{grid-template-columns:repeat(2,1fr);}.view{padding:16px;}.header{padding:14px 16px;}}
+
+/* ── Quran Reader ── */
+.quran-reader-overlay{
+  display:none;position:fixed;inset:0;z-index:2000;
+  background:#0a0c0a;flex-direction:column;
+}
+.quran-reader-overlay.active{display:flex;}
+.qr-topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 20px;background:#0f110f;border-bottom:1px solid var(--border);
+  flex-shrink:0;gap:12px;
+}
+.qr-title{font-family:'Amiri',serif;font-size:16px;color:var(--gold);}
+.qr-info{font-size:11px;color:var(--text-dim);letter-spacing:.5px;}
+.qr-close{
+  background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);
+  padding:6px 14px;border-radius:var(--radius);cursor:pointer;
+  font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;transition:all .2s;
+}
+.qr-close:hover{border-color:#c05050;color:#c05050;}
+.qr-canvas-wrap{
+  flex:1;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:#111311;position:relative;
+}
+canvas#qrCanvas{
+  max-width:100%;max-height:100%;object-fit:contain;
+  box-shadow:0 0 40px rgba(0,0,0,.8);
+}
+.qr-bottombar{
+  display:flex;align-items:center;justify-content:center;
+  gap:16px;padding:12px 20px;background:#0f110f;border-top:1px solid var(--border);
+  flex-shrink:0;
+}
+.qr-nav{
+  background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);
+  padding:8px 20px;border-radius:var(--radius);cursor:pointer;
+  font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1px;transition:all .2s;
+}
+.qr-nav:hover:not(:disabled){border-color:var(--gold-dim);color:var(--gold);}
+.qr-nav:disabled{opacity:.3;cursor:not-allowed;}
+.qr-page-display{
+  font-family:'DM Mono',monospace;font-size:13px;color:var(--text);
+  min-width:140px;text-align:center;letter-spacing:.5px;
+}
+.qr-session-info{
+  font-size:10px;color:var(--purple-bright);letter-spacing:.5px;
+  text-align:center;padding:4px 0 0;
+}
+.qr-loading{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:#111311;color:var(--text-dim);font-size:12px;letter-spacing:1px;
+  font-family:'DM Mono',monospace;
+}
+.qr-open-btn{
+  margin-top:10px;width:100%;padding:10px;
+  background:linear-gradient(135deg,#0f1a12,#1a2a1a);
+  border:1px solid var(--green);border-radius:var(--radius);
+  color:var(--green-bright);cursor:pointer;font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:1px;transition:all .2s;
+}
+.qr-open-btn:hover{background:linear-gradient(135deg,#152010,#253525);box-shadow:0 0 12px rgba(74,124,89,.2);}
+.qr-session-badge{
+  margin-top:8px;font-size:10px;color:var(--text-muted);letter-spacing:.5px;
+  background:var(--surface2);padding:5px 8px;border-radius:3px;line-height:1.6;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">محاسبة</div>
+    <div class="header-sub">Muhasabah — Daily Tracker 2026</div>
+  </div>
+  <div class="contact-banner">
+    <div class="contact-inner">
+      <span class="contact-pulse"></span>
+      <div class="contact-text">
+        <span class="contact-line1">🐛 Found A Bug? &nbsp;<a class="contact-num" href="https://wa.me/8801829624608">WhatsApp 01829624608</a></span>
+        <span class="contact-sep">·</span>
+        <span class="contact-line2">❤️ Support Development &nbsp;<span class="contact-num">bKash / Nagad 01829624608</span></span>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="back-btn" id="backBtn" onclick="showCalendar()">← Calendar</button>
+    <button class="export-btn" onclick="exportData()">↑ Export</button>
+    <button class="import-btn" onclick="openImportModal()">↓ Import</button>
+    <button class="reset-btn" onclick="openResetModal()">Reset All Data</button>
+  </div>
+</div>
+
+<!-- Reset Modal -->
+<div class="modal-overlay" id="resetModal">
+  <div class="modal">
+    <h3>⚠ Reset Everything?</h3>
+    <p>This permanently deletes <strong>all</strong> tracked data for 2026 — every day, every goal, every note. Cannot be undone.</p>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeResetModal()">Cancel — Keep Data</button>
+      <button class="modal-confirm" onclick="confirmReset()">Yes, Delete All</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal" style="max-width:440px;">
+    <h3 style="color:var(--purple-bright);">↑ Import Data</h3>
+    <p>Load a previously exported <code style="color:var(--gold);font-size:11px;">Muhasabah.json</code> file. Your current data will be merged — imported days overwrite matching local days, but days only on this device are kept.</p>
+    <div class="import-drop" id="importDrop" onclick="document.getElementById('importFileInput').click()">
+      Drop Your JSON File Here<br>
+      <span style="font-size:10px;color:var(--text-muted);">Or Click To Browse</span>
+      <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="handleImportFile(this)">
+    </div>
+    <div class="import-meta" id="importMeta"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeImportModal()">Cancel</button>
+      <button class="modal-confirm" id="importConfirmBtn" style="background:#1a102a;border-color:var(--purple);color:var(--purple-bright);display:none;" onclick="confirmImport()">Import & Merge</button>
+    </div>
+  </div>
+</div>
+<!-- Support Modal -->
+<div class="modal-overlay" id="supportModal">
+  <div class="modal support-modal">
+    <h3>❤️ Enjoying Muhasabah?</h3>
+    <p>This tracker is free and always will be. If it's helping your daily practice, consider supporting its development.</p>
+    <div class="support-bkash">
+      <div class="num">01829624608</div>
+      <div class="lbl" style="color:var(--text-dim);">bKash &nbsp;·&nbsp; Nagad</div>
+    </div>
+    <div class="support-btns">
+      <button class="btn-donate" onclick="supportDonate()">💛 I'll Donate</button>
+      <button class="btn-later" onclick="supportLater()">Remind Me In 7 Days</button>
+      <button class="btn-never" onclick="supportNever()">Never Show This Again</button>
+    </div>
+  </div>
+</div>
+
+<div class="view active" id="calendarView">
+  <div class="year-label">2026</div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="streakNum">0</div><div class="stat-label">🔥 Current Streak</div></div>
+    <div class="stat-card"><div class="stat-num green" id="bestStreakNum">0</div><div class="stat-label">⭐ Best Streak</div></div>
+    <div class="stat-card"><div class="stat-num" id="totalDaysNum">0</div><div class="stat-label">📅 Days Logged</div></div>
+    <div class="stat-card"><div class="stat-num purple" id="bestDayLabel">—</div><div class="stat-label">🏆 Best Day</div></div>
+  </div>
+  <div class="months-grid" id="monthsGrid"></div>
+</div>
+
+<!-- ═══════════ DAILY VIEW ═══════════ -->
+<div class="view" id="dailyView">
+  <div class="daily-header">
+    <div class="daily-date" id="dailyDateLabel">—</div>
+    <div class="daily-pct-display" id="dailyPctLabel">0%</div>
+    <div class="daily-bonus-display" id="dailyBonusLabel"></div>
+    <div class="daily-total-display" id="dailyTotalLabel"></div>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="bonus-track"><div class="bonus-fill" id="bonusFill" style="width:0%"></div></div>
+  <div class="track-labels"><span>Core Score (Max 100%)</span><span class="bonus-side">Bonus Track</span></div>
+
+  <!-- ══ Ibadah Core ══ -->
+  <div class="section-label">Ibadah — Core Goals</div>
+  <div class="goals-grid">
+
+    <!-- Salah 15% -->
+    <div class="goal-card full" id="card-salah">
+      <div class="goal-top">
+        <div class="goal-name">🕌 Salah <span class="weight-hint">(15% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-salah">0%</div>
+      </div>
+      <div class="salah-hint">
+        Jamā'ah = 100% &nbsp;·&nbsp; Munfarid = 75% &nbsp;·&nbsp; Qadhā = 25% &nbsp;·&nbsp; Missed = 0%<br>
+        Each Of The 5 Prayers Contributes 3% To Core Score &nbsp;·&nbsp; All 5 Jamā'ah = Full 15%
+      </div>
+      <div class="salah-grid" id="salahGrid"></div>
+    </div>
+
+    <!-- Quran 10% -->
+    <div class="goal-card" id="card-quran">
+      <div class="goal-top">
+        <div class="goal-name">📖 Quran <span class="weight-hint">(10% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-quran">0%</div>
+      </div>
+      <div class="quran-row">
+        <select id="quranJuzz" onchange="saveAndRefresh()"><option value="">Starting Juzz?</option></select>
+        <select id="quranQuarter" onchange="saveAndRefresh()">
+          <option value="0">No Recitation</option>
+          <option value="0.25">1/4 Juzz</option>
+          <option value="0.5">2/4 Juzz</option>
+          <option value="0.75">3/4 Juzz</option>
+          <option value="1">Full Juzz ✓ (Goal)</option>
+          <option value="1.25">1 Juzz 1/4 (+1.25% Bonus)</option>
+          <option value="1.5">1 Juzz 2/4 (+2.5% Bonus)</option>
+          <option value="1.75">1 Juzz 3/4 (+3.75% Bonus)</option>
+          <option value="2">2 Full Juzz (+5% Bonus)</option>
+          <option value="2.25">2 Juzz 1/4 (+6.25% Bonus)</option>
+          <option value="2.5">2 Juzz 2/4 (+7.5% Bonus)</option>
+          <option value="2.75">2 Juzz 3/4 (+8.75% Bonus)</option>
+          <option value="3">3 Full Juzz (+10% Bonus)</option>
+          <option value="3.25">3 Juzz 1/4 (+11.25% Bonus)</option>
+          <option value="3.5">3 Juzz 2/4 (+12.5% Bonus)</option>
+          <option value="3.75">3 Juzz 3/4 (+13.75% Bonus)</option>
+          <option value="4">4 Full Juzz (+15% Bonus)</option>
+          <option value="4.25">4 Juzz 1/4 (+16.25% Bonus)</option>
+          <option value="4.5">4 Juzz 2/4 (+17.5% Bonus)</option>
+          <option value="4.75">4 Juzz 3/4 (+18.75% Bonus)</option>
+          <option value="5">5 Full Juzz (+20% Bonus)</option>
+          <option value="5.25">5 Juzz 1/4 (+21.25% Bonus)</option>
+          <option value="5.5">5 Juzz 2/4 (+22.5% Bonus)</option>
+          <option value="5.75">5 Juzz 3/4 (+23.75% Bonus)</option>
+          <option value="6">6 Full Juzz (+25% Bonus)</option>
+          <option value="6.25">6 Juzz 1/4 (+26.25% Bonus)</option>
+          <option value="6.5">6 Juzz 2/4 (+27.5% Bonus)</option>
+          <option value="6.75">6 Juzz 3/4 (+28.75% Bonus)</option>
+          <option value="7">7 Full Juzz (+30% Bonus)</option>
+          <option value="7.25">7 Juzz 1/4 (+31.25% Bonus)</option>
+          <option value="7.5">7 Juzz 2/4 (+32.5% Bonus)</option>
+          <option value="7.75">7 Juzz 3/4 (+33.75% Bonus)</option>
+          <option value="8">8 Full Juzz (+35% Bonus)</option>
+          <option value="8.25">8 Juzz 1/4 (+36.25% Bonus)</option>
+          <option value="8.5">8 Juzz 2/4 (+37.5% Bonus)</option>
+          <option value="8.75">8 Juzz 3/4 (+38.75% Bonus)</option>
+          <option value="9">9 Full Juzz (+40% Bonus)</option>
+          <option value="9.25">9 Juzz 1/4 (+41.25% Bonus)</option>
+          <option value="9.5">9 Juzz 2/4 (+42.5% Bonus)</option>
+          <option value="9.75">9 Juzz 3/4 (+43.75% Bonus)</option>
+          <option value="10">10 Full Juzz (+45% Bonus)</option>
+        </select>
+      </div>
+      <div class="sub-label">Goal: 1 Juzz/Day = Full 10% Core &nbsp;·&nbsp; Every Extra Juzz = +5% Bonus &nbsp;·&nbsp; Quarters Proportional</div>
+      <button class="qr-open-btn" onclick="openQuranReader()">📖 Open Quran Reader — Resume From Last Page</button>
+      <div class="qr-session-badge" id="quranSessionBadge" style="display:none;"></div>
+    </div>
+
+    <!-- Tahajjud 10% -->
+    <div class="goal-card" id="card-tahajjud">
+      <div class="goal-top">
+        <div class="goal-name">🌙 Tahajjud <span class="weight-hint">(10% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-tahajjud">0%</div>
+      </div>
+      <div class="num-row">
+        <input type="number" id="tahajjudRakat" min="0" placeholder="0" oninput="saveAndRefresh()">
+        <span class="of-label">Rakat &nbsp;/&nbsp; 4 Goal</span>
+      </div>
+      <div class="sub-label">Goal: 4 Rakat = Full 10% Core &nbsp;·&nbsp; Every Extra 4 Rakat = +5% Bonus</div>
+    </div>
+
+    <!-- Zikr 5% -->
+    <div class="goal-card" id="card-zikr">
+      <div class="goal-top">
+        <div class="goal-name">📿 Zikr <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-zikr">0%</div>
+      </div>
+      <div class="num-row">
+        <input type="number" id="zikrCount" min="0" placeholder="0" oninput="saveAndRefresh()">
+        <span class="of-label">/ 1500 Goal</span>
+      </div>
+      <div class="sub-label">Goal: 1500 = Full 5% Core &nbsp;·&nbsp; Every Extra 1500 = +2.5% Bonus</div>
+    </div>
+
+    <!-- Hadith 5% -->
+    <div class="goal-card" id="card-hadith">
+      <div class="goal-top">
+        <div class="goal-name">📚 Hadith <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-hadith">0%</div>
+      </div>
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="hadith" data-val="yes" onclick="setYN('hadith','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="hadith" data-val="no"  onclick="setYN('hadith','no')">No</button>
+      </div>
+    </div>
+
+    <!-- Tafsir 5% -->
+    <div class="goal-card" id="card-tafsir">
+      <div class="goal-top">
+        <div class="goal-name">🔍 Tafsir <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-tafsir">0%</div>
+      </div>
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="tafsir" data-val="yes" onclick="setYN('tafsir','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="tafsir" data-val="no"  onclick="setYN('tafsir','no')">No</button>
+      </div>
+    </div>
+
+    <!-- Asmaul Husna 5% -->
+    <div class="goal-card" id="card-asmaul">
+      <div class="goal-top">
+        <div class="goal-name">🌿 Asmaul Husna <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-asmaul">0%</div>
+      </div>
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="asmaul" data-val="yes" onclick="setYN('asmaul','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="asmaul" data-val="no"  onclick="setYN('asmaul','no')">No</button>
+      </div>
+    </div>
+
+    <!-- Zikr Morning 5% -->
+    <div class="goal-card" id="card-zikrMorning">
+      <div class="goal-top">
+        <div class="goal-name">☀️ Zikr Morning <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-zikrMorning">0%</div>
+      </div>
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="zikrMorning" data-val="yes" onclick="setYN('zikrMorning','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="zikrMorning" data-val="no"  onclick="setYN('zikrMorning','no')">No</button>
+      </div>
+    </div>
+
+    <!-- Zikr Evening 5% -->
+    <div class="goal-card" id="card-zikrEvening">
+      <div class="goal-top">
+        <div class="goal-name">🌆 Zikr Evening <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-zikrEvening">0%</div>
+      </div>
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="zikrEvening" data-val="yes" onclick="setYN('zikrEvening','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="zikrEvening" data-val="no"  onclick="setYN('zikrEvening','no')">No</button>
+      </div>
+    </div>
+
+    <!-- Surah Al-Waqiah 5% -->
+    <div class="goal-card" id="card-surahWaqiah">
+      <div class="goal-top">
+        <div class="goal-name">📜 Surah Al-Waqiah <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-surahWaqiah">0%</div>
+      </div>
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="surahWaqiah" data-val="yes" onclick="setYN('surahWaqiah','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="surahWaqiah" data-val="no"  onclick="setYN('surahWaqiah','no')">No</button>
+      </div>
+    </div>
+
+    <!-- Surah Al-Mulk 5% -->
+    <div class="goal-card" id="card-surahMulk">
+      <div class="goal-top">
+        <div class="goal-name">📜 Surah Al-Mulk <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-surahMulk">0%</div>
+      </div>
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="surahMulk" data-val="yes" onclick="setYN('surahMulk','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="surahMulk" data-val="no"  onclick="setYN('surahMulk','no')">No</button>
+      </div>
+    </div>
+
+  </div><!-- /ibadah -->
+
+  <!-- ══ Bonus Ibadah ══ -->
+  <div class="section-label">
+    Bonus Ibadah
+    <span class="bonus-tag">✦ Bonus — Adds On Top Of Core Score</span>
+  </div>
+  <div class="goals-grid">
+
+    <!-- Sawm +10% bonus -->
+    <div class="goal-card bonus-card" id="card-sawm">
+      <div class="goal-top">
+        <div class="goal-name">🌙 Sawm — Fast <span class="weight-hint">(Bonus)</span></div>
+        <div class="goal-pct-badge bonus" id="pct-sawm">+0%</div>
+      </div>
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="sawm" data-val="yes" onclick="setYN('sawm','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="sawm" data-val="no"  onclick="setYN('sawm','no')">No</button>
+      </div>
+      <div class="sub-label">+10% Bonus For Fasting Today</div>
+    </div>
+
+    <!-- Sunnah Salah +10% max -->
+    <div class="goal-card bonus-card" id="card-sunnahSalah">
+      <div class="goal-top">
+        <div class="goal-name">🌿 Sunnah Salah <span class="weight-hint">(Bonus)</span></div>
+        <div class="goal-pct-badge bonus" id="pct-sunnahSalah">+0%</div>
+      </div>
+      <div class="num-row">
+        <input type="number" id="sunnahRakat" min="0" placeholder="0" oninput="saveAndRefresh()">
+        <span class="of-label">Rakat &nbsp;/&nbsp; 50 Max</span>
+      </div>
+      <div class="sub-label">+0.2% Per Rakat &nbsp;·&nbsp; Max +10% At 50 Rakat</div>
+    </div>
+
+    <!-- Nafl Salah +10% max -->
+    <div class="goal-card bonus-card" id="card-naflSalah">
+      <div class="goal-top">
+        <div class="goal-name">✨ Nafl Salah <span class="weight-hint">(Bonus)</span></div>
+        <div class="goal-pct-badge bonus" id="pct-naflSalah">+0%</div>
+      </div>
+      <div class="num-row">
+        <input type="number" id="naflRakat" min="0" placeholder="0" oninput="saveAndRefresh()">
+        <span class="of-label">Rakat &nbsp;/&nbsp; 50 Max</span>
+      </div>
+      <div class="sub-label">+0.2% Per Rakat &nbsp;·&nbsp; Max +10% At 50 Rakat</div>
+    </div>
+
+    <!-- Zikr From Book +10% max -->
+    <div class="goal-card bonus-card" id="card-zikrBook">
+      <div class="goal-top">
+        <div class="goal-name">📖 Zikr From Book <span class="weight-hint">(Bonus)</span></div>
+        <div class="goal-pct-badge bonus" id="pct-zikrBook">+0%</div>
+      </div>
+      <div class="num-row">
+        <input type="number" id="zikrBookPages" min="0" max="56" placeholder="0" oninput="saveAndRefresh()">
+        <span class="of-label">Pages &nbsp;/&nbsp; 56 Total</span>
+      </div>
+      <div class="sub-label">Max +10% At 56 Pages &nbsp;·&nbsp; ~+0.18% Per Page</div>
+    </div>
+
+    <!-- Sadaqah +10% max -->
+    <div class="goal-card bonus-card" id="card-sadaqah">
+      <div class="goal-top">
+        <div class="goal-name">💛 Sadaqah <span class="weight-hint">(Bonus)</span></div>
+        <div class="goal-pct-badge bonus" id="pct-sadaqah">+0%</div>
+      </div>
+      <div class="num-row">
+        <input type="number" id="sadaqahUnits" min="0" placeholder="0" oninput="saveAndRefresh()">
+        <span class="of-label">Units Donated</span>
+      </div>
+      <div class="sub-label">Max +10% At 50,000 Units &nbsp;·&nbsp; Scales Proportionally</div>
+    </div>
+
+  </div><!-- /bonus ibadah -->
+
+  <!-- ══ Growth & Development ══ -->
+  <div class="section-label">Growth &amp; Development — Core Goals</div>
+  <div class="goals-grid">
+
+    <!-- Exercise 5% -->
+    <div class="goal-card" id="card-exercise">
+      <div class="goal-top">
+        <div class="goal-name">🏃 Exercise <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-exercise">0%</div>
+      </div>
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="exercise" data-val="yes" onclick="setYN('exercise','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="exercise" data-val="no"  onclick="setYN('exercise','no')">No</button>
+      </div>
+    </div>
+
+    <!-- Book 5% -->
+    <div class="goal-card" id="card-books">
+      <div class="goal-top">
+        <div class="goal-name">📕 Book <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-books">0%</div>
+      </div>
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="books" data-val="yes" onclick="setYN('books','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="books" data-val="no"  onclick="setYN('books','no')">No</button>
+      </div>
+    </div>
+
+    <!-- Language 5% -->
+    <div class="goal-card" id="card-language">
+      <div class="goal-top">
+        <div class="goal-name">🗣 Language <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-language">0%</div>
+      </div>
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="language" data-val="yes" onclick="setYN('language','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="language" data-val="no"  onclick="setYN('language','no')">No</button>
+      </div>
+    </div>
+
+    <!-- Writing 5% -->
+    <div class="goal-card" id="card-writing">
+      <div class="goal-top">
+        <div class="goal-name">✍️ Writing <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-writing">0%</div>
+      </div>
+      <div class="net-sub">
+        <div class="net-sub-row">
+          <span class="net-sub-label">LinkedIn Post <span class="weight-hint">(2.5%)</span></span>
+          <div class="yn-mini">
+            <button class="yn-btn yes" data-key="writingLinkedin" data-val="yes" onclick="setYN('writingLinkedin','yes')">Yes</button>
+            <button class="yn-btn no"  data-key="writingLinkedin" data-val="no"  onclick="setYN('writingLinkedin','no')">No</button>
+          </div>
+        </div>
+        <div class="net-sub-row">
+          <span class="net-sub-label">Facebook Post <span class="weight-hint">(2.5%)</span></span>
+          <div class="yn-mini">
+            <button class="yn-btn yes" data-key="writingFacebook" data-val="yes" onclick="setYN('writingFacebook','yes')">Yes</button>
+            <button class="yn-btn no"  data-key="writingFacebook" data-val="no"  onclick="setYN('writingFacebook','no')">No</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Networking 5% -->
+    <div class="goal-card" id="card-networking">
+      <div class="goal-top">
+        <div class="goal-name">🤝 Networking <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-networking">0%</div>
+      </div>
+      <div class="net-sub">
+        <div class="net-sub-row">
+          <span class="net-sub-label">Connected With 5+ People <span class="weight-hint">(2.5%)</span></span>
+          <div class="yn-mini">
+            <button class="yn-btn yes" data-key="netConnected" data-val="yes" onclick="setYN('netConnected','yes')">Yes</button>
+            <button class="yn-btn no"  data-key="netConnected" data-val="no"  onclick="setYN('netConnected','no')">No</button>
+          </div>
+        </div>
+        <div class="net-sub-row">
+          <span class="net-sub-label">Commented On 5+ Posts <span class="weight-hint">(2.5%)</span></span>
+          <div class="yn-mini">
+            <button class="yn-btn yes" data-key="netCommented" data-val="yes" onclick="setYN('netCommented','yes')">Yes</button>
+            <button class="yn-btn no"  data-key="netCommented" data-val="no"  onclick="setYN('netCommented','no')">No</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /growth -->
+
+  <button class="save-btn" onclick="saveDayAndExport()">Save Day</button>
+  <div id="savedToast">✓ Saved</div>
+  <div style="height:52px"></div>
+</div><!-- /dailyView -->
+
+<!-- ══ Quran Reader Overlay ══ -->
+<div class="quran-reader-overlay" id="quranReaderOverlay">
+  <div class="qr-topbar">
+    <div>
+      <div class="qr-title">القرآن الكريم — نورانی حافظی</div>
+      <div class="qr-info" id="qrInfoBar">Emdadia Hafezi Edition</div>
+    </div>
+    <div class="qr-session-info" id="qrSessionInfo"></div>
+    <button class="qr-close" onclick="closeQuranReader()">✕ Close & Save</button>
+  </div>
+  <div class="qr-canvas-wrap">
+    <div class="qr-loading" id="qrLoading">Loading Quran…</div>
+    <canvas id="qrCanvas"></canvas>
+  </div>
+  <div class="qr-bottombar">
+    <button class="qr-nav" id="qrPrev" onclick="qrChangePage(-1)">← Prev</button>
+    <div class="qr-page-display" id="qrPageDisplay">Page — / —</div>
+    <button class="qr-nav" id="qrNext" onclick="qrChangePage(1)">Next →</button>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   CORE WEIGHTS — Total = 100%
+   ──────────────────────────────────────────────────────────
+   Salah          15%  (5 prayers × 3%: jamaah=3, munfarid=2.25, qaza=0.75, missed=0)
+   Quran          10%  goal=1 juzz; extra juzz = +5% bonus each (quarters proportional)
+   Tahajjud       10%  goal=4 rakat; every extra 4 rakat = +5% bonus
+   Zikr            5%  goal=1500; every extra 1500 = +2.5% bonus
+   Hadith          5%  goal=5; every extra 5 hadiths = +2.5% bonus
+   Tafsir          5%  yes/no
+   Asmaul Husna    5%  yes/no
+   Zikr Morning    5%  yes/no
+   Zikr Evening    5%  yes/no
+   Surah Waqiah    5%  yes/no
+   Surah Mulk      5%  yes/no
+   Exercise        5%  yes/no
+   Books           5%  yes/no
+   Language        5%  yes/no
+   Writing         5%  (LinkedIn 2.5% + Facebook 2.5%)
+   Networking      5%  (Connected 2.5% + Commented 2.5%)
+   ──────────────────────────────────────────────────────────
+   TOTAL = 100%
+
+   BONUS (no cap per goal except where noted):
+   Sawm           +10% flat
+   Sunnah Salah   +0.2%/rakat, max +10% at 50 rakat
+   Nafl Salah     +0.2%/rakat, max +10% at 50 rakat
+   Quran extra    +5% per full extra juzz (quarters proportional)
+   Zikr extra     +2.5% per extra 1500 zikr
+   Hadith extra   +2.5% per extra 5 hadiths
+   Tahajjud extra +5% per extra 4 rakat
+   Zikr Book      +10% max at 56 pages
+   Sadaqah        +10% max at 50,000 units
+══════════════════════════════════════════════════════════ */
+
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS_SHORT=['Su','Mo','Tu','We','Th','Fr','Sa'];
+const SALAHS=['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+const SALAH_OPTS=[
+  {key:'jamaah',  label:"Jamā'ah", cls:'jamaah'},
+  {key:'munfarid',label:'Munfarid',cls:'munfarid'},
+  {key:'qaza',    label:'Qadhā',   cls:'qaza'},
+  {key:'missed',  label:'Missed',  cls:'missed'},
+];
+
+let currentDateKey=null;
+
+/* ══════════════════════════════════════════════════════════
+   QURAN READER
+   PDF: Imdadia-Hafezi-Quran.pdf (must be in same folder as HTML)
+   PDF page 1 = Cover, PDF page 2 = Quran page 1 (Fatiha)
+   PDF pages 2–613 = 612 Quran pages, page 614 = Index
+   Quran page N = PDF page N+1
+   30 juzz × ~20.4 pages each
+══════════════════════════════════════════════════════════ */
+const QR_PDF_PATH    = 'Imdadia-Hafezi-Quran.pdf';
+const QR_FIRST_PAGE  = 2;   // PDF page index of Quran page 1
+const QR_LAST_PAGE   = 613; // PDF page index of last Quran page
+const QR_TOTAL_QURAN = 612; // total Quran content pages
+const PAGES_PER_JUZZ = QR_TOTAL_QURAN / 30; // ~20.4
+
+let qrPdfDoc     = null;
+let qrCurPage    = 2;    // current PDF page number
+let qrStartPage  = null; // PDF page at session open
+let qrRendering  = false;
+let qrScale      = 1.5;
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+/* Convert PDF page number → Quran page number (1-based) */
+function pdfToQuranPage(pdfPage){ return pdfPage - 1; }
+
+/* Map pages read → juzz fraction (rounded to nearest 0.25) */
+function pagesReadToJuzz(pagesRead){
+  const raw = pagesRead / PAGES_PER_JUZZ;
+  return Math.round(raw * 4) / 4; // nearest quarter
+}
+
+/* Find the nearest option in quranQuarter select */
+function nearestQuarterOption(val){
+  const sel = document.getElementById('quranQuarter');
+  const opts = Array.from(sel.options).map(o=>parseFloat(o.value)||0);
+  let best = 0, bestDiff = Infinity;
+  opts.forEach((v,i)=>{const d=Math.abs(v-val);if(d<bestDiff){bestDiff=d;best=i;}});
+  return sel.options[best].value;
+}
+
+async function openQuranReader(){
+  const overlay = document.getElementById('quranReaderOverlay');
+  overlay.classList.add('active');
+  document.getElementById('qrLoading').style.display='flex';
+  document.getElementById('qrCanvas').style.display='none';
+
+  // Determine start page: resume from last saved position
+  const lastPage = await getQrLastPage();
+  qrCurPage = lastPage || QR_FIRST_PAGE;
+  qrStartPage = qrCurPage;
+
+  updateSessionInfo();
+
+  if(!qrPdfDoc){
+    try{
+      qrPdfDoc = await pdfjsLib.getDocument(QR_PDF_PATH).promise;
+    }catch(e){
+      document.getElementById('qrLoading').textContent =
+        '⚠ Could Not Load PDF — Make Sure Imdadia-Hafezi-Quran.pdf Is In The Same Folder As This HTML File';
+      return;
+    }
+  }
+  await qrRenderPage(qrCurPage);
+}
+
+async function qrRenderPage(pdfPageNum){
+  if(qrRendering) return;
+  qrRendering = true;
+  document.getElementById('qrLoading').style.display='flex';
+  document.getElementById('qrCanvas').style.display='none';
+
+  try{
+    const page = await qrPdfDoc.getPage(pdfPageNum);
+    const wrap = document.querySelector('.qr-canvas-wrap');
+    const maxW  = wrap.clientWidth  - 20;
+    const maxH  = wrap.clientHeight - 20;
+    const vp0   = page.getViewport({scale:1});
+    const scale = Math.min(maxW/vp0.width, maxH/vp0.height, 2.2);
+    const vp    = page.getViewport({scale});
+
+    const canvas  = document.getElementById('qrCanvas');
+    canvas.width  = vp.width;
+    canvas.height = vp.height;
+
+    await page.render({canvasContext:canvas.getContext('2d'), viewport:vp}).promise;
+
+    canvas.style.display='block';
+    document.getElementById('qrLoading').style.display='none';
+
+    const qPage = pdfToQuranPage(pdfPageNum);
+    const juzz  = Math.ceil(qPage / PAGES_PER_JUZZ);
+    document.getElementById('qrPageDisplay').textContent =
+      `Page ${qPage} / 612  ·  Juzz ${juzz}`;
+    document.getElementById('qrInfoBar').textContent =
+      `Emdadia Hafezi  ·  Quran Page ${qPage}  ·  Juzz ${Math.max(1,juzz)}`;
+
+    document.getElementById('qrPrev').disabled = pdfPageNum <= QR_FIRST_PAGE;
+    document.getElementById('qrNext').disabled = pdfPageNum >= QR_LAST_PAGE;
+
+    updateSessionInfo();
+    await setQrLastPage(pdfPageNum);
+  }catch(e){
+    document.getElementById('qrLoading').textContent='⚠ Error Rendering Page';
+  }
+  qrRendering = false;
+}
+
+async function qrChangePage(delta){
+  const next = qrCurPage + delta;
+  if(next < QR_FIRST_PAGE || next > QR_LAST_PAGE) return;
+  qrCurPage = next;
+  await qrRenderPage(qrCurPage);
+}
+
+function updateSessionInfo(){
+  if(!qrStartPage) return;
+  const pagesRead = Math.max(0, qrCurPage - qrStartPage);
+  const el = document.getElementById('qrSessionInfo');
+  if(pagesRead > 0){
+    const juzzRead = pagesReadToJuzz(pagesRead);
+    el.textContent = `This Session: ${pagesRead} page${pagesRead!==1?'s':''} read  ·  ≈ ${juzzRead.toFixed(2)} Juzz`;
+  } else {
+    el.textContent = 'Session started — start reading';
+  }
+}
+
+async function closeQuranReader(){
+  const overlay = document.getElementById('quranReaderOverlay');
+  overlay.classList.remove('active');
+
+  if(!qrStartPage || !currentDateKey) return;
+
+  const pagesRead = Math.max(0, qrCurPage - qrStartPage);
+  if(pagesRead === 0) return;
+
+  // Convert pages to juzz fraction and auto-fill the Quran goal
+  const juzzRead = pagesReadToJuzz(pagesRead);
+  const startQuranPage = pdfToQuranPage(qrStartPage);
+  const endQuranPage   = pdfToQuranPage(qrCurPage);
+  const startJuzz = Math.ceil(startQuranPage / PAGES_PER_JUZZ);
+
+  // Update selects
+  const juzzSel = document.getElementById('quranJuzz');
+  // Set starting juzz if not already set
+  if(!juzzSel.value) juzzSel.value = String(startJuzz);
+
+  const quarterSel = document.getElementById('quranQuarter');
+  // Only update if new reading is more than what's already recorded
+  const existing = parseFloat(quarterSel.value) || 0;
+  if(juzzRead > existing){
+    quarterSel.value = nearestQuarterOption(juzzRead);
+  }
+
+  // Save session range into day data
+  const dayData = {...getCached(currentDateKey)};
+  dayData.quranSessionStart = qrStartPage;
+  dayData.quranSessionEnd   = qrCurPage;
+  _cache[currentDateKey] = dayData;
+  await setStore(currentDateKey, dayData);
+
+  // Show session badge in card
+  const badge = document.getElementById('quranSessionBadge');
+  badge.style.display = 'block';
+  badge.innerHTML =
+    `📖 Last Session: Pages ${startQuranPage}–${endQuranPage} &nbsp;·&nbsp; ${pagesRead} pages &nbsp;·&nbsp; ≈ ${juzzRead.toFixed(2)} Juzz recorded`;
+
+  await saveAndRefresh();
+}
+
+/* IDB helpers for Quran reader last-page persistence (global, not per-day) */
+async function getQrLastPage(){
+  try{
+    const db = await openDB();
+    return new Promise((res)=>{
+      const tx = db.transaction(STORE,'readonly');
+      const req = tx.objectStore(STORE).get('_qr_lastpage');
+      req.onsuccess = ()=> res(req.result ? req.result.data : null);
+      req.onerror   = ()=> res(null);
+    });
+  }catch(e){ return null; }
+}
+
+async function setQrLastPage(pdfPageNum){
+  try{
+    const db = await openDB();
+    return new Promise((res,rej)=>{
+      const tx = db.transaction(STORE,'readwrite');
+      tx.objectStore(STORE).put({dk:'_qr_lastpage', data:pdfPageNum});
+      tx.oncomplete = ()=> res();
+      tx.onerror    = e => rej(e.target.error);
+    });
+  }catch(e){}
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   IndexedDB Storage Layer
+   DB: MuhasabahDB  |  Store: days  |  keyPath: dk
+══════════════════════════════════════════════════════════ */
+const DB_NAME='MuhasabahDB', DB_VER=1, STORE='days';
+let _db=null;
+
+function openDB(){
+  if(_db) return Promise.resolve(_db);
+  return new Promise((res,rej)=>{
+    const req=indexedDB.open(DB_NAME,DB_VER);
+    req.onupgradeneeded=e=>{
+      const db=e.target.result;
+      if(!db.objectStoreNames.contains(STORE))
+        db.createObjectStore(STORE,{keyPath:'dk'});
+    };
+    req.onsuccess=e=>{_db=e.target.result;res(_db);};
+    req.onerror=e=>rej(e.target.error);
+  });
+}
+
+async function getStore(dk){
+  const db=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(STORE,'readonly');
+    const req=tx.objectStore(STORE).get(dk);
+    req.onsuccess=()=>res(req.result?req.result.data:{});
+    req.onerror=e=>rej(e.target.error);
+  });
+}
+
+async function setStore(dk,data){
+  const db=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).put({dk,data});
+    tx.oncomplete=()=>res();
+    tx.onerror=e=>rej(e.target.error);
+  });
+}
+
+async function deleteStore(dk){
+  const db=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).delete(dk);
+    tx.oncomplete=()=>res();
+    tx.onerror=e=>rej(e.target.error);
+  });
+}
+
+async function getAllStoredData(){
+  const db=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(STORE,'readonly');
+    const req=tx.objectStore(STORE).getAll();
+    req.onsuccess=()=>{
+      const out={};
+      (req.result||[]).forEach(row=>{if(Object.keys(row.data).length>0)out[row.dk]=row.data;});
+      res(out);
+    };
+    req.onerror=e=>rej(e.target.error);
+  });
+}
+
+/* ── Migrate old localStorage data into IDB (runs once) ── */
+async function migrateFromLocalStorage(){
+  const migrated=localStorage.getItem('mhsb_migrated_idb');
+  if(migrated) return;
+  const prefix='mhsb_';
+  const keys=Object.keys(localStorage).filter(k=>k.startsWith(prefix)&&k!=='mhsb_migrated_idb');
+  if(keys.length===0){localStorage.setItem('mhsb_migrated_idb','1');return;}
+  for(const k of keys){
+    try{
+      const dk=k.slice(prefix.length);
+      const d=JSON.parse(localStorage.getItem(k));
+      if(d&&Object.keys(d).length>0) await setStore(dk,d);
+      localStorage.removeItem(k);
+    }catch(e){}
+  }
+  localStorage.setItem('mhsb_migrated_idb','1');
+}
+
+/* In-memory cache so synchronous scoring functions work after initial load */
+let _cache={};
+
+async function preloadCache(){
+  const db=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(STORE,'readonly');
+    const req=tx.objectStore(STORE).getAll();
+    req.onsuccess=()=>{
+      _cache={};
+      (req.result||[]).forEach(row=>{_cache[row.dk]=row.data;});
+      res();
+    };
+    req.onerror=e=>rej(e.target.error);
+  });
+}
+
+/* Sync wrappers used by scoring/calendar (reads from cache) */
+function getCached(dk){return _cache[dk]||{};}
+
+function todayKey(){const t=new Date();return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;}
+function mkDK(y,m,d){return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+function all2026Keys(toToday=true){
+  const today=todayKey(),keys=[];
+  for(let m=0;m<12;m++){const days=new Date(2026,m+1,0).getDate();for(let d=1;d<=days;d++){const dk=mkDK(2026,m,d);if(!toToday||dk<=today)keys.push(dk);}}
+  return keys;
+}
+
+/* ── Scoring ── */
+function scoreDay(data){
+  let core=0;
+
+  // Salah 15% (5 × 3%)
+  const salahs=data.salahs||{};
+  SALAHS.forEach(s=>{
+    const v=salahs[s]||'';
+    if(v==='jamaah')        core+=3;
+    else if(v==='munfarid') core+=2.25;
+    else if(v==='qaza')     core+=0.75;
+  });
+
+  // Quran 10% (goal = 1 juzz)
+  const qRaw=parseFloat(data.quranQuarter)||0;
+  core+=Math.min(qRaw*10,10);
+
+  // Tahajjud 10% (goal = 4 rakat)
+  const tah=parseInt(data.tahajjudRakat)||0;
+  core+=Math.min((tah/4)*10,10);
+
+  // Zikr 5% (goal = 1500)
+  const zikr=parseInt(data.zikrCount)||0;
+  core+=Math.min((zikr/1500)*5,5);
+
+  // Hadith 5% (yes/no)
+  if(data.hadith==='yes') core+=5;
+
+  // Yes/No core goals — 5% each
+  const yn=(k,w)=>{if(data[k]==='yes')core+=w;};
+  yn('tafsir',5); yn('asmaul',5); yn('zikrMorning',5); yn('zikrEvening',5);
+  yn('surahWaqiah',5); yn('surahMulk',5);
+  yn('exercise',5); yn('books',5); yn('language',5);
+  yn('writingLinkedin',2.5); yn('writingFacebook',2.5);
+  yn('netConnected',2.5); yn('netCommented',2.5);
+
+  core=Math.min(core,100);
+
+  // ── Bonus ──
+  let bonus=0;
+
+  // Sawm +10% flat
+  if(data.sawm==='yes') bonus+=10;
+
+  // Sunnah +0.2%/rakat, max +10%
+  bonus+=Math.min((parseInt(data.sunnahRakat)||0)*0.2,10);
+
+  // Nafl +0.2%/rakat, max +10%
+  bonus+=Math.min((parseInt(data.naflRakat)||0)*0.2,10);
+
+  // Quran extra: every juzz above 1 = +5% (quarters proportional)
+  if(qRaw>1) bonus+=(qRaw-1)*5;
+
+  // Zikr extra: every 1500 above goal = +2.5%
+  if(zikr>1500) bonus+=Math.floor((zikr-1500)/1500)*2.5;
+
+  // Tahajjud extra: every 4 rakat above goal = +5%
+  if(tah>4) bonus+=Math.floor((tah-4)/4)*5;
+
+  // Zikr Book: max +10% at 56 pages
+  bonus+=Math.min((parseInt(data.zikrBookPages)||0)*(10/56),10);
+
+  // Sadaqah: max +10% at 50,000 units
+  bonus+=Math.min((parseInt(data.sadaqahUnits)||0)*(10/50000),10);
+
+  bonus=Math.round(bonus*10)/10;
+  core =Math.round(core*10)/10;
+  return {core, bonus, total:Math.round((core+bonus)*10)/10};
+}
+
+/* Per-card completion % for badge & colour */
+function goalScore(data,key){
+  const salahs=data.salahs||{};
+  switch(key){
+    case 'salah':{
+      let s=0;
+      SALAHS.forEach(p=>{
+        const v=salahs[p]||'';
+        if(v==='jamaah')        s+=1;
+        else if(v==='munfarid') s+=0.75;
+        else if(v==='qaza')     s+=0.25;
+      });
+      return Math.round((s/5)*100);
+    }
+    case 'quran':    return Math.min(Math.round((parseFloat(data.quranQuarter)||0)*100),100);
+    case 'tahajjud': return Math.min(Math.round(((parseInt(data.tahajjudRakat)||0)/4)*100),100);
+    case 'zikr':     return Math.min(Math.round(((parseInt(data.zikrCount)||0)/1500)*100),100);
+    case 'hadith':   return data.hadith==='yes'?100:0;
+    case 'tafsir':      return data.tafsir==='yes'?100:0;
+    case 'asmaul':      return data.asmaul==='yes'?100:0;
+    case 'zikrMorning': return data.zikrMorning==='yes'?100:0;
+    case 'zikrEvening': return data.zikrEvening==='yes'?100:0;
+    case 'surahWaqiah': return data.surahWaqiah==='yes'?100:0;
+    case 'surahMulk':   return data.surahMulk==='yes'?100:0;
+    case 'exercise':    return data.exercise==='yes'?100:0;
+    case 'books':       return data.books==='yes'?100:0;
+    case 'language':    return data.language==='yes'?100:0;
+    case 'writing':     return Math.round(((data.writingLinkedin==='yes'?1:0)+(data.writingFacebook==='yes'?1:0))/2*100);
+    case 'networking':  return Math.round(((data.netConnected==='yes'?1:0)+(data.netCommented==='yes'?1:0))/2*100);
+    default: return 0;
+  }
+}
+
+function bonusScore(data,key){
+  switch(key){
+    case 'sawm':        return data.sawm==='yes'?10:0;
+    case 'sunnahSalah': return Math.min(Math.round((parseInt(data.sunnahRakat)||0)*0.2*10)/10,10);
+    case 'naflSalah':   return Math.min(Math.round((parseInt(data.naflRakat)||0)*0.2*10)/10,10);
+    case 'zikrBook':    return Math.min(Math.round((parseInt(data.zikrBookPages)||0)*(10/56)*10)/10,10);
+    case 'sadaqah':     return Math.min(Math.round((parseInt(data.sadaqahUnits)||0)*(10/50000)*10)/10,10);
+    default: return 0;
+  }
+}
+
+/* ── Calendar ── */
+function buildCalendar(){
+  const grid=document.getElementById('monthsGrid');
+  grid.innerHTML='';
+  const today=todayKey();
+  let bestScore=0,bestDayKey=null;
+  all2026Keys().forEach(dk=>{
+    const d=getCached(dk);
+    if(Object.keys(d).length>0){const sc=scoreDay(d);if(sc.total>bestScore){bestScore=sc.total;bestDayKey=dk;}}
+  });
+
+  for(let m=0;m<12;m++){
+    const block=document.createElement('div');block.className='month-block';
+    const firstDay=new Date(2026,m,1).getDay();
+    const daysInMonth=new Date(2026,m+1,0).getDate();
+    let html=`<div class="month-name">${MONTHS[m]}</div><div class="days-grid">`;
+    DAYS_SHORT.forEach(d=>{html+=`<div class="day-header">${d}</div>`;});
+    for(let i=0;i<firstDay;i++) html+=`<div class="day-cell empty"></div>`;
+    for(let d=1;d<=daysInMonth;d++){
+      const dk=mkDK(2026,m,d);
+      const isFuture=dk>today,isToday=dk===today;
+      const dayData=getCached(dk),hasData=Object.keys(dayData).length>0;
+      const sc=hasData?scoreDay(dayData):{core:0,bonus:0,total:0};
+      let cls='day-cell';
+      if(isFuture) cls+=' future';
+      if(isToday)  cls+=' today';
+      if(dk===bestDayKey) cls+=' best-day';
+      else if(sc.core>=100) cls+=' perfect';
+      html+=`<div class="${cls}"${!isFuture?` onclick="openDay('${dk}')"`:''}>`
+           +`<span class="day-num">${d}</span>`;
+      if(!isFuture&&hasData){
+        const t=sc.total;
+        const pctClass=t>=100?'pct-full':t>=70?'pct-high':t>=40?'pct-mid':'pct-low';
+        html+=`<span class="day-pct ${pctClass}">${Math.round(t)}%</span>`;
+      }
+      html+=`</div>`;
+    }
+    html+=`</div>`;
+    block.innerHTML=html;
+    grid.appendChild(block);
+  }
+  updateStats(bestScore,bestDayKey);
+}
+
+function updateStats(bestScore,bestDayKey){
+  let streak=0,bestStreak=0,cur=0,total=0;
+  all2026Keys().forEach(dk=>{
+    const data=getCached(dk);
+    if(Object.keys(data).length>0&&scoreDay(data).core>0){total++;cur++;if(cur>bestStreak)bestStreak=cur;}
+    else cur=0;
+  });
+  streak=cur;
+  document.getElementById('streakNum').textContent=streak;
+  document.getElementById('bestStreakNum').textContent=bestStreak;
+  document.getElementById('totalDaysNum').textContent=total;
+  if(bestDayKey){
+    const [y,mo,d]=bestDayKey.split('-').map(Number);
+    const lbl=new Date(y,mo-1,d).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    document.getElementById('bestDayLabel').textContent=`${bestScore}% (${lbl})`;
+  }else{
+    document.getElementById('bestDayLabel').textContent='—';
+  }
+}
+
+/* ── Daily View ── */
+function openDay(dk){
+  currentDateKey=dk;
+  const [y,m,d]=dk.split('-').map(Number);
+  const label=new Date(y,m-1,d).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('dailyDateLabel').textContent=label;
+  document.getElementById('backBtn').classList.add('visible');
+  document.getElementById('calendarView').classList.remove('active');
+  document.getElementById('dailyView').classList.add('active');
+  buildSalahGrid();
+  buildQuranSelector();
+  loadDayData(dk);
+}
+
+function showCalendar(){
+  currentDateKey=null;
+  document.getElementById('dailyView').classList.remove('active');
+  document.getElementById('calendarView').classList.add('active');
+  document.getElementById('backBtn').classList.remove('visible');
+  buildCalendar();
+}
+
+function buildSalahGrid(){
+  const grid=document.getElementById('salahGrid');grid.innerHTML='';
+  SALAHS.forEach(salah=>{
+    const row=document.createElement('div');row.className='salah-row';
+    let html=`<div class="salah-name">${salah}</div><div class="salah-options" id="salah_${salah}">`;
+    SALAH_OPTS.forEach(opt=>{
+      html+=`<div class="salah-opt ${opt.cls}" data-salah="${salah}" data-val="${opt.key}" onclick="setSalah('${salah}','${opt.key}')">${opt.label}</div>`;
+    });
+    html+=`</div>`;row.innerHTML=html;grid.appendChild(row);
+  });
+}
+
+function buildQuranSelector(){
+  const sel=document.getElementById('quranJuzz');
+  sel.innerHTML='<option value="">Starting Juzz?</option>';
+  for(let i=1;i<=30;i++) sel.innerHTML+=`<option value="${i}">Juzz ${i}</option>`;
+}
+
+function loadDayData(dk){
+  const data=getCached(dk);
+  ['zikrCount','tahajjudRakat','sunnahRakat','naflRakat','zikrBookPages','sadaqahUnits']
+    .forEach(id=>{document.getElementById(id).value=data[id]||'';});
+  document.getElementById('quranJuzz').value      =data.quranJuzz||'';
+  document.getElementById('quranQuarter').value   =data.quranQuarter||'0';
+
+  // Show Quran session badge if reader was used today
+  const badge = document.getElementById('quranSessionBadge');
+  if(data.quranSessionStart && data.quranSessionEnd){
+    badge.style.display='block';
+    const pages = data.quranSessionEnd - data.quranSessionStart;
+    badge.innerHTML = `📖 Last Session: Pages ${pdfToQuranPage(data.quranSessionStart)}–${pdfToQuranPage(data.quranSessionEnd)} &nbsp;·&nbsp; ${pages} pages read`;
+  } else {
+    badge.style.display='none';
+  }
+
+  const salahs=data.salahs||{};
+  SALAHS.forEach(salah=>{
+    const val=salahs[salah]||'';
+    document.querySelectorAll(`[data-salah="${salah}"]`).forEach(el=>el.classList.toggle('active',el.dataset.val===val));
+  });
+
+  ['hadith','tafsir','asmaul','zikrMorning','zikrEvening','surahWaqiah','surahMulk','sawm',
+   'exercise','books','language','writingLinkedin','writingFacebook','netConnected','netCommented']
+    .forEach(key=>{
+      document.querySelectorAll(`.yn-btn[data-key="${key}"]`).forEach(btn=>btn.classList.toggle('active',btn.dataset.val===data[key]));
+    });
+  refreshScores();
+}
+
+function collectData(){
+  const data={...getCached(currentDateKey)};
+  ['zikrCount','tahajjudRakat','sunnahRakat','naflRakat','zikrBookPages','sadaqahUnits']
+    .forEach(id=>{data[id]=document.getElementById(id).value;});
+  data.quranJuzz      =document.getElementById('quranJuzz').value;
+  data.quranQuarter   =document.getElementById('quranQuarter').value;
+  return data;
+}
+
+/* Called by interactive controls (salah, yn) — saves to IDB + updates cache */
+async function saveAndRefresh(){
+  if(!currentDateKey) return;
+  const data=collectData();
+  _cache[currentDateKey]=data;
+  await setStore(currentDateKey,data);
+  refreshScores();
+}
+
+/* Called by Save Day button — saves + auto-exports JSON backup */
+async function saveDayAndExport(){
+  if(!currentDateKey) return;
+  const data=collectData();
+  _cache[currentDateKey]=data;
+  await setStore(currentDateKey,data);
+  refreshScores();
+  markFirstSave();
+  await autoExport();
+  showSavedToast();
+  checkSupportPrompt();
+}
+
+function refreshScores(){
+  if(!currentDateKey) return;
+  const data=getCached(currentDateKey);
+  const sc=scoreDay(data);
+
+  document.getElementById('dailyPctLabel').textContent=sc.core+'%';
+  document.getElementById('progressFill').style.width=Math.min(sc.core,100)+'%';
+
+  if(sc.bonus>0){
+    document.getElementById('dailyBonusLabel').textContent='+'+sc.bonus+'% Bonus';
+    document.getElementById('dailyTotalLabel').textContent='= '+sc.total+'% Total';
+    document.getElementById('bonusFill').style.width=Math.min((sc.bonus/50)*100,100)+'%';
+  }else{
+    document.getElementById('dailyBonusLabel').textContent='';
+    document.getElementById('dailyTotalLabel').textContent='';
+    document.getElementById('bonusFill').style.width='0%';
+  }
+
+  // Core badges
+  ['salah','quran','tahajjud','zikr','hadith','tafsir','asmaul','zikrMorning','zikrEvening',
+   'surahWaqiah','surahMulk','exercise','books','language','writing','networking']
+    .forEach(key=>{
+      const pct=goalScore(data,key);
+      const badge=document.getElementById('pct-'+key);
+      const card=document.getElementById('card-'+key);
+      if(badge){badge.textContent=pct+'%';badge.className='goal-pct-badge'+(pct>=100?' done':'');}
+      if(card){card.classList.remove('completed','partial');if(pct>=100)card.classList.add('completed');else if(pct>0)card.classList.add('partial');}
+    });
+
+  // Bonus badges
+  ['sawm','sunnahSalah','naflSalah','zikrBook','sadaqah'].forEach(key=>{
+    const val=bonusScore(data,key);
+    const badge=document.getElementById('pct-'+key);
+    const card=document.getElementById('card-'+key);
+    if(badge){badge.textContent='+'+val+'%';}
+    if(card){card.classList.toggle('bonus-active',val>0);}
+  });
+}
+
+async function setSalah(salah,val){
+  if(!currentDateKey) return;
+  const data={...getCached(currentDateKey)};
+  if(!data.salahs) data.salahs={};
+  const newVal = data.salahs[salah]===val ? null : val;
+  if(newVal===null) delete data.salahs[salah]; else data.salahs[salah]=newVal;
+  _cache[currentDateKey]=data;
+  await setStore(currentDateKey,data);
+  document.querySelectorAll(`[data-salah="${salah}"]`).forEach(el=>el.classList.toggle('active',el.dataset.val===newVal));
+  refreshScores();
+}
+
+async function setYN(key,val){
+  if(!currentDateKey) return;
+  const data={...getCached(currentDateKey)};
+  const newVal = data[key]===val ? null : val;
+  if(newVal===null) delete data[key]; else data[key]=newVal;
+  _cache[currentDateKey]=data;
+  await setStore(currentDateKey,data);
+  document.querySelectorAll(`.yn-btn[data-key="${key}"]`).forEach(btn=>btn.classList.toggle('active',btn.dataset.val===newVal));
+  refreshScores();
+}
+
+function showSavedToast(msg){
+  const t=document.getElementById('savedToast');
+  t.textContent=msg||'✓ Saved & Backed Up';
+  t.style.display='block';
+  setTimeout(()=>{t.style.display='none';t.textContent='✓ Saved & Backed Up';},2200);
+}
+
+/* ── Reset ── */
+function openResetModal(){document.getElementById('resetModal').classList.add('active');}
+function closeResetModal(){document.getElementById('resetModal').classList.remove('active');}
+async function confirmReset(){
+  const db=await openDB();
+  await new Promise((res,rej)=>{
+    const tx=db.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).clear();
+    tx.oncomplete=()=>res();
+    tx.onerror=e=>rej(e.target.error);
+  });
+  _cache={};
+  closeResetModal();
+  if(currentDateKey) loadDayData(currentDateKey); else buildCalendar();
+}
+
+/* ── File System Access API (Chrome/Edge desktop only) ── */
+let _fsFileHandle=null; // remembered handle for the session
+
+async function getExportHandle(){
+  // Already have a handle for this session — reuse it
+  if(_fsFileHandle) return _fsFileHandle;
+  // FSA supported?
+  if(window.showSaveFilePicker){
+    try{
+      const handle=await window.showSaveFilePicker({
+        suggestedName:'Muhasabah.json',
+        types:[{description:'JSON Backup',accept:{'application/json':['.json']}}]
+      });
+      _fsFileHandle=handle;
+      return handle;
+    }catch(e){
+      // User cancelled — fall back to Downloads
+      return null;
+    }
+  }
+  return null;
+}
+
+async function triggerExport(outObj){
+  const json=JSON.stringify(outObj,null,2);
+  const handle=await getExportHandle();
+  if(handle){
+    try{
+      const writable=await handle.createWritable();
+      await writable.write(json);
+      await writable.close();
+      return; // success via FSA
+    }catch(e){
+      _fsFileHandle=null; // handle went stale — fall through to download
+    }
+  }
+  // Fallback: trigger download to Downloads folder
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='Muhasabah.json';a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ── Auto-Export (triggered by Save Day) ── */
+async function autoExport(){
+  const allData=await getAllStoredData();
+  if(Object.keys(allData).length===0) return;
+  const out={version:2,exported:new Date().toISOString(),data:allData};
+  await triggerExport(out);
+}
+
+/* ── Manual Export ── */
+async function exportData(){
+  const allData=await getAllStoredData();
+  if(Object.keys(allData).length===0){alert('No data to export yet.');return;}
+  const out={version:2,exported:new Date().toISOString(),data:allData};
+  await triggerExport(out);
+}
+
+/* ── Support Modal ── */
+function shouldShowSupport(){
+  const s=localStorage.getItem('mhsb_support');
+  if(!s) return false; // haven't saved first day yet
+  if(s==='never') return false;
+  if(s==='done') return false;
+  const ts=parseInt(s,10);
+  if(isNaN(ts)) return true;
+  return Date.now()>ts; // remind-later timestamp passed
+}
+
+function markFirstSave(){
+  const s=localStorage.getItem('mhsb_support');
+  if(!s) localStorage.setItem('mhsb_support','show'); // first time
+}
+
+function openSupportModal(){document.getElementById('supportModal').classList.add('active');}
+function closeSupportModal(){document.getElementById('supportModal').classList.remove('active');}
+
+function supportDonate(){
+  localStorage.setItem('mhsb_support','done');
+  closeSupportModal();
+  window.open('https://bKash.com','_blank');
+}
+
+function supportLater(){
+  const sevenDays=Date.now()+(7*24*60*60*1000);
+  localStorage.setItem('mhsb_support',String(sevenDays));
+  closeSupportModal();
+}
+
+function supportNever(){
+  localStorage.setItem('mhsb_support','never');
+  closeSupportModal();
+}
+
+function checkSupportPrompt(){
+  const s=localStorage.getItem('mhsb_support');
+  if(s==='show'){
+    localStorage.setItem('mhsb_support','shown_once');
+    setTimeout(openSupportModal,800);
+    return;
+  }
+  if(shouldShowSupport()) setTimeout(openSupportModal,800);
+}
+
+/* ── Import Modal ── */
+let pendingImportData=null;
+
+function openImportModal(){
+  pendingImportData=null;
+  document.getElementById('importMeta').className='import-meta';
+  document.getElementById('importMeta').textContent='';
+  document.getElementById('importConfirmBtn').style.display='none';
+  document.getElementById('importFileInput').value='';
+  document.getElementById('importModal').classList.add('active');
+
+  // Drag & drop
+  const drop=document.getElementById('importDrop');
+  drop.ondragover=(e)=>{e.preventDefault();drop.classList.add('dragover');};
+  drop.ondragleave=()=>drop.classList.remove('dragover');
+  drop.ondrop=(e)=>{
+    e.preventDefault();drop.classList.remove('dragover');
+    const file=e.dataTransfer.files[0];
+    if(file) readImportFile(file);
+  };
+}
+
+function closeImportModal(){
+  pendingImportData=null;
+  document.getElementById('importModal').classList.remove('active');
+}
+
+function handleImportFile(input){
+  if(input.files[0]) readImportFile(input.files[0]);
+}
+
+function readImportFile(file){
+  if(!file.name.endsWith('.json')){
+    showImportMeta('⚠ Please select a .json file.',false);return;
+  }
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    try{
+      const parsed=JSON.parse(e.target.result);
+      if(!parsed.data||typeof parsed.data!=='object') throw new Error('Invalid format');
+      const days=Object.keys(parsed.data).length;
+      const exported=parsed.exported?new Date(parsed.exported).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'Unknown';
+      pendingImportData=parsed.data;
+      showImportMeta(
+        `✓ File Looks Good\n`+
+        `Days In File: ${days}\n`+
+        `Exported On: ${exported}\n\n`+
+        `Clicking "Import & Merge" Will Overwrite Any Matching Days On This Device With The File Version. Days Only On This Device Will Be Kept.`,
+        true
+      );
+    }catch(err){
+      pendingImportData=null;
+      showImportMeta('✗ Could Not Read File — Make Sure It Is A Valid Muhasabah Export.',false);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function showImportMeta(msg,success){
+  const el=document.getElementById('importMeta');
+  el.textContent=msg;
+  el.className='import-meta visible';
+  el.style.color=success?'var(--green-bright)':'#c05050';
+  el.style.borderLeft=success?'3px solid var(--green)':'3px solid var(--red)';
+  el.style.paddingLeft='12px';
+  document.getElementById('importConfirmBtn').style.display=success?'block':'none';
+}
+
+async function confirmImport(){
+  if(!pendingImportData) return;
+  let count=0;
+  for(const [dk,dayData] of Object.entries(pendingImportData)){
+    _cache[dk]=dayData;
+    await setStore(dk,dayData);
+    count++;
+  }
+  closeImportModal();
+  if(currentDateKey) loadDayData(currentDateKey);
+  else buildCalendar();
+  const t=document.getElementById('savedToast');
+  t.textContent=`✓ ${count} Day${count!==1?'s':''} Imported`;
+  t.style.display='block';
+  setTimeout(()=>{t.style.display='none';t.textContent='✓ Saved & Backed Up';},2500);
+}
+
+/* ── Init ── */
+(async()=>{
+  await migrateFromLocalStorage();
+  await preloadCache();
+  buildCalendar();
+})();
+</script>
+</body>
+</html>

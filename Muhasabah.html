@@ -1046,8 +1046,13 @@ async function closeQuranReader(){
   const badge = document.getElementById('quranSessionBadge');
   badge.style.display = 'block';
   const sessionCount = dayData.quranSessions.length;
+  // Compute overall total range across all sessions today
+  const firstSession = dayData.quranSessions[0];
+  const lastSession  = dayData.quranSessions[dayData.quranSessions.length - 1];
+  const totalPages   = dayData.quranSessions.reduce((s,x)=>s+x.pages,0);
   badge.innerHTML =
     `📖 Today: ${sessionCount} session${sessionCount !== 1 ? 's' : ''} &nbsp;·&nbsp; ≈ ${todayTotal.toFixed(2)} Juzz total`
+    + `<br><span style="font-size:9px;color:var(--text-muted);">Total: ${firstSession.start}–${lastSession.end} (${totalPages} pages, ≈ ${todayTotal.toFixed(2)} Juzz)</span>`
     + `<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages ${startQuranPage}–${endQuranPage} (${pagesRead} pages, ${sessionJuzz.toFixed(2)} juzz)</span>`;
 
   await saveAndRefresh();
@@ -1258,37 +1263,64 @@ async function closePdfReader(){
   pdfReaderType = null;
   if(!type || !currentDateKey) return;
 
-  const cfg        = PDF_READER_CONFIG[type];
-  const reachedEnd = pdfReaderCurPage >= pdfReaderLastPage;
+  const cfg = PDF_READER_CONFIG[type];
 
   // Zikr: reference only — nothing to save
   if(!cfg.goalKey) return;
 
-  // Morning / Evening: auto-complete if last page reached
+  const pagesRead  = Math.max(0, pdfReaderCurPage - pdfReaderStartPage + 1);
+  const reachedEnd = pdfReaderCurPage >= pdfReaderLastPage;
+
+  // Accumulate sessions for today
   const data = {...getCached(currentDateKey)};
+  if(!data[type + '_sessions']) data[type + '_sessions'] = [];
+  data[type + '_sessions'].push({
+    start: pdfReaderStartPage,
+    end:   pdfReaderCurPage,
+    pages: pagesRead,
+  });
+
+  // Compute today's total pages across all sessions, cap at PDF length
+  const totalPages = data[type + '_sessions'].reduce((s,x)=>s+x.pages, 0);
+  // Ratio 0–1 (capped at 1.0 = fully read)
+  const ratio = Math.min(totalPages / pdfReaderLastPage, 1);
+  data[type + '_pdfRatio']  = ratio;
+  data[type + '_readerPage']= pdfReaderCurPage;
+  data[type + '_totalPages']= totalPages;
+
+  // Auto-set yes/no: yes only when fully completed
   if(reachedEnd){
-    data[cfg.goalKey]            = 'yes';
-    data[type + '_readerDone']   = true;
-    // Update YN buttons
-    document.querySelectorAll(`.yn-btn[data-key="${cfg.goalKey}"]`).forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.val === 'yes');
-    });
+    data[cfg.goalKey]          = 'yes';
+    data[type + '_readerDone'] = true;
   }
-  data[type + '_readerPage'] = pdfReaderCurPage;
+
   _cache[currentDateKey] = data;
   await setStore(currentDateKey, data);
 
-  // Update badge
+  // Update YN buttons to reflect completion state
+  document.querySelectorAll(`.yn-btn[data-key="${cfg.goalKey}"]`).forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.val === (reachedEnd ? 'yes' : data[cfg.goalKey]));
+  });
+
+  // Build badge
   const badge = document.getElementById(cfg.badgeId);
   if(badge){
     badge.style.display = 'block';
-    if(reachedEnd){
-      badge.innerHTML   = `✓ Completed — All ${pdfReaderLastPage} pages read`;
-      badge.style.color = 'var(--green-bright)';
-    } else {
-      badge.innerHTML   = `📖 Resumed at page ${pdfReaderStartPage} · Stopped at ${pdfReaderCurPage} of ${pdfReaderLastPage}`;
-      badge.style.color = 'var(--text-muted)';
-    }
+    const sessions     = data[type + '_sessions'];
+    const count        = sessions.length;
+    const first        = sessions[0];
+    const last         = sessions[sessions.length - 1];
+    const pct          = Math.round(ratio * 100);
+    const headerColor  = reachedEnd ? 'var(--green-bright)' : 'var(--purple-bright)';
+    const totalLabel   = reachedEnd
+      ? `✓ Completed — ${pdfReaderLastPage} pages`
+      : `${totalPages} / ${pdfReaderLastPage} pages (${pct}%)`;
+
+    badge.innerHTML =
+      `<span style="color:${headerColor};">Today: ${count} session${count!==1?'s':''} &nbsp;·&nbsp; ${totalLabel}</span>`
+      + `<br><span style="font-size:9px;color:var(--text-muted);">Total: ${first.start}–${last.end} (${totalPages} pages)</span>`
+      + `<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages ${last.start}–${last.end} (${pagesRead} pages)</span>`;
+    badge.style.color = '';
   }
 
   await saveAndRefresh();
@@ -1437,8 +1469,18 @@ function scoreDay(data){
   if(data.hadith==='yes') core+=5;
 
   // Yes/No core goals — 5% each
+  // zikrMorning and zikrEvening use PDF ratio if available, else yes/no
   const yn=(k,w)=>{if(data[k]==='yes')core+=w;};
-  yn('tafsir',5); yn('asmaul',5); yn('zikrMorning',5); yn('zikrEvening',5);
+  yn('tafsir',5); yn('asmaul',5);
+
+  // zikrMorning 5% — proportional if PDF used, else yes/no
+  const zmRatio = data['zikrMorning_pdfRatio'];
+  core += zmRatio !== undefined ? Math.min(zmRatio * 5, 5) : (data.zikrMorning==='yes'?5:0);
+
+  // zikrEvening 5% — proportional if PDF used, else yes/no
+  const zeRatio = data['zikrEvening_pdfRatio'];
+  core += zeRatio !== undefined ? Math.min(zeRatio * 5, 5) : (data.zikrEvening==='yes'?5:0);
+
   yn('surahWaqiah',5); yn('surahMulk',5);
   yn('exercise',5); yn('books',5); yn('language',5);
   yn('writingLinkedin',2.5); yn('writingFacebook',2.5);
@@ -1503,8 +1545,14 @@ function goalScore(data,key){
     case 'hadith':   return data.hadith==='yes'?100:0;
     case 'tafsir':      return data.tafsir==='yes'?100:0;
     case 'asmaul':      return data.asmaul==='yes'?100:0;
-    case 'zikrMorning': return data.zikrMorning==='yes'?100:0;
-    case 'zikrEvening': return data.zikrEvening==='yes'?100:0;
+    case 'zikrMorning': {
+      const r = data['zikrMorning_pdfRatio'];
+      return r !== undefined ? Math.min(Math.round(r * 100), 100) : (data.zikrMorning==='yes'?100:0);
+    }
+    case 'zikrEvening': {
+      const r = data['zikrEvening_pdfRatio'];
+      return r !== undefined ? Math.min(Math.round(r * 100), 100) : (data.zikrEvening==='yes'?100:0);
+    }
     case 'surahWaqiah': return data.surahWaqiah==='yes'?100:0;
     case 'surahMulk':   return data.surahMulk==='yes'?100:0;
     case 'exercise':    return data.exercise==='yes'?100:0;
@@ -1642,11 +1690,14 @@ function loadDayData(dk){
   const badge = document.getElementById('quranSessionBadge');
   if(data.quranSessions && data.quranSessions.length > 0){
     badge.style.display='block';
-    const total = parseFloat(data.quranPdfJuzz) || 0;
-    const count = data.quranSessions.length;
-    const last  = data.quranSessions[data.quranSessions.length - 1];
+    const total   = parseFloat(data.quranPdfJuzz) || 0;
+    const count   = data.quranSessions.length;
+    const first   = data.quranSessions[0];
+    const last    = data.quranSessions[data.quranSessions.length - 1];
+    const totPg   = data.quranSessions.reduce((s,x)=>s+x.pages,0);
     badge.innerHTML =
       `📖 Today: ${count} session${count !== 1 ? 's' : ''} &nbsp;·&nbsp; ≈ ${total.toFixed(2)} Juzz total`
+      + `<br><span style="font-size:9px;color:var(--text-muted);">Total: ${first.start}–${last.end} (${totPg} pages, ≈ ${total.toFixed(2)} Juzz)</span>`
       + `<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages ${last.start}–${last.end} (${last.pages} pages, ${last.juzz.toFixed(2)} juzz)</span>`;
   } else {
     badge.style.display='none';
@@ -1657,14 +1708,25 @@ function loadDayData(dk){
     const cfg = PDF_READER_CONFIG[type];
     const b = document.getElementById(cfg.badgeId);
     if(!b) return;
-    if(data[type + '_readerDone']){
+    const sessions = data[type + '_sessions'];
+    if(sessions && sessions.length > 0){
       b.style.display = 'block';
-      b.innerHTML = `✓ Completed — All pages read`;
-      b.style.color = 'var(--green-bright)';
-    } else if(data[type + '_readerPage']){
-      b.style.display = 'block';
-      b.innerHTML = `📖 Stopped at page ${data[type + '_readerPage']}`;
-      b.style.color = 'var(--text-muted)';
+      const done       = data[type + '_readerDone'];
+      const ratio      = parseFloat(data[type + '_pdfRatio']) || 0;
+      const totalPages = data[type + '_totalPages'] || 0;
+      const count      = sessions.length;
+      const first      = sessions[0];
+      const last       = sessions[sessions.length - 1];
+      const pct        = Math.round(ratio * 100);
+      const headerColor= done ? 'var(--green-bright)' : 'var(--purple-bright)';
+      const totalLabel = done
+        ? `✓ Completed`
+        : `${totalPages} pages (${pct}%)`;
+      b.innerHTML =
+        `<span style="color:${headerColor};">Today: ${count} session${count!==1?'s':''} &nbsp;·&nbsp; ${totalLabel}</span>`
+        + `<br><span style="font-size:9px;color:var(--text-muted);">Total: ${first.start}–${last.end} (${totalPages} pages)</span>`
+        + `<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages ${last.start}–${last.end} (${last.pages} pages)</span>`;
+      b.style.color = '';
     } else {
       b.style.display = 'none';
     }

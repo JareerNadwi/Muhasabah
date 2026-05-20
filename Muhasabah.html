@@ -481,7 +481,6 @@ canvas#qrCanvas{
       </div>
       <div class="sub-label">Goal: 1500 = Full 5% Core &nbsp;·&nbsp; Every Extra 1500 = +2.5% Bonus</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('zikr')">📿 Open Zikr Reader</button>
-      <div class="qr-session-badge" id="zikrSessionBadge" style="display:none;"></div>
     </div>
 
     <!-- Hadith 5% -->
@@ -1025,25 +1024,31 @@ async function closeQuranReader(){
   const pagesRead = Math.max(0, qrCurPage - qrStartPage + 1);
   if(pagesRead === 0) return;
 
-  const juzzRead = pagesReadToJuzz(pagesRead, qrStartPage);
+  const sessionJuzz    = pagesReadToJuzz(pagesRead, qrStartPage);
   const startQuranPage = pdfToQuranPage(qrStartPage);
   const endQuranPage   = pdfToQuranPage(qrCurPage);
 
-  // Save session into day data — PDF reader wins, store juzzRead directly
+  // Accumulate today's total — add this session on top of any earlier sessions today
   const dayData = {...getCached(currentDateKey)};
-  dayData.quranSessionStart = qrStartPage;
-  dayData.quranSessionEnd   = qrCurPage;
-  dayData.quranPdfJuzz      = juzzRead; // PDF reader result — takes priority in scoring
-  // Also set starting juzz for reference
-  dayData.quranJuzz = String(pageToJuzz(startQuranPage));
+  const prevJuzz = parseFloat(dayData.quranPdfJuzz) || 0;
+  const todayTotal = Math.round((prevJuzz + sessionJuzz) * 1000) / 1000;
+
+  dayData.quranPdfJuzz    = todayTotal;
+  dayData.quranJuzz       = String(pageToJuzz(startQuranPage));
+  // Track sessions list for badge display
+  if(!dayData.quranSessions) dayData.quranSessions = [];
+  dayData.quranSessions.push({start: startQuranPage, end: endQuranPage, pages: pagesRead, juzz: sessionJuzz});
+
   _cache[currentDateKey] = dayData;
   await setStore(currentDateKey, dayData);
 
-  // Show session badge in card
+  // Show today's total in badge
   const badge = document.getElementById('quranSessionBadge');
   badge.style.display = 'block';
+  const sessionCount = dayData.quranSessions.length;
   badge.innerHTML =
-    `📖 Last Session: Pages ${startQuranPage}–${endQuranPage} &nbsp;·&nbsp; ${pagesRead} pages &nbsp;·&nbsp; ≈ ${juzzRead.toFixed(2)} Juzz`;
+    `📖 Today: ${sessionCount} session${sessionCount !== 1 ? 's' : ''} &nbsp;·&nbsp; ≈ ${todayTotal.toFixed(2)} Juzz total`
+    + `<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages ${startQuranPage}–${endQuranPage} (${pagesRead} pages, ${sessionJuzz.toFixed(2)} juzz)</span>`;
 
   await saveAndRefresh();
 }
@@ -1075,39 +1080,68 @@ async function setQrLastPage(pdfPageNum){
 
 /* ══════════════════════════════════════════════════════════
    GENERIC PDF READER — Zikr / Zikr Morning / Zikr Evening
-   Each PDF sits in the same folder as the HTML.
-   When the last page is reached and the reader is closed,
-   the corresponding yes/no goal is automatically set to "yes".
+
+   Zikr:        Reference only — no completion, no badge, always page 1.
+   Zikr Morning: Resumes from next page. Reaching last page → auto-complete yes.
+   Zikr Evening: Resumes from next page. Reaching last page → auto-complete yes.
 ══════════════════════════════════════════════════════════ */
 const PDF_READER_CONFIG = {
   zikr: {
-    pdfPath:    'Zikr.pdf',
-    idbKey:     '_pdf_lastpage_zikr',
-    title:      '📿 Zikr',
-    goalKey:    null,           // zikr uses count-based scoring, not yes/no
-    badgeId:    'zikrSessionBadge',
+    pdfPath:  'Zikr.pdf',
+    title:    '📿 Zikr',
+    resume:   false,   // reference only — always open from page 1
+    goalKey:  null,    // no auto-complete
+    badgeId:  null,    // no badge
+    idbKey:   null,
   },
   zikrMorning: {
-    pdfPath:    'Zikr%20Morning.pdf',
-    idbKey:     '_pdf_lastpage_zikrMorning',
-    title:      '☀️ Zikr Morning',
-    goalKey:    'zikrMorning',
-    badgeId:    'zikrMorningSessionBadge',
+    pdfPath:  'Zikr%20Morning.pdf',
+    title:    '☀️ Zikr Morning',
+    resume:   true,
+    goalKey:  'zikrMorning',
+    badgeId:  'zikrMorningSessionBadge',
+    idbKey:   '_pdf_lastpage_zikrMorning',
   },
   zikrEvening: {
-    pdfPath:    'Zikr%20Evening.pdf',
-    idbKey:     '_pdf_lastpage_zikrEvening',
-    title:      '🌆 Zikr Evening',
-    goalKey:    'zikrEvening',
-    badgeId:    'zikrEveningSessionBadge',
+    pdfPath:  'Zikr%20Evening.pdf',
+    title:    '🌆 Zikr Evening',
+    resume:   true,
+    goalKey:  'zikrEvening',
+    badgeId:  'zikrEveningSessionBadge',
+    idbKey:   '_pdf_lastpage_zikrEvening',
   },
 };
 
-let pdfReaderType     = null;  // which reader is active ('zikr'|'zikrMorning'|'zikrEvening')
-let pdfReaderDoc      = {};    // cache of loaded pdfjsLib docs per type
-let pdfReaderCurPage  = 1;
-let pdfReaderLastPage = 1;     // total pages in current PDF
-let pdfReaderRendering= false;
+let pdfReaderType      = null;
+let pdfReaderDoc       = {};   // loaded pdfjsLib docs cached per type
+let pdfReaderCurPage   = 1;
+let pdfReaderStartPage = 1;    // page this session started on (for resume types)
+let pdfReaderLastPage  = 1;    // total pages in PDF
+let pdfReaderRendering = false;
+
+/* IDB helpers for per-type last page (resume only) */
+async function getPdfLastPage(idbKey){
+  try{
+    const db = await openDB();
+    return new Promise(res => {
+      const req = db.transaction(STORE,'readonly').objectStore(STORE).get(idbKey);
+      req.onsuccess = () => res(req.result ? req.result.data : null);
+      req.onerror   = () => res(null);
+    });
+  }catch(e){ return null; }
+}
+
+async function setPdfLastPage(idbKey, pageNum){
+  try{
+    const db = await openDB();
+    return new Promise((res,rej) => {
+      const tx = db.transaction(STORE,'readwrite');
+      tx.objectStore(STORE).put({dk: idbKey, data: pageNum});
+      tx.oncomplete = () => res();
+      tx.onerror    = e => rej(e.target.error);
+    });
+  }catch(e){}
+}
 
 async function openPdfReader(type){
   pdfReaderType = type;
@@ -1116,6 +1150,7 @@ async function openPdfReader(type){
   document.getElementById('pdfReaderTitle').textContent = cfg.title;
   document.getElementById('pdfReaderInfo').textContent  = cfg.title + ' — PDF Reader';
   document.getElementById('pdfReaderSessionInfo').textContent = '';
+  document.getElementById('pdfReaderSessionInfo').style.color = 'var(--purple-bright)';
   document.getElementById('pdfReaderLoading').style.display = 'flex';
   document.getElementById('pdfReaderLoading').textContent   = 'Loading…';
   document.getElementById('pdfReaderCanvas').style.display  = 'none';
@@ -1127,15 +1162,22 @@ async function openPdfReader(type){
       pdfReaderDoc[type] = await pdfjsLib.getDocument(cfg.pdfPath).promise;
     }catch(e){
       document.getElementById('pdfReaderLoading').textContent =
-        '⚠ Could Not Load PDF — Make sure ' + cfg.pdfPath + ' is in the same folder as this HTML file.';
+        '⚠ Could Not Load PDF — Make sure ' + cfg.title + ' PDF is in the same folder as this HTML.';
       return;
     }
   }
 
   pdfReaderLastPage = pdfReaderDoc[type].numPages;
 
-  // Always start from page 1 (no resume for zikr readers)
-  pdfReaderCurPage = 1;
+  // Determine start page
+  if(cfg.resume && cfg.idbKey){
+    const last = await getPdfLastPage(cfg.idbKey);
+    pdfReaderCurPage = last ? Math.min(last + 1, pdfReaderLastPage) : 1;
+  } else {
+    // Zikr: always page 1
+    pdfReaderCurPage = 1;
+  }
+  pdfReaderStartPage = pdfReaderCurPage;
 
   await pdfReaderRenderPage(pdfReaderCurPage);
 }
@@ -1145,19 +1187,20 @@ async function pdfReaderRenderPage(pageNum){
   pdfReaderRendering = true;
 
   const type = pdfReaderType;
+  const cfg  = PDF_READER_CONFIG[type];
   document.getElementById('pdfReaderLoading').style.display = 'flex';
   document.getElementById('pdfReaderCanvas').style.display  = 'none';
 
   try{
     const page = await pdfReaderDoc[type].getPage(pageNum);
     const wrap = document.querySelector('#pdfReaderOverlay .qr-canvas-wrap');
-    const maxW  = wrap.clientWidth  - 20;
-    const maxH  = wrap.clientHeight - 20;
-    const vp0   = page.getViewport({scale:1});
-    const scale = Math.min(maxW/vp0.width, maxH/vp0.height, 2.2);
-    const vp    = page.getViewport({scale});
+    const maxW = wrap.clientWidth  - 20;
+    const maxH = wrap.clientHeight - 20;
+    const vp0  = page.getViewport({scale:1});
+    const scale= Math.min(maxW/vp0.width, maxH/vp0.height, 2.2);
+    const vp   = page.getViewport({scale});
 
-    const canvas  = document.getElementById('pdfReaderCanvas');
+    const canvas = document.getElementById('pdfReaderCanvas');
     canvas.width  = vp.width;
     canvas.height = vp.height;
     await page.render({canvasContext:canvas.getContext('2d'), viewport:vp}).promise;
@@ -1168,19 +1211,31 @@ async function pdfReaderRenderPage(pageNum){
     document.getElementById('pdfReaderPageDisplay').textContent =
       `Page ${pageNum} / ${pdfReaderLastPage}`;
     document.getElementById('pdfReaderInfo').textContent =
-      PDF_READER_CONFIG[type].title + `  ·  Page ${pageNum} of ${pdfReaderLastPage}`;
+      cfg.title + `  ·  Page ${pageNum} of ${pdfReaderLastPage}`;
 
     document.getElementById('pdfReaderPrev').disabled = pageNum <= 1;
     document.getElementById('pdfReaderNext').disabled = pageNum >= pdfReaderLastPage;
 
-    // Session info: show completion hint on last page
     const sessionEl = document.getElementById('pdfReaderSessionInfo');
-    if(pageNum >= pdfReaderLastPage){
-      sessionEl.textContent = '✓ Last page reached — Exit & Save to complete goal';
-      sessionEl.style.color = 'var(--green-bright)';
+    if(cfg.goalKey){
+      // Resume types: show progress / completion hint
+      if(pageNum >= pdfReaderLastPage){
+        sessionEl.textContent = '✓ Last page reached — Exit & Save to complete goal';
+        sessionEl.style.color = 'var(--green-bright)';
+      } else {
+        const rem = pdfReaderLastPage - pageNum;
+        sessionEl.textContent = `${rem} page${rem !== 1 ? 's' : ''} remaining`;
+        sessionEl.style.color = 'var(--purple-bright)';
+      }
     } else {
-      sessionEl.textContent = `${pdfReaderLastPage - pageNum} page${pdfReaderLastPage - pageNum !== 1 ? 's' : ''} remaining`;
-      sessionEl.style.color = 'var(--purple-bright)';
+      // Zikr reference: no completion messaging
+      sessionEl.textContent = `Reference — Page ${pageNum} of ${pdfReaderLastPage}`;
+      sessionEl.style.color = 'var(--text-muted)';
+    }
+
+    // Save last-read page for resume types
+    if(cfg.resume && cfg.idbKey){
+      await setPdfLastPage(cfg.idbKey, pageNum);
     }
   }catch(e){
     document.getElementById('pdfReaderLoading').textContent = '⚠ Error Rendering Page';
@@ -1200,47 +1255,43 @@ async function closePdfReader(){
   overlay.classList.remove('active');
 
   const type = pdfReaderType;
+  pdfReaderType = null;
   if(!type || !currentDateKey) return;
 
-  const cfg = PDF_READER_CONFIG[type];
+  const cfg        = PDF_READER_CONFIG[type];
   const reachedEnd = pdfReaderCurPage >= pdfReaderLastPage;
 
-  // Auto-complete the yes/no goal if last page was reached
-  if(reachedEnd && cfg.goalKey){
-    const data = {...getCached(currentDateKey)};
-    data[cfg.goalKey] = 'yes';
-    data[type + '_readerCompleted'] = true;
-    data[type + '_readerPage'] = pdfReaderCurPage;
-    _cache[currentDateKey] = data;
-    await setStore(currentDateKey, data);
+  // Zikr: reference only — nothing to save
+  if(!cfg.goalKey) return;
 
+  // Morning / Evening: auto-complete if last page reached
+  const data = {...getCached(currentDateKey)};
+  if(reachedEnd){
+    data[cfg.goalKey]            = 'yes';
+    data[type + '_readerDone']   = true;
     // Update YN buttons
     document.querySelectorAll(`.yn-btn[data-key="${cfg.goalKey}"]`).forEach(btn => {
       btn.classList.toggle('active', btn.dataset.val === 'yes');
     });
-  } else {
-    // Save partial progress
-    const data = {...getCached(currentDateKey)};
-    data[type + '_readerPage'] = pdfReaderCurPage;
-    _cache[currentDateKey] = data;
-    await setStore(currentDateKey, data);
   }
+  data[type + '_readerPage'] = pdfReaderCurPage;
+  _cache[currentDateKey] = data;
+  await setStore(currentDateKey, data);
 
-  // Show session badge
+  // Update badge
   const badge = document.getElementById(cfg.badgeId);
   if(badge){
     badge.style.display = 'block';
     if(reachedEnd){
-      badge.innerHTML = `✓ Completed — All ${pdfReaderLastPage} pages read`;
+      badge.innerHTML   = `✓ Completed — All ${pdfReaderLastPage} pages read`;
       badge.style.color = 'var(--green-bright)';
     } else {
-      badge.innerHTML = `📖 Stopped at page ${pdfReaderCurPage} of ${pdfReaderLastPage}`;
+      badge.innerHTML   = `📖 Resumed at page ${pdfReaderStartPage} · Stopped at ${pdfReaderCurPage} of ${pdfReaderLastPage}`;
       badge.style.color = 'var(--text-muted)';
     }
   }
 
   await saveAndRefresh();
-  pdfReaderType = null;
 }
 
 
@@ -1589,20 +1640,24 @@ function loadDayData(dk){
 
   // Show Quran session badge if reader was used today
   const badge = document.getElementById('quranSessionBadge');
-  if(data.quranSessionStart && data.quranSessionEnd){
+  if(data.quranSessions && data.quranSessions.length > 0){
     badge.style.display='block';
-    const pages = data.quranSessionEnd - data.quranSessionStart;
-    badge.innerHTML = `📖 Last Session: Pages ${pdfToQuranPage(data.quranSessionStart)}–${pdfToQuranPage(data.quranSessionEnd)} &nbsp;·&nbsp; ${pages} pages read`;
+    const total = parseFloat(data.quranPdfJuzz) || 0;
+    const count = data.quranSessions.length;
+    const last  = data.quranSessions[data.quranSessions.length - 1];
+    badge.innerHTML =
+      `📖 Today: ${count} session${count !== 1 ? 's' : ''} &nbsp;·&nbsp; ≈ ${total.toFixed(2)} Juzz total`
+      + `<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages ${last.start}–${last.end} (${last.pages} pages, ${last.juzz.toFixed(2)} juzz)</span>`;
   } else {
     badge.style.display='none';
   }
 
-  // Show zikr reader badges
-  ['zikr','zikrMorning','zikrEvening'].forEach(type => {
+  // Show zikr reader badges (Morning and Evening only — Zikr is reference-only)
+  ['zikrMorning','zikrEvening'].forEach(type => {
     const cfg = PDF_READER_CONFIG[type];
     const b = document.getElementById(cfg.badgeId);
     if(!b) return;
-    if(data[type + '_readerCompleted']){
+    if(data[type + '_readerDone']){
       b.style.display = 'block';
       b.innerHTML = `✓ Completed — All pages read`;
       b.style.color = 'var(--green-bright)';

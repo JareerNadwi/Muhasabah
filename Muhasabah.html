@@ -909,9 +909,9 @@ async function openQuranReader(){
   document.getElementById('qrLoading').style.display='flex';
   document.getElementById('qrCanvas').style.display='none';
 
-  // Determine start page: resume from last saved position
+  // Determine start page: resume from NEXT page after last saved position
   const lastPage = await getQrLastPage();
-  qrCurPage = lastPage || QR_FIRST_PAGE;
+  qrCurPage = lastPage ? Math.min(lastPage + 1, QR_LAST_PAGE) : QR_FIRST_PAGE;
   qrStartPage = qrCurPage;
 
   updateSessionInfo();
@@ -998,28 +998,17 @@ async function closeQuranReader(){
   const pagesRead = Math.max(0, qrCurPage - qrStartPage);
   if(pagesRead === 0) return;
 
-  // Convert pages to juzz fraction and auto-fill the Quran goal
   const juzzRead = pagesReadToJuzz(pagesRead, qrStartPage);
   const startQuranPage = pdfToQuranPage(qrStartPage);
   const endQuranPage   = pdfToQuranPage(qrCurPage);
-  const startJuzz = Math.ceil(startQuranPage / PAGES_PER_JUZZ);
 
-  // Update selects
-  const juzzSel = document.getElementById('quranJuzz');
-  // Set starting juzz if not already set
-  if(!juzzSel.value) juzzSel.value = String(startJuzz);
-
-  const quarterSel = document.getElementById('quranQuarter');
-  // Only update if new reading is more than what's already recorded
-  const existing = parseFloat(quarterSel.value) || 0;
-  if(juzzRead > existing){
-    quarterSel.value = nearestQuarterOption(juzzRead);
-  }
-
-  // Save session range into day data
+  // Save session into day data — PDF reader wins, store juzzRead directly
   const dayData = {...getCached(currentDateKey)};
   dayData.quranSessionStart = qrStartPage;
   dayData.quranSessionEnd   = qrCurPage;
+  dayData.quranPdfJuzz      = juzzRead; // PDF reader result — takes priority in scoring
+  // Also set starting juzz for reference
+  dayData.quranJuzz = String(pageToJuzz(startQuranPage));
   _cache[currentDateKey] = dayData;
   await setStore(currentDateKey, dayData);
 
@@ -1027,7 +1016,7 @@ async function closeQuranReader(){
   const badge = document.getElementById('quranSessionBadge');
   badge.style.display = 'block';
   badge.innerHTML =
-    `📖 Last Session: Pages ${startQuranPage}–${endQuranPage} &nbsp;·&nbsp; ${pagesRead} pages &nbsp;·&nbsp; ≈ ${juzzRead.toFixed(2)} Juzz recorded`;
+    `📖 Last Session: Pages ${startQuranPage}–${endQuranPage} &nbsp;·&nbsp; ${pagesRead} pages &nbsp;·&nbsp; ≈ ${juzzRead.toFixed(2)} Juzz`;
 
   await saveAndRefresh();
 }
@@ -1182,8 +1171,10 @@ function scoreDay(data){
     else if(v==='qaza')     core+=0.75;
   });
 
-  // Quran 10% (goal = 1 juzz)
-  const qRaw=parseFloat(data.quranQuarter)||0;
+  // Quran 10% — PDF reader wins over manual dropdown
+  const qRaw = data.quranPdfJuzz !== undefined
+    ? parseFloat(data.quranPdfJuzz) || 0
+    : parseFloat(data.quranQuarter) || 0;
   core+=Math.min(qRaw*10,10);
 
   // Tahajjud 10% (goal = 4 rakat)
@@ -1253,7 +1244,12 @@ function goalScore(data,key){
       });
       return Math.round((s/5)*100);
     }
-    case 'quran':    return Math.min(Math.round((parseFloat(data.quranQuarter)||0)*100),100);
+    case 'quran': {
+      const q = data.quranPdfJuzz !== undefined
+        ? parseFloat(data.quranPdfJuzz) || 0
+        : parseFloat(data.quranQuarter) || 0;
+      return Math.min(Math.round(q * 100), 100);
+    }
     case 'tahajjud': return Math.min(Math.round(((parseInt(data.tahajjudRakat)||0)/4)*100),100);
     case 'zikr':     return Math.min(Math.round(((parseInt(data.zikrCount)||0)/1500)*100),100);
     case 'hadith':   return data.hadith==='yes'?100:0;

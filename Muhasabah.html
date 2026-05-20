@@ -452,7 +452,7 @@ canvas#qrCanvas{
         </select>
       </div>
       <div class="sub-label">Goal: 1 Juzz/Day = Full 10% Core &nbsp;·&nbsp; Every Extra Juzz = +5% Bonus &nbsp;·&nbsp; Quarters Proportional</div>
-      <button class="qr-open-btn" onclick="openQuranReader()">📖 Open Quran Reader — Resume From Last Page</button>
+      <button class="qr-open-btn" onclick="openQuranReader()">📖 Open Quran Reader</button>
       <div class="qr-session-badge" id="quranSessionBadge" style="display:none;"></div>
     </div>
 
@@ -480,6 +480,8 @@ canvas#qrCanvas{
         <span class="of-label">/ 1500 Goal</span>
       </div>
       <div class="sub-label">Goal: 1500 = Full 5% Core &nbsp;·&nbsp; Every Extra 1500 = +2.5% Bonus</div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('zikr')">📿 Open Zikr Reader</button>
+      <div class="qr-session-badge" id="zikrSessionBadge" style="display:none;"></div>
     </div>
 
     <!-- Hadith 5% -->
@@ -528,6 +530,8 @@ canvas#qrCanvas{
         <button class="yn-btn yes" data-key="zikrMorning" data-val="yes" onclick="setYN('zikrMorning','yes')">Yes</button>
         <button class="yn-btn no"  data-key="zikrMorning" data-val="no"  onclick="setYN('zikrMorning','no')">No</button>
       </div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('zikrMorning')">☀️ Open Morning Zikr Reader</button>
+      <div class="qr-session-badge" id="zikrMorningSessionBadge" style="display:none;"></div>
     </div>
 
     <!-- Zikr Evening 5% -->
@@ -540,6 +544,8 @@ canvas#qrCanvas{
         <button class="yn-btn yes" data-key="zikrEvening" data-val="yes" onclick="setYN('zikrEvening','yes')">Yes</button>
         <button class="yn-btn no"  data-key="zikrEvening" data-val="no"  onclick="setYN('zikrEvening','no')">No</button>
       </div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('zikrEvening')">🌆 Open Evening Zikr Reader</button>
+      <div class="qr-session-badge" id="zikrEveningSessionBadge" style="display:none;"></div>
     </div>
 
     <!-- Surah Al-Waqiah 5% -->
@@ -755,6 +761,27 @@ canvas#qrCanvas{
     <button class="qr-nav" id="qrPrev" onclick="qrChangePage(-1)">← Prev</button>
     <div class="qr-page-display" id="qrPageDisplay">Page — / —</div>
     <button class="qr-nav" id="qrNext" onclick="qrChangePage(1)">Next →</button>
+  </div>
+</div>
+
+<!-- ══ Generic PDF Reader Overlay (shared for Zikr / Morning / Evening) ══ -->
+<div class="quran-reader-overlay" id="pdfReaderOverlay">
+  <div class="qr-topbar">
+    <div>
+      <div class="qr-title" id="pdfReaderTitle">PDF Reader</div>
+      <div class="qr-info" id="pdfReaderInfo"></div>
+    </div>
+    <div class="qr-session-info" id="pdfReaderSessionInfo"></div>
+    <button class="qr-close" onclick="closePdfReader()">✕ Exit & Save</button>
+  </div>
+  <div class="qr-canvas-wrap">
+    <div class="qr-loading" id="pdfReaderLoading">Loading…</div>
+    <canvas id="pdfReaderCanvas"></canvas>
+  </div>
+  <div class="qr-bottombar">
+    <button class="qr-nav" id="pdfReaderPrev" onclick="pdfReaderChangePage(-1)">← Prev</button>
+    <div class="qr-page-display" id="pdfReaderPageDisplay">Page — / —</div>
+    <button class="qr-nav" id="pdfReaderNext" onclick="pdfReaderChangePage(1)">Next →</button>
   </div>
 </div>
 
@@ -1044,6 +1071,176 @@ async function setQrLastPage(pdfPageNum){
       tx.onerror    = e => rej(e.target.error);
     });
   }catch(e){}
+}
+
+/* ══════════════════════════════════════════════════════════
+   GENERIC PDF READER — Zikr / Zikr Morning / Zikr Evening
+   Each PDF sits in the same folder as the HTML.
+   When the last page is reached and the reader is closed,
+   the corresponding yes/no goal is automatically set to "yes".
+══════════════════════════════════════════════════════════ */
+const PDF_READER_CONFIG = {
+  zikr: {
+    pdfPath:    'Zikr.pdf',
+    idbKey:     '_pdf_lastpage_zikr',
+    title:      '📿 Zikr',
+    goalKey:    null,           // zikr uses count-based scoring, not yes/no
+    badgeId:    'zikrSessionBadge',
+  },
+  zikrMorning: {
+    pdfPath:    'Zikr%20Morning.pdf',
+    idbKey:     '_pdf_lastpage_zikrMorning',
+    title:      '☀️ Zikr Morning',
+    goalKey:    'zikrMorning',
+    badgeId:    'zikrMorningSessionBadge',
+  },
+  zikrEvening: {
+    pdfPath:    'Zikr%20Evening.pdf',
+    idbKey:     '_pdf_lastpage_zikrEvening',
+    title:      '🌆 Zikr Evening',
+    goalKey:    'zikrEvening',
+    badgeId:    'zikrEveningSessionBadge',
+  },
+};
+
+let pdfReaderType     = null;  // which reader is active ('zikr'|'zikrMorning'|'zikrEvening')
+let pdfReaderDoc      = {};    // cache of loaded pdfjsLib docs per type
+let pdfReaderCurPage  = 1;
+let pdfReaderLastPage = 1;     // total pages in current PDF
+let pdfReaderRendering= false;
+
+async function openPdfReader(type){
+  pdfReaderType = type;
+  const cfg = PDF_READER_CONFIG[type];
+
+  document.getElementById('pdfReaderTitle').textContent = cfg.title;
+  document.getElementById('pdfReaderInfo').textContent  = cfg.title + ' — PDF Reader';
+  document.getElementById('pdfReaderSessionInfo').textContent = '';
+  document.getElementById('pdfReaderLoading').style.display = 'flex';
+  document.getElementById('pdfReaderLoading').textContent   = 'Loading…';
+  document.getElementById('pdfReaderCanvas').style.display  = 'none';
+  document.getElementById('pdfReaderOverlay').classList.add('active');
+
+  // Load PDF if not already cached
+  if(!pdfReaderDoc[type]){
+    try{
+      pdfReaderDoc[type] = await pdfjsLib.getDocument(cfg.pdfPath).promise;
+    }catch(e){
+      document.getElementById('pdfReaderLoading').textContent =
+        '⚠ Could Not Load PDF — Make sure ' + cfg.pdfPath + ' is in the same folder as this HTML file.';
+      return;
+    }
+  }
+
+  pdfReaderLastPage = pdfReaderDoc[type].numPages;
+
+  // Always start from page 1 (no resume for zikr readers)
+  pdfReaderCurPage = 1;
+
+  await pdfReaderRenderPage(pdfReaderCurPage);
+}
+
+async function pdfReaderRenderPage(pageNum){
+  if(pdfReaderRendering) return;
+  pdfReaderRendering = true;
+
+  const type = pdfReaderType;
+  document.getElementById('pdfReaderLoading').style.display = 'flex';
+  document.getElementById('pdfReaderCanvas').style.display  = 'none';
+
+  try{
+    const page = await pdfReaderDoc[type].getPage(pageNum);
+    const wrap = document.querySelector('#pdfReaderOverlay .qr-canvas-wrap');
+    const maxW  = wrap.clientWidth  - 20;
+    const maxH  = wrap.clientHeight - 20;
+    const vp0   = page.getViewport({scale:1});
+    const scale = Math.min(maxW/vp0.width, maxH/vp0.height, 2.2);
+    const vp    = page.getViewport({scale});
+
+    const canvas  = document.getElementById('pdfReaderCanvas');
+    canvas.width  = vp.width;
+    canvas.height = vp.height;
+    await page.render({canvasContext:canvas.getContext('2d'), viewport:vp}).promise;
+
+    canvas.style.display = 'block';
+    document.getElementById('pdfReaderLoading').style.display = 'none';
+
+    document.getElementById('pdfReaderPageDisplay').textContent =
+      `Page ${pageNum} / ${pdfReaderLastPage}`;
+    document.getElementById('pdfReaderInfo').textContent =
+      PDF_READER_CONFIG[type].title + `  ·  Page ${pageNum} of ${pdfReaderLastPage}`;
+
+    document.getElementById('pdfReaderPrev').disabled = pageNum <= 1;
+    document.getElementById('pdfReaderNext').disabled = pageNum >= pdfReaderLastPage;
+
+    // Session info: show completion hint on last page
+    const sessionEl = document.getElementById('pdfReaderSessionInfo');
+    if(pageNum >= pdfReaderLastPage){
+      sessionEl.textContent = '✓ Last page reached — Exit & Save to complete goal';
+      sessionEl.style.color = 'var(--green-bright)';
+    } else {
+      sessionEl.textContent = `${pdfReaderLastPage - pageNum} page${pdfReaderLastPage - pageNum !== 1 ? 's' : ''} remaining`;
+      sessionEl.style.color = 'var(--purple-bright)';
+    }
+  }catch(e){
+    document.getElementById('pdfReaderLoading').textContent = '⚠ Error Rendering Page';
+  }
+  pdfReaderRendering = false;
+}
+
+async function pdfReaderChangePage(delta){
+  const next = pdfReaderCurPage + delta;
+  if(next < 1 || next > pdfReaderLastPage) return;
+  pdfReaderCurPage = next;
+  await pdfReaderRenderPage(pdfReaderCurPage);
+}
+
+async function closePdfReader(){
+  const overlay = document.getElementById('pdfReaderOverlay');
+  overlay.classList.remove('active');
+
+  const type = pdfReaderType;
+  if(!type || !currentDateKey) return;
+
+  const cfg = PDF_READER_CONFIG[type];
+  const reachedEnd = pdfReaderCurPage >= pdfReaderLastPage;
+
+  // Auto-complete the yes/no goal if last page was reached
+  if(reachedEnd && cfg.goalKey){
+    const data = {...getCached(currentDateKey)};
+    data[cfg.goalKey] = 'yes';
+    data[type + '_readerCompleted'] = true;
+    data[type + '_readerPage'] = pdfReaderCurPage;
+    _cache[currentDateKey] = data;
+    await setStore(currentDateKey, data);
+
+    // Update YN buttons
+    document.querySelectorAll(`.yn-btn[data-key="${cfg.goalKey}"]`).forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.val === 'yes');
+    });
+  } else {
+    // Save partial progress
+    const data = {...getCached(currentDateKey)};
+    data[type + '_readerPage'] = pdfReaderCurPage;
+    _cache[currentDateKey] = data;
+    await setStore(currentDateKey, data);
+  }
+
+  // Show session badge
+  const badge = document.getElementById(cfg.badgeId);
+  if(badge){
+    badge.style.display = 'block';
+    if(reachedEnd){
+      badge.innerHTML = `✓ Completed — All ${pdfReaderLastPage} pages read`;
+      badge.style.color = 'var(--green-bright)';
+    } else {
+      badge.innerHTML = `📖 Stopped at page ${pdfReaderCurPage} of ${pdfReaderLastPage}`;
+      badge.style.color = 'var(--text-muted)';
+    }
+  }
+
+  await saveAndRefresh();
+  pdfReaderType = null;
 }
 
 
@@ -1399,6 +1596,24 @@ function loadDayData(dk){
   } else {
     badge.style.display='none';
   }
+
+  // Show zikr reader badges
+  ['zikr','zikrMorning','zikrEvening'].forEach(type => {
+    const cfg = PDF_READER_CONFIG[type];
+    const b = document.getElementById(cfg.badgeId);
+    if(!b) return;
+    if(data[type + '_readerCompleted']){
+      b.style.display = 'block';
+      b.innerHTML = `✓ Completed — All pages read`;
+      b.style.color = 'var(--green-bright)';
+    } else if(data[type + '_readerPage']){
+      b.style.display = 'block';
+      b.innerHTML = `📖 Stopped at page ${data[type + '_readerPage']}`;
+      b.style.color = 'var(--text-muted)';
+    } else {
+      b.style.display = 'none';
+    }
+  });
 
   const salahs=data.salahs||{};
   SALAHS.forEach(salah=>{

@@ -307,8 +307,9 @@ canvas#qrCanvas{
   </div>
   <div class="header-right">
     <button class="back-btn" id="backBtn" onclick="showCalendar()">← Calendar</button>
-    <button class="export-btn" onclick="exportData()">↑ Export</button>
-    <button class="import-btn" onclick="openImportModal()">↓ Import</button>
+    <button class="export-btn" onclick="openReadMe()" style="border-color:var(--purple);color:var(--purple-bright);">&#x1F4D6; Read Me</button>
+    <button class="export-btn" onclick="exportData()">&#x2191; Export</button>
+    <button class="import-btn" onclick="openImportModal()">&#x2193; Import</button>
     <button class="reset-btn" onclick="openResetModal()">Reset All Data</button>
   </div>
 </div>
@@ -355,6 +356,17 @@ canvas#qrCanvas{
       <button class="btn-donate" onclick="supportDonate()">💛 I'll Donate</button>
       <button class="btn-later" onclick="supportLater()">Remind Me In 7 Days</button>
       <button class="btn-never" onclick="supportNever()">Never Show This Again</button>
+    </div>
+  </div>
+</div>
+
+<!-- Read Me Modal -->
+<div class="modal-overlay" id="readMeModal">
+  <div class="modal" style="max-width:500px;border-color:var(--purple);text-align:left;">
+    <h3 style="color:var(--purple-bright);margin-bottom:16px;">&#x1F4D6; Read Me</h3>
+    <p style="color:var(--text-dim);font-size:12px;line-height:1.8;">Contents coming soon. This section will contain guidance on how to use the tracker.</p>
+    <div class="modal-btns" style="margin-top:24px;">
+      <button class="modal-cancel" onclick="closeReadMe()">Close</button>
     </div>
   </div>
 </div>
@@ -1574,13 +1586,16 @@ function scoreDay(data){
   const zikr=parseInt(data.zikrCount)||0;
   core+=Math.min((zikr/1500)*5,5);
 
-  // Hadith 5% (yes/no)
-  if(data.hadith==='yes') core+=5;
+  // Hadith 5% — proportional via ratio if reader used, else yes/no
+  const hdRatio = data['hadith_ratio'];
+  core += hdRatio !== undefined ? Math.min(hdRatio * 5, 5) : (data.hadith==='yes'?5:0);
 
   // Yes/No core goals — 5% each
   // zikrMorning and zikrEvening use PDF ratio if available, else yes/no
   const yn=(k,w)=>{if(data[k]==='yes')core+=w;};
-  yn('tafsir',5);
+  // Tafsir 5% — proportional via ratio if reader used, else yes/no
+  const tfRatio = data['tafsir_ratio'];
+  core += tfRatio !== undefined ? Math.min(tfRatio * 5, 5) : (data.tafsir==='yes'?5:0);
 
   // asmaul 5% — proportional if PDF used, else yes/no
   const azRatio = data['asmaul_pdfRatio'];
@@ -1666,8 +1681,14 @@ function goalScore(data,key){
     }
     case 'tahajjud': return Math.min(Math.round(((parseInt(data.tahajjudRakat)||0)/4)*100),100);
     case 'zikr':     return Math.min(Math.round(((parseInt(data.zikrCount)||0)/1500)*100),100);
-    case 'hadith':   return data.hadith==='yes'?100:0;
-    case 'tafsir':      return data.tafsir==='yes'?100:0;
+    case 'hadith': {
+      const r = data['hadith_ratio'];
+      return r !== undefined ? Math.min(Math.round(r*100),100) : (data.hadith==='yes'?100:0);
+    }
+    case 'tafsir': {
+      const r = data['tafsir_ratio'];
+      return r !== undefined ? Math.min(Math.round(r*100),100) : (data.tafsir==='yes'?100:0);
+    }
     case 'asmaul': {
       const r = data['asmaul_pdfRatio'];
       return r !== undefined ? Math.min(Math.round(r * 100), 100) : (data.asmaul==='yes'?100:0);
@@ -2212,6 +2233,14 @@ async function confirmImport(){
   setTimeout(()=>{t.style.display='none';t.textContent='✓ Saved & Backed Up';},2500);
 }
 
+/* ── Read Me ── */
+function openReadMe(){
+  document.getElementById('readMeModal').classList.add('active');
+}
+function closeReadMe(){
+  document.getElementById('readMeModal').classList.remove('active');
+}
+
 /* ── Init ── */
 (async()=>{
   await migrateFromLocalStorage();
@@ -2221,11 +2250,6 @@ async function confirmImport(){
 
 /* ════════════════════════════════════════════════════
    HADITH & TAFSIR READERS
-   Strategy:
-   - Hadith: fetch entire eng-muslim book once, cache in memory,
-             slice 5 hadiths per day from the array. No per-hadith calls.
-   - Tafsir: fetch entire surah from alquran.cloud once per surah,
-             cache in memory. Zero per-verse calls. No failures.
    ════════════════════════════════════════════════════ */
 
 const HADITH_START_DATE = '2026-01-01';
@@ -2233,11 +2257,12 @@ const TAFSIR_START_DATE = '2026-01-01';
 const HADITHS_PER_DAY   = 5;
 const VERSES_PER_DAY    = 17;
 const TOTAL_VERSES      = 6236;
+const BASE_URL          = 'https://jareernadwi.github.io/Muhasabah/';
 
 const SURAH_LENGTHS = [7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,
   110,98,135,112,78,118,64,77,227,93,88,69,60,34,30,73,54,45,83,182,88,75,85,54,53,
   89,59,37,35,31,31,18,45,60,49,62,39,40,29,67,29,53,44,55,26,24,43,6,11,50,28,52,
-  28,28,20,56,40,31,50,45,6,29,22,59,85,8,8,72,28,31,28,88,20,94,6,5,8,29,7,22,6,
+  28,28,20,56,40,31,50,45,6,29,22,59,85,8,8,72,28,31,28,28,20,94,6,5,8,29,7,22,6,
   71,65,30,54,26,20,19,18,26,25,25,26,25,32,24,20,28,36,22,26,24,27,33,7,50,11,11,
   9,12,10,7,5,8,14,19,3,22,21,28,18,22,15,12,13,14,18,17,9,12,14,16,19,14,16,4,11,
   14,11,6,17,5,17,11,22,16,16,10,12,5,3,4,4,7,3,6,3,5,3,5,3,3,3];
@@ -2249,7 +2274,7 @@ const SURAH_NAMES = ['','Al-Fatihah','Al-Baqarah',"Ali 'Imran","An-Nisa","Al-Ma'
   "Al-'Ankabut",'Ar-Rum','Luqman','As-Sajdah','Al-Ahzab','Saba','Fatir','Ya-Sin',
   'As-Saffat','Sad','Az-Zumar','Ghafir','Fussilat','Ash-Shuraa','Az-Zukhruf',
   'Ad-Dukhan','Al-Jathiyah','Al-Ahqaf','Muhammad','Al-Fath','Al-Hujurat','Qaf',
-  'Adh-Dhariyat',"At-Tur",'An-Najm','Al-Qamar',"Ar-Rahman","Al-Waqi'ah",'Al-Hadid',
+  'Adh-Dhariyat','At-Tur','An-Najm','Al-Qamar',"Ar-Rahman","Al-Waqi'ah",'Al-Hadid',
   'Al-Mujadila','Al-Hashr','Al-Mumtahanah','As-Saf','Al-Jumuah','Al-Munafiqun',
   'At-Taghabun','At-Talaq','At-Tahrim','Al-Mulk','Al-Qalam','Al-Haqqah','Al-Maarij',
   'Nuh','Al-Jinn','Al-Muzzammil','Al-Muddaththir','Al-Qiyamah','Al-Insan','Al-Mursalat',
@@ -2264,58 +2289,100 @@ function dayIdx(startDK, dk){
   return Math.max(0, Math.floor((new Date(dk) - new Date(startDK)) / 86400000));
 }
 
-/* Global verse number → {surah, ayah} */
 function globalVerseToSurahAyah(n){
   let rem = n;
   for(let s = 0; s < SURAH_LENGTHS.length; s++){
-    if(rem <= SURAH_LENGTHS[s]) return { surah: s + 1, ayah: rem };
+    if(rem <= SURAH_LENGTHS[s]) return { surah: s+1, ayah: rem };
     rem -= SURAH_LENGTHS[s];
   }
-  return { surah: 114, ayah: 6 };
+  return { surah:114, ayah:6 };
 }
 
-/* ─── save + refresh ─── */
+/* IDB resume helpers */
+async function getReaderResume(key){
+  try{
+    const db = await openDB();
+    return new Promise(res=>{
+      const tx = db.transaction(STORE,'readonly');
+      const req = tx.objectStore(STORE).get(key);
+      req.onsuccess = ()=> res(req.result ? req.result.data : null);
+      req.onerror   = ()=> res(null);
+    });
+  }catch(e){ return null; }
+}
+async function setReaderResume(key, val){
+  try{
+    const db = await openDB();
+    return new Promise((res,rej)=>{
+      const tx = db.transaction(STORE,'readwrite');
+      tx.objectStore(STORE).put({dk:key, data:val});
+      tx.oncomplete = ()=> res();
+      tx.onerror    = e => rej(e.target.error);
+    });
+  }catch(e){}
+}
+
+/* Save + refresh */
 async function saveReaderData(dk, patch){
   const d = Object.assign({}, getCached(dk), patch);
   _cache[dk] = d;
   await setStore(dk, d);
   refreshScores();
-  refreshHadithBadge(dk);
-  refreshTafsirBadge(dk);
+  renderHadithBadge(dk);
+  renderTafsirBadge(dk);
 }
 
-function refreshHadithBadge(dk){
+/* Badge renderers */
+function renderHadithBadge(dk){
+  const data  = getCached(dk);
   const badge = document.getElementById('hadithSessionBadge');
   if(!badge) return;
-  const done = getCached(dk).hadith === 'yes';
-  badge.textContent   = '✓ All 5 Hadiths Read Today';
-  badge.style.display = done ? 'block' : 'none';
+  const sessions = data.hadith_sessions || [];
+  if(!sessions.length){ badge.style.display='none'; return; }
+  const done  = data.hadith === 'yes';
+  const ratio = parseFloat(data.hadith_ratio) || 0;
+  const pct   = Math.round(ratio * 100);
+  const count = sessions.length;
+  const last  = sessions[sessions.length-1];
+  badge.style.display = 'block';
+  badge.innerHTML =
+    '<span style="color:var(--gold);">\u{1F4DA} Today: '+count+' session'+(count!==1?'s':'')+' &nbsp;&middot;&nbsp; '+(done?'Completed \u2713':pct+'% ('+last.end+'/'+HADITHS_PER_DAY+' hadiths)')+'</span>'
+    +'<br><span style="font-size:9px;color:var(--text-muted);">Session '+count+': Hadiths '+last.start+'\u2013'+last.end+'</span>';
 }
 
-function refreshTafsirBadge(dk){
+function renderTafsirBadge(dk){
+  const data  = getCached(dk);
   const badge = document.getElementById('tafsirSessionBadge');
   if(!badge) return;
-  const done = getCached(dk).tafsir === 'yes';
-  badge.textContent   = '✓ All 17 Verses Read Today';
-  badge.style.display = done ? 'block' : 'none';
+  const sessions = data.tafsir_sessions || [];
+  if(!sessions.length){ badge.style.display='none'; return; }
+  const done  = data.tafsir === 'yes';
+  const ratio = parseFloat(data.tafsir_ratio) || 0;
+  const pct   = Math.round(ratio * 100);
+  const count = sessions.length;
+  const last  = sessions[sessions.length-1];
+  badge.style.display = 'block';
+  badge.innerHTML =
+    '<span style="color:var(--gold);">\u{1F50D} Today: '+count+' session'+(count!==1?'s':'')+' &nbsp;&middot;&nbsp; '+(done?'Completed \u2713':pct+'% ('+last.end+'/'+VERSES_PER_DAY+' verses)')+'</span>'
+    +'<br><span style="font-size:9px;color:var(--text-muted);">Session '+count+': Verses '+last.start+'\u2013'+last.end+'</span>';
 }
 
-/* ══════════════════════════════════════
-   HADITH READER
-   Fetch full book once → slice per day
-   ══════════════════════════════════════ */
-let _hadithBook  = null;   /* full array of {hadithnumber, text} once loaded */
-let _hadithData  = [];     /* today's 5 */
-let _hadithIdx   = 0;
-let _hadithDK    = '';
+/* Scoring updates */
+function getHadithScore(data){ return Math.min(Math.round((parseFloat(data.hadith_ratio)||0)*100),100); }
+function getTafsirScore(data){ return Math.min(Math.round((parseFloat(data.tafsir_ratio)||0)*100),100); }
+
+/* ══════ HADITH READER ══════ */
+let _hadithBook = null;
+let _hadithData = [];
+let _hadithIdx  = 0;
+let _hadithDK   = '';
+let _hadithSessionStart = 0;
 
 async function openHadithReader(){
-  _hadithDK  = currentDateKey || todayKey();
-  _hadithIdx = 0;
-
+  _hadithDK = currentDateKey || todayKey();
   document.getElementById('hadithReaderOverlay').classList.add('active');
 
-  const di    = dayIdx(HADITH_START_DATE, _hadithDK);
+  const di      = dayIdx(HADITH_START_DATE, _hadithDK);
   const already = getCached(_hadithDK).hadith === 'yes';
   document.getElementById('hadithDoneNote').style.display = already ? 'block' : 'none';
   document.getElementById('hadithLoading').style.display  = 'flex';
@@ -2324,32 +2391,32 @@ async function openHadithReader(){
 
   try {
     if(!_hadithBook){
-      document.getElementById('hadithLoading').innerHTML = 'Loading Sahih Muslim…';
-      const res  = await fetch('https://jareernadwi.github.io/Muhasabah/hadith-muslim.json');
-      if(!res.ok) throw new Error('hadith-muslim.json not found: ' + res.status);
+      document.getElementById('hadithLoading').innerHTML = 'Loading Sahih Muslim...';
+      const res = await fetch(BASE_URL + 'hadith-muslim.json');
+      if(!res.ok) throw new Error('hadith-muslim.json HTTP ' + res.status);
       const json = await res.json();
       _hadithBook = json.hadiths || [];
     }
+    const total    = _hadithBook.length;
+    const dayStart = (di * HADITHS_PER_DAY) % total;
+    _hadithData    = [];
+    for(let i = 0; i < HADITHS_PER_DAY; i++) _hadithData.push(_hadithBook[(dayStart+i)%total]);
 
-    const total   = _hadithBook.length;
-    const startI  = (di * HADITHS_PER_DAY) % total;
-    _hadithData   = [];
-    for(let i = 0; i < HADITHS_PER_DAY; i++){
-      _hadithData.push(_hadithBook[(startI + i) % total]);
-    }
+    const savedIdx = await getReaderResume('_hadith_resume_' + _hadithDK);
+    const startIdx = (savedIdx !== null && savedIdx < HADITHS_PER_DAY) ? savedIdx : 0;
+    _hadithSessionStart = startIdx;
 
-    const firstNum = _hadithData[0]?.hadithnumber || startI + 1;
-    const lastNum  = _hadithData[HADITHS_PER_DAY-1]?.hadithnumber || startI + HADITHS_PER_DAY;
+    const firstNum = _hadithData[0]?.hadithnumber || dayStart+1;
+    const lastNum  = _hadithData[HADITHS_PER_DAY-1]?.hadithnumber || dayStart+HADITHS_PER_DAY;
     document.getElementById('hadithDayInfo').textContent =
-      `Sahih Muslim · Day ${di+1} · Hadiths ${firstNum}–${lastNum}`;
+      'Sahih Muslim \u00B7 Day '+(di+1)+' \u00B7 Hadiths '+firstNum+'\u2013'+lastNum;
 
     document.getElementById('hadithLoading').style.display = 'none';
     document.getElementById('hadithContent').style.display = 'block';
     document.getElementById('hadithNav').style.display     = 'flex';
-    renderHadith(0);
-  } catch(e) {
-    document.getElementById('hadithLoading').textContent =
-      '⚠ Failed to load. Check internet connection and try again.';
+    renderHadith(startIdx);
+  } catch(e){
+    document.getElementById('hadithLoading').textContent = '\u26A0 Failed: ' + e.message;
   }
 }
 
@@ -2357,112 +2424,111 @@ function renderHadith(idx){
   _hadithIdx = idx;
   const h = _hadithData[idx];
   if(!h) return;
-  document.getElementById('hadithNum').textContent     = `Hadith ${h.hadithnumber}`;
-  document.getElementById('hadithCounter').textContent = `${idx+1} / ${HADITHS_PER_DAY}`;
+  document.getElementById('hadithNum').textContent     = 'Hadith ' + h.hadithnumber;
+  document.getElementById('hadithCounter').textContent = (idx+1) + ' / ' + HADITHS_PER_DAY;
   document.getElementById('hadithText').textContent    = h.text || 'Content unavailable.';
   document.getElementById('hadithPrevBtn').disabled    = idx === 0;
   const isLast  = idx === HADITHS_PER_DAY - 1;
-  const nextBtn = document.getElementById('hadithNextBtn');
-  nextBtn.textContent         = isLast ? '✓ Mark Done' : 'Next →';
-  nextBtn.style.background    = isLast ? 'var(--green)'        : '';
-  nextBtn.style.borderColor   = isLast ? 'var(--green-bright)' : '';
-  nextBtn.style.color         = isLast ? '#fff'                : '';
-  nextBtn.disabled = false;
+  const btn = document.getElementById('hadithNextBtn');
+  btn.textContent       = isLast ? '\u2713 Mark Done' : 'Next \u2192';
+  btn.style.background  = isLast ? 'var(--green)'        : '';
+  btn.style.borderColor = isLast ? 'var(--green-bright)' : '';
+  btn.style.color       = isLast ? '#fff'                : '';
+  btn.disabled = false;
 }
 
 async function hadithNavNext(){
   if(_hadithIdx < HADITHS_PER_DAY - 1){
-    renderHadith(_hadithIdx + 1);
+    const next = _hadithIdx + 1;
+    await setReaderResume('_hadith_resume_' + _hadithDK, next);
+    await _saveHadithProgress(next + 1, false);
+    renderHadith(next);
   } else {
-    await saveReaderData(_hadithDK, { hadith: 'yes' });
-    document.getElementById('hadithDoneNote').style.display = 'block';
-    const btn = document.getElementById('hadithNextBtn');
-    btn.textContent = '✓ Completed';
-    btn.disabled    = true;
+    await _saveHadithProgress(HADITHS_PER_DAY, true);
+    closeHadithReader();
   }
 }
+
+async function _saveHadithProgress(read, done){
+  const existing = getCached(_hadithDK);
+  const sessions = existing.hadith_sessions ? [...existing.hadith_sessions] : [];
+  const entry    = { start: _hadithSessionStart+1, end: read };
+  if(sessions.length && sessions[sessions.length-1].start === _hadithSessionStart+1)
+    sessions[sessions.length-1] = entry;
+  else sessions.push(entry);
+  const patch = { hadith_sessions: sessions, hadith_ratio: Math.min(read/HADITHS_PER_DAY,1) };
+  if(done) patch.hadith = 'yes';
+  await saveReaderData(_hadithDK, patch);
+}
+
 function hadithNavPrev(){ if(_hadithIdx > 0) renderHadith(_hadithIdx - 1); }
 function closeHadithReader(){ document.getElementById('hadithReaderOverlay').classList.remove('active'); }
 
-/* ══════════════════════════════════════
-   TAFSIR READER
-   Fetch full surah once → slice verses
-   ══════════════════════════════════════ */
-let _quranArabic  = null;   /* full array of {chapter, verse, text} */
-let _quranEnglish = null;   /* full array of {chapter, verse, text} */
-let _tafsirSlice = [];    /* today's 17 verse objects */
-let _tafsirIdx   = 0;
-let _tafsirDK    = '';
+/* ══════ TAFSIR READER ══════ */
+let _quranArabic  = null;
+let _quranEnglish = null;
+let _tafsirSlice  = [];
+let _tafsirIdx    = 0;
+let _tafsirDK     = '';
+let _tafsirSessionStart = 0;
 
 async function openTafsirReader(){
-  _tafsirDK  = currentDateKey || todayKey();
-  _tafsirIdx = 0;
-
+  _tafsirDK = currentDateKey || todayKey();
   document.getElementById('tafsirReaderOverlay').classList.add('active');
 
-  const di    = dayIdx(TAFSIR_START_DATE, _tafsirDK);
+  const di     = dayIdx(TAFSIR_START_DATE, _tafsirDK);
   const startV = (di * VERSES_PER_DAY) % TOTAL_VERSES + 1;
   const endV   = Math.min(startV + VERSES_PER_DAY - 1, TOTAL_VERSES);
 
   const already = getCached(_tafsirDK).tafsir === 'yes';
   document.getElementById('tafsirDoneNote').style.display = already ? 'block' : 'none';
   document.getElementById('tafsirDayInfo').textContent =
-    `Saheeh International · Day ${di+1} · Verses ${startV}–${endV}`;
+    'Saheeh International \u00B7 Day '+(di+1)+' \u00B7 Verses '+startV+'\u2013'+endV;
 
   document.getElementById('tafsirLoading').style.display = 'flex';
   document.getElementById('tafsirContent').style.display = 'none';
   document.getElementById('tafsirNav').style.display     = 'none';
 
   try {
-    /* Load both Quran files once, cache in memory */
-    const BASE = 'https://jareernadwi.github.io/Muhasabah/';
     if(!_quranArabic){
-      document.getElementById('tafsirLoading').innerHTML = 'Loading Quran Arabic…';
-      const res  = await fetch(BASE + 'quran-arabic.json');
-      if(!res.ok) throw new Error('quran-arabic.json not found: ' + res.status);
+      document.getElementById('tafsirLoading').innerHTML = 'Loading Quran Arabic...';
+      const res = await fetch(BASE_URL + 'quran-arabic.json');
+      if(!res.ok) throw new Error('quran-arabic.json HTTP ' + res.status);
       const json = await res.json();
       _quranArabic = json.quran || [];
+      _quranArabic._map = {};
+      _quranArabic.forEach(v => { _quranArabic._map[v.chapter+':'+v.verse] = v.text; });
     }
     if(!_quranEnglish){
-      document.getElementById('tafsirLoading').innerHTML = 'Loading Quran English…';
-      const res  = await fetch(BASE + 'quran-english.json');
-      if(!res.ok) throw new Error('quran-english.json not found: ' + res.status);
+      document.getElementById('tafsirLoading').innerHTML = 'Loading Quran English...';
+      const res = await fetch(BASE_URL + 'quran-english.json');
+      if(!res.ok) throw new Error('quran-english.json HTTP ' + res.status);
       const json = await res.json();
       _quranEnglish = json.quran || [];
-    }
-
-    /* Build lookup maps: "surah:ayah" → text */
-    if(!_quranArabic._map){
-      _quranArabic._map = {};
-      _quranArabic.forEach(v => { _quranArabic._map[`${v.chapter}:${v.verse}`] = v.text; });
-    }
-    if(!_quranEnglish._map){
       _quranEnglish._map = {};
-      _quranEnglish.forEach(v => { _quranEnglish._map[`${v.chapter}:${v.verse}`] = v.text; });
+      _quranEnglish.forEach(v => { _quranEnglish._map[v.chapter+':'+v.verse] = v.text; });
     }
 
-    /* Build today's verse slice */
     _tafsirSlice = [];
     for(let v = startV; v <= endV; v++){
-      const { surah, ayah } = globalVerseToSurahAyah(v);
-      const key = `${surah}:${ayah}`;
-      _tafsirSlice.push({
-        globalNum : v,
-        surahNum  : surah,
-        surahName : SURAH_NAMES[surah] || `Surah ${surah}`,
-        ayah,
-        arabic  : _quranArabic._map[key]  || '',
-        meaning : _quranEnglish._map[key] || 'Translation unavailable.'
-      });
+      const {surah, ayah} = globalVerseToSurahAyah(v);
+      const key = surah+':'+ayah;
+      _tafsirSlice.push({ globalNum:v, surahNum:surah,
+        surahName: SURAH_NAMES[surah]||'Surah '+surah, ayah,
+        arabic:  _quranArabic._map[key]  || '',
+        meaning: _quranEnglish._map[key] || 'Translation unavailable.' });
     }
+
+    const savedIdx = await getReaderResume('_tafsir_resume_' + _tafsirDK);
+    const startIdx = (savedIdx !== null && savedIdx < _tafsirSlice.length) ? savedIdx : 0;
+    _tafsirSessionStart = startIdx;
 
     document.getElementById('tafsirLoading').style.display = 'none';
     document.getElementById('tafsirContent').style.display = 'block';
     document.getElementById('tafsirNav').style.display     = 'flex';
-    renderTafsirVerse(0);
-  } catch(e) {
-    document.getElementById('tafsirLoading').textContent =
-      '⚠ Failed: ' + e.message;
+    renderTafsirVerse(startIdx);
+  } catch(e){
+    document.getElementById('tafsirLoading').textContent = '\u26A0 Failed: ' + e.message;
   }
 }
 
@@ -2471,94 +2537,122 @@ function renderTafsirVerse(idx){
   const v = _tafsirSlice[idx];
   if(!v) return;
   const total = _tafsirSlice.length;
-  document.getElementById('tafsirVerseRef').textContent =
-    `${v.surahName} · ${v.surahNum}:${v.ayah}`;
-  document.getElementById('tafsirCounter').textContent = `${idx+1} / ${total}`;
-  document.getElementById('tafsirArabic').textContent  = v.arabic;
-  document.getElementById('tafsirText').textContent    = v.meaning;
-  document.getElementById('tafsirPrevBtn').disabled    = idx === 0;
-  const isLast  = idx === total - 1;
-  const nextBtn = document.getElementById('tafsirNextBtn');
-  nextBtn.textContent       = isLast ? '✓ Mark Done' : 'Next →';
-  nextBtn.style.background  = isLast ? 'var(--green)'        : '';
-  nextBtn.style.borderColor = isLast ? 'var(--green-bright)' : '';
-  nextBtn.style.color       = isLast ? '#fff'                : '';
-  nextBtn.disabled = false;
+  document.getElementById('tafsirVerseRef').textContent = v.surahName+' \u00B7 '+v.surahNum+':'+v.ayah;
+  document.getElementById('tafsirCounter').textContent  = (idx+1)+' / '+total;
+  document.getElementById('tafsirArabic').textContent   = v.arabic;
+  document.getElementById('tafsirText').textContent     = v.meaning;
+  document.getElementById('tafsirPrevBtn').disabled     = idx === 0;
+  const isLast = idx === total - 1;
+  const btn = document.getElementById('tafsirNextBtn');
+  btn.textContent       = isLast ? '\u2713 Mark Done' : 'Next \u2192';
+  btn.style.background  = isLast ? 'var(--green)'        : '';
+  btn.style.borderColor = isLast ? 'var(--green-bright)' : '';
+  btn.style.color       = isLast ? '#fff'                : '';
+  btn.disabled = false;
 }
 
 async function tafsirNavNext(){
-  if(_tafsirIdx < _tafsirSlice.length - 1){
-    renderTafsirVerse(_tafsirIdx + 1);
+  const total = _tafsirSlice.length;
+  if(_tafsirIdx < total - 1){
+    const next = _tafsirIdx + 1;
+    await setReaderResume('_tafsir_resume_' + _tafsirDK, next);
+    await _saveTafsirProgress(next+1, false);
+    renderTafsirVerse(next);
   } else {
-    await saveReaderData(_tafsirDK, { tafsir: 'yes' });
-    document.getElementById('tafsirDoneNote').style.display = 'block';
-    const btn = document.getElementById('tafsirNextBtn');
-    btn.textContent = '✓ Completed';
-    btn.disabled    = true;
+    await _saveTafsirProgress(total, true);
+    closeTafsirReader();
   }
 }
+
+async function _saveTafsirProgress(read, done){
+  const total    = _tafsirSlice.length;
+  const existing = getCached(_tafsirDK);
+  const sessions = existing.tafsir_sessions ? [...existing.tafsir_sessions] : [];
+  const entry    = { start: _tafsirSessionStart+1, end: read };
+  if(sessions.length && sessions[sessions.length-1].start === _tafsirSessionStart+1)
+    sessions[sessions.length-1] = entry;
+  else sessions.push(entry);
+  const patch = { tafsir_sessions: sessions, tafsir_ratio: Math.min(read/total,1) };
+  if(done) patch.tafsir = 'yes';
+  await saveReaderData(_tafsirDK, patch);
+}
+
 function tafsirNavPrev(){ if(_tafsirIdx > 0) renderTafsirVerse(_tafsirIdx - 1); }
 function closeTafsirReader(){ document.getElementById('tafsirReaderOverlay').classList.remove('active'); }
 
-/* patch loadDayData to refresh hadith/tafsir badges */
+/* Keyboard arrow navigation for both readers */
+document.addEventListener('keydown', e => {
+  const hO = document.getElementById('hadithReaderOverlay');
+  const tO = document.getElementById('tafsirReaderOverlay');
+  if(hO && hO.classList.contains('active')){
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') hadithNavNext();
+    if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   hadithNavPrev();
+  }
+  if(tO && tO.classList.contains('active')){
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') tafsirNavNext();
+    if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   tafsirNavPrev();
+  }
+});
+
+/* patch loadDayData to refresh badges */
 const _origLoadDayData = loadDayData;
 loadDayData = function(dk){
   _origLoadDayData(dk);
-  refreshHadithBadge(dk);
-  refreshTafsirBadge(dk);
+  renderHadithBadge(dk);
+  renderTafsirBadge(dk);
 };
 </script>
 
-<!-- ═══ HADITH READER OVERLAY ═══ -->
+<!-- HADITH READER OVERLAY -->
 <div class="modal-overlay" id="hadithReaderOverlay" style="padding:16px;">
   <div style="display:flex;flex-direction:column;width:100%;max-width:680px;margin:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;max-height:92vh;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;">
       <div>
-        <div style="font-family:'Instrument Serif',serif;font-size:17px;color:var(--gold);">📚 Daily Hadith</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:17px;color:var(--gold);">&#x1F4DA; Daily Hadith</div>
         <div id="hadithDayInfo" style="font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:.4px;"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="hadithCounter" style="font-size:11px;color:var(--text-dim);"></span>
-        <button onclick="closeHadithReader()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:5px 11px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;">✕ Close</button>
+        <button onclick="closeHadithReader()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:5px 11px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;">&#x2715; Close</button>
       </div>
     </div>
-    <div id="hadithDoneNote" style="display:none;background:#071407;border-bottom:1px solid var(--green);padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">✓ You've already completed today's hadiths</div>
-    <div id="hadithLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:var(--text-dim);">Loading Sahih Muslim…</div>
+    <div id="hadithDoneNote" style="display:none;background:#071407;border-bottom:1px solid var(--green);padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">&#x2713; You've already completed today's hadiths</div>
+    <div id="hadithLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:var(--text-dim);">Loading Sahih Muslim...</div>
     <div id="hadithContent" style="display:none;flex:1;overflow-y:auto;padding:20px 18px;">
       <div id="hadithNum" style="font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:10px;text-transform:uppercase;"></div>
       <div id="hadithText" style="font-size:13px;color:var(--text);line-height:2;white-space:pre-wrap;"></div>
     </div>
     <div id="hadithNav" style="display:none;padding:12px 18px;border-top:1px solid var(--border);background:var(--surface2);flex-shrink:0;gap:8px;">
-      <button id="hadithPrevBtn" onclick="hadithNavPrev()" style="flex:1;padding:9px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;">← Prev</button>
-      <button id="hadithNextBtn" onclick="hadithNavNext()" style="flex:2;padding:9px;background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;transition:all .2s;">Next →</button>
+      <button id="hadithPrevBtn" onclick="hadithNavPrev()" style="flex:1;padding:9px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;">&#x2190; Prev</button>
+      <button id="hadithNextBtn" onclick="hadithNavNext()" style="flex:2;padding:9px;background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;transition:all .2s;">Next &#x2192;</button>
     </div>
   </div>
 </div>
 
-<!-- ═══ TAFSIR READER OVERLAY ═══ -->
+<!-- TAFSIR READER OVERLAY -->
 <div class="modal-overlay" id="tafsirReaderOverlay" style="padding:16px;">
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;max-height:92vh;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;">
       <div>
-        <div style="font-family:'Instrument Serif',serif;font-size:17px;color:var(--gold);">🔍 Daily Tafsir</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:17px;color:var(--gold);">&#x1F50D; Daily Tafsir</div>
         <div id="tafsirDayInfo" style="font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:.4px;"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="tafsirCounter" style="font-size:11px;color:var(--text-dim);"></span>
-        <button onclick="closeTafsirReader()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:5px 11px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;">✕ Close</button>
+        <button onclick="closeTafsirReader()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:5px 11px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;">&#x2715; Close</button>
       </div>
     </div>
-    <div id="tafsirDoneNote" style="display:none;background:#071407;border-bottom:1px solid var(--green);padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">✓ You've already completed today's tafsir</div>
-    <div id="tafsirLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:var(--text-dim);">Loading verses…</div>
+    <div id="tafsirDoneNote" style="display:none;background:#071407;border-bottom:1px solid var(--green);padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">&#x2713; You've already completed today's tafsir</div>
+    <div id="tafsirLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:var(--text-dim);">Loading verses...</div>
     <div id="tafsirContent" style="display:none;flex:1;overflow-y:auto;padding:20px 18px;">
       <div id="tafsirVerseRef" style="font-size:11px;color:var(--gold);letter-spacing:.5px;margin-bottom:14px;"></div>
       <div id="tafsirArabic" style="font-family:'Amiri',serif;font-size:22px;color:var(--text);line-height:2;text-align:right;direction:rtl;padding:14px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;"></div>
-      <div style="font-size:10px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase;">Meaning — Saheeh International</div>
+      <div style="font-size:10px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase;">Meaning &#x2014; Saheeh International</div>
       <div id="tafsirText" style="font-size:13px;color:var(--text);line-height:1.9;"></div>
     </div>
     <div id="tafsirNav" style="display:none;padding:12px 18px;border-top:1px solid var(--border);background:var(--surface2);flex-shrink:0;gap:8px;">
-      <button id="tafsirPrevBtn" onclick="tafsirNavPrev()" style="flex:1;padding:9px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;">← Prev</button>
-      <button id="tafsirNextBtn" onclick="tafsirNavNext()" style="flex:2;padding:9px;background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;transition:all .2s;">Next →</button>
+      <button id="tafsirPrevBtn" onclick="tafsirNavPrev()" style="flex:1;padding:9px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;">&#x2190; Prev</button>
+      <button id="tafsirNextBtn" onclick="tafsirNavNext()" style="flex:2;padding:9px;background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;transition:all .2s;">Next &#x2192;</button>
     </div>
   </div>
 </div>

@@ -2413,7 +2413,7 @@ async function openHadithReader(){
     for(let i = 0; i < HADITHS_PER_DAY; i++) _hadithData.push(_hadithBook[(dayStart+i)%total]);
 
     const savedIdx = await getReaderResume('_hadith_resume_' + _hadithDK);
-    const startIdx = (savedIdx !== null && savedIdx < HADITHS_PER_DAY) ? savedIdx : 0;
+    const startIdx = (savedIdx !== null && savedIdx + 1 < HADITHS_PER_DAY) ? savedIdx + 1 : 0;
     _hadithSessionStart = startIdx;
 
     const firstNum = _hadithData[0]?.hadithnumber || dayStart+1;
@@ -2538,7 +2538,7 @@ async function openTafsirReader(){
     }
 
     const savedIdx = await getReaderResume('_tafsir_resume_' + _tafsirDK);
-    const startIdx = (savedIdx !== null && savedIdx < _tafsirSlice.length) ? savedIdx : 0;
+    const startIdx = (savedIdx !== null && savedIdx + 1 < _tafsirSlice.length) ? savedIdx + 1 : 0;
     _tafsirSessionStart = startIdx;
 
     document.getElementById('tafsirLoading').style.display = 'none';

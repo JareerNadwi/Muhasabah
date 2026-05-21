@@ -501,7 +501,11 @@ canvas#qrCanvas{
         <div class="goal-name">📚 Hadith <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-hadith">0%</div>
       </div>
-      <button class="qr-open-btn" onclick="openHadithReader()">📚 Open Hadith Reader</button>
+      <div class="num-row">
+        <input type="number" id="hadithManual" min="0" placeholder="0" oninput="saveAndRefresh()">
+        <span class="of-label">/ 5 hadiths (manual)</span>
+      </div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openHadithReader()">📚 Open Hadith Reader</button>
       <div class="qr-session-badge" id="hadithSessionBadge" style="display:none;"></div>
     </div>
 
@@ -511,7 +515,11 @@ canvas#qrCanvas{
         <div class="goal-name">🔍 Tafsir <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-tafsir">0%</div>
       </div>
-      <button class="qr-open-btn" onclick="openTafsirReader()">🔍 Open Tafsir Reader</button>
+      <div class="num-row">
+        <input type="number" id="tafsirManual" min="0" placeholder="0" oninput="saveAndRefresh()">
+        <span class="of-label">/ 17 verses (manual)</span>
+      </div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openTafsirReader()">🔍 Open Tafsir Reader</button>
       <div class="qr-session-badge" id="tafsirSessionBadge" style="display:none;"></div>
     </div>
 
@@ -830,6 +838,7 @@ canvas#qrCanvas{
    Quran extra    +5% per full extra juzz (quarters proportional)
    Zikr extra     +2.5% per extra 1500 zikr
    Hadith extra   +2.5% per extra 5 hadiths
+   Tafsir extra   +2.5% per extra 17 verses
    Tahajjud extra +5% per extra 4 rakat
    Zikr Book      +10% max at 56 pages
    Sadaqah        +10% max at 50,000 units
@@ -1584,17 +1593,20 @@ function scoreDay(data){
   const zikr=parseInt(data.zikrCount)||0;
   core+=Math.min((zikr/1500)*5,5);
 
-  // Hadith 5% — proportional via ratio if reader used, else yes/no
-  const hdRatio = data['hadith_ratio'];
-  core += hdRatio !== undefined ? Math.min(hdRatio * 5, 5) : (data.hadith==='yes'?5:0);
+  // Hadith 5% — manual wins over reader ratio
+  const hdManual = parseInt(data.hadithManual) || 0;
+  const hdRatio  = data['hadith_ratio'];
+  const hdCount  = hdManual > 0 ? hdManual : (hdRatio !== undefined ? Math.round(hdRatio * 5) : 0);
+  core += Math.min((hdCount / 5) * 5, 5);
 
   // Yes/No core goals — 5% each
   // zikrMorning and zikrEvening use PDF ratio if available, else yes/no
   const yn=(k,w)=>{if(data[k]==='yes')core+=w;};
-  // Tafsir 5% — proportional via ratio if reader used, else yes/no
-  const tfRatio = data['tafsir_ratio'];
-  core += tfRatio !== undefined ? Math.min(tfRatio * 5, 5) : (data.tafsir==='yes'?5:0);
-
+  // Tafsir 5% — manual wins over reader ratio
+  const tfManual = parseInt(data.tafsirManual) || 0;
+  const tfRatio  = data['tafsir_ratio'];
+  const tfCount  = tfManual > 0 ? tfManual : (tfRatio !== undefined ? Math.round(tfRatio * 17) : 0);
+  core += Math.min((tfCount / 17) * 5, 5);
   // asmaul 5% — proportional if PDF used, else yes/no
   const azRatio = data['asmaul_pdfRatio'];
   core += azRatio !== undefined ? Math.min(azRatio * 5, 5) : (data.asmaul==='yes'?5:0);
@@ -1641,6 +1653,12 @@ function scoreDay(data){
   // Tahajjud extra: every 4 rakat above goal = +5%
   if(tah>4) bonus+=Math.floor((tah-4)/4)*5;
 
+  // Hadith extra: every 5 above goal = +2.5%
+  if(hdCount > 5) bonus += Math.floor((hdCount - 5) / 5) * 2.5;
+
+  // Tafsir extra: every 17 above goal = +2.5%
+  if(tfCount > 17) bonus += Math.floor((tfCount - 17) / 17) * 2.5;
+
   // Zikr Book: max +10% at 56 pages — use PDF reader ratio if available
   const zbRatio = data['zikrBook_bonusRatio'];
   if(zbRatio !== undefined){
@@ -1680,12 +1698,16 @@ function goalScore(data,key){
     case 'tahajjud': return Math.min(Math.round(((parseInt(data.tahajjudRakat)||0)/4)*100),100);
     case 'zikr':     return Math.min(Math.round(((parseInt(data.zikrCount)||0)/1500)*100),100);
     case 'hadith': {
+      const manual = parseInt(data.hadithManual) || 0;
+      if(manual > 0) return Math.min(Math.round((manual/5)*100),100);
       const r = data['hadith_ratio'];
-      return r !== undefined ? Math.min(Math.round(r*100),100) : (data.hadith==='yes'?100:0);
+      return r !== undefined ? Math.min(Math.round(r*100),100) : 0;
     }
     case 'tafsir': {
+      const manual = parseInt(data.tafsirManual) || 0;
+      if(manual > 0) return Math.min(Math.round((manual/17)*100),100);
       const r = data['tafsir_ratio'];
-      return r !== undefined ? Math.min(Math.round(r*100),100) : (data.tafsir==='yes'?100:0);
+      return r !== undefined ? Math.min(Math.round(r*100),100) : 0;
     }
     case 'asmaul': {
       const r = data['asmaul_pdfRatio'];
@@ -1721,6 +1743,18 @@ function bonusScore(data,key){
     case 'sawm':        return data.sawm==='yes'?10:0;
     case 'sunnahSalah': return Math.min(Math.round((parseInt(data.sunnahRakat)||0)*0.2*10)/10,10);
     case 'naflSalah':   return Math.min(Math.round((parseInt(data.naflRakat)||0)*0.2*10)/10,10);
+    case 'hadithBonus': {
+      const manual = parseInt(data.hadithManual) || 0;
+      const ratio  = data['hadith_ratio'];
+      const count  = manual > 0 ? manual : (ratio !== undefined ? Math.round(ratio*5) : 0);
+      return count > 5 ? Math.floor((count-5)/5)*2.5 : 0;
+    }
+    case 'tafsirBonus': {
+      const manual = parseInt(data.tafsirManual) || 0;
+      const ratio  = data['tafsir_ratio'];
+      const count  = manual > 0 ? manual : (ratio !== undefined ? Math.round(ratio*17) : 0);
+      return count > 17 ? Math.floor((count-17)/17)*2.5 : 0;
+    }
     case 'zikrBook': {
       const r = data['zikrBook_bonusRatio'];
       return r !== undefined
@@ -1838,7 +1872,7 @@ function buildQuranSelector(){
 
 function loadDayData(dk){
   const data=getCached(dk);
-  ['zikrCount','tahajjudRakat','sunnahRakat','naflRakat','zikrBookPages','sadaqahUnits']
+  ['zikrCount','tahajjudRakat','sunnahRakat','naflRakat','zikrBookPages','sadaqahUnits','hadithManual','tafsirManual']
     .forEach(id=>{document.getElementById(id).value=data[id]||'';});
   document.getElementById('quranJuzz').value      =data.quranJuzz||'';
   document.getElementById('quranQuarter').value   =data.quranQuarter||'0';
@@ -1926,7 +1960,7 @@ function loadDayData(dk){
 
 function collectData(){
   const data={...getCached(currentDateKey)};
-  ['zikrCount','tahajjudRakat','sunnahRakat','naflRakat','zikrBookPages','sadaqahUnits']
+  ['zikrCount','tahajjudRakat','sunnahRakat','naflRakat','zikrBookPages','sadaqahUnits','hadithManual','tafsirManual']
     .forEach(id=>{data[id]=document.getElementById(id).value;});
   data.quranJuzz      =document.getElementById('quranJuzz').value;
   data.quranQuarter   =document.getElementById('quranQuarter').value;

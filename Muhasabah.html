@@ -299,7 +299,7 @@ canvas#qrCanvas{
     <div class="contact-inner">
       <span class="contact-pulse"></span>
       <div class="contact-text">
-        <span class="contact-line1">🐛 Found A Bug? &nbsp;<a class="contact-num" href="https://wa.me/8801829624608">WhatsApp 01829624608</a></span>
+        <span class="contact-line1">❓ Question? &nbsp;<a class="contact-num" href="https://wa.me/8801829624608">WhatsApp 01829624608</a></span>
         <span class="contact-sep">·</span>
         <span class="contact-line2">❤️ Support Development &nbsp;<span class="contact-num">bKash / Nagad 01829624608</span></span>
       </div>
@@ -632,8 +632,8 @@ canvas#qrCanvas{
         <div class="goal-pct-badge bonus" id="pct-zikrBook">+0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="zikrBookPages" min="0" max="56" placeholder="0" oninput="saveAndRefresh()">
-        <span class="of-label">Pages &nbsp;/&nbsp; 56 Total</span>
+        <input type="number" id="zikrBookPages" min="0" max="22" placeholder="0" oninput="saveAndRefresh()">
+        <span class="of-label">Pages &nbsp;/&nbsp; 22 Total</span>
       </div>
       <div class="sub-label">Max +10% At 56 Pages &nbsp;·&nbsp; ~+0.18% Per Page</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('zikrBook')">📖 Open Zikr Book Reader</button>
@@ -648,7 +648,7 @@ canvas#qrCanvas{
       </div>
       <div class="num-row">
         <input type="number" id="sadaqahUnits" min="0" placeholder="0" oninput="saveAndRefresh()">
-        <span class="of-label">Units Donated</span>
+        <span class="of-label">Money Donated</span>
       </div>
       <div class="sub-label">Max +10% At 50,000 Units &nbsp;·&nbsp; Scales Proportionally</div>
     </div>
@@ -1136,11 +1136,11 @@ const PDF_READER_CONFIG = {
   asmaul: {
     pdfPath:          'Asmaul%20Husna.pdf',
     title:            '🌿 Asmaul Husna',
-    resume:           false,   // always page 1
+    resume:           true,    // per-day resume (resets each day)
     goalKey:          'asmaul',
     badgeId:          'asmaulSessionBadge',
-    idbKey:           null,
-    autoCompleteOnClose: true, // mark yes on any open+close
+    idbKey:           '_pdf_lastpage_asmaul',
+    autoCompleteOnClose: false,
     globalResume:     false,
   },
   zikrBook: {
@@ -1582,7 +1582,11 @@ function scoreDay(data){
   // Yes/No core goals — 5% each
   // zikrMorning and zikrEvening use PDF ratio if available, else yes/no
   const yn=(k,w)=>{if(data[k]==='yes')core+=w;};
-  yn('tafsir',5); yn('asmaul',5);
+  yn('tafsir',5);
+
+  // asmaul 5% — proportional if PDF used, else yes/no
+  const azRatio = data['asmaul_pdfRatio'];
+  core += azRatio !== undefined ? Math.min(azRatio * 5, 5) : (data.asmaul==='yes'?5:0);
 
   // zikrMorning 5% — proportional if PDF used, else yes/no
   const zmRatio = data['zikrMorning_pdfRatio'];
@@ -1631,7 +1635,7 @@ function scoreDay(data){
   if(zbRatio !== undefined){
     bonus += Math.min(zbRatio * 10, 10);
   } else {
-    bonus+=Math.min((parseInt(data.zikrBookPages)||0)*(10/56),10);
+    bonus+=Math.min((parseInt(data.zikrBookPages)||0)*(10/22),10);
   }
 
   // Sadaqah: max +10% at 50,000 units
@@ -1666,7 +1670,10 @@ function goalScore(data,key){
     case 'zikr':     return Math.min(Math.round(((parseInt(data.zikrCount)||0)/1500)*100),100);
     case 'hadith':   return data.hadith==='yes'?100:0;
     case 'tafsir':      return data.tafsir==='yes'?100:0;
-    case 'asmaul':      return data.asmaul==='yes'?100:0;
+    case 'asmaul': {
+      const r = data['asmaul_pdfRatio'];
+      return r !== undefined ? Math.min(Math.round(r * 100), 100) : (data.asmaul==='yes'?100:0);
+    }
     case 'zikrMorning': {
       const r = data['zikrMorning_pdfRatio'];
       return r !== undefined ? Math.min(Math.round(r * 100), 100) : (data.zikrMorning==='yes'?100:0);
@@ -1701,7 +1708,7 @@ function bonusScore(data,key){
       const r = data['zikrBook_bonusRatio'];
       return r !== undefined
         ? Math.min(Math.round(r * 10 * 10) / 10, 10)
-        : Math.min(Math.round((parseInt(data.zikrBookPages)||0)*(10/56)*10)/10, 10);
+        : Math.min(Math.round((parseInt(data.zikrBookPages)||0)*(10/22)*10)/10, 10);
     }
     case 'sadaqah':     return Math.min(Math.round((parseInt(data.sadaqahUnits)||0)*(10/50000)*10)/10,10);
     default: return 0;
@@ -1837,7 +1844,7 @@ function loadDayData(dk){
   }
 
   // Show zikr reader badges (Morning and Evening only — Zikr is reference-only)
-  ['zikrMorning','zikrEvening','surahWaqiah','surahMulk'].forEach(type => {
+  ['zikrMorning','zikrEvening','surahWaqiah','surahMulk','asmaul'].forEach(type => {
     const cfg = PDF_READER_CONFIG[type];
     const b = document.getElementById(cfg.badgeId);
     if(!b) return;
@@ -1863,19 +1870,6 @@ function loadDayData(dk){
       b.style.display = 'none';
     }
   });
-
-  // Asmaul Husna badge
-  const asmaulBadge = document.getElementById('asmaulSessionBadge');
-  if(asmaulBadge){
-    if(data.asmaul === 'yes'){
-      asmaulBadge.style.display = 'block';
-      asmaulBadge.innerHTML =
-        `<span style="color:var(--gold);">📖 Opened &amp; read today</span>`
-        + `<br><span style="font-size:9px;color:var(--text-muted);">Goal marked complete ✓</span>`;
-    } else {
-      asmaulBadge.style.display = 'none';
-    }
-  }
 
   // Zikr From Book badge
   const zikrBookBadge = document.getElementById('zikrBookReaderBadge');

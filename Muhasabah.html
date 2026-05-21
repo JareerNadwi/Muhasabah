@@ -2324,9 +2324,9 @@ async function openHadithReader(){
 
   try {
     if(!_hadithBook){
-      document.getElementById('hadithLoading').innerHTML =
-        'Loading Sahih Muslim…';
-      const res  = await fetch('./hadith-muslim.json');
+      document.getElementById('hadithLoading').innerHTML = 'Loading Sahih Muslim…';
+      const res  = await fetch('https://jareernadwi.github.io/Muhasabah/hadith-muslim.json');
+      if(!res.ok) throw new Error('hadith-muslim.json not found: ' + res.status);
       const json = await res.json();
       _hadithBook = json.hadiths || [];
     }
@@ -2415,16 +2415,18 @@ async function openTafsirReader(){
 
   try {
     /* Load both Quran files once, cache in memory */
+    const BASE = 'https://jareernadwi.github.io/Muhasabah/';
     if(!_quranArabic){
       document.getElementById('tafsirLoading').innerHTML = 'Loading Quran Arabic…';
-      const res  = await fetch('./quran-arabic.json');
+      const res  = await fetch(BASE + 'quran-arabic.json');
+      if(!res.ok) throw new Error('quran-arabic.json not found: ' + res.status);
       const json = await res.json();
-      /* structure: { quran: [ {chapter, verse, text} ] } */
       _quranArabic = json.quran || [];
     }
     if(!_quranEnglish){
       document.getElementById('tafsirLoading').innerHTML = 'Loading Quran English…';
-      const res  = await fetch('./quran-english.json');
+      const res  = await fetch(BASE + 'quran-english.json');
+      if(!res.ok) throw new Error('quran-english.json not found: ' + res.status);
       const json = await res.json();
       _quranEnglish = json.quran || [];
     }
@@ -2460,7 +2462,7 @@ async function openTafsirReader(){
     renderTafsirVerse(0);
   } catch(e) {
     document.getElementById('tafsirLoading').textContent =
-      '⚠ Failed to load. Make sure quran-arabic.json and quran-english.json are in your repo.';
+      '⚠ Failed: ' + e.message;
   }
 }
 

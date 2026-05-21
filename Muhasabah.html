@@ -2219,119 +2219,137 @@ async function confirmImport(){
   buildCalendar();
 })();
 
-/* ════════════════════════════════════════
+/* ════════════════════════════════════════════════════
    HADITH & TAFSIR READERS
-   ════════════════════════════════════════ */
+   Strategy:
+   - Hadith: fetch entire eng-muslim book once, cache in memory,
+             slice 5 hadiths per day from the array. No per-hadith calls.
+   - Tafsir: fetch entire surah from alquran.cloud once per surah,
+             cache in memory. Zero per-verse calls. No failures.
+   ════════════════════════════════════════════════════ */
 
-const HADITH_START_DATE  = '2026-01-01';
-const TAFSIR_START_DATE  = '2026-01-01';
-const HADITHS_PER_DAY    = 5;
-const VERSES_PER_DAY     = 17;
-const TOTAL_MUSLIM       = 3033;
-const TOTAL_VERSES       = 6236;
+const HADITH_START_DATE = '2026-01-01';
+const TAFSIR_START_DATE = '2026-01-01';
+const HADITHS_PER_DAY   = 5;
+const VERSES_PER_DAY    = 17;
+const TOTAL_VERSES      = 6236;
 
-function dayIndex(startDK, dk){
+const SURAH_LENGTHS = [7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,
+  110,98,135,112,78,118,64,77,227,93,88,69,60,34,30,73,54,45,83,182,88,75,85,54,53,
+  89,59,37,35,31,31,18,45,60,49,62,39,40,29,67,29,53,44,55,26,24,43,6,11,50,28,52,
+  28,28,20,56,40,31,50,45,6,29,22,59,85,8,8,72,28,31,28,88,20,94,6,5,8,29,7,22,6,
+  71,65,30,54,26,20,19,18,26,25,25,26,25,32,24,20,28,36,22,26,24,27,33,7,50,11,11,
+  9,12,10,7,5,8,14,19,3,22,21,28,18,22,15,12,13,14,18,17,9,12,14,16,19,14,16,4,11,
+  14,11,6,17,5,17,11,22,16,16,10,12,5,3,4,4,7,3,6,3,5,3,5,3,3,3];
+
+const SURAH_NAMES = ['','Al-Fatihah','Al-Baqarah',"Ali 'Imran","An-Nisa","Al-Ma'idah",
+  "Al-An'am","Al-A'raf",'Al-Anfal','At-Tawbah','Yunus','Hud','Yusuf',"Ar-Ra'd",
+  'Ibrahim','Al-Hijr','An-Nahl','Al-Isra','Al-Kahf','Maryam','Taha','Al-Anbiya',
+  'Al-Hajj',"Al-Mu'minun",'An-Nur','Al-Furqan',"Ash-Shu'ara",'An-Naml','Al-Qasas',
+  "Al-'Ankabut",'Ar-Rum','Luqman','As-Sajdah','Al-Ahzab','Saba','Fatir','Ya-Sin',
+  'As-Saffat','Sad','Az-Zumar','Ghafir','Fussilat','Ash-Shuraa','Az-Zukhruf',
+  'Ad-Dukhan','Al-Jathiyah','Al-Ahqaf','Muhammad','Al-Fath','Al-Hujurat','Qaf',
+  'Adh-Dhariyat',"At-Tur",'An-Najm','Al-Qamar',"Ar-Rahman","Al-Waqi'ah",'Al-Hadid',
+  'Al-Mujadila','Al-Hashr','Al-Mumtahanah','As-Saf','Al-Jumuah','Al-Munafiqun',
+  'At-Taghabun','At-Talaq','At-Tahrim','Al-Mulk','Al-Qalam','Al-Haqqah','Al-Maarij',
+  'Nuh','Al-Jinn','Al-Muzzammil','Al-Muddaththir','Al-Qiyamah','Al-Insan','Al-Mursalat',
+  "An-Naba","An-Nazi'at",'Abasa','At-Takwir','Al-Infitar','Al-Mutaffifin','Al-Inshiqaq',
+  'Al-Buruj','At-Tariq',"Al-A'la",'Al-Ghashiyah','Al-Fajr','Al-Balad','Ash-Shams',
+  'Al-Layl','Ad-Duha','Ash-Sharh','At-Tin',"Al-'Alaq",'Al-Qadr','Al-Bayyinah',
+  'Az-Zalzalah',"Al-'Adiyat","Al-Qari'ah",'At-Takathur',"Al-'Asr",'Al-Humazah',
+  'Al-Fil','Quraysh',"Al-Ma'un",'Al-Kawthar','Al-Kafirun','An-Nasr','Al-Masad',
+  'Al-Ikhlas','Al-Falaq','An-Nas'];
+
+function dayIdx(startDK, dk){
   return Math.max(0, Math.floor((new Date(dk) - new Date(startDK)) / 86400000));
 }
 
-/* ─── save data + refresh all UI ─── */
+/* Global verse number → {surah, ayah} */
+function globalVerseToSurahAyah(n){
+  let rem = n;
+  for(let s = 0; s < SURAH_LENGTHS.length; s++){
+    if(rem <= SURAH_LENGTHS[s]) return { surah: s + 1, ayah: rem };
+    rem -= SURAH_LENGTHS[s];
+  }
+  return { surah: 114, ayah: 6 };
+}
+
+/* ─── save + refresh ─── */
 async function saveReaderData(dk, patch){
-  const dayData = Object.assign({}, getCached(dk), patch);
-  _cache[dk] = dayData;
-  await setStore(dk, dayData);
-  /* refresh scores + badges without reloading form inputs */
+  const d = Object.assign({}, getCached(dk), patch);
+  _cache[dk] = d;
+  await setStore(dk, d);
   refreshScores();
-  /* also refresh session badges */
   refreshHadithBadge(dk);
   refreshTafsirBadge(dk);
 }
 
 function refreshHadithBadge(dk){
-  const data  = getCached(dk);
   const badge = document.getElementById('hadithSessionBadge');
   if(!badge) return;
-  if(data.hadith === 'yes'){
-    badge.textContent  = '✓ All 5 Hadiths Read Today';
-    badge.style.display = 'block';
-  } else {
-    badge.style.display = 'none';
-  }
+  const done = getCached(dk).hadith === 'yes';
+  badge.textContent   = '✓ All 5 Hadiths Read Today';
+  badge.style.display = done ? 'block' : 'none';
 }
 
 function refreshTafsirBadge(dk){
-  const data  = getCached(dk);
   const badge = document.getElementById('tafsirSessionBadge');
   if(!badge) return;
-  if(data.tafsir === 'yes'){
-    badge.textContent  = '✓ All 17 Verses Read Today';
-    badge.style.display = 'block';
-  } else {
-    badge.style.display = 'none';
-  }
+  const done = getCached(dk).tafsir === 'yes';
+  badge.textContent   = '✓ All 17 Verses Read Today';
+  badge.style.display = done ? 'block' : 'none';
 }
 
-/* ══════════════ HADITH READER ══════════════ */
-let _hadithData  = [];
+/* ══════════════════════════════════════
+   HADITH READER
+   Fetch full book once → slice per day
+   ══════════════════════════════════════ */
+let _hadithBook  = null;   /* full array of {hadithnumber, text} once loaded */
+let _hadithData  = [];     /* today's 5 */
 let _hadithIdx   = 0;
 let _hadithDK    = '';
 
 async function openHadithReader(){
   _hadithDK  = currentDateKey || todayKey();
   _hadithIdx = 0;
-  _hadithData = [];
 
-  const overlay = document.getElementById('hadithReaderOverlay');
-  overlay.classList.add('active');
+  document.getElementById('hadithReaderOverlay').classList.add('active');
 
-  const idx   = dayIndex(HADITH_START_DATE, _hadithDK);
-  const start = (idx * HADITHS_PER_DAY) % TOTAL_MUSLIM + 1;
-
-  document.getElementById('hadithDayInfo').textContent =
-    `Sahih Muslim · Day ${idx+1} · Hadiths ${start}–${start + HADITHS_PER_DAY - 1}`;
-
+  const di    = dayIdx(HADITH_START_DATE, _hadithDK);
   const already = getCached(_hadithDK).hadith === 'yes';
   document.getElementById('hadithDoneNote').style.display = already ? 'block' : 'none';
-
-  document.getElementById('hadithLoading').style.display = 'flex';
-  document.getElementById('hadithContent').style.display = 'none';
-  document.getElementById('hadithNav').style.display     = 'none';
-
-  const nums = [];
-  for(let i = 0; i < HADITHS_PER_DAY; i++)
-    nums.push((start - 1 + i) % TOTAL_MUSLIM + 1);
+  document.getElementById('hadithLoading').style.display  = 'flex';
+  document.getElementById('hadithContent').style.display  = 'none';
+  document.getElementById('hadithNav').style.display      = 'none';
 
   try {
-    _hadithData = await Promise.all(nums.map(fetchHadith));
+    if(!_hadithBook){
+      document.getElementById('hadithLoading').innerHTML =
+        'Loading Sahih Muslim…';
+      const res  = await fetch('./hadith-muslim.json');
+      const json = await res.json();
+      _hadithBook = json.hadiths || [];
+    }
+
+    const total   = _hadithBook.length;
+    const startI  = (di * HADITHS_PER_DAY) % total;
+    _hadithData   = [];
+    for(let i = 0; i < HADITHS_PER_DAY; i++){
+      _hadithData.push(_hadithBook[(startI + i) % total]);
+    }
+
+    const firstNum = _hadithData[0]?.hadithnumber || startI + 1;
+    const lastNum  = _hadithData[HADITHS_PER_DAY-1]?.hadithnumber || startI + HADITHS_PER_DAY;
+    document.getElementById('hadithDayInfo').textContent =
+      `Sahih Muslim · Day ${di+1} · Hadiths ${firstNum}–${lastNum}`;
+
     document.getElementById('hadithLoading').style.display = 'none';
     document.getElementById('hadithContent').style.display = 'block';
     document.getElementById('hadithNav').style.display     = 'flex';
     renderHadith(0);
   } catch(e) {
     document.getElementById('hadithLoading').textContent =
-      '⚠ Failed to load. Check internet connection.';
-  }
-}
-
-async function fetchHadith(num){
-  /* Each file may contain multiple variant narrations — join them all */
-  const primary  = `https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-muslim/${num}.json`;
-  const fallback = `https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-muslim/${num}.min.json`;
-  try {
-    let res = await fetch(primary);
-    if(!res.ok) res = await fetch(fallback);
-    const json = await res.json();
-    let text = '';
-    if(Array.isArray(json.hadiths) && json.hadiths.length > 0){
-      /* Join all variant narrations with a divider */
-      text = json.hadiths
-        .map((h, i) => json.hadiths.length > 1 ? `[Narration ${i+1}]\n${h.text}` : h.text)
-        .join('\n\n');
-    } else if(typeof json.text === 'string'){
-      text = json.text;
-    }
-    return { num, text: text.trim() || 'Content unavailable for this hadith.' };
-  } catch(e) {
-    return { num, text: 'Failed to load hadith #' + num + '.' };
+      '⚠ Failed to load. Check internet connection and try again.';
   }
 }
 
@@ -2339,16 +2357,16 @@ function renderHadith(idx){
   _hadithIdx = idx;
   const h = _hadithData[idx];
   if(!h) return;
-  document.getElementById('hadithNum').textContent     = `Hadith ${h.num}`;
+  document.getElementById('hadithNum').textContent     = `Hadith ${h.hadithnumber}`;
   document.getElementById('hadithCounter').textContent = `${idx+1} / ${HADITHS_PER_DAY}`;
-  document.getElementById('hadithText').textContent    = h.text;
+  document.getElementById('hadithText').textContent    = h.text || 'Content unavailable.';
   document.getElementById('hadithPrevBtn').disabled    = idx === 0;
-  const isLast = idx === HADITHS_PER_DAY - 1;
+  const isLast  = idx === HADITHS_PER_DAY - 1;
   const nextBtn = document.getElementById('hadithNextBtn');
-  nextBtn.textContent = isLast ? '✓ Mark Done' : 'Next →';
-  nextBtn.style.background    = isLast ? 'var(--green)' : '';
+  nextBtn.textContent         = isLast ? '✓ Mark Done' : 'Next →';
+  nextBtn.style.background    = isLast ? 'var(--green)'        : '';
   nextBtn.style.borderColor   = isLast ? 'var(--green-bright)' : '';
-  nextBtn.style.color         = isLast ? '#fff' : '';
+  nextBtn.style.color         = isLast ? '#fff'                : '';
   nextBtn.disabled = false;
 }
 
@@ -2358,143 +2376,129 @@ async function hadithNavNext(){
   } else {
     await saveReaderData(_hadithDK, { hadith: 'yes' });
     document.getElementById('hadithDoneNote').style.display = 'block';
-    const nextBtn = document.getElementById('hadithNextBtn');
-    nextBtn.textContent = '✓ Completed';
-    nextBtn.disabled    = true;
+    const btn = document.getElementById('hadithNextBtn');
+    btn.textContent = '✓ Completed';
+    btn.disabled    = true;
   }
 }
+function hadithNavPrev(){ if(_hadithIdx > 0) renderHadith(_hadithIdx - 1); }
+function closeHadithReader(){ document.getElementById('hadithReaderOverlay').classList.remove('active'); }
 
-function hadithNavPrev(){
-  if(_hadithIdx > 0) renderHadith(_hadithIdx - 1);
-}
-
-function closeHadithReader(){
-  document.getElementById('hadithReaderOverlay').classList.remove('active');
-}
-
-/* ══════════════ TAFSIR READER ══════════════ */
-let _tafsirVerses = [];
-let _tafsirIdx    = 0;
-let _tafsirDK     = '';
-
-/* Map global verse number 1-6236 → "surah:ayah" */
-function globalVerseToKey(n){
-  const S=[7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,110,98,135,
-           112,78,118,64,77,227,93,88,69,60,34,30,73,54,45,83,182,88,75,85,54,53,89,
-           59,37,35,31,31,18,45,60,49,62,39,40,29,67,29,53,44,55,26,24,43,6,11,50,28,
-           52,28,28,20,56,40,31,50,45,6,29,22,59,85,8,8,72,28,31,28,28,20,94,6,5,8,
-           29,7,22,6,71,65,30,54,26,20,19,18,26,25,25,26,25,32,24,20,28,36,22,26,24,
-           27,33,7,50,11,11,9,12,10,7,5,8,14,19,3,22,21,28,18,22,15,12,13,14,18,17,
-           9,12,14,16,19,14,16,4,11,14,11,6,17,5,17,11,22,16,16,10,12,5,3,4,4,7,3,6,
-           3,5,3,5,3,3,3];
-  let rem = n;
-  for(let s = 0; s < S.length; s++){
-    if(rem <= S[s]) return `${s+1}:${rem}`;
-    rem -= S[s];
-  }
-  return '114:6';
-}
+/* ══════════════════════════════════════
+   TAFSIR READER
+   Fetch full surah once → slice verses
+   ══════════════════════════════════════ */
+let _quranArabic  = null;   /* full array of {chapter, verse, text} */
+let _quranEnglish = null;   /* full array of {chapter, verse, text} */
+let _tafsirSlice = [];    /* today's 17 verse objects */
+let _tafsirIdx   = 0;
+let _tafsirDK    = '';
 
 async function openTafsirReader(){
   _tafsirDK  = currentDateKey || todayKey();
   _tafsirIdx = 0;
-  _tafsirVerses = [];
 
-  const overlay = document.getElementById('tafsirReaderOverlay');
-  overlay.classList.add('active');
+  document.getElementById('tafsirReaderOverlay').classList.add('active');
 
-  const idx   = dayIndex(TAFSIR_START_DATE, _tafsirDK);
-  const start = (idx * VERSES_PER_DAY) % TOTAL_VERSES + 1;
-  const end   = Math.min(start + VERSES_PER_DAY - 1, TOTAL_VERSES);
-
-  document.getElementById('tafsirDayInfo').textContent =
-    `Saheeh International · Day ${idx+1} · Verses ${start}–${end}`;
+  const di    = dayIdx(TAFSIR_START_DATE, _tafsirDK);
+  const startV = (di * VERSES_PER_DAY) % TOTAL_VERSES + 1;
+  const endV   = Math.min(startV + VERSES_PER_DAY - 1, TOTAL_VERSES);
 
   const already = getCached(_tafsirDK).tafsir === 'yes';
   document.getElementById('tafsirDoneNote').style.display = already ? 'block' : 'none';
+  document.getElementById('tafsirDayInfo').textContent =
+    `Saheeh International · Day ${di+1} · Verses ${startV}–${endV}`;
 
   document.getElementById('tafsirLoading').style.display = 'flex';
   document.getElementById('tafsirContent').style.display = 'none';
   document.getElementById('tafsirNav').style.display     = 'none';
 
-  const nums = [];
-  for(let v = start; v <= end; v++) nums.push(v);
-
   try {
-    _tafsirVerses = await Promise.all(nums.map(fetchTafsirVerse));
+    /* Load both Quran files once, cache in memory */
+    if(!_quranArabic){
+      document.getElementById('tafsirLoading').innerHTML = 'Loading Quran Arabic…';
+      const res  = await fetch('./quran-arabic.json');
+      const json = await res.json();
+      /* structure: { quran: [ {chapter, verse, text} ] } */
+      _quranArabic = json.quran || [];
+    }
+    if(!_quranEnglish){
+      document.getElementById('tafsirLoading').innerHTML = 'Loading Quran English…';
+      const res  = await fetch('./quran-english.json');
+      const json = await res.json();
+      _quranEnglish = json.quran || [];
+    }
+
+    /* Build lookup maps: "surah:ayah" → text */
+    if(!_quranArabic._map){
+      _quranArabic._map = {};
+      _quranArabic.forEach(v => { _quranArabic._map[`${v.chapter}:${v.verse}`] = v.text; });
+    }
+    if(!_quranEnglish._map){
+      _quranEnglish._map = {};
+      _quranEnglish.forEach(v => { _quranEnglish._map[`${v.chapter}:${v.verse}`] = v.text; });
+    }
+
+    /* Build today's verse slice */
+    _tafsirSlice = [];
+    for(let v = startV; v <= endV; v++){
+      const { surah, ayah } = globalVerseToSurahAyah(v);
+      const key = `${surah}:${ayah}`;
+      _tafsirSlice.push({
+        globalNum : v,
+        surahNum  : surah,
+        surahName : SURAH_NAMES[surah] || `Surah ${surah}`,
+        ayah,
+        arabic  : _quranArabic._map[key]  || '',
+        meaning : _quranEnglish._map[key] || 'Translation unavailable.'
+      });
+    }
+
     document.getElementById('tafsirLoading').style.display = 'none';
     document.getElementById('tafsirContent').style.display = 'block';
     document.getElementById('tafsirNav').style.display     = 'flex';
     renderTafsirVerse(0);
   } catch(e) {
     document.getElementById('tafsirLoading').textContent =
-      '⚠ Failed to load. Check internet connection.';
-  }
-}
-
-async function fetchTafsirVerse(globalNum){
-  const key = globalVerseToKey(globalNum);
-  /* en.sahih = Saheeh International — complete English meaning, every verse, no gaps */
-  const url  = `https://api.alquran.cloud/v1/ayah/${key}/editions/en.sahih,quran-uthmani`;
-  try {
-    const res  = await fetch(url);
-    const json = await res.json();
-    const eng  = json.data?.[0];   /* en.sahih */
-    const arb  = json.data?.[1];   /* quran-uthmani */
-    return {
-      globalNum,
-      key,
-      surahName : eng?.surah?.englishName || arb?.surah?.englishName || '',
-      ayahNum   : eng?.numberInSurah || '',
-      arabic    : arb?.text || '',
-      meaning   : eng?.text || 'Translation unavailable for this verse.'
-    };
-  } catch(e) {
-    return { globalNum, key, surahName:'', ayahNum:'', arabic:'', meaning:'Failed to load verse '+globalNum+'.' };
+      '⚠ Failed to load. Make sure quran-arabic.json and quran-english.json are in your repo.';
   }
 }
 
 function renderTafsirVerse(idx){
   _tafsirIdx = idx;
-  const v = _tafsirVerses[idx];
+  const v = _tafsirSlice[idx];
   if(!v) return;
-  const total = _tafsirVerses.length;
+  const total = _tafsirSlice.length;
   document.getElementById('tafsirVerseRef').textContent =
-    v.surahName ? `${v.surahName} · ${v.key}` : v.key;
+    `${v.surahName} · ${v.surahNum}:${v.ayah}`;
   document.getElementById('tafsirCounter').textContent = `${idx+1} / ${total}`;
   document.getElementById('tafsirArabic').textContent  = v.arabic;
-  document.getElementById('tafsirText').textContent    = v.meaning || v.tafsir || '';
+  document.getElementById('tafsirText').textContent    = v.meaning;
   document.getElementById('tafsirPrevBtn').disabled    = idx === 0;
   const isLast  = idx === total - 1;
   const nextBtn = document.getElementById('tafsirNextBtn');
-  nextBtn.textContent = isLast ? '✓ Mark Done' : 'Next →';
-  nextBtn.style.background  = isLast ? 'var(--green)' : '';
+  nextBtn.textContent       = isLast ? '✓ Mark Done' : 'Next →';
+  nextBtn.style.background  = isLast ? 'var(--green)'        : '';
   nextBtn.style.borderColor = isLast ? 'var(--green-bright)' : '';
-  nextBtn.style.color       = isLast ? '#fff' : '';
+  nextBtn.style.color       = isLast ? '#fff'                : '';
   nextBtn.disabled = false;
 }
 
 async function tafsirNavNext(){
-  if(_tafsirIdx < _tafsirVerses.length - 1){
+  if(_tafsirIdx < _tafsirSlice.length - 1){
     renderTafsirVerse(_tafsirIdx + 1);
   } else {
     await saveReaderData(_tafsirDK, { tafsir: 'yes' });
     document.getElementById('tafsirDoneNote').style.display = 'block';
-    const nextBtn = document.getElementById('tafsirNextBtn');
-    nextBtn.textContent = '✓ Completed';
-    nextBtn.disabled    = true;
+    const btn = document.getElementById('tafsirNextBtn');
+    btn.textContent = '✓ Completed';
+    btn.disabled    = true;
   }
 }
+function tafsirNavPrev(){ if(_tafsirIdx > 0) renderTafsirVerse(_tafsirIdx - 1); }
+function closeTafsirReader(){ document.getElementById('tafsirReaderOverlay').classList.remove('active'); }
 
-function tafsirNavPrev(){
-  if(_tafsirIdx > 0) renderTafsirVerse(_tafsirIdx - 1);
-}
-
-function closeTafsirReader(){
-  document.getElementById('tafsirReaderOverlay').classList.remove('active');
-}
-
-/* patch loadDayData to also refresh hadith/tafsir badges */
+/* patch loadDayData to refresh hadith/tafsir badges */
 const _origLoadDayData = loadDayData;
 loadDayData = function(dk){
   _origLoadDayData(dk);
@@ -2517,10 +2521,10 @@ loadDayData = function(dk){
       </div>
     </div>
     <div id="hadithDoneNote" style="display:none;background:#071407;border-bottom:1px solid var(--green);padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">✓ You've already completed today's hadiths</div>
-    <div id="hadithLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:var(--text-dim);">Loading hadiths…</div>
+    <div id="hadithLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:var(--text-dim);">Loading Sahih Muslim…</div>
     <div id="hadithContent" style="display:none;flex:1;overflow-y:auto;padding:20px 18px;">
       <div id="hadithNum" style="font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:10px;text-transform:uppercase;"></div>
-      <div id="hadithText" style="font-size:13px;color:var(--text);line-height:2;"></div>
+      <div id="hadithText" style="font-size:13px;color:var(--text);line-height:2;white-space:pre-wrap;"></div>
     </div>
     <div id="hadithNav" style="display:none;padding:12px 18px;border-top:1px solid var(--border);background:var(--surface2);flex-shrink:0;gap:8px;">
       <button id="hadithPrevBtn" onclick="hadithNavPrev()" style="flex:1;padding:9px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;">← Prev</button>
@@ -2545,9 +2549,7 @@ loadDayData = function(dk){
     <div id="tafsirDoneNote" style="display:none;background:#071407;border-bottom:1px solid var(--green);padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">✓ You've already completed today's tafsir</div>
     <div id="tafsirLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:var(--text-dim);">Loading verses…</div>
     <div id="tafsirContent" style="display:none;flex:1;overflow-y:auto;padding:20px 18px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <div id="tafsirVerseRef" style="font-size:11px;color:var(--gold);letter-spacing:.5px;"></div>
-      </div>
+      <div id="tafsirVerseRef" style="font-size:11px;color:var(--gold);letter-spacing:.5px;margin-bottom:14px;"></div>
       <div id="tafsirArabic" style="font-family:'Amiri',serif;font-size:22px;color:var(--text);line-height:2;text-align:right;direction:rtl;padding:14px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;"></div>
       <div style="font-size:10px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase;">Meaning — Saheeh International</div>
       <div id="tafsirText" style="font-size:13px;color:var(--text);line-height:1.9;"></div>

@@ -2473,10 +2473,11 @@ async function _saveHadithProgress(read, done){
 
 function hadithNavPrev(){ if(_hadithIdx > 0) renderHadith(_hadithIdx - 1); }
 function closeHadithReader(){
-  /* Save current position so next open resumes from here, but only if user read something */
-  if(_hadithDK && _hadithIdx > _hadithSessionStart){
+  /* Always save current position on close so next session resumes from here */
+  if(_hadithDK && _hadithData.length > 0){
     setReaderResume('_hadith_resume_' + _hadithDK, _hadithIdx);
-    _saveHadithProgress(_hadithIdx + 1, false);
+    if(_hadithIdx >= _hadithSessionStart)
+      _saveHadithProgress(_hadithIdx + 1, false);
   }
   document.getElementById('hadithReaderOverlay').classList.remove('active');
 }
@@ -2596,10 +2597,11 @@ async function _saveTafsirProgress(read, done){
 
 function tafsirNavPrev(){ if(_tafsirIdx > 0) renderTafsirVerse(_tafsirIdx - 1); }
 function closeTafsirReader(){
-  /* Save current position so next open resumes from here, but only if user read something */
-  if(_tafsirDK && _tafsirIdx > _tafsirSessionStart){
+  /* Always save current position on close so next session resumes from here */
+  if(_tafsirDK && _tafsirSlice.length > 0){
     setReaderResume('_tafsir_resume_' + _tafsirDK, _tafsirIdx);
-    _saveTafsirProgress(_tafsirIdx + 1, false);
+    if(_tafsirIdx >= _tafsirSessionStart)
+      _saveTafsirProgress(_tafsirIdx + 1, false);
   }
   document.getElementById('tafsirReaderOverlay').classList.remove('active');
 }
@@ -2662,7 +2664,7 @@ loadDayData = function(dk){
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="hadithCounter" style="font-size:11px;color:var(--text-dim);"></span>
-        <button onclick="closeHadithReader()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:5px 11px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;">&#x2715; Close</button>
+        <button onclick="closeHadithReader()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:5px 11px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;">&#x2713; Save & Close</button>
       </div>
     </div>
     <div id="hadithDoneNote" style="display:none;background:#071407;border-bottom:1px solid var(--green);padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">&#x2713; You've already completed today's hadiths</div>
@@ -2688,7 +2690,7 @@ loadDayData = function(dk){
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="tafsirCounter" style="font-size:11px;color:var(--text-dim);"></span>
-        <button onclick="closeTafsirReader()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:5px 11px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;">&#x2715; Close</button>
+        <button onclick="closeTafsirReader()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:5px 11px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;">&#x2713; Save & Close</button>
       </div>
     </div>
     <div id="tafsirDoneNote" style="display:none;background:#071407;border-bottom:1px solid var(--green);padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">&#x2713; You've already completed today's tafsir</div>

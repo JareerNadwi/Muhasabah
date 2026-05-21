@@ -286,6 +286,12 @@ canvas#qrCanvas{
   margin-top:8px;font-size:10px;color:var(--text-muted);letter-spacing:.5px;
   background:var(--surface2);padding:5px 8px;border-radius:3px;line-height:1.6;
 }
+
+/* ── Read Me Glow ── */
+@keyframes readMeGlow{
+  0%,100%{box-shadow:0 0 6px rgba(154,106,191,.3);text-shadow:0 0 8px rgba(154,106,191,.4);}
+  50%{box-shadow:0 0 16px rgba(154,106,191,.7),0 0 28px rgba(154,106,191,.25);text-shadow:0 0 16px rgba(154,106,191,.9),0 0 28px rgba(154,106,191,.3);}
+}
 </style>
 </head>
 <body>
@@ -307,7 +313,7 @@ canvas#qrCanvas{
   </div>
   <div class="header-right">
     <button class="back-btn" id="backBtn" onclick="showCalendar()">← Calendar</button>
-    <button class="export-btn" onclick="openReadMe()" style="border-color:var(--purple);color:var(--purple-bright);">&#x1F4D6; Read Me</button>
+    <button class="export-btn" onclick="openReadMe()" style="border-color:var(--purple);color:var(--purple-bright);animation:readMeGlow 2.5s ease-in-out infinite;">&#x1F4D6; Read Me</button>
     <button class="export-btn" onclick="exportData()">&#x2191; Export</button>
     <button class="import-btn" onclick="openImportModal()">&#x2193; Import</button>
     <button class="reset-btn" onclick="openResetModal()">Reset All Data</button>
@@ -404,11 +410,11 @@ canvas#qrCanvas{
         <div class="goal-name">🕌 Salah <span class="weight-hint">(15% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-salah">0%</div>
       </div>
-      <div class="salah-hint">
+      <div class="salah-grid" id="salahGrid"></div>
+      <div class="salah-hint" style="margin-top:10px;margin-bottom:0;">
         Jamā'ah = 100% &nbsp;·&nbsp; Munfarid = 75% &nbsp;·&nbsp; Qadhā = 25% &nbsp;·&nbsp; Missed = 0%<br>
         Each Of The 5 Prayers Contributes 3% To Core Score &nbsp;·&nbsp; All 5 Jamā'ah = Full 15%
       </div>
-      <div class="salah-grid" id="salahGrid"></div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openSalahArticle()">🕌 Salah</button>
     </div>
 
@@ -464,7 +470,7 @@ canvas#qrCanvas{
           <option value="10">10 Full Juzz (+45% Bonus)</option>
         </select>
       </div>
-      <div class="sub-label">Goal: 1 Juzz/Day = Full 10% Core &nbsp;·&nbsp; Every Extra Juzz = +5% Bonus &nbsp;·&nbsp; Quarters Proportional</div>
+      <div class="sub-label">Goal: 1 Juzz/Day = Full 10% Core &nbsp;·&nbsp; Every Extra Juzz = +5% Bonus</div>
       <button class="qr-open-btn" onclick="openQuranReader()">📖 Open Quran Reader</button>
       <div class="qr-session-badge" id="quranSessionBadge" style="display:none;"></div>
     </div>
@@ -480,6 +486,7 @@ canvas#qrCanvas{
         <span class="of-label">Rakat &nbsp;/&nbsp; 4 Goal</span>
       </div>
       <div class="sub-label">Goal: 4 Rakat = Full 10% Core &nbsp;·&nbsp; Every Extra 4 Rakat = +5% Bonus</div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('tahajjud')">🌙 Tahajjud</button>
     </div>
 
     <!-- Zikr 5% -->
@@ -504,7 +511,7 @@ canvas#qrCanvas{
       </div>
       <div class="num-row">
         <input type="number" id="hadithManual" min="0" placeholder="0" oninput="saveAndRefresh()">
-        <span class="of-label">/ 5 hadiths (manual)</span>
+        <span class="of-label">/ 5 Hadiths Goal</span>
       </div>
       <div class="sub-label">Goal: 5 Hadiths = Full 5% Core &nbsp;·&nbsp; Every Extra 5 Hadiths = +2.5% Bonus</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openHadithReader()">📚 Open Hadith Reader</button>
@@ -519,7 +526,7 @@ canvas#qrCanvas{
       </div>
       <div class="num-row">
         <input type="number" id="tafsirManual" min="0" placeholder="0" oninput="saveAndRefresh()">
-        <span class="of-label">/ 17 verses (manual)</span>
+        <span class="of-label">/ 17 Verses Goal</span>
       </div>
       <div class="sub-label">Goal: 17 Verses = Full 5% Core &nbsp;·&nbsp; Every Extra 17 Verses = +2.5% Bonus</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openTafsirReader()">🔍 Open Tafsir Reader</button>
@@ -613,7 +620,7 @@ canvas#qrCanvas{
     <!-- Sawm +10% bonus -->
     <div class="goal-card bonus-card" id="card-sawm">
       <div class="goal-top">
-        <div class="goal-name">🌙 Sawm — Fast <span class="weight-hint">(Bonus)</span></div>
+        <div class="goal-name">🌙 Sawm <span class="weight-hint">(Bonus)</span></div>
         <div class="goal-pct-badge bonus" id="pct-sawm">+0%</div>
       </div>
       <div class="yn-group">
@@ -621,6 +628,7 @@ canvas#qrCanvas{
         <button class="yn-btn no"  data-key="sawm" data-val="no"  onclick="setYN('sawm','no')">No</button>
       </div>
       <div class="sub-label">+10% Bonus For Fasting Today</div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('sawm')">🌙 Sawm</button>
     </div>
 
     <!-- Sunnah Salah +10% max -->
@@ -634,6 +642,7 @@ canvas#qrCanvas{
         <span class="of-label">Rakat &nbsp;/&nbsp; 50 Max</span>
       </div>
       <div class="sub-label">+0.2% Per Rakat &nbsp;·&nbsp; Max +10% At 50 Rakat</div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('sunnahSalah')">🌿 Sunnah Salah</button>
     </div>
 
     <!-- Nafl Salah +10% max -->
@@ -647,6 +656,7 @@ canvas#qrCanvas{
         <span class="of-label">Rakat &nbsp;/&nbsp; 50 Max</span>
       </div>
       <div class="sub-label">+0.2% Per Rakat &nbsp;·&nbsp; Max +10% At 50 Rakat</div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('naflSalah')">✨ Nafl Salah</button>
     </div>
 
     <!-- Zikr From Book +10% max -->
@@ -675,6 +685,7 @@ canvas#qrCanvas{
         <span class="of-label">Money Donated</span>
       </div>
       <div class="sub-label">Max +10% At 50,000 Units &nbsp;·&nbsp; Scales Proportionally</div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('sadaqah')">💛 Sadaqah</button>
     </div>
 
   </div><!-- /bonus ibadah -->
@@ -2771,7 +2782,7 @@ loadDayData = function(dk){
 
       <!-- Quranic Verses -->
       <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">The Quran on Salah</div>
-      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Two Verses</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Quran About Salah</div>
 
       <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
         <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">وَأَقِيمُوا الصَّلَاةَ وَآتُوا الزَّكَاةَ وَارْكَعُوا مَعَ الرَّاكِعِينَ</div>
@@ -2792,7 +2803,7 @@ loadDayData = function(dk){
 
       <!-- Hadiths -->
       <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">The Sunnah on Salah</div>
-      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Two Hadiths</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Hadith About Salah</div>
 
       <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
         <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">رَأْسُ الأَمْرِ الإِسْلاَمُ، وَعَمُودُهُ الصَّلاَةُ</div>
@@ -2847,7 +2858,7 @@ loadDayData = function(dk){
       <!-- 4. Rising from Rukoo -->
       <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:20px;">
         <div style="font-size:0.75rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;">Rising from Rukūʿ</div>
-        <div style="font-family:'DM Mono',monospace;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:14px;">Rabbanā Laka l-Ḥamd — Complete</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:14px;">Tasbeeh After Returning from Rukū</div>
         <div style="font-family:'Amiri',serif;font-size:1.5rem;line-height:2.4;direction:rtl;text-align:right;color:#f0e4c0;display:block;margin-bottom:8px;">سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ</div>
         <div style="font-style:italic;color:#a89060;font-size:0.88rem;margin-bottom:6px;">Samiʿa Llāhu liman ḥamidah</div>
         <div style="font-size:0.9rem;color:#b0a07a;margin-bottom:14px;">"Allah hears the one who praises Him." — Said while rising.</div>
@@ -2867,8 +2878,8 @@ loadDayData = function(dk){
 
       <!-- 6. Between two sajdahs -->
       <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:20px;">
-        <div style="font-size:0.75rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;">Between Two Sujūd — Full Version</div>
-        <div style="font-family:'DM Mono',monospace;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:14px;">Duʿa Bayna l-Sajdatayn — Complete</div>
+        <div style="font-size:0.75rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;">Between Two Sujūd</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:14px;">Duʿa Baynal-Sajdatayn</div>
         <div style="font-family:'Amiri',serif;font-size:1.5rem;line-height:2.4;direction:rtl;text-align:right;color:#f0e4c0;display:block;margin-bottom:12px;">رَبِّ اغْفِرْ لِي، وَارْحَمْنِي، وَاهْدِنِي، وَاجْبُرْنِي، وَعَافِنِي، وَارْزُقْنِي، وَارْفَعْنِي</div>
         <div style="font-style:italic;color:#a89060;font-size:0.88rem;line-height:1.7;margin-bottom:10px;">Rabbi ghfir lī, wa-rḥamnī, wa-hdinī, wa-jburnī, wa-ʿāfinī, wa-rzuqnī, wa-rfaʿnī</div>
         <div style="font-size:0.9rem;color:#b0a07a;line-height:1.7;border-top:1px solid #221e14;padding-top:10px;">"My Lord, forgive me, have mercy on me, guide me, restore me, grant me wellbeing, provide for me, and raise me in rank."</div>
@@ -2924,6 +2935,295 @@ function openSalahArticle(){
 }
 function closeSalahArticle(){
   document.getElementById('salahArticleOverlay').classList.remove('active');
+}
+</script>
+
+<!-- THE NIGHT PRAYER — TAHAJJUD ARTICLE OVERLAY -->
+<div class="modal-overlay" id="tahajjudArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
+      <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🌙 The Night Prayer — Tahajjud</div>
+      <button onclick="closeArticle('tahajjud')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+    </div>
+    <div style="padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Tahajjud is the voluntary night prayer performed after sleeping and waking before Fajr. It is the highest of the voluntary prayers in rank, and the most beloved of the nawāfil to Allah. The Prophet ﷺ never abandoned it throughout his life, whether in health or in travel.</p>
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">The time of Tahajjud is the last third of the night — when the world is silent, the nafs is soft, and Allah descends to the lowest heaven calling out: "Is there anyone supplicating so that I may respond? Is there anyone seeking forgiveness so that I may forgive?" The believer who wakes at this hour has answered a call that most others sleep through.</p>
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Tahajjud is not merely extra ibadah. It is the distinguishing mark of the serious servant — the one who loves Allah beyond obligation, who gives up comfortable sleep for the sweetness of standing before his Lord in darkness.</p>
+            <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">The Quran</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Quran About Tahajjud</div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">وَمِنَ اللَّيْلِ فَتَهَجَّدْ بِهِ نَافِلَةً لَّكَ عَسَىٰ أَن يَبْعَثَكَ رَبُّكَ مَقَامًا مَّحْمُودًا</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Wa-mina l-layli fa-tahajjad bihi nāfilatan lak, ʿasā an yabʿathaka rabbuka maqāman maḥmūdā</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"And during a part of the night, pray Tahajjud as an additional prayer for you. It may be that your Lord will raise you to a praised station."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Surah Al-Isra 17:79</div>
+      </div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">كَانُوا قَلِيلًا مِّنَ اللَّيْلِ مَا يَهْجَعُونَ ۝ وَبِالْأَسْحَارِ هُمْ يَسْتَغْفِرُونَ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Kānū qalīlan mina l-layli mā yahjaʿūn · Wa-bi-l-asḥāri hum yastaghfirūn</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"They used to sleep only a little of the night, and in the hours before dawn they would seek forgiveness."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Surah Adh-Dhariyat 51:17–18</div>
+      </div>
+            <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">The Sunnah</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Hadith About Tahajjud</div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">أَفْضَلُ الصَّلَاةِ بَعْدَ الْفَرِيضَةِ صَلَاةُ اللَّيْلِ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Afḍalu ṣ-ṣalāti baʿda l-farīḍati ṣalātu l-layl</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"The best prayer after the obligatory prayers is the night prayer."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Muslim — Sahih</div>
+      </div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">يَنْزِلُ رَبُّنَا تَبَارَكَ وَتَعَالَى كُلَّ لَيْلَةٍ إِلَى السَّمَاءِ الدُّنْيَا حِينَ يَبْقَى ثُلُثُ اللَّيْلِ الآخِرُ فَيَقُولُ مَنْ يَدْعُونِي فَأَسْتَجِيبَ لَهُ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Yanzilu rabbunā tabāraka wa-taʿālā kulla laylatin ilā s-samāʾi d-dunyā ḥīna yabqā thuluthu l-layli l-ākhiru fa-yaqūlu: man yadʿūnī fa-astajība lah</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"Our Lord descends every night to the lowest heaven when the last third of the night remains and says: Who is calling upon Me so that I may answer him?"</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Bukhari & Muslim — Mutawatir</div>
+      </div>
+            <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">Duas &amp; Remembrance</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Related Supplications</div>
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:20px;">
+        <div style="font-size:0.75rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;">Tahajjud Opening — After Waking</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:14px;">Duʿa of the Prophet ﷺ at Night</div>
+        <div style="font-family:'Amiri',serif;font-size:1.5rem;line-height:2.4;direction:rtl;text-align:right;color:#f0e4c0;display:block;margin-bottom:12px;">اللَّهُمَّ لَكَ الْحَمْدُ أَنْتَ نُورُ السَّمَاوَاتِ وَالْأَرْضِ وَمَنْ فِيهِنَّ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.88rem;line-height:1.7;margin-bottom:10px;">Allāhumma laka l-ḥamdu anta nūru s-samāwāti wa-l-arḍi wa-man fīhinn</div>
+        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.7;border-top:1px solid #221e14;padding-top:10px;">"O Allah, to You belongs all praise. You are the Light of the heavens and the earth and all that is in them." — Bukhari</div>
+      </div>
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:20px;">
+        <div style="font-size:0.75rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;">During Qiyam al-Layl</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:14px;">Duʿa Al-Witr (Qunut)</div>
+        <div style="font-family:'Amiri',serif;font-size:1.5rem;line-height:2.4;direction:rtl;text-align:right;color:#f0e4c0;display:block;margin-bottom:12px;">اللَّهُمَّ اهْدِنِي فِيمَنْ هَدَيْتَ، وَعَافِنِي فِيمَنْ عَافَيْتَ، وَتَوَلَّنِي فِيمَنْ تَوَلَّيْتَ، وَبَارِكْ لِي فِيمَا أَعْطَيْتَ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.88rem;line-height:1.7;margin-bottom:10px;">Allāhumma hdinī fīman hadayt, wa-ʿāfinī fīman ʿāfayt, wa-tawallanī fīman tawallayt, wa-bārik lī fīmā aʿṭayt</div>
+        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.7;border-top:1px solid #221e14;padding-top:10px;">"O Allah, guide me among those You have guided, grant me wellbeing among those You have granted wellbeing, take me under Your protection among those You have protected, and bless for me what You have given me." — Abu Dawud, Tirmidhi</div>
+      </div>
+      <div style="text-align:center;color:#5a5030;font-size:0.85rem;font-style:italic;margin-top:32px;border-top:1px solid #1e1a10;padding-top:20px;">May Allah grant us the tawfeeq and accept our deeds. آمين</div>
+    </div>
+  </div>
+</div>
+<!-- SAWM — THE FAST ARTICLE OVERLAY -->
+<div class="modal-overlay" id="sawmArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
+      <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🌙 Sawm — The Fast</div>
+      <button onclick="closeArticle('sawm')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+    </div>
+    <div style="padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Sawm — fasting — is the fourth pillar of Islam, obligatory upon every Muslim in the month of Ramadan and recommended throughout the year on designated days. It is not merely abstaining from food and drink. The Prophet ﷺ warned that whoever does not abandon falsehood and acting upon it, Allah has no need of him giving up his food and drink.</p>
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Fasting purifies the nafs, breaks the dominance of the lower self, and creates taqwa — God-consciousness — which is precisely what Allah mentions as its purpose in the Quran. The fasting person tames the desires that separate him from his Lord.</p>
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Voluntary fasting — on Mondays and Thursdays, the 13th, 14th, and 15th of each lunar month, and the day of Arafah — are among the most beloved of deeds to Allah. The Prophet ﷺ fasted so frequently that his companions wondered when he ever broke fast.</p>
+            <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">The Quran</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Quran About Sawm</div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">يَا أَيُّهَا الَّذِينَ آمَنُوا كُتِبَ عَلَيْكُمُ الصِّيَامُ كَمَا كُتِبَ عَلَى الَّذِينَ مِن قَبْلِكُمْ لَعَلَّكُمْ تَتَّقُونَ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Yā ayyuhā lladhīna āmanū kutiba ʿalaykumu ṣ-ṣiyāmu kamā kutiba ʿalā lladhīna min qablikum laʿallakum tattaqūn</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"O you who have believed, decreed upon you is fasting as it was decreed upon those before you — that you may become righteous."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Surah Al-Baqarah 2:183</div>
+      </div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">شَهْرُ رَمَضَانَ الَّذِي أُنزِلَ فِيهِ الْقُرْآنُ هُدًى لِّلنَّاسِ وَبَيِّنَاتٍ مِّنَ الْهُدَىٰ وَالْفُرْقَانِ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Shahru ramaḍāna lladhī unzila fīhi l-qurʾānu hudan li-n-nāsi wa-bayyinātin mina l-hudā wa-l-furqān</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"The month of Ramadan in which was revealed the Quran — a guidance for the people and clear proofs of guidance and criterion."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Surah Al-Baqarah 2:185</div>
+      </div>
+            <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">The Sunnah</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Hadith About Sawm</div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">الصِّيَامُ جُنَّةٌ، فَلَا يَرْفُثْ وَلَا يَجْهَلْ، وَإِنِ امْرُؤٌ قَاتَلَهُ أَوْ شَاتَمَهُ فَلْيَقُلْ: إِنِّي صَائِمٌ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Aṣ-ṣiyāmu junnah, fa-lā yarfuth wa-lā yajhal, wa-in mruʾun qātalahu aw shātamahu fa-l-yaqul: innī ṣāʾim</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"Fasting is a shield. Let him not behave obscenely or foolishly. If someone fights or insults him, let him say: I am fasting."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Bukhari & Muslim</div>
+      </div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">كُلُّ عَمَلِ ابْنِ آدَمَ لَهُ إِلَّا الصَّوْمَ، فَإِنَّهُ لِي وَأَنَا أَجْزِي بِهِ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Kullu ʿamali bni Ādama lahu illā ṣ-ṣawm, fa-innahu lī wa-anā ajzī bih</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"Every deed of the son of Adam is for him, except fasting — it is for Me, and I will reward it."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Bukhari & Muslim — Hadith Qudsi</div>
+      </div>
+            <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">Duas &amp; Remembrance</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Related Supplications</div>
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:20px;">
+        <div style="font-size:0.75rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;">Breaking the Fast — At Iftar</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:14px;">Duʿa Al-Iftar</div>
+        <div style="font-family:'Amiri',serif;font-size:1.5rem;line-height:2.4;direction:rtl;text-align:right;color:#f0e4c0;display:block;margin-bottom:12px;">ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِن شَاءَ اللَّهُ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.88rem;line-height:1.7;margin-bottom:10px;">Dhahaba ẓ-ẓamaʾu wa-btallati l-ʿurūqu wa-thabata l-ajru in shāʾa Llāh</div>
+        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.7;border-top:1px solid #221e14;padding-top:10px;">"The thirst is gone, the veins are moistened, and the reward is established, if Allah wills." — Abu Dawud</div>
+      </div>
+      <div style="text-align:center;color:#5a5030;font-size:0.85rem;font-style:italic;margin-top:32px;border-top:1px solid #1e1a10;padding-top:20px;">May Allah grant us the tawfeeq and accept our deeds. آمين</div>
+    </div>
+  </div>
+</div>
+<!-- SUNNAH SALAH — THE CONFIRMED PRAYERS ARTICLE OVERLAY -->
+<div class="modal-overlay" id="sunnahSalahArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
+      <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🌿 Sunnah Salah — The Confirmed Prayers</div>
+      <button onclick="closeArticle('sunnahSalah')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+    </div>
+    <div style="padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">The Sunnah prayers are the voluntary prayers the Prophet ﷺ consistently performed alongside the obligatory prayers. They are of two types: the Rawātib — the confirmed sunnahs attached to the five daily prayers — and the non-attached sunnahs performed at other times.</p>
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">The Prophet ﷺ said that there is no Muslim servant who prays twelve rakāt of voluntary prayer every day, over and above the obligatory prayers, except that Allah builds for him a house in Paradise. These twelve are: 2 before Fajr, 4 before Dhuhr and 2 after, 2 after Maghrib, and 2 after Isha.</p>
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">The Sunnah prayers serve as a cover for deficiencies in the obligatory prayer. On the Day of Judgment, when the obligatory prayer is found incomplete, Allah will say: "Look and see if My servant has any voluntary prayers that can complete what is missing from his obligatory prayers."</p>
+            <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">The Quran</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Quran About Voluntary Prayer</div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">وَمِنَ اللَّيْلِ فَسَبِّحْهُ وَأَدْبَارَ السُّجُودِ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Wa-mina l-layli fa-sabbiḥhu wa-adbāra s-sujūd</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"And glorify Him during part of the night and after prostration."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Surah Qaf 50:40</div>
+      </div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">وَتَتَجَافَىٰ جُنُوبُهُمْ عَنِ الْمَضَاجِعِ يَدْعُونَ رَبَّهُمْ خَوْفًا وَطَمَعًا</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Wa-tatajāfā junūbuhum ʿani l-maḍājiʿi yadʿūna rabbahum khawfan wa-ṭamaʿā</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"Their sides forsake their beds as they call upon their Lord in fear and hope."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Surah As-Sajdah 32:16</div>
+      </div>
+            <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">The Sunnah</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Hadith About Sunnah Salah</div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">مَنْ صَلَّى فِي يَوْمٍ وَلَيْلَةٍ اثْنَتَيْ عَشْرَةَ رَكْعَةً بُنِيَ لَهُ بَيْتٌ فِي الْجَنَّةِ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Man ṣallā fī yawmin wa-laylatin ithnatay ʿashrata rakʿatan buniya lahu baytun fi l-jannah</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"Whoever prays twelve rakāt in a day and night, a house will be built for him in Paradise."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Muslim — Sahih</div>
+      </div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">أَوَّلُ مَا يُحَاسَبُ بِهِ الْعَبْدُ الصَّلَاةُ، فَإِنْ صَلُحَتْ صَلُحَ سَائِرُ عَمَلِهِ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Awwalu mā yuḥāsabu bihi l-ʿabdu ṣ-ṣalāh, fa-in ṣaluḥat ṣaluḥa sāʾiru ʿamalih</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"The first thing a servant will be held accountable for is the prayer. If it is sound, all his deeds will be sound."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Tirmidhi — Hasan</div>
+      </div>
+      <div style="text-align:center;color:#5a5030;font-size:0.85rem;font-style:italic;margin-top:32px;border-top:1px solid #1e1a10;padding-top:20px;">May Allah grant us the tawfeeq and accept our deeds. آمين</div>
+    </div>
+  </div>
+</div>
+<!-- NAFL SALAH — THE SUPEREROGATORY PRAYER ARTICLE OVERLAY -->
+<div class="modal-overlay" id="naflSalahArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
+      <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">✨ Nafl Salah — The Supererogatory Prayer</div>
+      <button onclick="closeArticle('naflSalah')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+    </div>
+    <div style="padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Nafl Salah refers to any voluntary prayer beyond the obligatory and the confirmed Sunnah prayers. It is the overflow of a heart that cannot get enough of standing before Allah — praying not out of obligation or routine, but out of love and longing.</p>
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Among the most virtuous Nafl prayers are: Salat Ad-Duha (the forenoon prayer, 2 to 12 rakāt), Salat Al-Awwabeen (6 rakāt after Maghrib), Tahiyyatul Masjid (2 rakāt upon entering the mosque), and Salat Al-Istikhārah (2 rakāt when seeking guidance in a matter).</p>
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">The Prophet ﷺ said: "Whoever draws near to Me through supererogatory deeds, I will love him." The Nafl prayer is the primary vehicle through which a servant earns the nearness and love of Allah beyond what duty requires.</p>
+            <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">The Quran</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Quran About Extra Worship</div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">فَاسْتَبِقُوا الْخَيْرَاتِ أَيْنَ مَا تَكُونُوا يَأْتِ بِكُمُ اللَّهُ جَمِيعًا</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Fa-stabiqū l-khayrāti aynamā takūnū yaʾti bikumu Llāhu jamīʿā</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"So race to all that is good. Wherever you may be, Allah will bring you all together."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Surah Al-Baqarah 2:148</div>
+      </div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">وَاسْجُدْ وَاقْتَرِب</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Wa-sjud wa-qtarib</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"Prostrate and draw near [to Allah]."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Surah Al-Alaq 96:19</div>
+      </div>
+            <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">The Sunnah</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Hadith About Nafl Salah</div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">مَا يَزَالُ عَبْدِي يَتَقَرَّبُ إِلَيَّ بِالنَّوَافِلِ حَتَّى أُحِبَّهُ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Mā yazālu ʿabdī yataqarrabu ilayya bi-n-nawāfili ḥattā uḥibbah</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"My servant continues to draw near to Me through supererogatory deeds until I love him." — Hadith Qudsi</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Bukhari</div>
+      </div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">صَلِّ رَكْعَتَيِ الضُّحَى فَإِنَّهَا صَلَاةُ الْأَوَّابِينَ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Ṣalli rakʿatay ḍ-ḍuḥā fa-innahā ṣalātu l-awwābīn</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"Pray the two rakāt of Duha — it is the prayer of those who often return to Allah."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Ibn Khuzaymah — Sahih</div>
+      </div>
+            <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">Duas &amp; Remembrance</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Related Supplications</div>
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:20px;">
+        <div style="font-size:0.75rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;">Salat Al-Istikhārah — Before Sleeping or After Nafl</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:14px;">Duʿa Al-Istikhārah</div>
+        <div style="font-family:'Amiri',serif;font-size:1.5rem;line-height:2.4;direction:rtl;text-align:right;color:#f0e4c0;display:block;margin-bottom:12px;">اللَّهُمَّ إِنِّي أَسْتَخِيرُكَ بِعِلْمِكَ وَأَسْتَقْدِرُكَ بِقُدْرَتِكَ وَأَسْأَلُكَ مِنْ فَضْلِكَ الْعَظِيمِ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.88rem;line-height:1.7;margin-bottom:10px;">Allāhumma innī astakhīruka bi-ʿilmika wa-astaqhdiruka bi-qudratika wa-asʾaluka min faḍlika l-ʿaẓīm</div>
+        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.7;border-top:1px solid #221e14;padding-top:10px;">"O Allah, I seek Your counsel through Your knowledge, and I seek Your assistance through Your power, and I ask of You from Your great bounty." — Bukhari</div>
+      </div>
+      <div style="text-align:center;color:#5a5030;font-size:0.85rem;font-style:italic;margin-top:32px;border-top:1px solid #1e1a10;padding-top:20px;">May Allah grant us the tawfeeq and accept our deeds. آمين</div>
+    </div>
+  </div>
+</div>
+<!-- SADAQAH — VOLUNTARY CHARITY ARTICLE OVERLAY -->
+<div class="modal-overlay" id="sadaqahArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
+      <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">💛 Sadaqah — Voluntary Charity</div>
+      <button onclick="closeArticle('sadaqah')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+    </div>
+    <div style="padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Sadaqah is voluntary charity given for the sake of Allah alone — beyond the obligatory Zakat. It is one of the greatest deeds a Muslim can perform, extinguishing sin as water extinguishes fire, warding off calamity, and multiplying in reward with Allah in ways the mind cannot measure.</p>
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">The Prophet ﷺ was the most generous of people, and his generosity increased dramatically in Ramadan. He gave without fear of poverty, because he understood the promise of Allah: that every dirham given in charity, Allah replaces manifold. Sadaqah is not a loss — it is the most profitable investment a believer can make.</p>
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Sadaqah takes many forms: wealth, a smile, removing harm from a path, giving good counsel, and speaking a kind word. The Prophet ﷺ said: "Every act of goodness is sadaqah." But wealth-based sadaqah carries a special weight, as it is hardest for the nafs and most visible in its sincerity.</p>
+            <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">The Quran</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Quran About Sadaqah</div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">مَّثَلُ الَّذِينَ يُنفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ أَنبَتَتْ سَبْعَ سَنَابِلَ فِي كُلِّ سُنبُلَةٍ مِّائَةُ حَبَّةٍ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Mathalu lladhīna yunfiqūna amwālahum fī sabīli Llāhi ka-mathali ḥabbatin anbatatss sabʿa sanābila fī kulli sunbulatin miʾatu ḥabbah</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"The example of those who spend their wealth in the way of Allah is like a seed that grows seven spikes — in each spike is a hundred grains."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Surah Al-Baqarah 2:261</div>
+      </div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">الَّذِينَ يُنفِقُونَ أَمْوَالَهُم بِاللَّيْلِ وَالنَّهَارِ سِرًّا وَعَلَانِيَةً فَلَهُمْ أَجْرُهُمْ عِندَ رَبِّهِمْ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Alladhīna yunfiqūna amwālahum bi-l-layli wa-n-nahāri sirran wa-ʿalāniyatan fa-lahum ajruhum ʿinda rabbihim</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"Those who spend their wealth by night and by day, secretly and publicly — they will have their reward with their Lord."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Surah Al-Baqarah 2:274</div>
+      </div>
+            <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">The Sunnah</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Hadith About Sadaqah</div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">الصَّدَقَةُ تُطْفِئُ الْخَطِيئَةَ كَمَا يُطْفِئُ الْمَاءُ النَّارَ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Aṣ-ṣadaqatu tuṭfiʾu l-khaṭīʾata kamā yuṭfiʾu l-māʾu n-nār</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"Charity extinguishes sin as water extinguishes fire."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Tirmidhi — Hasan Sahih</div>
+      </div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">مَا نَقَصَتْ صَدَقَةٌ مِنْ مَالٍ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Mā naqaṣat ṣadaqatun min māl</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"Charity does not decrease wealth."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Muslim — Sahih</div>
+      </div>
+            <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">Duas &amp; Remembrance</div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Related Supplications</div>
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:20px;">
+        <div style="font-size:0.75rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;">Duʿa for the One Who Gives — Said by the Recipient</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:14px;">Jazāka Llāhu Khayran</div>
+        <div style="font-family:'Amiri',serif;font-size:1.5rem;line-height:2.4;direction:rtl;text-align:right;color:#f0e4c0;display:block;margin-bottom:12px;">جَزَاكَ اللَّهُ خَيْرًا</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.88rem;line-height:1.7;margin-bottom:10px;">Jazāka Llāhu khayran</div>
+        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.7;border-top:1px solid #221e14;padding-top:10px;">"May Allah reward you with good." — The Prophet ﷺ said this is the greatest thanks one can give. Tirmidhi.</div>
+      </div>
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:20px;">
+        <div style="font-size:0.75rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;">Duʿa When Giving — Recommended Intention</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:14px;">Sincerity of Intention</div>
+        <div style="font-family:'Amiri',serif;font-size:1.5rem;line-height:2.4;direction:rtl;text-align:right;color:#f0e4c0;display:block;margin-bottom:12px;">رَبَّنَا تَقَبَّلْ مِنَّا إِنَّكَ أَنتَ السَّمِيعُ الْعَلِيمُ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.88rem;line-height:1.7;margin-bottom:10px;">Rabbanā taqabbal minnā innaka anta s-samīʿu l-ʿalīm</div>
+        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.7;border-top:1px solid #221e14;padding-top:10px;">"Our Lord, accept from us. Indeed, You are the All-Hearing, the All-Knowing." — Al-Baqarah 2:127</div>
+      </div>
+      <div style="text-align:center;color:#5a5030;font-size:0.85rem;font-style:italic;margin-top:32px;border-top:1px solid #1e1a10;padding-top:20px;">May Allah grant us the tawfeeq and accept our deeds. آمين</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openArticle(id){
+  document.getElementById(id+'ArticleOverlay').classList.add('active');
+}
+function closeArticle(id){
+  document.getElementById(id+'ArticleOverlay').classList.remove('active');
 }
 </script>
 

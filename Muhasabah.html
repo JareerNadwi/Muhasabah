@@ -500,7 +500,7 @@ canvas#qrCanvas{
         <div class="goal-name">🔍 Tafsir <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-tafsir">0%</div>
       </div>
-      <div class="sub-label" style="margin-bottom:8px;">Al-Jalalayn · 17 Verses/Day · Auto-marks done when all read</div>
+      <div class="sub-label" style="margin-bottom:8px;">Saheeh International · 17 Verses/Day · Auto-marks done when all read</div>
       <button class="qr-open-btn" onclick="openTafsirReader()">🔍 Open Tafsir Reader</button>
       <div class="qr-session-badge" id="tafsirSessionBadge" style="display:none;"></div>
     </div>
@@ -2313,21 +2313,23 @@ async function openHadithReader(){
 }
 
 async function fetchHadith(num){
-  /* API returns: { metadata:{}, hadiths:[ {hadithnumber, text}, … ] } */
+  /* Each file may contain multiple variant narrations — join them all */
   const primary  = `https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-muslim/${num}.json`;
   const fallback = `https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-muslim/${num}.min.json`;
   try {
     let res = await fetch(primary);
     if(!res.ok) res = await fetch(fallback);
     const json = await res.json();
-    /* structure: { hadiths: [ { hadithnumber:N, text:"…" } ] } */
     let text = '';
     if(Array.isArray(json.hadiths) && json.hadiths.length > 0){
-      text = json.hadiths[0].text || '';
+      /* Join all variant narrations with a divider */
+      text = json.hadiths
+        .map((h, i) => json.hadiths.length > 1 ? `[Narration ${i+1}]\n${h.text}` : h.text)
+        .join('\n\n');
     } else if(typeof json.text === 'string'){
       text = json.text;
     }
-    return { num, text: text || 'Content unavailable for this hadith.' };
+    return { num, text: text.trim() || 'Content unavailable for this hadith.' };
   } catch(e) {
     return { num, text: 'Failed to load hadith #' + num + '.' };
   }
@@ -2406,7 +2408,7 @@ async function openTafsirReader(){
   const end   = Math.min(start + VERSES_PER_DAY - 1, TOTAL_VERSES);
 
   document.getElementById('tafsirDayInfo').textContent =
-    `Al-Jalalayn · Day ${idx+1} · Verses ${start}–${end}`;
+    `Saheeh International · Day ${idx+1} · Verses ${start}–${end}`;
 
   const already = getCached(_tafsirDK).tafsir === 'yes';
   document.getElementById('tafsirDoneNote').style.display = already ? 'block' : 'none';
@@ -2432,23 +2434,23 @@ async function openTafsirReader(){
 
 async function fetchTafsirVerse(globalNum){
   const key = globalVerseToKey(globalNum);
-  const url  = `https://api.alquran.cloud/v1/ayah/${key}/editions/en.jalalayn,quran-uthmani`;
+  /* en.sahih = Saheeh International — complete English meaning, every verse, no gaps */
+  const url  = `https://api.alquran.cloud/v1/ayah/${key}/editions/en.sahih,quran-uthmani`;
   try {
     const res  = await fetch(url);
     const json = await res.json();
-    /* alquran.cloud returns data as array: [edition1, edition2] */
-    const jal  = json.data?.[0];   /* en.jalalayn */
+    const eng  = json.data?.[0];   /* en.sahih */
     const arb  = json.data?.[1];   /* quran-uthmani */
     return {
       globalNum,
       key,
-      surahName : jal?.surah?.englishName || '',
-      ayahNum   : jal?.numberInSurah || '',
+      surahName : eng?.surah?.englishName || arb?.surah?.englishName || '',
+      ayahNum   : eng?.numberInSurah || '',
       arabic    : arb?.text || '',
-      tafsir    : jal?.text || 'Tafsir unavailable for this verse.'
+      meaning   : eng?.text || 'Translation unavailable for this verse.'
     };
   } catch(e) {
-    return { globalNum, key, surahName:'', ayahNum:'', arabic:'', tafsir:'Failed to load verse '+globalNum+'.' };
+    return { globalNum, key, surahName:'', ayahNum:'', arabic:'', meaning:'Failed to load verse '+globalNum+'.' };
   }
 }
 
@@ -2461,7 +2463,7 @@ function renderTafsirVerse(idx){
     v.surahName ? `${v.surahName} · ${v.key}` : v.key;
   document.getElementById('tafsirCounter').textContent = `${idx+1} / ${total}`;
   document.getElementById('tafsirArabic').textContent  = v.arabic;
-  document.getElementById('tafsirText').textContent    = v.tafsir;
+  document.getElementById('tafsirText').textContent    = v.meaning || v.tafsir || '';
   document.getElementById('tafsirPrevBtn').disabled    = idx === 0;
   const isLast  = idx === total - 1;
   const nextBtn = document.getElementById('tafsirNextBtn');
@@ -2547,7 +2549,7 @@ loadDayData = function(dk){
         <div id="tafsirVerseRef" style="font-size:11px;color:var(--gold);letter-spacing:.5px;"></div>
       </div>
       <div id="tafsirArabic" style="font-family:'Amiri',serif;font-size:22px;color:var(--text);line-height:2;text-align:right;direction:rtl;padding:14px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;"></div>
-      <div style="font-size:10px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase;">Al-Jalalayn Tafsir</div>
+      <div style="font-size:10px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase;">Meaning — Saheeh International</div>
       <div id="tafsirText" style="font-size:13px;color:var(--text);line-height:1.9;"></div>
     </div>
     <div id="tafsirNav" style="display:none;padding:12px 18px;border-top:1px solid var(--border);background:var(--surface2);flex-shrink:0;gap:8px;">

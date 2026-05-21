@@ -501,7 +501,6 @@ canvas#qrCanvas{
         <div class="goal-name">📚 Hadith <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-hadith">0%</div>
       </div>
-      <div class="sub-label" style="margin-bottom:8px;">Sahih Muslim · 5 Hadiths/Day · Auto-marks done when all read</div>
       <button class="qr-open-btn" onclick="openHadithReader()">📚 Open Hadith Reader</button>
       <div class="qr-session-badge" id="hadithSessionBadge" style="display:none;"></div>
     </div>
@@ -512,7 +511,6 @@ canvas#qrCanvas{
         <div class="goal-name">🔍 Tafsir <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-tafsir">0%</div>
       </div>
-      <div class="sub-label" style="margin-bottom:8px;">Saheeh International · 17 Verses/Day · Auto-marks done when all read</div>
       <button class="qr-open-btn" onclick="openTafsirReader()">🔍 Open Tafsir Reader</button>
       <div class="qr-session-badge" id="tafsirSessionBadge" style="display:none;"></div>
     </div>
@@ -2341,13 +2339,19 @@ function renderHadithBadge(dk){
   if(!sessions.length){ badge.style.display='none'; return; }
   const done  = data.hadith === 'yes';
   const ratio = parseFloat(data.hadith_ratio) || 0;
+  const read  = Math.round(ratio * HADITHS_PER_DAY);
   const pct   = Math.round(ratio * 100);
   const count = sessions.length;
+  const first = sessions[0];
   const last  = sessions[sessions.length-1];
+  const headerTxt = done
+    ? `${count} session${count!==1?'s':''} \u00b7 Completed \u2713 \u2014 ${HADITHS_PER_DAY} hadiths`
+    : `${count} session${count!==1?'s':''} \u00b7 ${read} / ${HADITHS_PER_DAY} hadiths (${pct}%)`;
   badge.style.display = 'block';
   badge.innerHTML =
-    '<span style="color:var(--gold);">\u{1F4DA} Today: '+count+' session'+(count!==1?'s':'')+' &nbsp;&middot;&nbsp; '+(done?'Completed \u2713':pct+'% ('+last.end+'/'+HADITHS_PER_DAY+' hadiths)')+'</span>'
-    +'<br><span style="font-size:9px;color:var(--text-muted);">Session '+count+': Hadiths '+last.start+'\u2013'+last.end+'</span>';
+    `<span style="color:var(--gold);">\u{1F4DA} Today: ${headerTxt}</span>`
+    +`<br><span style="font-size:9px;color:var(--text-muted);">Total: ${first.start}\u2013${last.end} (${last.end} hadiths)</span>`
+    +`<br><span style="font-size:9px;color:var(--text-muted);">Last: Hadiths ${last.start}\u2013${last.end} (${last.end - last.start + 1} hadiths)</span>`;
 }
 
 function renderTafsirBadge(dk){
@@ -2358,13 +2362,19 @@ function renderTafsirBadge(dk){
   if(!sessions.length){ badge.style.display='none'; return; }
   const done  = data.tafsir === 'yes';
   const ratio = parseFloat(data.tafsir_ratio) || 0;
+  const read  = Math.round(ratio * VERSES_PER_DAY);
   const pct   = Math.round(ratio * 100);
   const count = sessions.length;
+  const first = sessions[0];
   const last  = sessions[sessions.length-1];
+  const headerTxt = done
+    ? `${count} session${count!==1?'s':''} \u00b7 Completed \u2713 \u2014 ${VERSES_PER_DAY} verses`
+    : `${count} session${count!==1?'s':''} \u00b7 ${read} / ${VERSES_PER_DAY} verses (${pct}%)`;
   badge.style.display = 'block';
   badge.innerHTML =
-    '<span style="color:var(--gold);">\u{1F50D} Today: '+count+' session'+(count!==1?'s':'')+' &nbsp;&middot;&nbsp; '+(done?'Completed \u2713':pct+'% ('+last.end+'/'+VERSES_PER_DAY+' verses)')+'</span>'
-    +'<br><span style="font-size:9px;color:var(--text-muted);">Session '+count+': Verses '+last.start+'\u2013'+last.end+'</span>';
+    `<span style="color:var(--gold);">\u{1F50D} Today: ${headerTxt}</span>`
+    +`<br><span style="font-size:9px;color:var(--text-muted);">Total: ${first.start}\u2013${last.end} (${last.end} verses)</span>`
+    +`<br><span style="font-size:9px;color:var(--text-muted);">Last: Verses ${last.start}\u2013${last.end} (${last.end - last.start + 1} verses)</span>`;
 }
 
 /* Scoring updates */
@@ -2462,7 +2472,14 @@ async function _saveHadithProgress(read, done){
 }
 
 function hadithNavPrev(){ if(_hadithIdx > 0) renderHadith(_hadithIdx - 1); }
-function closeHadithReader(){ document.getElementById('hadithReaderOverlay').classList.remove('active'); }
+function closeHadithReader(){
+  /* Save current position so next open resumes from here, but only if user read something */
+  if(_hadithDK && _hadithIdx > _hadithSessionStart){
+    setReaderResume('_hadith_resume_' + _hadithDK, _hadithIdx);
+    _saveHadithProgress(_hadithIdx + 1, false);
+  }
+  document.getElementById('hadithReaderOverlay').classList.remove('active');
+}
 
 /* ══════ TAFSIR READER ══════ */
 let _quranArabic  = null;
@@ -2578,19 +2595,51 @@ async function _saveTafsirProgress(read, done){
 }
 
 function tafsirNavPrev(){ if(_tafsirIdx > 0) renderTafsirVerse(_tafsirIdx - 1); }
-function closeTafsirReader(){ document.getElementById('tafsirReaderOverlay').classList.remove('active'); }
-
-/* Keyboard arrow navigation for both readers */
-document.addEventListener('keydown', e => {
-  const hO = document.getElementById('hadithReaderOverlay');
-  const tO = document.getElementById('tafsirReaderOverlay');
-  if(hO && hO.classList.contains('active')){
-    if(e.key==='ArrowRight'||e.key==='ArrowDown') hadithNavNext();
-    if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   hadithNavPrev();
+function closeTafsirReader(){
+  /* Save current position so next open resumes from here, but only if user read something */
+  if(_tafsirDK && _tafsirIdx > _tafsirSessionStart){
+    setReaderResume('_tafsir_resume_' + _tafsirDK, _tafsirIdx);
+    _saveTafsirProgress(_tafsirIdx + 1, false);
   }
+  document.getElementById('tafsirReaderOverlay').classList.remove('active');
+}
+
+/* Keyboard arrow navigation — all readers */
+document.addEventListener('keydown', e => {
+  if(e.key !== 'ArrowRight' && e.key !== 'ArrowLeft' &&
+     e.key !== 'ArrowDown'  && e.key !== 'ArrowUp') return;
+
+  const next = e.key === 'ArrowRight' || e.key === 'ArrowDown';
+
+  /* Quran PDF reader */
+  const qrO = document.getElementById('quranReaderOverlay');
+  if(qrO && qrO.classList.contains('active')){
+    e.preventDefault();
+    if(next) qrChangePage(1); else qrChangePage(-1);
+    return;
+  }
+
+  /* Generic PDF reader (Zikr Morning/Evening/Waqiah/Mulk/Asmaul/ZikrBook) */
+  const pdfO = document.getElementById('pdfReaderOverlay');
+  if(pdfO && pdfO.classList.contains('active')){
+    e.preventDefault();
+    if(next) pdfReaderChangePage(1); else pdfReaderChangePage(-1);
+    return;
+  }
+
+  /* Hadith reader */
+  const hO = document.getElementById('hadithReaderOverlay');
+  if(hO && hO.classList.contains('active')){
+    e.preventDefault();
+    if(next) hadithNavNext(); else hadithNavPrev();
+    return;
+  }
+
+  /* Tafsir reader */
+  const tO = document.getElementById('tafsirReaderOverlay');
   if(tO && tO.classList.contains('active')){
-    if(e.key==='ArrowRight'||e.key==='ArrowDown') tafsirNavNext();
-    if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   tafsirNavPrev();
+    e.preventDefault();
+    if(next) tafsirNavNext(); else tafsirNavPrev();
   }
 });
 

@@ -717,6 +717,9 @@ canvas#qrCanvas{
         <button class="yn-btn yes" data-key="books" data-val="yes" onclick="setYN('books','yes')">Yes</button>
         <button class="yn-btn no"  data-key="books" data-val="no"  onclick="setYN('books','no')">No</button>
       </div>
+      <div class="sub-label">Goal: Read today's book = Full 5% Core &nbsp;·&nbsp; 1 book pulled daily from 365-day plan</div>
+      <button class="qr-open-btn" style="margin-top:8px;background:linear-gradient(135deg,#0a1f10,#152a18);border-color:#22c55e;color:#4ade80;" onclick="openBookReader()">📗 Open Book Reader</button>
+      <div class="qr-session-badge" id="bookSessionBadge" style="display:none;"></div>
     </div>
 
     <!-- Language 5% -->
@@ -2456,8 +2459,8 @@ async function openHadithReader(){
   try {
     if(!_hadithBook){
       document.getElementById('hadithLoading').innerHTML = 'Loading Sahih Muslim...';
-      const res = await fetch(BASE_URL + 'hadith-muslim.json');
-      if(!res.ok) throw new Error('hadith-muslim.json HTTP ' + res.status);
+      const res = await fetch(BASE_URL + 'Hadith Muslim.json');
+      if(!res.ok) throw new Error('Hadith Muslim.json HTTP ' + res.status);
       const json = await res.json();
       _hadithBook = json.hadiths || [];
     }
@@ -2564,8 +2567,8 @@ async function openTafsirReader(){
   try {
     if(!_quranArabic){
       document.getElementById('tafsirLoading').innerHTML = 'Loading Quran Arabic...';
-      const res = await fetch(BASE_URL + 'quran-arabic.json');
-      if(!res.ok) throw new Error('quran-arabic.json HTTP ' + res.status);
+      const res = await fetch(BASE_URL + 'Quran Arabic.json');
+      if(!res.ok) throw new Error('Quran Arabic.json HTTP ' + res.status);
       const json = await res.json();
       _quranArabic = json.quran || [];
       _quranArabic._map = {};
@@ -2573,8 +2576,8 @@ async function openTafsirReader(){
     }
     if(!_quranEnglish){
       document.getElementById('tafsirLoading').innerHTML = 'Loading Quran English...';
-      const res = await fetch(BASE_URL + 'quran-english.json');
-      if(!res.ok) throw new Error('quran-english.json HTTP ' + res.status);
+      const res = await fetch(BASE_URL + 'Quran English.json');
+      if(!res.ok) throw new Error('Quran English.json HTTP ' + res.status);
       const json = await res.json();
       _quranEnglish = json.quran || [];
       _quranEnglish._map = {};
@@ -2705,8 +2708,291 @@ loadDayData = function(dk){
   _origLoadDayData(dk);
   renderHadithBadge(dk);
   renderTafsirBadge(dk);
+  renderBookBadge(dk);
 };
 </script>
+
+<script>
+/* ════════════════════════════════════════════════════
+   BOOK READER  —  pulls from Book.json (GitHub Pages)
+   One book per day based on day-of-year (1–365).
+   Lessons revealed one by one. Marks books=yes on complete.
+   ════════════════════════════════════════════════════ */
+
+let _bookData       = null;   // full books array from Book.json
+let _bookRevealed   = [];     // indices of revealed lessons
+let _bookDK         = '';     // current day key
+
+function _bookDayOfYear(dateStr) {
+  // dateStr = 'YYYY-MM-DD'
+  const d   = new Date(dateStr);
+  const start = new Date(d.getFullYear(), 0, 0);
+  const diff  = d - start;
+  return Math.min(Math.floor(diff / 86400000), 365);
+}
+
+const BOOK_BADGE_COLORS = {
+  must_not_skip : '#ef4444',
+  islamic       : '#10b981',
+  leadership    : '#8b5cf6',
+  communication : '#f59e0b',
+  psychology    : '#3b82f6',
+  business      : '#f97316',
+  money         : '#14b8a6',
+  career        : '#ec4899',
+};
+const BOOK_BADGE_LABELS = {
+  must_not_skip : 'Must Not Skip',
+  islamic       : 'Islamic',
+  leadership    : 'Leadership',
+  communication : 'Communication',
+  psychology    : 'Psychology',
+  business      : 'Business',
+  money         : 'Money',
+  career        : 'Career',
+};
+
+async function openBookReader() {
+  _bookDK = currentDateKey || todayKey();
+  document.getElementById('bookReaderOverlay').classList.add('active');
+
+  const dayNum = _bookDayOfYear(_bookDK);
+  document.getElementById('bookDayPill').textContent = 'Day ' + dayNum + ' of 365';
+
+  document.getElementById('bookLoading').style.display  = 'flex';
+  document.getElementById('bookContent').style.display  = 'none';
+
+  try {
+    if (!_bookData) {
+      document.getElementById('bookLoading').textContent = 'Loading Book.json…';
+      const res = await fetch(BASE_URL + 'Book.json');
+      if (!res.ok) throw new Error('Book.json HTTP ' + res.status);
+      const json = await res.json();
+      _bookData = json.books || [];
+    }
+
+    const book = _bookData.find(b => b.day === dayNum) || _bookData[0];
+    if (!book) throw new Error('No book found for day ' + dayNum);
+
+    // Restore revealed state from IDB
+    const saved = await getReaderResume('_book_revealed_' + _bookDK);
+    _bookRevealed = saved ? saved : [];
+
+    _renderBookContent(book);
+
+    document.getElementById('bookLoading').style.display = 'none';
+    document.getElementById('bookContent').style.display = 'block';
+
+  } catch(e) {
+    document.getElementById('bookLoading').textContent = '⚠ Failed: ' + e.message;
+  }
+}
+
+function _renderBookContent(book) {
+  // Header
+  document.getElementById('bookCategory').textContent = book.category || '';
+  document.getElementById('bookTitle').textContent    = book.title    || '';
+  document.getElementById('bookAuthor').textContent   = 'by ' + (book.author || '');
+  document.getElementById('bookWhy').textContent      = book.why_it_matters || '';
+
+  // Badges
+  const badgeEl = document.getElementById('bookBadges');
+  badgeEl.innerHTML = '';
+  (book.special || []).forEach(tag => {
+    const span = document.createElement('span');
+    span.textContent = BOOK_BADGE_LABELS[tag] || tag;
+    span.style.cssText =
+      'background:' + (BOOK_BADGE_COLORS[tag] || '#6b7280') + ';'
+      + 'color:#fff;border-radius:999px;padding:3px 10px;font-size:11px;'
+      + 'font-weight:600;font-family:\'DM Mono\',monospace;letter-spacing:.05em;';
+    badgeEl.appendChild(span);
+  });
+
+  // Lessons
+  const listEl = document.getElementById('bookLessons');
+  listEl.innerHTML = '';
+  (book.lessons || []).forEach((lesson, i) => {
+    const isVis = _bookRevealed.includes(i);
+    const item  = document.createElement('div');
+    item.id     = 'bookLesson_' + i;
+    item.style.cssText =
+      'display:flex;gap:14px;align-items:flex-start;'
+      + 'background:rgba(255,255,255,.03);border-radius:10px;padding:12px 14px;'
+      + 'border:1px solid rgba(255,255,255,.05);'
+      + 'opacity:' + (isVis ? '1' : '0.3') + ';'
+      + 'transform:' + (isVis ? 'translateX(0)' : 'translateX(-6px)') + ';'
+      + 'transition:all .3s ease;';
+
+    const num = document.createElement('div');
+    num.textContent = i + 1;
+    num.style.cssText =
+      'min-width:26px;height:26px;border-radius:50%;'
+      + 'background:rgba(22,163,74,.2);border:1px solid rgba(74,222,128,.25);'
+      + 'color:#4ade80;font-size:12px;font-weight:700;display:flex;'
+      + 'align-items:center;justify-content:center;font-family:\'DM Mono\',monospace;flex-shrink:0;';
+
+    const txt = document.createElement('div');
+    txt.textContent = lesson;
+    txt.style.cssText =
+      'font-size:13px;color:#e2e8f0;line-height:1.65;font-family:\'DM Mono\',monospace;';
+
+    item.appendChild(num);
+    item.appendChild(txt);
+    listEl.appendChild(item);
+  });
+
+  _updateBookButtons(book);
+}
+
+function _updateBookButtons(book) {
+  const total    = (book && book.lessons) ? book.lessons.length : 7;
+  const allDone  = _bookRevealed.length >= total;
+  const nextBtn  = document.getElementById('bookNextBtn');
+  const allBtn   = document.getElementById('bookRevealAllBtn');
+  const complete = document.getElementById('bookCompleteBanner');
+
+  if (allDone) {
+    nextBtn.style.display   = 'none';
+    allBtn.style.display    = 'none';
+    complete.style.display  = 'block';
+  } else {
+    nextBtn.style.display   = 'block';
+    allBtn.style.display    = 'block';
+    complete.style.display  = 'none';
+    const next = _bookRevealed.length;
+    nextBtn.textContent = next === 0
+      ? 'Reveal First Lesson'
+      : 'Reveal Lesson ' + (next + 1);
+  }
+}
+
+async function bookRevealNext() {
+  if (!_bookData) return;
+  const dayNum = _bookDayOfYear(_bookDK);
+  const book   = _bookData.find(b => b.day === dayNum) || _bookData[0];
+  const total  = book ? book.lessons.length : 7;
+  const next   = _bookRevealed.length;
+  if (next >= total) return;
+
+  _bookRevealed.push(next);
+  await setReaderResume('_book_revealed_' + _bookDK, _bookRevealed);
+
+  // Animate the revealed item
+  const el = document.getElementById('bookLesson_' + next);
+  if (el) {
+    el.style.opacity   = '1';
+    el.style.transform = 'translateX(0)';
+  }
+
+  // Auto-mark books = yes when all lessons revealed
+  if (_bookRevealed.length >= total) {
+    const data = {...getCached(_bookDK)};
+    data.books = 'yes';
+    _cache[_bookDK] = data;
+    await setStore(_bookDK, data);
+    document.querySelectorAll('.yn-btn[data-key="books"]').forEach(btn =>
+      btn.classList.toggle('active', btn.dataset.val === 'yes')
+    );
+    refreshScores();
+    renderBookBadge(_bookDK);
+  }
+
+  _updateBookButtons(book);
+}
+
+async function bookRevealAll() {
+  if (!_bookData) return;
+  const dayNum = _bookDayOfYear(_bookDK);
+  const book   = _bookData.find(b => b.day === dayNum) || _bookData[0];
+  const total  = book ? book.lessons.length : 7;
+
+  _bookRevealed = Array.from({length: total}, (_, i) => i);
+  await setReaderResume('_book_revealed_' + _bookDK, _bookRevealed);
+
+  for (let i = 0; i < total; i++) {
+    const el = document.getElementById('bookLesson_' + i);
+    if (el) { el.style.opacity = '1'; el.style.transform = 'translateX(0)'; }
+  }
+
+  // Mark complete
+  const data = {...getCached(_bookDK)};
+  data.books = 'yes';
+  _cache[_bookDK] = data;
+  await setStore(_bookDK, data);
+  document.querySelectorAll('.yn-btn[data-key="books"]').forEach(btn =>
+    btn.classList.toggle('active', btn.dataset.val === 'yes')
+  );
+  refreshScores();
+  renderBookBadge(_bookDK);
+  _updateBookButtons(book);
+}
+
+function closeBookReader() {
+  document.getElementById('bookReaderOverlay').classList.remove('active');
+  renderBookBadge(_bookDK);
+}
+
+function renderBookBadge(dk) {
+  const badge = document.getElementById('bookSessionBadge');
+  if (!badge) return;
+  const data = getCached(dk);
+  if (data.books === 'yes') {
+    badge.style.display = 'block';
+    badge.innerHTML =
+      '<span style="color:var(--green-bright);">📗 Book Completed — Goal Achieved ✓</span>';
+  } else if (_bookRevealed && _bookRevealed.length > 0) {
+    badge.style.display = 'block';
+    badge.innerHTML =
+      '<span style="color:var(--gold);">📗 ' + _bookRevealed.length + ' / 7 lessons revealed</span>';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+</script>
+
+<!-- BOOK READER OVERLAY -->
+<div class="modal-overlay" id="bookReaderOverlay" style="padding:16px;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:700px;margin:auto;background:#0f172a;border:1px solid #1e293b;border-radius:12px;overflow:hidden;max-height:92vh;">
+    <!-- Top bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #1e293b;background:#0a1120;flex-shrink:0;">
+      <div>
+        <div style="font-family:'Instrument Serif',serif;font-size:17px;color:#4ade80;">📗 Daily Book Reader</div>
+        <div id="bookDayInfo" style="font-size:10px;color:#64748b;margin-top:2px;letter-spacing:.4px;">Book.json · 365-Day Reading Plan</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="bookDayPill" style="background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3);border-radius:999px;padding:3px 12px;font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.06em;"></div>
+        <button onclick="closeBookReader()" style="background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:5px 11px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;">✓ Done & Close</button>
+      </div>
+    </div>
+    <!-- Loading -->
+    <div id="bookLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#64748b;font-family:'DM Mono',monospace;">Loading Book.json…</div>
+    <!-- Content -->
+    <div id="bookContent" style="display:none;flex:1;overflow-y:auto;padding:20px 20px 28px;">
+      <!-- Book header -->
+      <div id="bookCategory" style="font-size:10px;font-weight:700;letter-spacing:.14em;color:#475569;text-transform:uppercase;margin-bottom:8px;font-family:'DM Mono',monospace;"></div>
+      <div id="bookTitle" style="font-family:'Instrument Serif',serif;font-size:24px;color:#f8fafc;margin-bottom:6px;line-height:1.25;"></div>
+      <div id="bookAuthor" style="font-size:14px;color:#94a3b8;margin-bottom:12px;font-style:italic;font-family:'DM Mono',monospace;"></div>
+      <!-- Badges -->
+      <div id="bookBadges" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;"></div>
+      <!-- Why it matters -->
+      <div style="background:rgba(255,255,255,.03);border-radius:10px;padding:14px 16px;border:1px solid rgba(255,255,255,.06);margin-bottom:20px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.14em;color:#475569;margin-bottom:8px;font-family:'DM Mono',monospace;">WHY IT MATTERS</div>
+        <div id="bookWhy" style="font-size:13px;color:#cbd5e1;line-height:1.7;font-family:'DM Mono',monospace;"></div>
+      </div>
+      <!-- Lessons header -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <span style="font-size:10px;font-weight:700;letter-spacing:.14em;color:#475569;font-family:'DM Mono',monospace;">7 CORE LESSONS</span>
+        <button onclick="bookRevealAll()" id="bookRevealAllBtn" style="background:transparent;border:1px solid rgba(255,255,255,.12);color:#94a3b8;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:'DM Mono',monospace;">Reveal All</button>
+      </div>
+      <!-- Lessons list -->
+      <div id="bookLessons" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;"></div>
+      <!-- Next lesson button -->
+      <button id="bookNextBtn" onclick="bookRevealNext()" style="width:100%;padding:12px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Mono',monospace;letter-spacing:.04em;box-shadow:0 4px 12px rgba(22,163,74,.3);">Reveal First Lesson</button>
+      <!-- Complete banner -->
+      <div id="bookCompleteBanner" style="display:none;text-align:center;padding:12px;background:rgba(22,163,74,.12);border:1px solid rgba(74,222,128,.25);border-radius:10px;color:#4ade80;font-size:14px;font-weight:600;font-family:'DM Mono',monospace;">✓ All 7 Lessons Read — Goal Complete</div>
+    </div>
+  </div>
+</div>
 
 <!-- HADITH READER OVERLAY -->
 <div class="modal-overlay" id="hadithReaderOverlay" style="padding:16px;">

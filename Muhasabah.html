@@ -537,7 +537,7 @@ canvas#qrCanvas{
         <span class="of-label">Zikr &nbsp;/&nbsp; 1500 Goal</span>
       </div>
       <div class="sub-label">Every Extra 1500 = +2.5% Bonus</div>
-      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('zikr')">📿 Open Zikr Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('zikr')">📿 Open Zikr</button>
     </div>
 
     <!-- Hadith 5% -->
@@ -3674,12 +3674,116 @@ function closeSalahArticle(){
   </div>
 </div>
 
+<!-- ZIKR ARTICLE OVERLAY -->
+<div class="modal-overlay" id="zikrArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
+      <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">📿 Zikr</div>
+      <button onclick="closeArticle('zikr')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
+
+      <!-- Counter -->
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:28px 24px;margin-bottom:32px;text-align:center;">
+        <div id="zikrArticleCount" style="font-family:'Instrument Serif',serif;font-size:4rem;color:#c9a84c;line-height:1;margin-bottom:6px;text-shadow:0 0 24px rgba(200,169,110,0.3);">0</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.72rem;color:#5a4a28;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:24px;">/ 1500 Goal</div>
+        <div id="zikrArticleBar" style="height:6px;background:#1a1610;border-radius:3px;overflow:hidden;margin-bottom:24px;max-width:400px;margin-left:auto;margin-right:auto;">
+          <div id="zikrArticleFill" style="height:100%;width:0%;background:linear-gradient(90deg,#4a7c59,#c9a84c);border-radius:3px;transition:width 0.3s ease;"></div>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-bottom:16px;">
+          <button onclick="zikrArticleTap(1)" style="background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid #c9a84c;color:#c9a84c;border-radius:8px;padding:14px 36px;font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:700;cursor:pointer;letter-spacing:0.05em;transition:all 0.15s;" onmouseover="this.style.background='linear-gradient(135deg,#2a2000,#3a3000)'" onmouseout="this.style.background='linear-gradient(135deg,#1a1500,#2a2000)'">+1</button>
+          <button onclick="zikrArticleTap(-1)" style="background:#1a0a0a;border:1px solid #3a1a1a;color:#7a4040;border-radius:8px;padding:14px 36px;font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#8b3a3a';this.style.color='#c05050'" onmouseout="this.style.borderColor='#3a1a1a';this.style.color='#7a4040'">−1</button>
+        </div>
+        <div id="zikrArticleMsg" style="font-family:'DM Mono',monospace;font-size:0.75rem;color:#5a4a28;letter-spacing:0.1em;min-height:18px;transition:color 0.3s;"></div>
+      </div>
+
+      <!-- Divider -->
+      <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+
+      <!-- 1 -->
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:16px;">
+        <div style="font-family:'Amiri',serif;font-size:1.7rem;line-height:2.4;direction:rtl;text-align:right;color:#f0e4c0;display:block;margin-bottom:12px;">الله أكبر</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;line-height:1.7;margin-bottom:8px;">Allahu Akbar</div>
+        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.7;border-top:1px solid #221e14;padding-top:10px;">Allah is the Greatest.</div>
+      </div>
+
+      <!-- 2 -->
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:16px;">
+        <div style="font-family:'Amiri',serif;font-size:1.7rem;line-height:2.4;direction:rtl;text-align:right;color:#f0e4c0;display:block;margin-bottom:12px;">الحمد لله</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;line-height:1.7;margin-bottom:8px;">Alhamdulillah</div>
+        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.7;border-top:1px solid #221e14;padding-top:10px;">All praise is due to Allah.</div>
+      </div>
+
+      <!-- 3 -->
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:16px;">
+        <div style="font-family:'Amiri',serif;font-size:1.7rem;line-height:2.4;direction:rtl;text-align:right;color:#f0e4c0;display:block;margin-bottom:12px;">استغفر الله ٣</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;line-height:1.7;margin-bottom:8px;">Astaghfirullah (x3)</div>
+        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.7;border-top:1px solid #221e14;padding-top:10px;">I seek forgiveness from Allah.</div>
+      </div>
+
+      <!-- 4 -->
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:16px;">
+        <div style="font-family:'Amiri',serif;font-size:1.7rem;line-height:2.4;direction:rtl;text-align:right;color:#f0e4c0;display:block;margin-bottom:12px;">اللهم صلِّ على محمد</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;line-height:1.7;margin-bottom:8px;">Allahumma salli ala Muhammad</div>
+        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.7;border-top:1px solid #221e14;padding-top:10px;">O Allah, send blessings upon Muhammad.</div>
+      </div>
+
+      <!-- 5-6 together -->
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:16px;">
+        <div style="font-family:'Amiri',serif;font-size:1.7rem;line-height:2.4;direction:rtl;text-align:right;color:#f0e4c0;display:block;margin-bottom:12px;">سبحان الله وبحمده سبحان الله العظيم</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;line-height:1.7;margin-bottom:8px;">Subhanallahi wa bihamdihi Subhanallahil Azim</div>
+        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.7;border-top:1px solid #221e14;padding-top:10px;">Glory be to Allah and all praise is His. Glory be to Allah, the Most Magnificent.</div>
+      </div>
+
+      <!-- 7-10 together -->
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:32px;">
+        <div style="font-family:'Amiri',serif;font-size:1.7rem;line-height:2.6;direction:rtl;text-align:right;color:#f0e4c0;display:block;margin-bottom:12px;">لا إله إلا أنت يا حي يا قيوم برحمتك أستغيث أصلح لي شأني كله</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;line-height:1.9;margin-bottom:8px;">La ilaha illa Ant ya Hayyu ya Qayyum birahmatika astaghith aslih li sha'ni kullahu</div>
+        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.7;border-top:1px solid #221e14;padding-top:10px;">There is no god but You, O Ever-Living, O Self-Sustaining. Through Your mercy I seek help. Rectify all my affairs for me.</div>
+      </div>
+
+      <div style="font-family:'DM Mono',monospace;font-size:0.78rem;color:#5a4a28;line-height:1.8;border:1px solid #2a2010;border-radius:6px;padding:16px 18px;margin-bottom:20px;">These duas are selected by the creator of this tracker. The reader is free to choose whatever they like to read as their all-time zikr.</div>
+
+    </div>
+  </div>
+</div>
+
 <script>
 function openArticle(id){
   document.getElementById(id+'ArticleOverlay').classList.add('active');
+  if(id === 'zikr') syncZikrArticleCounter();
 }
 function closeArticle(id){
   document.getElementById(id+'ArticleOverlay').classList.remove('active');
+}
+
+function syncZikrArticleCounter(){
+  const val = parseInt(document.getElementById('zikrCount').value) || 0;
+  updateZikrArticleUI(val);
+}
+
+function updateZikrArticleUI(val){
+  document.getElementById('zikrArticleCount').textContent = val;
+  const pct = Math.min((val / 1500) * 100, 100);
+  document.getElementById('zikrArticleFill').style.width = pct + '%';
+  const msg = document.getElementById('zikrArticleMsg');
+  if(val === 0){ msg.textContent = ''; msg.style.color='#5a4a28'; }
+  else if(val < 1500){ msg.textContent = (1500 - val) + ' remaining to reach goal'; msg.style.color='#7a6a40'; }
+  else if(val === 1500){ msg.textContent = '✓ Goal reached — 1500 Zikr'; msg.style.color='#6aab7a'; }
+  else { msg.textContent = '✓ Goal reached · +' + Math.floor((val - 1500)/1500) + ' bonus sets'; msg.style.color='#6aab7a'; }
+}
+
+function zikrArticleTap(delta){
+  const el = document.getElementById('zikrCount');
+  const cur = parseInt(el.value) || 0;
+  const next = Math.max(0, cur + delta);
+  el.value = next;
+  updateZikrArticleUI(next);
+  saveAndRefresh();
 }
 </script>
 

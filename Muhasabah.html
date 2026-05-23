@@ -110,11 +110,28 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 .calendar-subheader{
   position:sticky;top:61px;z-index:90;
   background:var(--bg);
-  padding:20px 32px 16px;
+  padding:12px 32px;
   border-bottom:1px solid var(--border);
 }
 .calendar-subheader.hidden{display:none;}
-@media(max-width:600px){.calendar-subheader{padding:14px 16px 12px;top:57px;}}
+.stats-bar{
+  display:flex;align-items:center;gap:20px;
+  max-width:1260px;margin:0 auto;
+}
+.stats-cards{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+  flex:0 0 auto;
+  /* Match roughly one row of the 3-col months grid */
+  width:calc(66.66% - 10px);
+}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;}
+.stat-num{font-family:'Instrument Serif',serif;font-size:24px;color:var(--gold);}
+.stat-num.green{color:var(--green-bright);}
+.stat-num.purple{color:var(--purple-bright);}
+.stat-label{font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.year-label{font-family:'Instrument Serif',serif;font-size:52px;color:var(--text-dim);letter-spacing:-2px;line-height:1;flex-shrink:0;margin-left:auto;}
+@media(max-width:900px){.stats-cards{width:100%;}.year-label{font-size:36px;}}
+@media(max-width:600px){.calendar-subheader{padding:10px 16px;top:57px;}.stats-bar{flex-wrap:wrap;gap:8px;}.stats-cards{grid-template-columns:repeat(2,1fr);width:100%;}.year-label{font-size:28px;margin-left:0;}}
 
 /* ── Views ── */
 .view{display:none;padding:24px 32px 32px;max-width:1260px;margin:0 auto;}
@@ -122,13 +139,6 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 #calendarView{padding-top:20px;}
 
 /* ── Calendar ── */
-.year-label{font-family:'Instrument Serif',serif;font-size:48px;color:var(--text-dim);margin-bottom:24px;letter-spacing:-2px;}
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;}
-.stat-num{font-family:'Instrument Serif',serif;font-size:32px;color:var(--gold);}
-.stat-num.green{color:var(--green-bright);}
-.stat-num.purple{color:var(--purple-bright);}
-.stat-label{font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
 
 .months-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
 .month-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;}
@@ -400,12 +410,14 @@ canvas#qrCanvas{
 </div>
 
 <div class="calendar-subheader" id="calendarSubheader">
-  <div class="year-label" style="margin-bottom:16px;">2026</div>
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-num" id="streakNum">0</div><div class="stat-label">🔥 Current Streak</div></div>
-    <div class="stat-card"><div class="stat-num green" id="bestStreakNum">0</div><div class="stat-label">⭐ Best Streak</div></div>
-    <div class="stat-card"><div class="stat-num" id="totalDaysNum">0</div><div class="stat-label">📅 Days Logged</div></div>
-    <div class="stat-card"><div class="stat-num purple" id="bestDayLabel">—</div><div class="stat-label">🏆 Best Day</div></div>
+  <div class="stats-bar">
+    <div class="stats-cards">
+      <div class="stat-card"><div class="stat-num" id="streakNum">0</div><div class="stat-label">🔥 Current Streak</div></div>
+      <div class="stat-card"><div class="stat-num green" id="bestStreakNum">0</div><div class="stat-label">⭐ Best Streak</div></div>
+      <div class="stat-card"><div class="stat-num" id="totalDaysNum">0</div><div class="stat-label">📅 Days Logged</div></div>
+      <div class="stat-card"><div class="stat-num purple" id="bestDayLabel">—</div><div class="stat-label">🏆 Best Day</div></div>
+    </div>
+    <div class="year-label">2026</div>
   </div>
 </div>
 
@@ -1968,11 +1980,15 @@ function scrollToCurrentMonth(){
   const now = new Date();
   const monthIdx = now.getMonth();
   const blocks = document.querySelectorAll('.month-block');
-  if(blocks[monthIdx]){
-    setTimeout(()=>{
-      blocks[monthIdx].scrollIntoView({behavior:'smooth', block:'start'});
-    }, 80);
-  }
+  if(!blocks[monthIdx]) return;
+  setTimeout(()=>{
+    const mainHeader = document.querySelector('.header');
+    const subHeader  = document.getElementById('calendarSubheader');
+    const stickyH = (mainHeader ? mainHeader.offsetHeight : 0)
+                  + (subHeader  ? subHeader.offsetHeight  : 0);
+    const blockTop = blocks[monthIdx].getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: blockTop - stickyH - 16, behavior: 'smooth' });
+  }, 80);
 }
 
 function updateStats(bestScore,bestDayKey){

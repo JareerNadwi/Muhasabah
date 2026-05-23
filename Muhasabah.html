@@ -110,31 +110,32 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 .calendar-subheader{
   position:sticky;top:61px;z-index:90;
   background:var(--bg);
-  padding:12px 32px;
   border-bottom:1px solid var(--border);
 }
 .calendar-subheader.hidden{display:none;}
 .stats-bar{
-  position:relative;
-  max-width:1260px;margin:0 auto;
+  max-width:calc(1260px + 64px);margin:0 auto;
+  padding:12px 0;
+  display:grid;
+  grid-template-columns:64px 1fr;
+  align-items:center;
+  gap:0;
 }
 .year-label{
-  font-family:'Instrument Serif',serif;font-size:42px;color:var(--text-dim);
-  letter-spacing:-2px;line-height:1;
-  position:absolute;left:0;top:50%;transform:translateY(-50%);
-  pointer-events:none;
+  font-family:'Instrument Serif',serif;font-size:32px;color:var(--text-dim);
+  letter-spacing:-1px;line-height:1;white-space:nowrap;
+  padding-left:32px;
 }
 .stats-cards{
   display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
-  margin-left:130px;
+  padding-right:32px;
 }
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;}
 .stat-num{font-family:'Instrument Serif',serif;font-size:24px;color:var(--gold);}
 .stat-num.green{color:var(--green-bright);}
 .stat-num.purple{color:var(--purple-bright);}
 .stat-label{font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
-@media(max-width:900px){.year-label{font-size:30px;}.stats-cards{margin-left:100px;}}
-@media(max-width:600px){.calendar-subheader{padding:10px 16px;top:57px;}.year-label{position:static;transform:none;font-size:24px;margin-bottom:6px;}.stats-bar{display:block;}.stats-cards{margin-left:0;grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.calendar-subheader{top:57px;}.stats-bar{grid-template-columns:1fr;padding:10px 16px;}.year-label{padding-left:0;font-size:22px;margin-bottom:6px;}.stats-cards{padding-right:0;grid-template-columns:repeat(2,1fr);}}
 
 /* ── Views ── */
 .view{display:none;padding:24px 32px 32px;max-width:1260px;margin:0 auto;}

@@ -1178,7 +1178,8 @@ function qrZoom(direction){
   document.getElementById('qrZoomOut').disabled = qrZoomLevel === 0;
   document.getElementById('qrZoomIn').disabled  = qrZoomLevel === QR_ZOOM_MAX;
   document.getElementById('qrZoomLabel').textContent = (100 + qrZoomLevel * 25) + '%';
-  qrRenderPage(qrCurPage); // re-render with new zoom level baked in
+  qrRendering = false; // force-allow re-render even if previous render was mid-flight
+  qrRenderPage(qrCurPage);
 }
 
 /* ── Generic PDF Reader Zoom ── */
@@ -1188,6 +1189,7 @@ function pdfZoom(direction){
   document.getElementById('pdfZoomOut').disabled    = pdfZoomLevel === 0;
   document.getElementById('pdfZoomIn').disabled     = pdfZoomLevel === PDF_ZOOM_MAX;
   document.getElementById('pdfZoomLabel').textContent = (100 + pdfZoomLevel * 25) + '%';
+  pdfReaderRendering = false; // force-allow re-render
   pdfReaderRenderPage(pdfReaderCurPage);
 }
 
@@ -2940,7 +2942,9 @@ async function openBookReader() {
     _bookTotalLessons = (book.lessons || []).length;
 
     const saved = await getReaderResume('_book_lesson_' + _bookDK);
-    _bookCurrentLesson = (_bookAlreadyDone || saved === null) ? -1 : saved;
+    // Resume at last-read lesson regardless of completion status.
+    // Only show intro if there's truly no saved position.
+    _bookCurrentLesson = (saved !== null) ? saved : -1;
 
     document.getElementById('bookCategory').textContent = book.category || '';
     document.getElementById('bookTitle').textContent    = book.title    || '';
@@ -3015,6 +3019,7 @@ async function bookNavNext() {
 
   if (_bookCurrentLesson < total - 1) {
     _bookCurrentLesson++;
+    // Save current (just advanced to) — on re-open this is where we show
     await setReaderResume('_book_lesson_' + _bookDK, _bookCurrentLesson);
     if (!_bookAlreadyDone) await _saveBookProgress(book, false);
     _renderBookSlide(book);
@@ -3033,10 +3038,13 @@ async function bookNavPrev() {
 }
 
 async function _saveBookProgress(book, done) {
-  const total = (book && book.lessons) ? book.lessons.length : 1;
-  const cur   = _bookCurrentLesson;
-  const ratio = Math.min((cur + 1) / total, 1);
-  const data  = {...getCached(_bookDK)};
+  const total  = (book && book.lessons) ? book.lessons.length : 1;
+  const cur    = _bookCurrentLesson; // -1 = intro, 0..N-1 = lessons
+  // Count intro as step 1, lessons as steps 2..N+1 out of total+1 steps
+  const steps  = total + 1;
+  const doneSteps = cur === -1 ? 1 : (cur + 2); // intro=1, lesson0=2, lesson1=3 ...
+  const ratio  = done ? 1 : Math.min(doneSteps / steps, 1);
+  const data   = {...getCached(_bookDK)};
   data['book_lesson'] = cur;
   data['book_ratio']  = ratio;
   if (done) data.books = 'yes';
@@ -3052,6 +3060,16 @@ async function _saveBookProgress(book, done) {
 }
 
 function closeBookReader() {
+  if (_bookDK && _bookData) {
+    const dayNum = _bookDayOfYear(_bookDK);
+    const book   = _bookData.find(b => b.day === dayNum) || _bookData[0];
+    const total  = (book && book.lessons) ? book.lessons.length : 0;
+    // Save the NEXT lesson index so re-open advances past what was just read
+    // Cap at total-1 so we never go out of bounds
+    const nextPos = Math.min(_bookCurrentLesson + 1, total - 1);
+    setReaderResume('_book_lesson_' + _bookDK, nextPos);
+    if (!_bookAlreadyDone && book) _saveBookProgress(book, false);
+  }
   document.getElementById('bookReaderOverlay').classList.remove('active');
   renderBookBadge(_bookDK);
 }
@@ -3074,100 +3092,110 @@ function renderBookBadge(dk) {
 
 <!-- BOOK READER OVERLAY -->
 <div class="modal-overlay" id="bookReaderOverlay" style="padding:16px;">
-  <div style="display:flex;flex-direction:column;width:100%;max-width:700px;margin:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;max-height:92vh;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:700px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;max-height:92vh;">
     <!-- Top bar -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div>
-        <div style="font-family:'Instrument Serif',serif;font-size:17px;color:var(--gold);">📗 Daily Book Reader</div>
-        <div id="bookDayPill" style="font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:.4px;"></div>
+        <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">📗 Daily Book Reader</div>
+        <div id="bookDayPill" style="font-size:10px;color:#8a7840;margin-top:2px;letter-spacing:.4px;"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
-        <span id="bookProgressPill" style="font-size:11px;color:var(--text-dim);font-family:'DM Mono',monospace;"></span>
-        <button onclick="closeBookReader()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:5px 11px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;">✕ Save & Exit</button>
+        <span id="bookProgressPill" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
+        <button onclick="closeBookReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
       </div>
     </div>
     <!-- Already done note -->
-    <div id="bookDoneNote" style="display:none;background:#071407;border-bottom:1px solid var(--green);padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">✓ You've already completed today's book</div>
+    <div id="bookDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">✓ You've already completed today's book</div>
     <!-- Loading -->
-    <div id="bookLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:var(--text-dim);font-family:'DM Mono',monospace;">Loading Book.json…</div>
+    <div id="bookLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:'DM Mono',monospace;background:#0d0b08;">Loading Book.json…</div>
     <!-- Slide content -->
-    <div id="bookContent" style="display:none;flex:1;overflow-y:auto;padding:20px 18px;min-height:0;">
+    <div id="bookContent" style="display:none;flex:1;overflow-y:auto;padding:28px 24px;min-height:0;background:#0d0b08;color:#e8dfc8;font-family:'Amiri',serif;">
 
       <!-- Slide 0: Intro (title, author, why) -->
       <div id="bookSlideIntro">
-        <div id="bookCategory" style="font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:10px;text-transform:uppercase;font-family:'DM Mono',monospace;"></div>
-        <div id="bookTitle" style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--text);line-height:1.3;margin-bottom:6px;"></div>
-        <div id="bookAuthor" style="font-size:13px;color:var(--text-dim);margin-bottom:16px;font-style:italic;font-family:'DM Mono',monospace;"></div>
+        <div id="bookCategory" style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;font-family:'DM Mono',monospace;"></div>
+        <div id="bookTitle" style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:8px;font-weight:700;line-height:1.3;"></div>
+        <div id="bookAuthor" style="font-size:0.88rem;color:#a89060;margin-bottom:16px;font-style:italic;font-family:'DM Mono',monospace;"></div>
         <div id="bookBadges" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;"></div>
-        <div style="font-size:10px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase;font-family:'DM Mono',monospace;">Why This Book Matters</div>
-        <div id="bookWhy" style="font-size:16px;color:var(--text);line-height:1.9;"></div>
+        <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;">
+          <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;font-family:'DM Mono',monospace;">Why This Book Matters</div>
+          <div id="bookWhy" style="color:#c5b98a;font-size:1.05rem;line-height:1.85;"></div>
+        </div>
       </div>
 
       <!-- Slide 1+: Individual lesson -->
       <div id="bookSlideLesson" style="display:none;">
-        <div id="bookLessonNum" style="font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:14px;text-transform:uppercase;font-family:'DM Mono',monospace;"></div>
-        <div id="bookLessonText" style="font-size:16px;color:var(--text);line-height:2;white-space:pre-wrap;"></div>
+        <div id="bookLessonNum" style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;font-family:'DM Mono',monospace;"></div>
+        <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;">
+          <div id="bookLessonText" style="color:#c5b98a;font-size:1.05rem;line-height:1.85;white-space:pre-wrap;"></div>
+        </div>
       </div>
 
     </div>
     <!-- Nav bar -->
-    <div id="bookNav" style="display:none;padding:12px 18px;border-top:1px solid var(--border);background:var(--surface2);flex-shrink:0;display:flex;gap:8px;">
-      <button id="bookPrevBtn" onclick="bookNavPrev()" style="flex:1;padding:9px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;">← Prev</button>
-      <button id="bookNextBtn" onclick="bookNavNext()" style="flex:2;padding:9px;background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;transition:all .2s;">Next →</button>
+    <div id="bookNav" style="display:none;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;gap:8px;">
+      <button id="bookPrevBtn" onclick="bookNavPrev()" style="flex:1;padding:9px 14px;background:#1e1a10;border:1px solid #2a2010;color:#8a7840;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">← Prev</button>
+      <button id="bookNextBtn" onclick="bookNavNext()" style="flex:2;padding:9px 14px;background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Next →</button>
     </div>
   </div>
 </div>
 
 <!-- HADITH READER OVERLAY -->
 <div class="modal-overlay" id="hadithReaderOverlay" style="padding:16px;">
-  <div style="display:flex;flex-direction:column;width:100%;max-width:680px;margin:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;max-height:92vh;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:700px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;max-height:92vh;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div>
-        <div style="font-family:'Instrument Serif',serif;font-size:17px;color:var(--gold);">&#x1F4DA; Daily Hadith</div>
-        <div id="hadithDayInfo" style="font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:.4px;"></div>
+        <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">📚 Daily Hadith</div>
+        <div id="hadithDayInfo" style="font-size:10px;color:#8a7840;margin-top:2px;letter-spacing:.4px;"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
-        <span id="hadithCounter" style="font-size:11px;color:var(--text-dim);"></span>
-        <button onclick="closeHadithReader()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:5px 11px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;">✕ Save & Exit</button>
+        <span id="hadithCounter" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
+        <button onclick="closeHadithReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
       </div>
     </div>
-    <div id="hadithDoneNote" style="display:none;background:#071407;border-bottom:1px solid var(--green);padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">&#x2713; You've already completed today's hadiths</div>
-    <div id="hadithLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:var(--text-dim);">Loading Sahih Muslim...</div>
-    <div id="hadithContent" style="display:none;flex:1;overflow-y:auto;padding:20px 18px;">
-      <div id="hadithNum" style="font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:10px;text-transform:uppercase;"></div>
-      <div id="hadithText" style="font-size:16px;color:var(--text);line-height:2;white-space:pre-wrap;"></div>
+    <div id="hadithDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">✓ You've already completed today's hadiths</div>
+    <div id="hadithLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:'DM Mono',monospace;background:#0d0b08;">Loading Sahih Muslim...</div>
+    <div id="hadithContent" style="display:none;flex:1;overflow-y:auto;padding:28px 24px;background:#0d0b08;">
+      <div id="hadithNum" style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;font-family:'DM Mono',monospace;"></div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;">
+        <div id="hadithText" style="color:#c5b98a;font-size:1.05rem;line-height:1.85;font-family:'Amiri',serif;white-space:pre-wrap;"></div>
+      </div>
     </div>
-    <div id="hadithNav" style="display:none;padding:12px 18px;border-top:1px solid var(--border);background:var(--surface2);flex-shrink:0;gap:8px;">
-      <button id="hadithPrevBtn" onclick="hadithNavPrev()" style="flex:1;padding:9px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;">&#x2190; Prev</button>
-      <button id="hadithNextBtn" onclick="hadithNavNext()" style="flex:2;padding:9px;background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;transition:all .2s;">Next &#x2192;</button>
+    <div id="hadithNav" style="display:none;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;gap:8px;">
+      <button id="hadithPrevBtn" onclick="hadithNavPrev()" style="flex:1;padding:9px 14px;background:#1e1a10;border:1px solid #2a2010;color:#8a7840;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">← Prev</button>
+      <button id="hadithNextBtn" onclick="hadithNavNext()" style="flex:2;padding:9px 14px;background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Next →</button>
     </div>
   </div>
 </div>
 
 <!-- TAFSIR READER OVERLAY -->
 <div class="modal-overlay" id="tafsirReaderOverlay" style="padding:16px;">
-  <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;max-height:92vh;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;max-height:92vh;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div>
-        <div style="font-family:'Instrument Serif',serif;font-size:17px;color:var(--gold);">&#x1F50D; Daily Quran Meaning</div>
-        <div id="tafsirDayInfo" style="font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:.4px;"></div>
+        <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🔍 Daily Quran Meaning</div>
+        <div id="tafsirDayInfo" style="font-size:10px;color:#8a7840;margin-top:2px;letter-spacing:.4px;"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
-        <span id="tafsirCounter" style="font-size:11px;color:var(--text-dim);"></span>
-        <button onclick="closeTafsirReader()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:5px 11px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;">✕ Save & Exit</button>
+        <span id="tafsirCounter" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
+        <button onclick="closeTafsirReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
       </div>
     </div>
-    <div id="tafsirDoneNote" style="display:none;background:#071407;border-bottom:1px solid var(--green);padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">&#x2713; You've already completed today's Quran Meaning</div>
-    <div id="tafsirLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:var(--text-dim);">Loading verses...</div>
-    <div id="tafsirContent" style="display:none;flex:1;overflow-y:auto;padding:20px 18px;">
-      <div id="tafsirVerseRef" style="font-size:11px;color:var(--gold);letter-spacing:.5px;margin-bottom:14px;"></div>
-      <div id="tafsirArabic" style="font-family:'Amiri',serif;font-size:26px;color:var(--text);line-height:2;text-align:right;direction:rtl;padding:14px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;"></div>
-      <div style="font-size:10px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase;">Meaning &#x2014; Saheeh International</div>
-      <div id="tafsirText" style="font-size:16px;color:var(--text);line-height:1.9;"></div>
+    <div id="tafsirDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">✓ You've already completed today's Quran Meaning</div>
+    <div id="tafsirLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:'DM Mono',monospace;background:#0d0b08;">Loading verses...</div>
+    <div id="tafsirContent" style="display:none;flex:1;overflow-y:auto;padding:28px 24px;background:#0d0b08;">
+      <div id="tafsirVerseRef" style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;font-family:'DM Mono',monospace;"></div>
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:20px;">
+        <div id="tafsirArabic" style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;"></div>
+      </div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;font-family:'DM Mono',monospace;">Meaning — Saheeh International</div>
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:22px 24px;">
+        <div id="tafsirText" style="color:#c5b98a;font-size:1.05rem;line-height:1.85;font-family:'Amiri',serif;"></div>
+      </div>
     </div>
-    <div id="tafsirNav" style="display:none;padding:12px 18px;border-top:1px solid var(--border);background:var(--surface2);flex-shrink:0;gap:8px;">
-      <button id="tafsirPrevBtn" onclick="tafsirNavPrev()" style="flex:1;padding:9px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;">&#x2190; Prev</button>
-      <button id="tafsirNextBtn" onclick="tafsirNavNext()" style="flex:2;padding:9px;background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;transition:all .2s;">Next &#x2192;</button>
+    <div id="tafsirNav" style="display:none;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;gap:8px;">
+      <button id="tafsirPrevBtn" onclick="tafsirNavPrev()" style="flex:1;padding:9px 14px;background:#1e1a10;border:1px solid #2a2010;color:#8a7840;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">← Prev</button>
+      <button id="tafsirNextBtn" onclick="tafsirNavNext()" style="flex:2;padding:9px 14px;background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Next →</button>
     </div>
   </div>
 </div>

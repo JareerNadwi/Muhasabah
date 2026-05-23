@@ -115,23 +115,26 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 }
 .calendar-subheader.hidden{display:none;}
 .stats-bar{
-  display:flex;align-items:center;gap:20px;
+  position:relative;
   max-width:1260px;margin:0 auto;
+}
+.year-label{
+  font-family:'Instrument Serif',serif;font-size:42px;color:var(--text-dim);
+  letter-spacing:-2px;line-height:1;
+  position:absolute;left:0;top:50%;transform:translateY(-50%);
+  pointer-events:none;
 }
 .stats-cards{
   display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
-  flex:0 0 auto;
-  /* Match roughly one row of the 3-col months grid */
-  width:calc(66.66% - 10px);
+  margin-left:130px;
 }
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;}
 .stat-num{font-family:'Instrument Serif',serif;font-size:24px;color:var(--gold);}
 .stat-num.green{color:var(--green-bright);}
 .stat-num.purple{color:var(--purple-bright);}
 .stat-label{font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
-.year-label{font-family:'Instrument Serif',serif;font-size:52px;color:var(--text-dim);letter-spacing:-2px;line-height:1;flex-shrink:0;margin-left:auto;}
-@media(max-width:900px){.stats-cards{width:100%;}.year-label{font-size:36px;}}
-@media(max-width:600px){.calendar-subheader{padding:10px 16px;top:57px;}.stats-bar{flex-wrap:wrap;gap:8px;}.stats-cards{grid-template-columns:repeat(2,1fr);width:100%;}.year-label{font-size:28px;margin-left:0;}}
+@media(max-width:900px){.year-label{font-size:30px;}.stats-cards{margin-left:100px;}}
+@media(max-width:600px){.calendar-subheader{padding:10px 16px;top:57px;}.year-label{position:static;transform:none;font-size:24px;margin-bottom:6px;}.stats-bar{display:block;}.stats-cards{margin-left:0;grid-template-columns:repeat(2,1fr);}}
 
 /* ── Views ── */
 .view{display:none;padding:24px 32px 32px;max-width:1260px;margin:0 auto;}
@@ -411,13 +414,13 @@ canvas#qrCanvas{
 
 <div class="calendar-subheader" id="calendarSubheader">
   <div class="stats-bar">
+    <div class="year-label">2026</div>
     <div class="stats-cards">
       <div class="stat-card"><div class="stat-num" id="streakNum">0</div><div class="stat-label">🔥 Current Streak</div></div>
       <div class="stat-card"><div class="stat-num green" id="bestStreakNum">0</div><div class="stat-label">⭐ Best Streak</div></div>
       <div class="stat-card"><div class="stat-num" id="totalDaysNum">0</div><div class="stat-label">📅 Days Logged</div></div>
       <div class="stat-card"><div class="stat-num purple" id="bestDayLabel">—</div><div class="stat-label">🏆 Best Day</div></div>
     </div>
-    <div class="year-label">2026</div>
   </div>
 </div>
 

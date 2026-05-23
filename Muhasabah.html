@@ -3952,7 +3952,7 @@ function calcBMI(){
     <!-- Done note -->
     <div id="asmaulDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">✓ You've completed all 99 Names — you may continue reviewing</div>
     <!-- Slide content -->
-    <div id="asmaulContent" style="flex:1;overflow-y:auto;padding:28px 24px;background:#0d0b08;color:#e8dfc8;min-height:0;">
+    <div id="asmaulContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#e8dfc8;min-height:0;">
     </div>
     <!-- Nav bar -->
     <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
@@ -4213,12 +4213,12 @@ function _asmaulRenderSlide(){
     if(!name.arabic) return;
     const num    = _asmaulSlide * 3 + i + 1;
     const numStr = num < 10 ? "0" + num : "" + num;
-    html += "<div style=\"background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;\">" +
-      "<div style=\"font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;font-family:'DM Mono',monospace;\">" + numStr + " — Name of Allah SWT</div>" +
-      "<div style=\"font-family:'Amiri',serif;font-size:2.4rem;line-height:1.7;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:10px;\">" + name.arabic + "</div>" +
-      "<div style=\"font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;font-family:'DM Mono',monospace;\">" + name.latin + "</div>" +
-      "<div style=\"height:1px;background:linear-gradient(to right,#2a2418,transparent);margin:10px 0;\"></div>" +
-      "<div style=\"color:#c5b98a;font-size:0.97rem;line-height:1.85;font-family:'Amiri',serif;\">" + name.meaning + "</div>" +
+    html += "<div style=\"background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:10px;\">" +
+      "<div style=\"font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;font-family:'DM Mono',monospace;\">" + numStr + " — Name of Allah SWT</div>" +
+      "<div style=\"font-family:'Amiri',serif;font-size:1.5rem;line-height:1.6;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:6px;\">" + name.arabic + "</div>" +
+      "<div style=\"font-style:italic;color:#a89060;font-size:0.82rem;margin-bottom:4px;line-height:1.4;font-family:'DM Mono',monospace;\">" + name.latin + "</div>" +
+      "<div style=\"height:1px;background:linear-gradient(to right,#2a2418,transparent);margin:6px 0;\"></div>" +
+      "<div style=\"color:#c5b98a;font-size:0.88rem;line-height:1.6;font-family:'Amiri',serif;\">" + name.meaning + "</div>" +
       "</div>";
   });
   content.innerHTML = html;

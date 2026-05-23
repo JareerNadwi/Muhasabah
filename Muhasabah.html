@@ -4174,9 +4174,10 @@ const ASMAUL_HUSNA = [
 const ASMAUL_TOTAL_SLIDES = ASMAUL_HUSNA.length;
 const ASMAUL_RESUME_KEY   = "_asmaul_slideIdx";
 
-let _asmaulSlide     = 0;
-let _asmaulDK        = "";
-let _asmaulCompleted = false;
+let _asmaulSlide      = 0;
+let _asmaulStartSlide = 0;
+let _asmaulDK         = "";
+let _asmaulCompleted  = false;
 
 function _asmaulRenderSlide(){
   const slide    = ASMAUL_HUSNA[_asmaulSlide];
@@ -4236,6 +4237,7 @@ async function openAsmaulReader(){
   const saved  = await getReaderResume(ASMAUL_RESUME_KEY);
   _asmaulSlide = (saved !== null && saved >= 0) ? Math.min(saved, ASMAUL_TOTAL_SLIDES - 1) : 0;
 
+  _asmaulStartSlide = _asmaulSlide;
   _asmaulRenderSlide();
   await _saveAsmaulProgress(false);
 }
@@ -4279,6 +4281,17 @@ async function _saveAsmaulProgress(done){
 async function closeAsmaulReader(){
   const nextSlide = Math.min(_asmaulSlide + 1, ASMAUL_TOTAL_SLIDES - 1);
   await setReaderResume(ASMAUL_RESUME_KEY, nextSlide);
+  // Record this session
+  if(!_asmaulCompleted && _asmaulDK){
+    const sd = Object.assign({}, getCached(_asmaulDK));
+    if(!sd["asmaul_sessions"]) sd["asmaul_sessions"] = [];
+    const slidesRead = _asmaulSlide - _asmaulStartSlide + 1;
+    if(slidesRead > 0){
+      sd["asmaul_sessions"].push({ start: _asmaulStartSlide + 1, end: _asmaulSlide + 1, slides: slidesRead });
+    }
+    _cache[_asmaulDK] = sd;
+    await setStore(_asmaulDK, sd);
+  }
   if(!_asmaulCompleted) await _saveAsmaulProgress(false);
   document.getElementById("asmaulReaderOverlay").classList.remove("active");
   renderAsmaulBadge(_asmaulDK);
@@ -4288,17 +4301,35 @@ function renderAsmaulBadge(dk){
   const badge = document.getElementById("asmaulSessionBadge");
   if(!badge) return;
   const data = getCached(dk);
-  if(data["asmaul"] === "yes"){
+  if(data["asmaul"] === "yes" && !data["asmaul_sessions"]){
     badge.style.display = "block";
     badge.innerHTML = "<span style=\"color:var(--green-bright)\">🌿 All 99 Names Completed — Goal Achieved ✓</span>";
-  } else if(data["asmaul_slideIdx"] !== undefined){
-    const idx = data["asmaul_slideIdx"];
-    const pct = Math.round((idx + 1) / ASMAUL_TOTAL_SLIDES * 100);
-    badge.style.display = "block";
-    badge.innerHTML = "<span style=\"color:var(--gold)\">🌿 Page " + (idx+1) + " of 33 — " + pct + "% complete — in progress</span>";
-  } else {
-    badge.style.display = "none";
+    return;
   }
+  const sessions = data["asmaul_sessions"];
+  const idx      = data["asmaul_slideIdx"];
+  if(!sessions || sessions.length === 0){
+    if(idx !== undefined && idx >= 0){
+      const pct = Math.round((idx + 1) / ASMAUL_TOTAL_SLIDES * 100);
+      badge.style.display = "block";
+      badge.innerHTML = "<span style=\"color:var(--gold)\">🌿 Page " + (idx+1) + " of 33 — " + pct + "% complete</span>";
+    } else {
+      badge.style.display = "none";
+    }
+    return;
+  }
+  const count       = sessions.length;
+  const first       = sessions[0];
+  const last        = sessions[sessions.length - 1];
+  const totalSlides = sessions.reduce(function(s,x){ return s + x.slides; }, 0);
+  const totalPct    = Math.round((last.end) / ASMAUL_TOTAL_SLIDES * 100);
+  const lastSlides  = last.slides;
+  const doneText    = data["asmaul"] === "yes" ? " ✓ Completed" : "";
+  badge.style.display = "block";
+  badge.innerHTML =
+    "<span style=\"color:var(--gold)\">🌿 Today: " + count + " session" + (count !== 1 ? "s" : "") + " &nbsp;·&nbsp; " + totalSlides + " page" + (totalSlides !== 1 ? "s" : "") + " read (" + totalPct + "%" + doneText + ")</span>" +
+    "<br><span style=\"font-size:9px;color:var(--text-muted)\">Total: Page " + first.start + "–" + last.end + " (" + totalSlides + " pages today)</span>" +
+    "<br><span style=\"font-size:9px;color:var(--text-muted)\">Last: Pages " + last.start + "–" + last.end + " (" + lastSlides + " page" + (lastSlides !== 1 ? "s" : "") + ") · Global page " + last.end + "/" + ASMAUL_TOTAL_SLIDES + "</span>";
 }
 
 document.addEventListener("keydown", function(e){

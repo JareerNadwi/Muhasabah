@@ -841,8 +841,9 @@ canvas#qrCanvas{
   <div class="qr-bottombar">
     <button class="qr-nav" id="qrPrev" onclick="qrChangePage(-1)">← Prev</button>
     <div class="qr-page-display" id="qrPageDisplay">Page — / —</div>
-    <button class="qr-nav" id="qrZoomIn" onclick="qrZoom(1)" title="Zoom In">＋ Zoom In</button>
-    <button class="qr-nav" id="qrZoomOut" onclick="qrZoom(-1)" title="Zoom Out" style="display:none;">－ Zoom Out</button>
+    <button class="qr-nav" id="qrZoomOut" onclick="qrZoom(-1)" title="Zoom Out" disabled>－</button>
+    <span id="qrZoomLabel" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);min-width:40px;text-align:center;">100%</span>
+    <button class="qr-nav" id="qrZoomIn" onclick="qrZoom(1)" title="Zoom In">＋</button>
     <button class="qr-nav" id="qrNext" onclick="qrChangePage(1)">Next →</button>
   </div>
 </div>
@@ -864,8 +865,9 @@ canvas#qrCanvas{
   <div class="qr-bottombar">
     <button class="qr-nav" id="pdfReaderPrev" onclick="pdfReaderChangePage(-1)">← Prev</button>
     <div class="qr-page-display" id="pdfReaderPageDisplay">Page — / —</div>
-    <button class="qr-nav" id="pdfZoomIn" onclick="pdfZoom(1)" title="Zoom In">＋ Zoom In</button>
-    <button class="qr-nav" id="pdfZoomOut" onclick="pdfZoom(-1)" title="Zoom Out" style="display:none;">－ Zoom Out</button>
+    <button class="qr-nav" id="pdfZoomOut" onclick="pdfZoom(-1)" title="Zoom Out" disabled>－</button>
+    <span id="pdfZoomLabel" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);min-width:40px;text-align:center;">100%</span>
+    <button class="qr-nav" id="pdfZoomIn" onclick="pdfZoom(1)" title="Zoom In">＋</button>
     <button class="qr-nav" id="pdfReaderNext" onclick="pdfReaderChangePage(1)">Next →</button>
   </div>
 </div>
@@ -1026,8 +1028,9 @@ async function openQuranReader(){
   document.getElementById('qrCanvas').style.display='none';
   // Reset zoom
   qrZoomLevel = 0;
-  const zi = document.getElementById('qrZoomIn'); if(zi) zi.style.display='';
-  const zo = document.getElementById('qrZoomOut'); if(zo) zo.style.display='none';
+  const zi = document.getElementById('qrZoomIn'); if(zi){ zi.style.display=''; zi.disabled=false; }
+  const zo = document.getElementById('qrZoomOut'); if(zo){ zo.style.display=''; zo.disabled=true; }
+  const zl = document.getElementById('qrZoomLabel'); if(zl) zl.textContent='100%';
 
   // Determine start page: resume from NEXT page after last saved position
   const lastPage = await getQrLastPage();
@@ -1114,8 +1117,9 @@ async function closeQuranReader(){
   overlay.classList.remove('active');
   // Reset zoom state
   qrZoomLevel = 0;
-  const zi = document.getElementById('qrZoomIn'); if(zi) zi.style.display='';
-  const zo = document.getElementById('qrZoomOut'); if(zo) zo.style.display='none';
+  const zi = document.getElementById('qrZoomIn'); if(zi){ zi.style.display=''; zi.disabled=false; }
+  const zo = document.getElementById('qrZoomOut'); if(zo){ zo.style.display=''; zo.disabled=true; }
+  const zl = document.getElementById('qrZoomLabel'); if(zl) zl.textContent='100%';
 
   if(!qrStartPage || !currentDateKey) return;
 
@@ -1164,26 +1168,16 @@ async function closeQuranReader(){
 }
 
 /* ── Quran Reader Zoom ── */
-function qrZoom(direction){ // direction: +1 zoom in, -1 zoom out
-  const zoomInBtn  = document.getElementById('qrZoomIn');
-  const zoomOutBtn = document.getElementById('qrZoomOut');
-  const nextBtn    = document.getElementById('qrNext');
-  const prevBtn    = document.getElementById('qrPrev');
+const QR_ZOOM_MAX = 4; // 4 steps × 25% = 100% max zoom
+function qrZoom(direction){
+  qrZoomLevel = Math.max(0, Math.min(QR_ZOOM_MAX, qrZoomLevel + direction));
 
-  if(direction > 0){
-    qrZoomLevel++;
-  } else {
-    qrZoomLevel = Math.max(0, qrZoomLevel - 1);
-  }
-
-  // Next is blocked while zoomed in at all
   const isZoomed = qrZoomLevel > 0;
-  nextBtn.disabled = isZoomed || qrCurPage >= QR_LAST_PAGE;
-  prevBtn.disabled = isZoomed || qrCurPage <= QR_FIRST_PAGE;
-
-  // Show/hide buttons: zoom-out only visible when zoomed, zoom-in hidden when zoomed
-  zoomInBtn.style.display  = isZoomed ? 'none' : '';
-  zoomOutBtn.style.display = isZoomed ? ''     : 'none';
+  document.getElementById('qrZoomOut').disabled = qrZoomLevel === 0;
+  document.getElementById('qrZoomIn').disabled  = qrZoomLevel === QR_ZOOM_MAX;
+  document.getElementById('qrNext').disabled    = isZoomed || qrCurPage >= QR_LAST_PAGE;
+  document.getElementById('qrPrev').disabled    = isZoomed || qrCurPage <= QR_FIRST_PAGE;
+  document.getElementById('qrZoomLabel').textContent = (100 + qrZoomLevel * 25) + '%';
 
   _qrRenderZoomed(qrCurPage);
 }
@@ -1207,24 +1201,16 @@ async function _qrRenderZoomed(pdfPageNum){
 }
 
 /* ── Generic PDF Reader Zoom ── */
-function pdfZoom(direction){ // direction: +1 zoom in, -1 zoom out
-  const zoomInBtn  = document.getElementById('pdfZoomIn');
-  const zoomOutBtn = document.getElementById('pdfZoomOut');
-  const nextBtn    = document.getElementById('pdfReaderNext');
-  const prevBtn    = document.getElementById('pdfReaderPrev');
-
-  if(direction > 0){
-    pdfZoomLevel++;
-  } else {
-    pdfZoomLevel = Math.max(0, pdfZoomLevel - 1);
-  }
+const PDF_ZOOM_MAX = 4;
+function pdfZoom(direction){
+  pdfZoomLevel = Math.max(0, Math.min(PDF_ZOOM_MAX, pdfZoomLevel + direction));
 
   const isZoomed = pdfZoomLevel > 0;
-  nextBtn.disabled = isZoomed || pdfReaderCurPage >= pdfReaderLastPage;
-  prevBtn.disabled = isZoomed || pdfReaderCurPage <= 1;
-
-  zoomInBtn.style.display  = isZoomed ? 'none' : '';
-  zoomOutBtn.style.display = isZoomed ? ''     : 'none';
+  document.getElementById('pdfZoomOut').disabled    = pdfZoomLevel === 0;
+  document.getElementById('pdfZoomIn').disabled     = pdfZoomLevel === PDF_ZOOM_MAX;
+  document.getElementById('pdfReaderNext').disabled = isZoomed || pdfReaderCurPage >= pdfReaderLastPage;
+  document.getElementById('pdfReaderPrev').disabled = isZoomed || pdfReaderCurPage <= 1;
+  document.getElementById('pdfZoomLabel').textContent = (100 + pdfZoomLevel * 25) + '%';
 
   _pdfRenderZoomed(pdfReaderCurPage);
 }
@@ -1398,8 +1384,9 @@ async function openPdfReader(type){
   document.getElementById('pdfReaderOverlay').classList.add('active');
   // Reset zoom
   pdfZoomLevel = 0;
-  const _pzi = document.getElementById('pdfZoomIn'); if(_pzi) _pzi.style.display='';
-  const _pzo = document.getElementById('pdfZoomOut'); if(_pzo) _pzo.style.display='none';
+  const _pzi = document.getElementById('pdfZoomIn'); if(_pzi){ _pzi.style.display=''; _pzi.disabled=false; }
+  const _pzo = document.getElementById('pdfZoomOut'); if(_pzo){ _pzo.style.display=''; _pzo.disabled=true; }
+  const _pzl = document.getElementById('pdfZoomLabel'); if(_pzl) _pzl.textContent='100%';
 
   if(!pdfReaderDoc[type]){
     try{
@@ -1509,8 +1496,9 @@ async function closePdfReader(){
   overlay.classList.remove('active');
   // Reset zoom state
   pdfZoomLevel = 0;
-  const zi = document.getElementById('pdfZoomIn'); if(zi) zi.style.display='';
-  const zo = document.getElementById('pdfZoomOut'); if(zo) zo.style.display='none';
+  const zi = document.getElementById('pdfZoomIn'); if(zi){ zi.style.display=''; zi.disabled=false; }
+  const zo = document.getElementById('pdfZoomOut'); if(zo){ zo.style.display=''; zo.disabled=true; }
+  const zl = document.getElementById('pdfZoomLabel'); if(zl) zl.textContent='100%';
 
   const type = pdfReaderType;
   pdfReaderType = null;
@@ -2938,38 +2926,27 @@ loadDayData = function(dk){
    Lessons revealed one by one. Marks books=yes on complete.
    ════════════════════════════════════════════════════ */
 
-let _bookData       = null;   // full books array from Book.json
-let _bookCurrentLesson = -1; // -1 = intro screen, 0+ = lesson index shown
+let _bookData          = null;
+let _bookCurrentLesson = -1;  // -1 = intro slide, 0..N-1 = lesson slides
 let _bookTotalLessons  = 0;
-let _bookDK         = '';     // current day key
+let _bookDK            = '';
+let _bookAlreadyDone   = false;
 
 function _bookDayOfYear(dateStr) {
-  // dateStr = 'YYYY-MM-DD'
-  const d   = new Date(dateStr);
+  const d     = new Date(dateStr);
   const start = new Date(d.getFullYear(), 0, 0);
-  const diff  = d - start;
-  return Math.min(Math.floor(diff / 86400000), 365);
+  return Math.min(Math.floor((d - start) / 86400000), 365);
 }
 
 const BOOK_BADGE_COLORS = {
-  must_not_skip : '#ef4444',
-  islamic       : '#10b981',
-  leadership    : '#8b5cf6',
-  communication : '#f59e0b',
-  psychology    : '#3b82f6',
-  business      : '#f97316',
-  money         : '#14b8a6',
-  career        : '#ec4899',
+  must_not_skip:'#ef4444', islamic:'#10b981', leadership:'#8b5cf6',
+  communication:'#f59e0b', psychology:'#3b82f6', business:'#f97316',
+  money:'#14b8a6', career:'#ec4899',
 };
 const BOOK_BADGE_LABELS = {
-  must_not_skip : 'Must Not Skip',
-  islamic       : 'Islamic',
-  leadership    : 'Leadership',
-  communication : 'Communication',
-  psychology    : 'Psychology',
-  business      : 'Business',
-  money         : 'Money',
-  career        : 'Career',
+  must_not_skip:'Must Not Skip', islamic:'Islamic', leadership:'Leadership',
+  communication:'Communication', psychology:'Psychology', business:'Business',
+  money:'Money', career:'Career',
 };
 
 async function openBookReader() {
@@ -2977,191 +2954,133 @@ async function openBookReader() {
   document.getElementById('bookReaderOverlay').classList.add('active');
 
   const dayNum = _bookDayOfYear(_bookDK);
-  document.getElementById('bookDayPill').textContent = 'Day ' + dayNum + ' of 365  ·  Book.json';
+  document.getElementById('bookDayPill').textContent = 'Book.json · Day ' + dayNum + ' of 365';
 
-  document.getElementById('bookLoading').style.display  = 'flex';
-  document.getElementById('bookContent').style.display  = 'none';
+  document.getElementById('bookLoading').style.display = 'flex';
+  document.getElementById('bookContent').style.display = 'none';
+  document.getElementById('bookNav').style.display     = 'none';
+
+  _bookAlreadyDone = getCached(_bookDK).books === 'yes';
+  document.getElementById('bookDoneNote').style.display = _bookAlreadyDone ? 'block' : 'none';
 
   try {
     if (!_bookData) {
       document.getElementById('bookLoading').textContent = 'Loading Book.json…';
-      const res = await fetch(BASE_URL + 'Book.json');
+      const res  = await fetch(BASE_URL + 'Book.json');
       if (!res.ok) throw new Error('Book.json HTTP ' + res.status);
       const json = await res.json();
-      _bookData = json.books || [];
+      _bookData  = json.books || [];
     }
 
     const book = _bookData.find(b => b.day === dayNum) || _bookData[0];
-    if (!book) throw new Error('No book found for day ' + dayNum);
+    if (!book) throw new Error('No book for day ' + dayNum);
 
     _bookTotalLessons = (book.lessons || []).length;
 
-    // Check if already completed today — if so, reset to intro so user reads again fresh
-    // (progress won't be re-counted due to the guard in save function)
-    const alreadyDone = getCached(_bookDK).books === 'yes';
-    // Resume saved lesson index, but if already done reset to intro for re-read
-    const savedLesson = await getReaderResume('_book_lesson_' + _bookDK);
-    _bookCurrentLesson = (savedLesson !== null && !alreadyDone) ? savedLesson : -1;
+    const saved = await getReaderResume('_book_lesson_' + _bookDK);
+    _bookCurrentLesson = (_bookAlreadyDone || saved === null) ? -1 : saved;
 
-    _renderBookReader(book);
+    document.getElementById('bookCategory').textContent = book.category || '';
+    document.getElementById('bookTitle').textContent    = book.title    || '';
+    document.getElementById('bookAuthor').textContent   = 'by ' + (book.author || '');
+    document.getElementById('bookWhy').textContent      = book.why_it_matters || '';
+
+    const badgeEl = document.getElementById('bookBadges');
+    badgeEl.innerHTML = '';
+    (book.special || []).forEach(tag => {
+      const span = document.createElement('span');
+      span.textContent  = BOOK_BADGE_LABELS[tag] || tag;
+      span.style.cssText =
+        'background:' + (BOOK_BADGE_COLORS[tag]||'#6b7280') + ';color:#fff;' +
+        'border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600;' +
+        'font-family:\'DM Mono\',monospace;letter-spacing:.05em;';
+      badgeEl.appendChild(span);
+    });
 
     document.getElementById('bookLoading').style.display = 'none';
     document.getElementById('bookContent').style.display = 'block';
+    document.getElementById('bookNav').style.display     = 'flex';
 
+    _renderBookSlide(book);
   } catch(e) {
     document.getElementById('bookLoading').textContent = '⚠ Failed: ' + e.message;
   }
 }
 
-function _renderBookReader(book) {
-  // Header
-  document.getElementById('bookCategory').textContent = book.category || '';
-  document.getElementById('bookTitle').textContent    = book.title    || '';
-  document.getElementById('bookAuthor').textContent   = 'by ' + (book.author || '');
-  document.getElementById('bookWhy').textContent      = book.why_it_matters || '';
+function _renderBookSlide(book) {
+  const lessons    = book ? (book.lessons || []) : [];
+  const total      = lessons.length;
+  const cur        = _bookCurrentLesson;
+  const introSlide = document.getElementById('bookSlideIntro');
+  const lessonSlide= document.getElementById('bookSlideLesson');
+  const nextBtn    = document.getElementById('bookNextBtn');
+  const prevBtn    = document.getElementById('bookPrevBtn');
+  const pill       = document.getElementById('bookProgressPill');
 
-  // Badges
-  const badgeEl = document.getElementById('bookBadges');
-  badgeEl.innerHTML = '';
-  (book.special || []).forEach(tag => {
-    const span = document.createElement('span');
-    span.textContent = BOOK_BADGE_LABELS[tag] || tag;
-    span.style.cssText =
-      'background:' + (BOOK_BADGE_COLORS[tag] || '#6b7280') + ';'
-      + 'color:#fff;border-radius:999px;padding:3px 10px;font-size:11px;'
-      + 'font-weight:600;font-family:\'DM Mono\',monospace;letter-spacing:.05em;';
-    badgeEl.appendChild(span);
-  });
-
-  _updateBookView(book);
-}
-
-function _updateBookView(book) {
-  const lessons = book.lessons || [];
-  const total   = lessons.length;
-  const cur     = _bookCurrentLesson;
-  const allDone = cur >= total - 1 && cur >= 0;
-
-  const lessonsSection = document.getElementById('bookLessonsSection');
-  const progressWrap   = document.getElementById('bookProgressWrap');
-  const completeBanner = document.getElementById('bookCompleteBanner');
-  const nextBtn        = document.getElementById('bookNextBtn');
-  const prevBtn        = document.getElementById('bookPrevBtn');
-  const progressBar    = document.getElementById('bookProgressBar');
-  const progressLabel  = document.getElementById('bookProgressLabel');
-  const progressPill   = document.getElementById('bookProgressPill');
-
-  if(cur === -1){
-    // Intro screen: show header only, hide lessons
-    lessonsSection.style.display = 'none';
-    progressWrap.style.display   = 'none';
-    completeBanner.style.display = 'none';
-    prevBtn.style.display        = 'none';
-    nextBtn.style.display        = 'block';
-    nextBtn.textContent          = 'Read Lesson 1 →';
-    nextBtn.style.background     = 'linear-gradient(135deg,#1a1500,#2a2000)';
-    nextBtn.style.borderColor    = '#c9a84c';
-    nextBtn.style.color          = '#c9a84c';
-    progressPill.textContent     = 'Intro';
+  if (cur === -1) {
+    introSlide.style.display  = 'block';
+    lessonSlide.style.display = 'none';
+    prevBtn.disabled    = true;
+    prevBtn.style.opacity = '0.3';
+    nextBtn.textContent = 'Lesson 1 \u2192';
+    nextBtn.style.background  = '';
+    nextBtn.style.borderColor = '';
+    nextBtn.style.color       = '';
+    nextBtn.disabled    = false;
+    pill.textContent    = 'Intro';
   } else {
-    // Show lessons up to current
-    lessonsSection.style.display = 'block';
-    progressWrap.style.display   = 'block';
-
-    const listEl = document.getElementById('bookLessons');
-    listEl.innerHTML = '';
-    for(let i = 0; i <= cur && i < total; i++){
-      const item = document.createElement('div');
-      item.style.cssText =
-        'background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;'
-        + 'padding:22px 26px;';
-
-      const label = document.createElement('div');
-      label.style.cssText =
-        'font-family:\'DM Mono\',monospace;font-size:0.72rem;letter-spacing:0.14em;'
-        + 'text-transform:uppercase;color:#a89060;margin-bottom:10px;';
-      label.textContent = 'Lesson ' + (i + 1) + ' of ' + total;
-
-      const txt = document.createElement('div');
-      txt.style.cssText = 'color:#c5b98a;font-size:0.95rem;line-height:1.75;font-family:\'Amiri\',serif;';
-      txt.textContent   = lessons[i];
-
-      item.appendChild(label);
-      item.appendChild(txt);
-      listEl.appendChild(item);
-
-      if(i < cur){
-        const div = document.createElement('div');
-        div.style.cssText = 'height:1px;background:#2a2010;margin:4px 0;';
-        listEl.appendChild(div);
-      }
-    }
-
-    // Progress
-    const pct = Math.round(((cur + 1) / total) * 100);
-    progressBar.style.width   = pct + '%';
-    progressLabel.textContent = (cur + 1) + ' / ' + total + ' lessons  ·  ' + pct + '%';
-    progressPill.textContent  = (cur + 1) + ' / ' + total;
-
-    // Prev
-    prevBtn.style.display = cur > 0 ? 'block' : 'none';
-
-    if(allDone){
-      completeBanner.style.display = 'block';
-      nextBtn.style.display        = 'none';
-    } else {
-      completeBanner.style.display = 'none';
-      nextBtn.style.display        = 'block';
-      nextBtn.textContent          = 'Next: Lesson ' + (cur + 2) + ' →';
-      nextBtn.style.background     = 'linear-gradient(135deg,#1a1500,#2a2000)';
-      nextBtn.style.borderColor    = '#c9a84c';
-      nextBtn.style.color          = '#c9a84c';
-    }
+    introSlide.style.display  = 'none';
+    lessonSlide.style.display = 'block';
+    document.getElementById('bookLessonNum').textContent  = 'Lesson ' + (cur+1) + ' of ' + total;
+    document.getElementById('bookLessonText').textContent = lessons[cur] || '';
+    prevBtn.disabled    = false;
+    prevBtn.style.opacity = '1';
+    const isLast = cur >= total - 1;
+    nextBtn.textContent       = isLast ? '\u2713 Mark Done' : 'Lesson ' + (cur+2) + ' \u2192';
+    nextBtn.style.background  = isLast ? 'var(--green)'        : '';
+    nextBtn.style.borderColor = isLast ? 'var(--green-bright)' : '';
+    nextBtn.style.color       = isLast ? '#fff'                : '';
+    nextBtn.disabled    = false;
+    pill.textContent    = (cur+1) + ' / ' + total;
   }
 }
 
 async function bookNavNext() {
-  if(!_bookData) return;
+  if (!_bookData) return;
   const dayNum = _bookDayOfYear(_bookDK);
   const book   = _bookData.find(b => b.day === dayNum) || _bookData[0];
-  const total  = (book && book.lessons) ? book.lessons.length : 7;
+  const total  = (book && book.lessons) ? book.lessons.length : 0;
 
-  _bookCurrentLesson = Math.min(_bookCurrentLesson + 1, total - 1);
-  await setReaderResume('_book_lesson_' + _bookDK, _bookCurrentLesson);
-
-  // Save proportional progress
-  await _saveBookProgress(book);
-  _updateBookView(book);
+  if (_bookCurrentLesson < total - 1) {
+    _bookCurrentLesson++;
+    await setReaderResume('_book_lesson_' + _bookDK, _bookCurrentLesson);
+    if (!_bookAlreadyDone) await _saveBookProgress(book, false);
+    _renderBookSlide(book);
+  } else {
+    if (!_bookAlreadyDone) await _saveBookProgress(book, true);
+    closeBookReader();
+  }
 }
 
 async function bookNavPrev() {
-  if(!_bookData || _bookCurrentLesson <= 0) return;
+  if (!_bookData || _bookCurrentLesson <= -1) return;
   const dayNum = _bookDayOfYear(_bookDK);
   const book   = _bookData.find(b => b.day === dayNum) || _bookData[0];
-  _bookCurrentLesson = Math.max(0, _bookCurrentLesson - 1);
-  _updateBookView(book);
+  _bookCurrentLesson = Math.max(-1, _bookCurrentLesson - 1);
+  _renderBookSlide(book);
 }
 
-async function _saveBookProgress(book) {
-  const total = (book && book.lessons) ? book.lessons.length : 7;
+async function _saveBookProgress(book, done) {
+  const total = (book && book.lessons) ? book.lessons.length : 1;
   const cur   = _bookCurrentLesson;
-  if(cur < 0) return;
-
-  const alreadyDone = getCached(_bookDK).books === 'yes';
-  // Don't reset if already complete
-  if(alreadyDone) return;
-
   const ratio = Math.min((cur + 1) / total, 1);
-  const done  = cur >= total - 1;
-
-  const data = {...getCached(_bookDK)};
-  data['book_lesson']   = cur;
-  data['book_ratio']    = ratio;
-  if(done) data.books   = 'yes';
+  const data  = {...getCached(_bookDK)};
+  data['book_lesson'] = cur;
+  data['book_ratio']  = ratio;
+  if (done) data.books = 'yes';
   _cache[_bookDK] = data;
   await setStore(_bookDK, data);
-
-  if(done){
+  if (done) {
     document.querySelectorAll('.yn-btn[data-key="books"]').forEach(btn =>
       btn.classList.toggle('active', btn.dataset.val === 'yes')
     );
@@ -3181,13 +3100,10 @@ function renderBookBadge(dk) {
   const data = getCached(dk);
   if (data.books === 'yes') {
     badge.style.display = 'block';
-    badge.innerHTML =
-      '<span style="color:var(--green-bright);">📗 Book Completed — Goal Achieved ✓</span>';
+    badge.innerHTML = '<span style="color:var(--green-bright);">📗 Book Completed — Goal Achieved \u2713</span>';
   } else if (data['book_lesson'] !== undefined && data['book_lesson'] >= 0) {
-    const cur   = data['book_lesson'];
     badge.style.display = 'block';
-    badge.innerHTML =
-      `<span style="color:var(--gold);">📗 ${cur + 1} lesson${cur !== 0 ? 's' : ''} read — in progress</span>`;
+    badge.innerHTML = '<span style="color:var(--gold);">📗 Lesson ' + (data['book_lesson']+1) + ' read — in progress</span>';
   } else {
     badge.style.display = 'none';
   }
@@ -3195,64 +3111,47 @@ function renderBookBadge(dk) {
 </script>
 
 <!-- BOOK READER OVERLAY -->
-<div class="modal-overlay" id="bookReaderOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
-  <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;position:sticky;top:0;z-index:10;">
+<div class="modal-overlay" id="bookReaderOverlay" style="padding:16px;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:700px;margin:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;max-height:92vh;">
+    <!-- Top bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;">
       <div>
-        <div style="font-family:'Instrument Serif',serif;font-size:17px;color:#c9a84c;">📗 Daily Book Reader</div>
-        <div id="bookDayPill" style="font-size:10px;color:#8a7840;margin-top:2px;letter-spacing:.4px;"></div>
+        <div style="font-family:'Instrument Serif',serif;font-size:17px;color:var(--gold);">📗 Daily Book Reader</div>
+        <div id="bookDayPill" style="font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:.4px;"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
-        <span id="bookProgressPill" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
-        <button onclick="closeBookReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+        <span id="bookProgressPill" style="font-size:11px;color:var(--text-dim);font-family:'DM Mono',monospace;"></span>
+        <button onclick="closeBookReader()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:5px 11px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;">✕ Save & Exit</button>
       </div>
     </div>
+    <!-- Already done note -->
+    <div id="bookDoneNote" style="display:none;background:#071407;border-bottom:1px solid var(--green);padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">✓ You've already completed today's book</div>
     <!-- Loading -->
-    <div id="bookLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#6a5a30;font-family:'DM Mono',monospace;background:#0d0b08;">Loading Book.json…</div>
-    <!-- Content -->
-    <div id="bookContent" style="display:none;padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
+    <div id="bookLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:var(--text-dim);font-family:'DM Mono',monospace;">Loading Book.json…</div>
+    <!-- Slide content -->
+    <div id="bookContent" style="display:none;flex:1;overflow-y:auto;padding:20px 18px;min-height:0;">
 
-      <!-- Book header section -->
-      <div id="bookHeaderSection">
-        <div id="bookCategory" style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;font-family:'DM Mono',monospace;"></div>
-        <div id="bookTitle" style="font-family:'DM Mono',monospace;font-size:1.35rem;color:#f0e4c0;margin-bottom:8px;font-weight:700;line-height:1.3;"></div>
-        <div id="bookAuthor" style="font-size:0.88rem;color:#a89060;margin-bottom:16px;font-style:italic;font-family:'DM Mono',monospace;"></div>
-        <!-- Badges -->
+      <!-- Slide 0: Intro (title, author, why) -->
+      <div id="bookSlideIntro">
+        <div id="bookCategory" style="font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:10px;text-transform:uppercase;font-family:'DM Mono',monospace;"></div>
+        <div id="bookTitle" style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--text);line-height:1.3;margin-bottom:6px;"></div>
+        <div id="bookAuthor" style="font-size:13px;color:var(--text-dim);margin-bottom:16px;font-style:italic;font-family:'DM Mono',monospace;"></div>
         <div id="bookBadges" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;"></div>
-        <!-- Why it matters -->
-        <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:28px;">
-          <div style="font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:#a89060;margin-bottom:10px;">Why This Book Matters</div>
-          <div id="bookWhy" style="color:#c5b98a;font-size:0.95rem;line-height:1.75;font-family:'Amiri',serif;"></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:14px;margin:0 0 28px;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+        <div style="font-size:10px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase;font-family:'DM Mono',monospace;">Why This Book Matters</div>
+        <div id="bookWhy" style="font-size:16px;color:var(--text);line-height:1.9;"></div>
       </div>
 
-      <!-- Lessons — shown one at a time -->
-      <div id="bookLessonsSection" style="display:none;">
-        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;font-family:'DM Mono',monospace;">Core Lessons</div>
-        <div id="bookLessons" style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px;"></div>
+      <!-- Slide 1+: Individual lesson -->
+      <div id="bookSlideLesson" style="display:none;">
+        <div id="bookLessonNum" style="font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:14px;text-transform:uppercase;font-family:'DM Mono',monospace;"></div>
+        <div id="bookLessonText" style="font-size:16px;color:var(--text);line-height:2;white-space:pre-wrap;"></div>
       </div>
 
-      <!-- Progress bar -->
-      <div id="bookProgressWrap" style="display:none;margin-bottom:20px;">
-        <div style="display:flex;justify-content:space-between;font-size:10px;color:#6a5a30;margin-bottom:6px;font-family:'DM Mono',monospace;">
-          <span>Progress</span><span id="bookProgressLabel"></span>
-        </div>
-        <div style="height:4px;background:#1a1610;border-radius:2px;overflow:hidden;">
-          <div id="bookProgressBar" style="height:100%;background:linear-gradient(90deg,#c9a84c,#a07830);border-radius:2px;transition:width .4s ease;width:0%;"></div>
-        </div>
-      </div>
-
-      <!-- Complete banner -->
-      <div id="bookCompleteBanner" style="display:none;text-align:center;padding:16px;background:rgba(200,169,110,.08);border:1px solid #c9a84c55;border-radius:10px;color:#c9a84c;font-size:14px;font-family:'DM Mono',monospace;margin-bottom:16px;">✓ All Lessons Read — Goal Complete</div>
-
-      <!-- Navigation -->
-      <div id="bookNav" style="display:flex;gap:10px;">
-        <button id="bookPrevBtn" onclick="bookNavPrev()" style="display:none;flex:1;padding:12px;background:#1a1610;border:1px solid #3a2e14;color:#a89060;border-radius:8px;cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.05em;">← Prev Lesson</button>
-        <button id="bookNextBtn" onclick="bookNavNext()" style="flex:2;padding:12px;background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid #c9a84c;color:#c9a84c;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Mono',monospace;letter-spacing:.04em;transition:all .2s;">Start Reading →</button>
-      </div>
-
+    </div>
+    <!-- Nav bar -->
+    <div id="bookNav" style="display:none;padding:12px 18px;border-top:1px solid var(--border);background:var(--surface2);flex-shrink:0;display:flex;gap:8px;">
+      <button id="bookPrevBtn" onclick="bookNavPrev()" style="flex:1;padding:9px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;">← Prev</button>
+      <button id="bookNextBtn" onclick="bookNavNext()" style="flex:2;padding:9px;background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;transition:all .2s;">Next →</button>
     </div>
   </div>
 </div>

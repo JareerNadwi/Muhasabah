@@ -108,7 +108,7 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 
 /* ── Calendar Sub-Header (sticky below main header) ── */
 .calendar-subheader{
-  position:sticky;top:61px;z-index:90;
+  position:sticky;top:0;z-index:90;
   background:var(--bg);
   border-bottom:1px solid var(--border);
 }
@@ -131,7 +131,7 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 .stat-num.green{color:var(--green-bright);}
 .stat-num.purple{color:var(--purple-bright);}
 .stat-label{font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
-@media(max-width:600px){.calendar-subheader{top:57px;}.stats-bar{padding:10px 16px;grid-template-columns:1fr 1fr;}.year-label{grid-column:1/-1;font-size:24px;padding-right:0;}}
+@media(max-width:600px){.calendar-subheader{}.stats-bar{padding:10px 16px;grid-template-columns:1fr 1fr;}.year-label{grid-column:1/-1;font-size:24px;padding-right:0;}}
 
 /* ── Views ── */
 .view{display:none;padding:24px 32px 32px;max-width:1260px;margin:0 auto;}
@@ -2468,6 +2468,10 @@ function closeReadMe(){
   await migrateFromLocalStorage();
   await preloadCache();
   buildCalendar();
+  // Set sticky subheader top to actual header height
+  const hdr = document.querySelector('.header');
+  const sub = document.getElementById('calendarSubheader');
+  if(hdr && sub) sub.style.top = hdr.offsetHeight + 'px';
 })();
 
 /* ════════════════════════════════════════════════════

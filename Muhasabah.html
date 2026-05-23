@@ -280,8 +280,8 @@ select option{background:#1c1f1c;}
   overscroll-behavior:contain;
 }
 canvas#qrCanvas{
-  max-width:100%;max-height:100%;object-fit:contain;
   box-shadow:0 0 40px rgba(0,0,0,.8);
+  display:block;
 }
 .qr-bottombar{
   display:flex;align-items:center;justify-content:center;
@@ -1053,8 +1053,14 @@ async function openQuranReader(){
   await qrRenderPage(qrCurPage);
 }
 
+let _qrRenderTask = null; // tracks current PDF.js render task for cancellation
+
 async function qrRenderPage(pdfPageNum){
-  if(qrRendering) return;
+  // Cancel any in-progress render task before starting a new one
+  if(_qrRenderTask){
+    try{ _qrRenderTask.cancel(); }catch(e){}
+    _qrRenderTask = null;
+  }
   qrRendering = true;
   document.getElementById('qrLoading').style.display='flex';
   document.getElementById('qrCanvas').style.display='none';
@@ -1073,7 +1079,9 @@ async function qrRenderPage(pdfPageNum){
     canvas.width  = vp.width;
     canvas.height = vp.height;
 
-    await page.render({canvasContext:canvas.getContext('2d'), viewport:vp}).promise;
+    _qrRenderTask = page.render({canvasContext:canvas.getContext('2d'), viewport:vp});
+    await _qrRenderTask.promise;
+    _qrRenderTask = null;
 
     canvas.style.display='block';
     document.getElementById('qrLoading').style.display='none';
@@ -1092,7 +1100,9 @@ async function qrRenderPage(pdfPageNum){
     updateSessionInfo();
     await setQrLastPage(pdfPageNum);
   }catch(e){
-    document.getElementById('qrLoading').textContent='⚠ Error Rendering Page';
+    if(e && e.name !== 'RenderingCancelledException'){
+      document.getElementById('qrLoading').textContent='⚠ Error Rendering Page';
+    }
   }
   qrRendering = false;
 }
@@ -1178,7 +1188,6 @@ function qrZoom(direction){
   document.getElementById('qrZoomOut').disabled = qrZoomLevel === 0;
   document.getElementById('qrZoomIn').disabled  = qrZoomLevel === QR_ZOOM_MAX;
   document.getElementById('qrZoomLabel').textContent = (100 + qrZoomLevel * 25) + '%';
-  qrRendering = false; // force-allow re-render even if previous render was mid-flight
   qrRenderPage(qrCurPage);
 }
 
@@ -1189,7 +1198,6 @@ function pdfZoom(direction){
   document.getElementById('pdfZoomOut').disabled    = pdfZoomLevel === 0;
   document.getElementById('pdfZoomIn').disabled     = pdfZoomLevel === PDF_ZOOM_MAX;
   document.getElementById('pdfZoomLabel').textContent = (100 + pdfZoomLevel * 25) + '%';
-  pdfReaderRendering = false; // force-allow re-render
   pdfReaderRenderPage(pdfReaderCurPage);
 }
 
@@ -1376,8 +1384,13 @@ async function openPdfReader(type){
   await pdfReaderRenderPage(pdfReaderCurPage);
 }
 
+let _pdfRenderTask = null;
+
 async function pdfReaderRenderPage(pageNum){
-  if(pdfReaderRendering) return;
+  if(_pdfRenderTask){
+    try{ _pdfRenderTask.cancel(); }catch(e){}
+    _pdfRenderTask = null;
+  }
   pdfReaderRendering = true;
 
   const type = pdfReaderType;
@@ -1398,7 +1411,9 @@ async function pdfReaderRenderPage(pageNum){
     const canvas = document.getElementById('pdfReaderCanvas');
     canvas.width  = vp.width;
     canvas.height = vp.height;
-    await page.render({canvasContext:canvas.getContext('2d'), viewport:vp}).promise;
+    _pdfRenderTask = page.render({canvasContext:canvas.getContext('2d'), viewport:vp});
+    await _pdfRenderTask.promise;
+    _pdfRenderTask = null;
 
     canvas.style.display = 'block';
     document.getElementById('pdfReaderLoading').style.display = 'none';
@@ -1437,7 +1452,9 @@ async function pdfReaderRenderPage(pageNum){
       await setPdfLastPage(cfg.idbKey, pageNum);
     }
   }catch(e){
-    document.getElementById('pdfReaderLoading').textContent = '⚠ Error Rendering Page';
+    if(e && e.name !== 'RenderingCancelledException'){
+      document.getElementById('pdfReaderLoading').textContent = '⚠ Error Rendering Page';
+    }
   }
   pdfReaderRendering = false;
 }
@@ -3101,7 +3118,7 @@ function renderBookBadge(dk) {
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="bookProgressPill" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
-        <button onclick="closeBookReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+        <button onclick="closeBookReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Save & Exit</button>
       </div>
     </div>
     <!-- Already done note -->
@@ -3150,7 +3167,7 @@ function renderBookBadge(dk) {
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="hadithCounter" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
-        <button onclick="closeHadithReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+        <button onclick="closeHadithReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Save & Exit</button>
       </div>
     </div>
     <div id="hadithDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">✓ You've already completed today's hadiths</div>
@@ -3178,7 +3195,7 @@ function renderBookBadge(dk) {
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="tafsirCounter" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
-        <button onclick="closeTafsirReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+        <button onclick="closeTafsirReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Save & Exit</button>
       </div>
     </div>
     <div id="tafsirDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">✓ You've already completed today's Quran Meaning</div>

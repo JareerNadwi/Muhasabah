@@ -580,8 +580,8 @@ canvas#qrCanvas{
         <button class="yn-btn yes" data-key="asmaul" data-val="yes" onclick="setYN('asmaul','yes')">Yes</button>
         <button class="yn-btn no"  data-key="asmaul" data-val="no"  onclick="setYN('asmaul','no')">No</button>
       </div>
-      <div class="sub-label">Goal: Read All Names of Allah SWT in 7 Pages = Full 5% Core</div>
-      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('asmaul')">🌿 Open Asmaul Husna Reader</button>
+      <div class="sub-label">Goal: Read All Names of Allah SWT in 33 Pages = Full 5% Core</div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openAsmaulReader()">🌿 Open Asmaul Husna Reader</button>
       <div class="qr-session-badge" id="asmaulSessionBadge" style="display:none;"></div>
     </div>
 
@@ -3927,6 +3927,392 @@ function calcBMI(){
   marker.style.left=pct+'%';
   resDiv.style.display='block';
 }
+</script>
+
+<!-- ══════════════════════════════════════════════════════
+     ASMAUL HUSNA READER OVERLAY
+     33 slides × 3 names each. Global resume across days.
+     Proportional scoring via asmaul_pdfRatio.
+══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="asmaulReaderOverlay" style="padding:16px;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:700px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;max-height:92vh;">
+    <!-- Top bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
+      <div>
+        <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🌿 Asmaul Husna — Names of Allah SWT</div>
+        <div id="asmaulDayPill" style="font-size:10px;color:#8a7840;margin-top:2px;letter-spacing:.4px;"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span id="asmaulProgressPill" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
+        <button onclick="closeAsmaulReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Save & Exit</button>
+      </div>
+    </div>
+    <!-- Session info -->
+    <div id="asmaulSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#0d0b08;"></div>
+    <!-- Done note -->
+    <div id="asmaulDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">✓ You've completed all 99 Names — you may continue reviewing</div>
+    <!-- Slide content -->
+    <div id="asmaulContent" style="flex:1;overflow-y:auto;padding:28px 24px;background:#0d0b08;color:#e8dfc8;min-height:0;">
+    </div>
+    <!-- Nav bar -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
+      <button id="asmaulPrevBtn" onclick="asmaulNavPrev()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
+      <div id="asmaulPageDisplay" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text);min-width:110px;text-align:center;letter-spacing:.5px;">Page — / —</div>
+      <button id="asmaulNextBtn" onclick="asmaulNavNext()" style="background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════
+   ASMAUL HUSNA READER — 33 slides × 3 names, PDF order.
+   Gold color scheme matching other articles.
+   Global resume. Writes asmaul_pdfRatio for 5% scoring.
+════════════════════════════════════════════════════════ */
+
+const ASMAUL_HUSNA = [
+  // Slide 1
+  [
+    { arabic:"الرَّحْمَٰنُ", latin:"Ar-Raḥmān", meaning:"The Most or Entirely Merciful — whose mercy encompasses all of creation without condition." },
+    { arabic:"الرَّحِيمُ", latin:"Ar-Raḥīm", meaning:"The Especially Merciful — whose special, deep mercy is reserved for the believers." },
+    { arabic:"الْمَلِكُ", latin:"Al-Malik", meaning:"The King and Owner of Dominion — sovereign ruler over all kingdoms and dominions." },
+  ],
+  // Slide 2
+  [
+    { arabic:"الْقُدُّوسُ", latin:"Al-Quddūs", meaning:"The Absolutely Pure and Perfect — free from every deficiency, flaw, and imperfection." },
+    { arabic:"السَّلَامُ", latin:"As-Salām", meaning:"The Perfection and Giver of Peace — the source of all safety, security, and peace." },
+    { arabic:"الْمُؤْمِنُ", latin:"Al-Mu'min", meaning:"The Granter of Security and Faith — gives faith, security, and protection to His servants." },
+  ],
+  // Slide 3
+  [
+    { arabic:"الْمُهَيْمِنُ", latin:"Al-Muhaymin", meaning:"The Guardian, The Witness, The Overseer — watches over and controls all affairs." },
+    { arabic:"الْعَزِيزُ", latin:"Al-'Azīz", meaning:"The Almighty, The All-Powerful, The Invincible, The Honorable — unconquerable in all matters." },
+    { arabic:"الْجَبَّارُ", latin:"Al-Jabbār", meaning:"The Compeller, The Restorer — compels by His will and restores the broken." },
+  ],
+  // Slide 4
+  [
+    { arabic:"الْمُتَكَبِّرُ", latin:"Al-Mutakabbir", meaning:"The Supreme, The Majestic — possesses all greatness; pride and supremacy belong to Him alone." },
+    { arabic:"الْخَالِقُ", latin:"Al-Khāliq", meaning:"The Creator, The Maker — brings all things into existence from nothing." },
+    { arabic:"الْبَارِئُ", latin:"Al-Bāri'", meaning:"The Originator, The Inventor — fashions creation free from any prior model or example." },
+  ],
+  // Slide 5
+  [
+    { arabic:"الْمُصَوِّرُ", latin:"Al-Muṣawwir", meaning:"The Fashioner, The Shaper — gives each created thing its unique and precise form." },
+    { arabic:"الْغَفَّارُ", latin:"Al-Ghaffār", meaning:"The Constant Forgiver, The Great Forgiver — forgives sins repeatedly for those who repent." },
+    { arabic:"الْقَهَّارُ", latin:"Al-Qahhār", meaning:"The Subduer, The Ever-Dominating — irresistibly overpowers all things in existence." },
+  ],
+  // Slide 6
+  [
+    { arabic:"الْوَهَّابُ", latin:"Al-Wahhāb", meaning:"The Giver of Gifts, The Bestower — gives generously without condition or expectation of return." },
+    { arabic:"الرَّزَّاقُ", latin:"Ar-Razzāq", meaning:"The Ever-Providing, The Constant Provider — provision flows continuously from His generosity." },
+    { arabic:"الْفَتَّاحُ", latin:"Al-Fattāḥ", meaning:"The Opener, The Judge — opens gates of provision, mercy, and victory for His servants." },
+  ],
+  // Slide 7
+  [
+    { arabic:"الْعَلِيمُ", latin:"Al-'Alīm", meaning:"The All-Knowing, The Omniscient — possesses complete and perfect knowledge of all things." },
+    { arabic:"الْقَابِضُ", latin:"Al-Qābiḍ", meaning:"The Withholder, The Restrainer — withholds provision and matters by His perfect wisdom." },
+    { arabic:"الْبَاسِطُ", latin:"Al-Bāsiṭ", meaning:"The Extender, The Expander — expands provision and mercy generously by His grace." },
+  ],
+  // Slide 8
+  [
+    { arabic:"الْخَافِضُ", latin:"Al-Khāfiḍ", meaning:"The Reducer, The Abaser — lowers and humbles whom He wills by His just decree." },
+    { arabic:"الرَّافِعُ", latin:"Ar-Rāfi'", meaning:"The Exalter, The Elevator — raises and elevates whom He wills in rank and honour." },
+    { arabic:"الْمُعِزُّ", latin:"Al-Mu'izz", meaning:"The Honourer, The Bestower of Honor — gives dignity and honour to whom He wills." },
+  ],
+  // Slide 9
+  [
+    { arabic:"الْمُذِلُّ", latin:"Al-Mudhill", meaning:"The Dishonourer, The Humiliator — brings low whoever He wills by His just decree." },
+    { arabic:"السَّمِيعُ", latin:"As-Samī'", meaning:"The All-Hearing — hears every sound, whisper, and prayer without any limit." },
+    { arabic:"الْبَصِيرُ", latin:"Al-Baṣīr", meaning:"The All-Seeing — nothing in existence is hidden from His perfect sight." },
+  ],
+  // Slide 10
+  [
+    { arabic:"الْحَكَمُ", latin:"Al-Ḥakam", meaning:"The Judge, The Giver of Justice — the ultimate arbitrator whose judgment is perfectly just." },
+    { arabic:"الْعَدْلُ", latin:"Al-'Adl", meaning:"The Utterly Just — absolute in fairness; never wrongs any soul even by an atom." },
+    { arabic:"اللَّطِيفُ", latin:"Al-Laṭīf", meaning:"The Most Gentle, The Subtle One — knows the finest details and is tender with His servants." },
+  ],
+  // Slide 11
+  [
+    { arabic:"الْخَبِيرُ", latin:"Al-Khabīr", meaning:"The All-Aware, The All-Acquainted — intimately acquainted with every hidden and apparent matter." },
+    { arabic:"الْحَلِيمُ", latin:"Al-Ḥalīm", meaning:"The Most Forbearing — slow to anger; shows immense patience with His servants." },
+    { arabic:"الْعَظِيمُ", latin:"Al-'Aẓīm", meaning:"The Magnificent, The Supreme — possessing all greatness, grandeur, and majesty." },
+  ],
+  // Slide 12
+  [
+    { arabic:"الْغَفُورُ", latin:"Al-Ghafūr", meaning:"The Forgiving, The Exceedingly Forgiving — forgives abundantly and covers sins with mercy." },
+    { arabic:"الشَّكُورُ", latin:"Ash-Shakūr", meaning:"The Most Appreciative — acknowledges and multiplies rewards far beyond what is deserved." },
+    { arabic:"الْعَلِيُّ", latin:"Al-'Alī", meaning:"The Most High, The Exalted — supreme in status and rank above all of creation." },
+  ],
+  // Slide 13
+  [
+    { arabic:"الْكَبِيرُ", latin:"Al-Kabīr", meaning:"The Greatest, The Most Grand — incomparably great in every dimension and attribute." },
+    { arabic:"الْحَفِيظُ", latin:"Al-Ḥafīẓ", meaning:"The Preserver, The All-Heedful and All-Protecting — guards and protects all things." },
+    { arabic:"الْمُقِيتُ", latin:"Al-Muqīt", meaning:"The Sustainer, The Maintainer — sustains and provides nourishment to every creature." },
+  ],
+  // Slide 14
+  [
+    { arabic:"الْحَسِيبُ", latin:"Al-Ḥasīb", meaning:"The Reckoner — keeps perfect, complete account of every deed, large or small." },
+    { arabic:"الْجَلِيلُ", latin:"Al-Jalīl", meaning:"The Majestic — full of majesty, glory, and grandeur befitting only His Divine essence." },
+    { arabic:"الْكَرِيمُ", latin:"Al-Karīm", meaning:"The Most Generous, The Most Noble — generous beyond measure without expectation of return." },
+  ],
+  // Slide 15
+  [
+    { arabic:"الرَّقِيبُ", latin:"Ar-Raqīb", meaning:"The Watchful, The All-Watchful — ever-observant over all actions, words, and intentions." },
+    { arabic:"الْمُجِيبُ", latin:"Al-Mujīb", meaning:"The Responsive, The Answerer — answers the call of every sincere supplicant." },
+    { arabic:"الْوَاسِعُ", latin:"Al-Wāsi'", meaning:"The All-Encompassing, The Boundless — boundless in mercy, knowledge, and generosity." },
+  ],
+  // Slide 16
+  [
+    { arabic:"الْحَكِيمُ", latin:"Al-Ḥakīm", meaning:"The All-Wise — acts with perfect, complete wisdom in all His decrees and creation." },
+    { arabic:"الْوَدُودُ", latin:"Al-Wadūd", meaning:"The Most Loving — full of deep affection and love toward His righteous servants." },
+    { arabic:"الْمَجِيدُ", latin:"Al-Majīd", meaning:"The All-Glorious, The Ever-Majestic — full of glory, honour, and eternal majesty." },
+  ],
+  // Slide 17
+  [
+    { arabic:"الْبَاعِثُ", latin:"Al-Bā'ith", meaning:"The Infuser of New Life, The Resurrector — raises the dead and sends messengers to mankind." },
+    { arabic:"الشَّهِيدُ", latin:"Ash-Shahīd", meaning:"The All-Witnessing — present and bearing witness to all that occurs at all times." },
+    { arabic:"الْحَقُّ", latin:"Al-Ḥaqq", meaning:"The Absolute Truth — He alone is reality; all else is contingent and dependent upon Him." },
+  ],
+  // Slide 18
+  [
+    { arabic:"الْوَكِيلُ", latin:"Al-Wakīl", meaning:"The Trustee, The Disposer of Affairs — the best disposer of all affairs for those who rely on Him." },
+    { arabic:"الْقَوِيُّ", latin:"Al-Qawiyy", meaning:"The All-Strong — possesses absolute, inexhaustible, and perfect strength." },
+    { arabic:"الْمَتِينُ", latin:"Al-Matīn", meaning:"The Firm, The Steadfast — steadfast in power; never weakened or diminished in any way." },
+  ],
+  // Slide 19
+  [
+    { arabic:"الْوَلِيُّ", latin:"Al-Waliyy", meaning:"The Protector, The Guardian — the protecting ally and guardian of the believers." },
+    { arabic:"الْحَمِيدُ", latin:"Al-Ḥamīd", meaning:"The Praiseworthy, The Most Praised — inherently deserving of all praise and gratitude." },
+    { arabic:"الْمُحْصِي", latin:"Al-Muḥṣī", meaning:"The All-Enumerating, The Counter — has counted and recorded every single thing in existence." },
+  ],
+  // Slide 20
+  [
+    { arabic:"الْمُبْدِئُ", latin:"Al-Mubdi'", meaning:"The Originator, The Initiator — initiates creation from nothing without any prior model." },
+    { arabic:"الْمُعِيدُ", latin:"Al-Mu'īd", meaning:"The Restorer, The Reinstater — will restore and resurrect all creation after death." },
+    { arabic:"الْمُحْيِي", latin:"Al-Muḥyī", meaning:"The Giver of Life — bestows life upon whomever He wills by His power." },
+  ],
+  // Slide 21
+  [
+    { arabic:"الْمُمِيتُ", latin:"Al-Mumīt", meaning:"The Creator of Death — decrees death for every soul by His perfect wisdom." },
+    { arabic:"الْحَيُّ", latin:"Al-Ḥayy", meaning:"The Ever-Living — possesses absolute, eternal, undying life with no beginning or end." },
+    { arabic:"الْقَيُّومُ", latin:"Al-Qayyūm", meaning:"The Sustainer, The Self-Subsisting — sustains all of creation by His own eternal existence." },
+  ],
+  // Slide 22
+  [
+    { arabic:"الْوَاجِدُ", latin:"Al-Wājid", meaning:"The Finder, The Perceiver — finds and perceives all things; nothing escapes His awareness." },
+    { arabic:"الْمَاجِدُ", latin:"Al-Mājid", meaning:"The Noble, The Generous — noble and generous in His essence and in His gifts to creation." },
+    { arabic:"الْوَاحِدُ", latin:"Al-Wāḥid", meaning:"The One, The Indivisible — unique and alone in His essence, attributes, and actions." },
+  ],
+  // Slide 23
+  [
+    { arabic:"الْأَحَدُ", latin:"Al-Aḥad", meaning:"The Unique, The Only One — absolutely singular with no partners, equals, or division." },
+    { arabic:"الصَّمَدُ", latin:"Aṣ-Ṣamad", meaning:"The Eternal, The Absolute — the one all creation depends upon; He depends on nothing." },
+    { arabic:"الْقَادِرُ", latin:"Al-Qādir", meaning:"The Omnipotent, The All-Able — able to bring any matter into existence as He wills." },
+  ],
+  // Slide 24
+  [
+    { arabic:"الْمُقْتَدِرُ", latin:"Al-Muqtadir", meaning:"The All-Powerful, The Dominant — exercises His unlimited power with full authority." },
+    { arabic:"الْمُقَدِّمُ", latin:"Al-Muqaddim", meaning:"The Expediter, The Promoter — advances and promotes whom He wills in rank and provision." },
+    { arabic:"الْمُؤَخِّرُ", latin:"Al-Mu'akhkhir", meaning:"The Delayer, The Postponer — delays and postpones matters by His perfect wisdom and timing." },
+  ],
+  // Slide 25
+  [
+    { arabic:"الْأَوَّلُ", latin:"Al-Awwal", meaning:"The First, The Foremost — existed before all creation with no beginning." },
+    { arabic:"الْآخِرُ", latin:"Al-Ākhir", meaning:"The Last, The Utmost — will remain after all creation ceases with no end." },
+    { arabic:"الظَّاهِرُ", latin:"Aẓ-Ẓāhir", meaning:"The Manifest, The All-Surpassing — evident through His signs and creation above all things." },
+  ],
+  // Slide 26
+  [
+    { arabic:"الْبَاطِنُ", latin:"Al-Bāṭin", meaning:"The Hidden One, Knower of the Hidden — concealed in His essence; knows all that is hidden." },
+    { arabic:"الْوَالِي", latin:"Al-Wālī", meaning:"The Sole Governor — governs and manages all affairs of creation with complete authority." },
+    { arabic:"الْمُتَعَالِي", latin:"Al-Muta'ālī", meaning:"The Self-Exalted — supremely exalted above all in His attributes and essence." },
+  ],
+  // Slide 27
+  [
+    { arabic:"الْبَرُّ", latin:"Al-Barr", meaning:"The Source of All Goodness — the origin of all good; boundlessly kind to His servants." },
+    { arabic:"التَّوَّابُ", latin:"At-Tawwāb", meaning:"The Ever-Pardoning — turns toward His servants with mercy whenever they sincerely repent." },
+    { arabic:"الْمُنْتَقِمُ", latin:"Al-Muntaqim", meaning:"The Avenger — exacts just vengeance upon those who persist in wrongdoing and oppression." },
+  ],
+  // Slide 28
+  [
+    { arabic:"الْعَفُوُّ", latin:"Al-'Afūw", meaning:"The Pardoner — completely erases and wipes away sins, leaving no trace behind." },
+    { arabic:"الرَّؤُوفُ", latin:"Ar-Ra'ūf", meaning:"The Most Kind — full of tenderness and profound compassion toward His servants." },
+    { arabic:"مَالِكُ الْمُلْكِ", latin:"Mālik-ul-Mulk", meaning:"Master of the Dominion, Owner of the Kingdom — the true and absolute possessor of all sovereignty." },
+  ],
+  // Slide 29
+  [
+    { arabic:"ذُو الْجَلَالِ وَالْإِكْرَامِ", latin:"Dhū al-Jalāli wal-Ikrām", meaning:"Possessor of Glory and Honour — possesses all majesty and is the sole source of honour." },
+    { arabic:"الْمُقْسِطُ", latin:"Al-Muqsiṭ", meaning:"The Just One — establishes absolute justice and equity in all His decrees." },
+    { arabic:"الْجَامِعُ", latin:"Al-Jāmi'", meaning:"The Gatherer, The Uniter — will gather all of mankind on the Day of Resurrection." },
+  ],
+  // Slide 30
+  [
+    { arabic:"الْغَنِيُّ", latin:"Al-Ghaniyy", meaning:"The Self-Sufficient, The Wealthy — completely independent; needs nothing from any of creation." },
+    { arabic:"الْمُغْنِي", latin:"Al-Mughnī", meaning:"The Enricher — enriches and satisfies whomever He wills from His boundless treasures." },
+    { arabic:"الْمَانِعُ", latin:"Al-Māni'", meaning:"The Withholder — withholds and prevents by His wisdom; only He can remove what He withholds." },
+  ],
+  // Slide 31
+  [
+    { arabic:"الضَّارُّ", latin:"Aḍ-Ḍārr", meaning:"The Distresser — sends trials and hardship by His perfect wisdom and decree." },
+    { arabic:"النَّافِعُ", latin:"An-Nāfi'", meaning:"The Propitious, The Benefactor — brings benefit and good to whomever He wills." },
+    { arabic:"النُّورُ", latin:"An-Nūr", meaning:"The Light — the source of all light, guidance, and truth in the heavens and the earth." },
+  ],
+  // Slide 32
+  [
+    { arabic:"الْهَادِي", latin:"Al-Hādī", meaning:"The Guide — guides whomever He wills to the straight path of truth and salvation." },
+    { arabic:"الْبَدِيعُ", latin:"Al-Badī'", meaning:"The Incomparable Originator — creates in ways utterly unprecedented with no equal or model." },
+    { arabic:"الْبَاقِي", latin:"Al-Bāqī", meaning:"The Ever-Lasting — remains forever after all creation perishes; eternal without end." },
+  ],
+  // Slide 33
+  [
+    { arabic:"الْوَارِثُ", latin:"Al-Wāriṯ", meaning:"The Inheritor — inherits all things after creation ceases; the true and final owner." },
+    { arabic:"الرَّشِيدُ", latin:"Ar-Rashīd", meaning:"The Guide to the Right Path — directs all affairs with perfect and flawless wisdom." },
+    { arabic:"الصَّبُورُ", latin:"Aṣ-Ṣabūr", meaning:"The Patient — infinitely patient with His servants and delays in repentance." },
+  ],
+];
+
+const ASMAUL_TOTAL_SLIDES = ASMAUL_HUSNA.length;
+const ASMAUL_RESUME_KEY   = "_asmaul_slideIdx";
+
+let _asmaulSlide     = 0;
+let _asmaulDK        = "";
+let _asmaulCompleted = false;
+
+function _asmaulRenderSlide(){
+  const slide    = ASMAUL_HUSNA[_asmaulSlide];
+  const content  = document.getElementById("asmaulContent");
+  const prevBtn  = document.getElementById("asmaulPrevBtn");
+  const nextBtn  = document.getElementById("asmaulNextBtn");
+  const pill     = document.getElementById("asmaulProgressPill");
+  const pageDisp = document.getElementById("asmaulPageDisplay");
+  const sessInfo = document.getElementById("asmaulSessionInfo");
+
+  const isLast    = _asmaulSlide >= ASMAUL_TOTAL_SLIDES - 1;
+  const pagesLeft = ASMAUL_TOTAL_SLIDES - 1 - _asmaulSlide;
+
+  pill.textContent     = (_asmaulSlide + 1) + " / " + ASMAUL_TOTAL_SLIDES;
+  pageDisp.textContent = "Page " + (_asmaulSlide + 1) + " / " + ASMAUL_TOTAL_SLIDES;
+
+  if(isLast){
+    sessInfo.textContent = "✓ Last page — Exit & Save to complete";
+    sessInfo.style.color = "var(--green-bright)";
+  } else {
+    sessInfo.textContent = pagesLeft + " page" + (pagesLeft !== 1 ? "s" : "") + " remaining";
+    sessInfo.style.color = "var(--gold)";
+  }
+
+  prevBtn.disabled      = _asmaulSlide === 0;
+  prevBtn.style.opacity = _asmaulSlide === 0 ? "0.3" : "1";
+  nextBtn.textContent       = isLast ? "✓ Complete" : "Next →";
+  nextBtn.style.background  = isLast ? "var(--green)"        : "#1a1500";
+  nextBtn.style.borderColor = isLast ? "var(--green-bright)" : "#c9a84c55";
+  nextBtn.style.color       = isLast ? "#fff"                : "#c9a84c";
+
+  let html = "";
+  slide.forEach(function(name, i){
+    if(!name.arabic) return;
+    const num    = _asmaulSlide * 3 + i + 1;
+    const numStr = num < 10 ? "0" + num : "" + num;
+    html += "<div style=\"background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;\">" +
+      "<div style=\"font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;font-family:'DM Mono',monospace;\">" + numStr + " — Name of Allah SWT</div>" +
+      "<div style=\"font-family:'Amiri',serif;font-size:2.4rem;line-height:1.7;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:10px;\">" + name.arabic + "</div>" +
+      "<div style=\"font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;font-family:'DM Mono',monospace;\">" + name.latin + "</div>" +
+      "<div style=\"height:1px;background:linear-gradient(to right,#2a2418,transparent);margin:10px 0;\"></div>" +
+      "<div style=\"color:#c5b98a;font-size:0.97rem;line-height:1.85;font-family:'Amiri',serif;\">" + name.meaning + "</div>" +
+      "</div>";
+  });
+  content.innerHTML = html;
+  content.scrollTop = 0;
+}
+
+async function openAsmaulReader(){
+  _asmaulDK = currentDateKey || todayKey();
+  document.getElementById("asmaulReaderOverlay").classList.add("active");
+  document.getElementById("asmaulDayPill").textContent = "99 Names of Allah SWT — Global Progress";
+
+  _asmaulCompleted = getCached(_asmaulDK).asmaul === "yes";
+  document.getElementById("asmaulDoneNote").style.display = _asmaulCompleted ? "block" : "none";
+
+  const saved  = await getReaderResume(ASMAUL_RESUME_KEY);
+  _asmaulSlide = (saved !== null && saved >= 0) ? Math.min(saved, ASMAUL_TOTAL_SLIDES - 1) : 0;
+
+  _asmaulRenderSlide();
+  await _saveAsmaulProgress(false);
+}
+
+async function asmaulNavNext(){
+  if(_asmaulSlide < ASMAUL_TOTAL_SLIDES - 1){
+    _asmaulSlide++;
+    await setReaderResume(ASMAUL_RESUME_KEY, _asmaulSlide);
+    await _saveAsmaulProgress(false);
+    _asmaulRenderSlide();
+  } else {
+    await _saveAsmaulProgress(true);
+    closeAsmaulReader();
+  }
+}
+
+async function asmaulNavPrev(){
+  if(_asmaulSlide > 0){
+    _asmaulSlide = Math.max(0, _asmaulSlide - 1);
+    _asmaulRenderSlide();
+  }
+}
+
+async function _saveAsmaulProgress(done){
+  const ratio = done ? 1 : Math.min((_asmaulSlide + 1) / ASMAUL_TOTAL_SLIDES, 1);
+  const data  = Object.assign({}, getCached(_asmaulDK));
+  data["asmaul_pdfRatio"] = ratio;
+  data["asmaul_slideIdx"] = _asmaulSlide;
+  if(done) data["asmaul"] = "yes";
+  _cache[_asmaulDK] = data;
+  await setStore(_asmaulDK, data);
+  if(done){
+    document.querySelectorAll(".yn-btn[data-key=\"asmaul\"]").forEach(function(btn){
+      btn.classList.toggle("active", btn.dataset.val === "yes");
+    });
+  }
+  refreshScores();
+  renderAsmaulBadge(_asmaulDK);
+}
+
+async function closeAsmaulReader(){
+  const nextSlide = Math.min(_asmaulSlide + 1, ASMAUL_TOTAL_SLIDES - 1);
+  await setReaderResume(ASMAUL_RESUME_KEY, nextSlide);
+  if(!_asmaulCompleted) await _saveAsmaulProgress(false);
+  document.getElementById("asmaulReaderOverlay").classList.remove("active");
+  renderAsmaulBadge(_asmaulDK);
+}
+
+function renderAsmaulBadge(dk){
+  const badge = document.getElementById("asmaulSessionBadge");
+  if(!badge) return;
+  const data = getCached(dk);
+  if(data["asmaul"] === "yes"){
+    badge.style.display = "block";
+    badge.innerHTML = "<span style=\"color:var(--green-bright)\">🌿 All 99 Names Completed — Goal Achieved ✓</span>";
+  } else if(data["asmaul_slideIdx"] !== undefined){
+    const idx = data["asmaul_slideIdx"];
+    const pct = Math.round((idx + 1) / ASMAUL_TOTAL_SLIDES * 100);
+    badge.style.display = "block";
+    badge.innerHTML = "<span style=\"color:var(--gold)\">🌿 Page " + (idx+1) + " of 33 — " + pct + "% complete — in progress</span>";
+  } else {
+    badge.style.display = "none";
+  }
+}
+
+document.addEventListener("keydown", function(e){
+  const aO = document.getElementById("asmaulReaderOverlay");
+  if(!aO || !aO.classList.contains("active")) return;
+  if(e.key === "ArrowRight" || e.key === "ArrowDown"){ e.preventDefault(); asmaulNavNext(); }
+  else if(e.key === "ArrowLeft" || e.key === "ArrowUp"){ e.preventDefault(); asmaulNavPrev(); }
+});
+
+const _origLoadDayDataAsmaul = loadDayData;
+loadDayData = function(dk){
+  _origLoadDayDataAsmaul(dk);
+  renderAsmaulBadge(dk);
+};
 </script>
 
 </body>

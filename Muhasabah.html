@@ -108,7 +108,7 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 
 /* ── Calendar Sub-Header (sticky below main header) ── */
 .calendar-subheader{
-  position:sticky;top:0;z-index:90;
+  position:sticky;top:0;z-index:95;
   background:var(--bg);
   border-bottom:1px solid var(--border);
 }
@@ -2468,10 +2468,14 @@ function closeReadMe(){
   await migrateFromLocalStorage();
   await preloadCache();
   buildCalendar();
-  // Set sticky subheader top to actual header height
+  // Keep subheader stuck directly below the main header at all times
   const hdr = document.querySelector('.header');
   const sub = document.getElementById('calendarSubheader');
-  if(hdr && sub) sub.style.top = hdr.offsetHeight + 'px';
+  function syncTop(){
+    if(hdr && sub) sub.style.top = hdr.getBoundingClientRect().height + 'px';
+  }
+  syncTop();
+  new ResizeObserver(syncTop).observe(hdr);
 })();
 
 /* ════════════════════════════════════════════════════

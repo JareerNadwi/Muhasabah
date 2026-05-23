@@ -258,6 +258,7 @@ select option{background:#1c1f1c;}
 .quran-reader-overlay{
   display:none;position:fixed;inset:0;z-index:2000;
   background:#0a0c0a;flex-direction:column;
+  overscroll-behavior:contain;
 }
 .quran-reader-overlay.active{display:flex;}
 .qr-topbar{
@@ -274,8 +275,9 @@ select option{background:#1c1f1c;}
 }
 .qr-close:hover{border-color:#c05050;color:#c05050;}
 .qr-canvas-wrap{
-  flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;
+  flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;
   background:#111311;position:relative;
+  overscroll-behavior:contain;
 }
 canvas#qrCanvas{
   max-width:100%;max-height:100%;object-fit:contain;
@@ -752,7 +754,7 @@ canvas#qrCanvas{
         <button class="yn-btn yes" data-key="books" data-val="yes" onclick="setYN('books','yes')">Yes</button>
         <button class="yn-btn no"  data-key="books" data-val="no"  onclick="setYN('books','no')">No</button>
       </div>
-      <div class="sub-label">Goal: Read today's book = Full 5% Core &nbsp;·&nbsp; 1 book pulled daily from 365-day plan</div>
+      <div class="sub-label">Goal: Read today's book = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openBookReader()">📗 Open Book Reader</button>
       <div class="qr-session-badge" id="bookSessionBadge" style="display:none;"></div>
     </div>
@@ -1059,11 +1061,12 @@ async function qrRenderPage(pdfPageNum){
 
   try{
     const page = await qrPdfDoc.getPage(pdfPageNum);
-    const wrap = document.querySelector('.qr-canvas-wrap');
+    const wrap = document.querySelector('#quranReaderOverlay .qr-canvas-wrap');
     const maxW  = wrap.clientWidth  - 20;
     const maxH  = wrap.clientHeight - 20;
     const vp0   = page.getViewport({scale:1});
-    const scale = Math.min(maxW/vp0.width, maxH/vp0.height, 2.2);
+    const base  = Math.min(maxW/vp0.width, maxH/vp0.height, 2.2);
+    const scale = base * (1 + qrZoomLevel * 0.25);
     const vp    = page.getViewport({scale});
 
     const canvas  = document.getElementById('qrCanvas');
@@ -1082,8 +1085,9 @@ async function qrRenderPage(pdfPageNum){
     document.getElementById('qrInfoBar').textContent =
       `Emdadia Hafezi  ·  Quran Page ${qPage}  ·  Juzz ${juzz}`;
 
-    document.getElementById('qrPrev').disabled = pdfPageNum <= QR_FIRST_PAGE;
-    document.getElementById('qrNext').disabled = pdfPageNum >= QR_LAST_PAGE;
+    const isZoomed = qrZoomLevel > 0;
+    document.getElementById('qrPrev').disabled = isZoomed || pdfPageNum <= QR_FIRST_PAGE;
+    document.getElementById('qrNext').disabled = isZoomed || pdfPageNum >= QR_LAST_PAGE;
 
     updateSessionInfo();
     await setQrLastPage(pdfPageNum);
@@ -1171,67 +1175,20 @@ async function closeQuranReader(){
 const QR_ZOOM_MAX = 4; // 4 steps × 25% = 100% max zoom
 function qrZoom(direction){
   qrZoomLevel = Math.max(0, Math.min(QR_ZOOM_MAX, qrZoomLevel + direction));
-
-  const isZoomed = qrZoomLevel > 0;
   document.getElementById('qrZoomOut').disabled = qrZoomLevel === 0;
   document.getElementById('qrZoomIn').disabled  = qrZoomLevel === QR_ZOOM_MAX;
-  document.getElementById('qrNext').disabled    = isZoomed || qrCurPage >= QR_LAST_PAGE;
-  document.getElementById('qrPrev').disabled    = isZoomed || qrCurPage <= QR_FIRST_PAGE;
   document.getElementById('qrZoomLabel').textContent = (100 + qrZoomLevel * 25) + '%';
-
-  _qrRenderZoomed(qrCurPage);
-}
-
-async function _qrRenderZoomed(pdfPageNum){
-  if(!qrPdfDoc) return;
-  const page  = await qrPdfDoc.getPage(pdfPageNum);
-  const wrap  = document.querySelector('.qr-canvas-wrap');
-  const maxW  = wrap.clientWidth  - 20;
-  const maxH  = wrap.clientHeight - 20;
-  const vp0   = page.getViewport({scale:1});
-  const base  = Math.min(maxW/vp0.width, maxH/vp0.height, 2.2);
-  const scale = base * (1 + qrZoomLevel * 0.25);
-  const vp     = page.getViewport({scale});
-  const canvas = document.getElementById('qrCanvas');
-  canvas.width  = vp.width;
-  canvas.height = vp.height;
-  await page.render({canvasContext:canvas.getContext('2d'), viewport:vp}).promise;
-  canvas.style.display = 'block';
-  document.getElementById('qrLoading').style.display = 'none';
+  qrRenderPage(qrCurPage); // re-render with new zoom level baked in
 }
 
 /* ── Generic PDF Reader Zoom ── */
 const PDF_ZOOM_MAX = 4;
 function pdfZoom(direction){
   pdfZoomLevel = Math.max(0, Math.min(PDF_ZOOM_MAX, pdfZoomLevel + direction));
-
-  const isZoomed = pdfZoomLevel > 0;
   document.getElementById('pdfZoomOut').disabled    = pdfZoomLevel === 0;
   document.getElementById('pdfZoomIn').disabled     = pdfZoomLevel === PDF_ZOOM_MAX;
-  document.getElementById('pdfReaderNext').disabled = isZoomed || pdfReaderCurPage >= pdfReaderLastPage;
-  document.getElementById('pdfReaderPrev').disabled = isZoomed || pdfReaderCurPage <= 1;
   document.getElementById('pdfZoomLabel').textContent = (100 + pdfZoomLevel * 25) + '%';
-
-  _pdfRenderZoomed(pdfReaderCurPage);
-}
-
-async function _pdfRenderZoomed(pageNum){
-  const type = pdfReaderType;
-  if(!type || !pdfReaderDoc[type]) return;
-  const page  = await pdfReaderDoc[type].getPage(pageNum);
-  const wrap  = document.querySelector('#pdfReaderOverlay .qr-canvas-wrap');
-  const maxW  = wrap.clientWidth  - 20;
-  const maxH  = wrap.clientHeight - 20;
-  const vp0   = page.getViewport({scale:1});
-  const base  = Math.min(maxW/vp0.width, maxH/vp0.height, 2.2);
-  const scale = base * (1 + pdfZoomLevel * 0.25);
-  const vp     = page.getViewport({scale});
-  const canvas = document.getElementById('pdfReaderCanvas');
-  canvas.width  = vp.width;
-  canvas.height = vp.height;
-  await page.render({canvasContext:canvas.getContext('2d'), viewport:vp}).promise;
-  canvas.style.display = 'block';
-  document.getElementById('pdfReaderLoading').style.display = 'none';
+  pdfReaderRenderPage(pdfReaderCurPage);
 }
 
 /* IDB helpers for Quran reader last-page persistence (global, not per-day) */
@@ -1432,7 +1389,8 @@ async function pdfReaderRenderPage(pageNum){
     const maxW = wrap.clientWidth  - 20;
     const maxH = wrap.clientHeight - 20;
     const vp0  = page.getViewport({scale:1});
-    const scale= Math.min(maxW/vp0.width, maxH/vp0.height, 2.2);
+    const base = Math.min(maxW/vp0.width, maxH/vp0.height, 2.2);
+    const scale= base * (1 + pdfZoomLevel * 0.25);
     const vp   = page.getViewport({scale});
 
     const canvas = document.getElementById('pdfReaderCanvas');
@@ -1448,16 +1406,15 @@ async function pdfReaderRenderPage(pageNum){
     document.getElementById('pdfReaderInfo').textContent =
       cfg.title + `  ·  Page ${pageNum} of ${pdfReaderLastPage}`;
 
-    document.getElementById('pdfReaderPrev').disabled = pageNum <= 1;
-    document.getElementById('pdfReaderNext').disabled = pageNum >= pdfReaderLastPage;
+    const isZoomed = pdfZoomLevel > 0;
+    document.getElementById('pdfReaderPrev').disabled = isZoomed || pageNum <= 1;
+    document.getElementById('pdfReaderNext').disabled = isZoomed || pageNum >= pdfReaderLastPage;
 
     const sessionEl = document.getElementById('pdfReaderSessionInfo');
     if(cfg.autoCompleteOnClose){
-      // Asmaul Husna — just show page position, exit marks yes
       sessionEl.textContent = `Page ${pageNum} of ${pdfReaderLastPage} — Exit & Save to mark complete`;
       sessionEl.style.color = 'var(--gold)';
     } else if(cfg.globalResume){
-      // Zikr From Book — show global progress
       sessionEl.textContent = `Page ${pageNum} of ${pdfReaderLastPage} — progress saved across days`;
       sessionEl.style.color = 'var(--gold)';
     } else if(cfg.goalKey){
@@ -1474,7 +1431,6 @@ async function pdfReaderRenderPage(pageNum){
       sessionEl.style.color = 'var(--text-muted)';
     }
 
-    // Save last-read page — globalResume uses IDB, per-day resume uses day data
     if(cfg.globalResume && cfg.idbKey){
       await setPdfLastPage(cfg.idbKey, pageNum);
     }
@@ -1786,7 +1742,10 @@ function scoreDay(data){
   // surahMulk 5% — proportional if PDF used, else yes/no
   const smRatio = data['surahMulk_pdfRatio'];
   core += smRatio !== undefined ? Math.min(smRatio * 5, 5) : (data.surahMulk==='yes'?5:0);
-  yn('exercise',5); yn('books',5); yn('language',5);
+  // books 5% — proportional via book_ratio
+  const bkRatio = data['book_ratio'];
+  core += bkRatio !== undefined ? Math.min(bkRatio * 5, 5) : (data.books === 'yes' ? 5 : 0);
+  yn('exercise',5); yn('language',5);
   yn('writingLinkedin',2.5); yn('writingFacebook',2.5);
   yn('netConnected',2.5); yn('netCommented',2.5);
 
@@ -1890,7 +1849,10 @@ function goalScore(data,key){
       return r !== undefined ? Math.min(Math.round(r * 100), 100) : (data.surahMulk==='yes'?100:0);
     }
     case 'exercise':    return data.exercise==='yes'?100:0;
-    case 'books':       return data.books==='yes'?100:0;
+    case 'books': {
+      const bkRatio = data['book_ratio'];
+      return bkRatio !== undefined ? Math.min(Math.round(bkRatio * 100), 100) : (data.books === 'yes' ? 100 : 0);
+    }
     case 'language':    return data.language==='yes'?100:0;
     case 'writing':     return Math.round(((data.writingLinkedin==='yes'?1:0)+(data.writingFacebook==='yes'?1:0))/2*100);
     case 'networking':  return Math.round(((data.netConnected==='yes'?1:0)+(data.netCommented==='yes'?1:0))/2*100);
@@ -3027,7 +2989,7 @@ function _renderBookSlide(book) {
     nextBtn.style.borderColor = '';
     nextBtn.style.color       = '';
     nextBtn.disabled    = false;
-    pill.textContent    = 'Intro';
+    pill.textContent    = '';
   } else {
     introSlide.style.display  = 'none';
     lessonSlide.style.display = 'block';

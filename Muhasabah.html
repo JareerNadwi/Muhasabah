@@ -4334,7 +4334,7 @@ function renderAsmaulBadge(dk){
   badge.innerHTML =
     "<span style=\"color:var(--gold)\">🌿 Today: " + count + " session" + (count !== 1 ? "s" : "") + " &nbsp;·&nbsp; " + totalSlides + " page" + (totalSlides !== 1 ? "s" : "") + " read (" + totalPct + "%" + doneText + ")</span>" +
     "<br><span style=\"font-size:9px;color:var(--text-muted)\">Total: Page " + first.start + "–" + last.end + " (" + totalSlides + " pages today)</span>" +
-    "<br><span style=\"font-size:9px;color:var(--text-muted)\">Last: Pages " + last.start + "–" + last.end + " (" + lastSlides + " page" + (lastSlides !== 1 ? "s" : "") + ") · Global page " + last.end + "/" + ASMAUL_TOTAL_SLIDES + "</span>";
+    "<br><span style=\"font-size:9px;color:var(--text-muted)\">Last: Pages " + last.start + "–" + last.end + " (" + lastSlides + " page" + (lastSlides !== 1 ? "s" : "") + ")</span>";
 }
 
 document.addEventListener("keydown", function(e){
@@ -4648,7 +4648,7 @@ function renderZikrBadge(dk,mode){
   badge.innerHTML=
     "<span style=\"color:var(--gold)\">"+icon+" Today: "+count+" session"+(count!==1?"s":"")+" &nbsp;&#183;&nbsp; "+tot+" dua"+(tot!==1?"s":"")+" read ("+tp+"%"+dt+")</span>"+
     "<br><span style=\"font-size:9px;color:var(--text-muted)\">Total: Dua "+first.start+"-"+last.end+" ("+tot+" duas today)</span>"+
-    "<br><span style=\"font-size:9px;color:var(--text-muted)\">Last: Duas "+last.start+"-"+last.end+" ("+last.slides+" dua"+(last.slides!==1?"s":"")+") · Global dua "+last.end+"/"+ZIKR_TOTAL+"</span>";
+    "<br><span style=\"font-size:9px;color:var(--text-muted)\">Last: Duas "+last.start+"-"+last.end+" ("+last.slides+" dua"+(last.slides!==1?"s":"")+")</span>";
 }
 document.addEventListener("keydown",function(e){
   var zO=document.getElementById("zikrReaderOverlay");

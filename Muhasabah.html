@@ -626,7 +626,7 @@ canvas#qrCanvas{
         <button class="yn-btn no"  data-key="surahWaqiah" data-val="no"  onclick="setYN('surahWaqiah','no')">No</button>
       </div>
       <div class="sub-label">Goal: Read Full Surah = Full 5% Core</div>
-      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahWaqiah')">📜 Open Surah Al-Waqiah Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahWaqiah')">📜 Open Surah Al-Waqiah (Verse Reader)</button>
       <div class="qr-session-badge" id="surahWaqiahSessionBadge" style="display:none;"></div>
     </div>
 
@@ -641,7 +641,7 @@ canvas#qrCanvas{
         <button class="yn-btn no"  data-key="surahMulk" data-val="no"  onclick="setYN('surahMulk','no')">No</button>
       </div>
       <div class="sub-label">Goal: Read Full Surah = Full 5% Core</div>
-      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahMulk')">📜 Open Surah Al-Mulk Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahMulk')">📜 Open Surah Al-Mulk (Verse Reader)</button>
       <div class="qr-session-badge" id="surahMulkSessionBadge" style="display:none;"></div>
     </div>
 
@@ -1338,6 +1338,9 @@ async function setPdfLastPage(idbKey, pageNum){
 }
 
 async function openPdfReader(type){
+  // Surah Waqiah and Mulk use the verse reader, not PDF
+  if(type === 'surahWaqiah'){ openSurahVerseReader(56, '📜 Surah Al-Waqiah', 'surahWaqiah'); return; }
+  if(type === 'surahMulk'){   openSurahVerseReader(67, '📜 Surah Al-Mulk',   'surahMulk');   return; }
   pdfReaderType = type;
   const cfg = PDF_READER_CONFIG[type];
 
@@ -2713,6 +2716,7 @@ function closeHadithReader(){
 /* ══════ TAFSIR READER ══════ */
 let _quranArabic  = null;
 let _quranEnglish = null;
+let _quranTranslit = null;
 let _tafsirSlice  = [];
 let _tafsirIdx    = 0;
 let _tafsirDK     = '';
@@ -2755,6 +2759,18 @@ async function openTafsirReader(){
       _quranEnglish._map = {};
       _quranEnglish.forEach(v => { _quranEnglish._map[v.chapter+':'+v.verse] = v.text; });
     }
+    if(!_quranTranslit){
+      document.getElementById('tafsirLoading').innerHTML = 'Loading Transliteration...';
+      try {
+        const res = await fetch(BASE_URL + 'Quran Transliteration.json');
+        if(res.ok){
+          const json = await res.json();
+          _quranTranslit = json.quran || json || [];
+          _quranTranslit._map = {};
+          _quranTranslit.forEach(v => { _quranTranslit._map[v.chapter+':'+v.verse] = v.text || v.transliteration || ''; });
+        } else { _quranTranslit = { _map: {} }; }
+      } catch(e){ _quranTranslit = { _map: {} }; }
+    }
 
     _tafsirSlice = [];
     for(let v = startV; v <= endV; v++){
@@ -2763,6 +2779,7 @@ async function openTafsirReader(){
       _tafsirSlice.push({ globalNum:v, surahNum:surah,
         surahName: SURAH_NAMES[surah]||'Surah '+surah, ayah,
         arabic:  _quranArabic._map[key]  || '',
+        translit: _quranTranslit._map ? (_quranTranslit._map[key] || '') : '',
         meaning: _quranEnglish._map[key] || 'Translation unavailable.' });
     }
 
@@ -2794,6 +2811,8 @@ function renderTafsirVerse(idx){
   document.getElementById('tafsirVerseRef').textContent = v.surahName+' \u00B7 '+v.surahNum+':'+v.ayah;
   document.getElementById('tafsirCounter').textContent  = (idx+1)+' / '+total;
   document.getElementById('tafsirArabic').textContent   = v.arabic;
+  const translitEl = document.getElementById('tafsirTranslit');
+  if(translitEl){ translitEl.textContent = v.translit || ''; translitEl.parentElement.style.display = v.translit ? 'block' : 'none'; }
   document.getElementById('tafsirText').textContent     = v.meaning;
   document.getElementById('tafsirPrevBtn').disabled     = idx === 0;
   const isLast = idx === total - 1;
@@ -2843,6 +2862,119 @@ function closeTafsirReader(){
   document.getElementById('tafsirReaderOverlay').classList.remove('active');
 }
 
+/* ══════ SURAH VERSE READER (Waqiah & Mulk) ══════ */
+let _svSlice   = [];
+let _svIdx     = 0;
+let _svGoalKey = '';
+let _svDK      = '';
+
+async function openSurahVerseReader(surahNum, title, goalKey){
+  _svGoalKey = goalKey;
+  _svDK      = currentDateKey || todayKey();
+  const overlay = document.getElementById('surahVerseReaderOverlay');
+  document.getElementById('svTitle').textContent   = title;
+  document.getElementById('svLoading').style.display  = 'flex';
+  document.getElementById('svContent').style.display  = 'none';
+  document.getElementById('svNav').style.display      = 'none';
+  overlay.classList.add('active');
+
+  try{
+    if(!_quranArabic){
+      document.getElementById('svLoading').textContent = 'Loading Arabic...';
+      const res = await fetch(BASE_URL + 'Quran Arabic.json');
+      if(!res.ok) throw new Error('Quran Arabic.json ' + res.status);
+      const json = await res.json();
+      _quranArabic = json.quran || [];
+      _quranArabic._map = {};
+      _quranArabic.forEach(v => { _quranArabic._map[v.chapter+':'+v.verse] = v.text; });
+    }
+    if(!_quranEnglish){
+      document.getElementById('svLoading').textContent = 'Loading English...';
+      const res = await fetch(BASE_URL + 'Quran English.json');
+      if(!res.ok) throw new Error('Quran English.json ' + res.status);
+      const json = await res.json();
+      _quranEnglish = json.quran || [];
+      _quranEnglish._map = {};
+      _quranEnglish.forEach(v => { _quranEnglish._map[v.chapter+':'+v.verse] = v.text; });
+    }
+    if(!_quranTranslit){
+      document.getElementById('svLoading').textContent = 'Loading Transliteration...';
+      try{
+        const res = await fetch(BASE_URL + 'Quran Transliteration.json');
+        if(res.ok){
+          const json = await res.json();
+          _quranTranslit = json.quran || json || [];
+          _quranTranslit._map = {};
+          _quranTranslit.forEach(v => { _quranTranslit._map[v.chapter+':'+v.verse] = v.text || v.transliteration || ''; });
+        } else { _quranTranslit = { _map:{} }; }
+      } catch(e){ _quranTranslit = { _map:{} }; }
+    }
+
+    const totalAyahs = SURAH_LENGTHS[surahNum - 1];
+    _svSlice = [];
+    for(let ayah = 1; ayah <= totalAyahs; ayah++){
+      const key = surahNum + ':' + ayah;
+      _svSlice.push({
+        surahNum, ayah, totalAyahs,
+        surahName: SURAH_NAMES[surahNum] || 'Surah ' + surahNum,
+        arabic:   _quranArabic._map[key]  || '',
+        translit: _quranTranslit._map ? (_quranTranslit._map[key] || '') : '',
+        meaning:  _quranEnglish._map[key] || 'Translation unavailable.'
+      });
+    }
+
+    document.getElementById('svLoading').style.display = 'none';
+    document.getElementById('svContent').style.display = 'block';
+    document.getElementById('svNav').style.display     = 'flex';
+    renderSurahVerse(0);
+  } catch(e){
+    document.getElementById('svLoading').textContent = '⚠ Failed: ' + e.message;
+  }
+}
+
+function renderSurahVerse(idx){
+  _svIdx = idx;
+  const v = _svSlice[idx];
+  if(!v) return;
+  const total = _svSlice.length;
+  document.getElementById('svVerseRef').textContent = v.surahName + ' · ' + v.surahNum + ':' + v.ayah;
+  document.getElementById('svCounter').textContent  = (idx + 1) + ' / ' + total;
+  document.getElementById('svArabic').textContent   = v.arabic;
+  const trEl = document.getElementById('svTranslit');
+  const trWrap = document.getElementById('svTranslitWrap');
+  if(trEl && trWrap){ trEl.textContent = v.translit || ''; trWrap.style.display = v.translit ? 'block' : 'none'; }
+  document.getElementById('svText').textContent = v.meaning;
+  document.getElementById('svPrevBtn').disabled = idx === 0;
+  const isLast = idx === total - 1;
+  const btn = document.getElementById('svNextBtn');
+  btn.textContent       = isLast ? '✓ Mark Done' : 'Next →';
+  btn.style.background  = isLast ? 'var(--green)'        : '';
+  btn.style.borderColor = isLast ? 'var(--green-bright)' : '';
+  btn.style.color       = isLast ? '#fff'                : '';
+  btn.disabled = false;
+}
+
+async function svNavNext(){
+  const total = _svSlice.length;
+  if(_svIdx < total - 1){
+    renderSurahVerse(_svIdx + 1);
+  } else {
+    // Mark done
+    if(_svGoalKey && _svDK){
+      const d = getCached(_svDK);
+      d[_svGoalKey] = 'yes';
+      setCached(_svDK, d);
+      saveAndRefresh();
+    }
+    closeSurahVerseReader();
+  }
+}
+function svNavPrev(){ if(_svIdx > 0) renderSurahVerse(_svIdx - 1); }
+function closeSurahVerseReader(){
+  document.getElementById('surahVerseReaderOverlay').classList.remove('active');
+}
+
+
 /* Keyboard arrow navigation — all readers */
 document.addEventListener('keydown', e => {
   if(e.key !== 'ArrowRight' && e.key !== 'ArrowLeft' &&
@@ -2863,6 +2995,14 @@ document.addEventListener('keydown', e => {
   if(pdfO && pdfO.classList.contains('active')){
     e.preventDefault();
     if(next) pdfReaderChangePage(1); else pdfReaderChangePage(-1);
+    return;
+  }
+
+  /* Surah Verse reader (Waqiah / Mulk) */
+  const svO = document.getElementById('surahVerseReaderOverlay');
+  if(svO && svO.classList.contains('active')){
+    e.preventDefault();
+    if(next) svNavNext(); else svNavPrev();
     return;
   }
 
@@ -3205,6 +3345,10 @@ function renderBookBadge(dk) {
       <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:20px;">
         <div id="tafsirArabic" style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;"></div>
       </div>
+      <div id="tafsirTranslitWrap" style="background:#141008;border:1px solid #2a2010;border-top:2px solid #7a6a40;border-radius:8px;padding:14px 24px;margin-bottom:16px;">
+        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#7a6a40;margin-bottom:8px;font-family:'DM Mono',monospace;">Pronunciation</div>
+        <div id="tafsirTranslit" style="color:#a89060;font-size:0.95rem;line-height:1.85;font-family:'Amiri',serif;font-style:italic;"></div>
+      </div>
       <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;font-family:'DM Mono',monospace;">Meaning — Saheeh International</div>
       <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:22px 24px;">
         <div id="tafsirText" style="color:#c5b98a;font-size:1.05rem;line-height:1.85;font-family:'Amiri',serif;"></div>
@@ -3213,6 +3357,40 @@ function renderBookBadge(dk) {
     <div id="tafsirNav" style="display:none;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;gap:8px;">
       <button id="tafsirPrevBtn" onclick="tafsirNavPrev()" style="flex:1;padding:9px 14px;background:#1e1a10;border:1px solid #2a2010;color:#8a7840;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">← Prev</button>
       <button id="tafsirNextBtn" onclick="tafsirNavNext()" style="flex:2;padding:9px 14px;background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SURAH VERSE READER OVERLAY (Waqiah & Mulk) -->
+<div class="modal-overlay" id="surahVerseReaderOverlay" style="padding:16px;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;max-height:92vh;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
+      <div>
+        <div id="svTitle" style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;"></div>
+        <div id="svVerseRef" style="font-size:10px;color:#8a7840;margin-top:2px;letter-spacing:.4px;"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span id="svCounter" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
+        <button onclick="closeSurahVerseReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+      </div>
+    </div>
+    <div id="svLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:'DM Mono',monospace;background:#0d0b08;">Loading verses…</div>
+    <div id="svContent" style="display:none;flex:1;overflow-y:auto;padding:28px 24px;background:#0d0b08;">
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:20px;">
+        <div id="svArabic" style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;"></div>
+      </div>
+      <div id="svTranslitWrap" style="background:#141008;border:1px solid #2a2010;border-top:2px solid #7a6a40;border-radius:8px;padding:14px 24px;margin-bottom:16px;">
+        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#7a6a40;margin-bottom:8px;font-family:'DM Mono',monospace;">Pronunciation</div>
+        <div id="svTranslit" style="color:#a89060;font-size:0.95rem;line-height:1.85;font-family:'Amiri',serif;font-style:italic;"></div>
+      </div>
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;font-family:'DM Mono',monospace;">Meaning — Saheeh International</div>
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:22px 24px;">
+        <div id="svText" style="color:#c5b98a;font-size:1.05rem;line-height:1.85;font-family:'Amiri',serif;"></div>
+      </div>
+    </div>
+    <div id="svNav" style="display:none;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;gap:8px;display:flex;">
+      <button id="svPrevBtn" onclick="svNavPrev()" style="flex:1;padding:9px 14px;background:#1e1a10;border:1px solid #2a2010;color:#8a7840;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">← Prev</button>
+      <button id="svNextBtn" onclick="svNavNext()" style="flex:2;padding:9px 14px;background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Next →</button>
     </div>
   </div>
 </div>

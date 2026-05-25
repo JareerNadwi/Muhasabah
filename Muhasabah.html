@@ -4841,7 +4841,7 @@ loadDayData=function(dk){_origLDDZikr(dk);renderZikrBadge(dk,"morning");renderZi
 <script>
 /* ════════════════════════════════════════════════════════
    ZIKR FROM BOOK READER — JSON-based
-   123 duas loaded from duas.json (GitHub Pages).
+   123 duas loaded from Zikr From Book.json (GitHub Pages).
    Global resume across days (like zikrBook PDF was).
    Proportional bonus scoring: duasRead / 123 × 10%.
    Auto-fills zikrBookPages input.
@@ -4861,14 +4861,14 @@ let _zbCompleted = false;    // already read all today
 async function _zbLoadDuas() {
   if (_zbDuas) return true;
   try {
-    const res = await fetch(BASE_URL + 'duas.json');
+    const res = await fetch(BASE_URL + 'Zikr%20From%20Book.json');
     if (!res.ok) throw new Error('duas.json HTTP ' + res.status);
     const json = await res.json();
     _zbDuas = json.duas || [];
     return true;
   } catch(e) {
     document.getElementById('zikrBookContent').innerHTML =
-      '<div style="color:#c05050;padding:20px;font-family:\'DM Mono\',monospace;font-size:12px;">⚠ Could not load duas.json — make sure it is in the same folder as the HTML file.<br><br>' + e.message + '</div>';
+      '<div style="color:#c05050;padding:20px;font-family:\'DM Mono\',monospace;font-size:12px;">⚠ Could not load <b>Zikr From Book.json</b> — make sure it is in the same folder as the HTML file on GitHub Pages.<br><br>' + e.message + '</div>';
     return false;
   }
 }
@@ -4928,7 +4928,7 @@ async function openZikrBookReader() {
   document.getElementById('zikrBookReaderOverlay').classList.add('active');
   document.getElementById('zikrBookDayPill').textContent = '123 Duas — Progress saved across days';
   document.getElementById('zikrBookContent').innerHTML =
-    '<div style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:\'DM Mono\',monospace;">Loading duas.json…</div>';
+    '<div style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:\'DM Mono\',monospace;">Loading Zikr From Book.json…</div>';
 
   const ok = await _zbLoadDuas();
   if (!ok) return;

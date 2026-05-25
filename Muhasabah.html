@@ -704,10 +704,10 @@ canvas#qrCanvas{
       </div>
       <div class="num-row">
         <input type="number" id="zikrBookPages" min="0" max="22" placeholder="0" oninput="saveAndRefresh()">
-        <span class="of-label">Pages &nbsp;/&nbsp; 22 Total</span>
+        <span class="of-label">Duas &nbsp;/&nbsp; 123 Total</span>
       </div>
-      <div class="sub-label">Max +10% At 22 Pages &nbsp;·&nbsp; ~+0.45% Per Page</div>
-      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('zikrBook')">📖 Open Zikr Book Reader</button>
+      <div class="sub-label">Max +10% At 123 Duas &nbsp;·&nbsp; ~+0.08% Per Dua</div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openZikrBookReader()">📖 Open Zikr From Book Reader</button>
       <div class="qr-session-badge" id="zikrBookReaderBadge" style="display:none;"></div>
     </div>
 
@@ -1274,16 +1274,7 @@ const PDF_READER_CONFIG = {
     autoCompleteOnClose: false,
     globalResume:     false,
   },
-  zikrBook: {
-    pdfPath:          'Zikr%20From%20Book.pdf',
-    title:            '📖 Zikr From Book',
-    resume:           true,    // global resume — persists across days
-    goalKey:          null,    // bonus scoring via pages, not yes/no
-    badgeId:          'zikrBookReaderBadge',
-    idbKey:           '_pdf_lastpage_zikrBook', // global key, not per-day
-    autoCompleteOnClose: false,
-    globalResume:     true,    // does NOT reset each day
-  },
+  zikrBook: null, // handled by JSON reader (openZikrBookReader)
   surahWaqiah: {
     pdfPath:          'Surah%20Al-Waqiah.pdf',
     title:            '📜 Surah Al-Waqiah',
@@ -1341,8 +1332,10 @@ async function openPdfReader(type){
   // Surah Waqiah and Mulk use the verse reader, not PDF
   if(type === 'surahWaqiah'){ openSurahVerseReader(56, '📜 Surah Al-Waqiah', 'surahWaqiah'); return; }
   if(type === 'surahMulk'){   openSurahVerseReader(67, '📜 Surah Al-Mulk',   'surahMulk');   return; }
+  if(type === 'zikrBook'){ openZikrBookReader(); return; }
   pdfReaderType = type;
   const cfg = PDF_READER_CONFIG[type];
+  if(!cfg) return;
 
   document.getElementById('pdfReaderTitle').textContent = cfg.title;
   document.getElementById('pdfReaderInfo').textContent  = cfg.title + ' — PDF Reader';
@@ -1482,7 +1475,8 @@ async function closePdfReader(){
   pdfReaderType = null;
   if(!type || !currentDateKey) return;
 
-  const cfg        = PDF_READER_CONFIG[type];
+  const cfg = PDF_READER_CONFIG[type];
+  if(!cfg) return; // handled by custom reader (e.g. zikrBook)
   const pagesRead  = Math.max(0, pdfReaderCurPage - pdfReaderStartPage + 1);
   const reachedEnd = pdfReaderCurPage >= pdfReaderLastPage;
 
@@ -1805,7 +1799,7 @@ function scoreDay(data){
   if(zbRatio !== undefined){
     bonus += Math.min(zbRatio * 10, 10);
   } else {
-    bonus+=Math.min((parseInt(data.zikrBookPages)||0)*(10/22),10);
+    bonus+=Math.min((parseInt(data.zikrBookPages)||0)*(10/123),10);
   }
 
   // Sadaqah: max +10% at 50,000 units
@@ -1903,7 +1897,7 @@ function bonusScore(data,key){
       const r = data['zikrBook_bonusRatio'];
       return r !== undefined
         ? Math.min(Math.round(r * 10 * 10) / 10, 10)
-        : Math.min(Math.round((parseInt(data.zikrBookPages)||0)*(10/22)*10)/10, 10);
+        : Math.min(Math.round((parseInt(data.zikrBookPages)||0)*(10/123)*10)/10, 10);
     }
     case 'sadaqah':     return Math.min(Math.round((parseInt(data.sadaqahUnits)||0)*(10/50000)*10)/10,10);
     default: return 0;
@@ -2090,27 +2084,7 @@ function loadDayData(dk){
     }
   });
 
-  // Zikr From Book badge
-  const zikrBookBadge = document.getElementById('zikrBookReaderBadge');
-  if(zikrBookBadge){
-    const zbs = data['zikrBook_sessions'];
-    if(zbs && zbs.length > 0){
-      zikrBookBadge.style.display = 'block';
-      const count           = zbs.length;
-      const first           = zbs[0];
-      const last            = zbs[zbs.length - 1];
-      const totalPagesToday = data['zikrBook_pagesToday'] || 0;
-      const bonusRatio      = parseFloat(data['zikrBook_bonusRatio']) || 0;
-      const pct             = Math.round(bonusRatio * 100);
-      const globalPage      = data['zikrBook_readerPage'] || last.end;
-      zikrBookBadge.innerHTML =
-        `<span style="color:var(--gold);">📖 Today: ${count} session${count!==1?'s':''} &nbsp;·&nbsp; ${totalPagesToday} pages read (${pct}%)</span>`
-        + `<br><span style="font-size:9px;color:var(--text-muted);">Total: ${first.start}–${last.end} (${totalPagesToday} pages today)</span>`
-        + `<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages ${last.start}–${last.end} (${last.pages} pages) · Global page ${globalPage}</span>`;
-    } else {
-      zikrBookBadge.style.display = 'none';
-    }
-  }
+  // Zikr From Book badge — rendered by _zbRenderBadge via patched loadDayData
 
   const salahs=data.salahs||{};
   SALAHS.forEach(salah=>{
@@ -4836,6 +4810,246 @@ document.addEventListener("keydown",function(e){
 });
 var _origLDDZikr=loadDayData;
 loadDayData=function(dk){_origLDDZikr(dk);renderZikrBadge(dk,"morning");renderZikrBadge(dk,"evening");};
+</script>
+
+<!-- ══════════════════════════════════════════════════════
+     ZIKR FROM BOOK READER OVERLAY — JSON-based, mirrors Zikr Morning/Evening
+══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="zikrBookReaderOverlay" style="padding:16px;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:700px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;max-height:92vh;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
+      <div>
+        <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">📖 Zikr From Book</div>
+        <div id="zikrBookDayPill" style="font-size:10px;color:#8a7840;margin-top:2px;letter-spacing:.4px;"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span id="zikrBookProgressPill" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
+        <button onclick="closeZikrBookReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Save & Exit</button>
+      </div>
+    </div>
+    <div id="zikrBookSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#0d0b08;"></div>
+    <div id="zikrBookDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">✓ You have read all 123 Duas today — you may continue reviewing</div>
+    <div id="zikrBookContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#e8dfc8;min-height:0;"></div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
+      <button id="zikrBookPrevBtn" onclick="zikrBookNavPrev()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
+      <div id="zikrBookPageDisplay" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text);min-width:110px;text-align:center;letter-spacing:.5px;">Dua — / —</div>
+      <button id="zikrBookNextBtn" onclick="zikrBookNavNext()" style="background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════
+   ZIKR FROM BOOK READER — JSON-based
+   123 duas loaded from duas.json (GitHub Pages).
+   Global resume across days (like zikrBook PDF was).
+   Proportional bonus scoring: duasRead / 123 × 10%.
+   Auto-fills zikrBookPages input.
+   Mirrors Zikr Morning/Evening style exactly.
+════════════════════════════════════════════════════════ */
+
+const ZIKR_BOOK_TOTAL = 123;
+const ZIKR_BOOK_IDX_KEY = '_zikrBook_duaIdx'; // global IDB key
+
+let _zbDuas = null;          // loaded JSON array
+let _zbSlide = 0;
+let _zbStartSlide = 0;
+let _zbDK = '';
+let _zbCompleted = false;    // already read all today
+
+/* ── Load JSON ── */
+async function _zbLoadDuas() {
+  if (_zbDuas) return true;
+  try {
+    const res = await fetch(BASE_URL + 'duas.json');
+    if (!res.ok) throw new Error('duas.json HTTP ' + res.status);
+    const json = await res.json();
+    _zbDuas = json.duas || [];
+    return true;
+  } catch(e) {
+    document.getElementById('zikrBookContent').innerHTML =
+      '<div style="color:#c05050;padding:20px;font-family:\'DM Mono\',monospace;font-size:12px;">⚠ Could not load duas.json — make sure it is in the same folder as the HTML file.<br><br>' + e.message + '</div>';
+    return false;
+  }
+}
+
+/* ── Render a single dua slide ── */
+function _zbRender() {
+  const dua = _zbDuas[_zbSlide];
+  if (!dua) return;
+
+  const isLast = _zbSlide >= ZIKR_BOOK_TOTAL - 1;
+  const num = _zbSlide + 1;
+  const rem = ZIKR_BOOK_TOTAL - 1 - _zbSlide;
+  const numStr = num < 10 ? '0' + num : '' + num;
+
+  document.getElementById('zikrBookProgressPill').textContent = num + ' / ' + ZIKR_BOOK_TOTAL;
+  document.getElementById('zikrBookPageDisplay').textContent = 'Dua ' + num + ' / ' + ZIKR_BOOK_TOTAL;
+
+  const si = document.getElementById('zikrBookSessionInfo');
+  if (isLast) {
+    si.textContent = '✓ Last dua — Exit & Save to complete';
+    si.style.color = 'var(--green-bright)';
+  } else {
+    si.textContent = rem + ' dua' + (rem !== 1 ? 's' : '') + ' remaining';
+    si.style.color = 'var(--gold)';
+  }
+
+  const pb = document.getElementById('zikrBookPrevBtn');
+  pb.disabled = _zbSlide === 0;
+  pb.style.opacity = _zbSlide === 0 ? '0.3' : '1';
+
+  const nb = document.getElementById('zikrBookNextBtn');
+  nb.textContent = isLast ? '✓ Complete' : 'Next →';
+  nb.style.background  = isLast ? 'var(--green)'        : '#1a1500';
+  nb.style.borderColor = isLast ? 'var(--green-bright)' : '#c9a84c55';
+  nb.style.color       = isLast ? '#fff'                : '#c9a84c';
+
+  const sourceTag = dua.source
+    ? '<div style="font-size:0.72rem;color:#7a6a40;margin-top:10px;text-align:right;font-family:\'DM Mono\',monospace;">' + dua.source + '</div>'
+    : '';
+
+  document.getElementById('zikrBookContent').innerHTML =
+    '<div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;">' +
+      '<div style="font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;font-family:\'DM Mono\',monospace;">' + numStr + ' — Dua</div>' +
+      '<div style="font-family:\'Amiri\',serif;font-size:1.55rem;line-height:1.9;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">' + dua.arabic + '</div>' +
+      '<div style="font-style:italic;color:#a89060;font-size:0.85rem;margin-bottom:8px;line-height:1.55;font-family:\'DM Mono\',monospace;">' + (dua.transliteration || '') + '</div>' +
+      '<div style="height:1px;background:linear-gradient(to right,#2a2418,transparent);margin:10px 0;"></div>' +
+      '<div style="color:#c5b98a;font-size:0.92rem;line-height:1.75;font-family:\'Amiri\',serif;">' + (dua.translation || '') + '</div>' +
+      sourceTag +
+    '</div>';
+
+  document.getElementById('zikrBookContent').scrollTop = 0;
+}
+
+/* ── Open ── */
+async function openZikrBookReader() {
+  _zbDK = currentDateKey || todayKey();
+  document.getElementById('zikrBookReaderOverlay').classList.add('active');
+  document.getElementById('zikrBookDayPill').textContent = '123 Duas — Progress saved across days';
+  document.getElementById('zikrBookContent').innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:\'DM Mono\',monospace;">Loading duas.json…</div>';
+
+  const ok = await _zbLoadDuas();
+  if (!ok) return;
+
+  // Global resume from IDB
+  const savedIdx = await getPdfLastPage(ZIKR_BOOK_IDX_KEY);
+  _zbCompleted = false; // no yes/no completion — it's bonus scoring
+
+  // Resume from saved position (global, persists across days)
+  _zbSlide = (savedIdx !== null && savedIdx >= 0) ? Math.min(savedIdx, ZIKR_BOOK_TOTAL - 1) : 0;
+  _zbStartSlide = _zbSlide;
+
+  document.getElementById('zikrBookDoneNote').style.display = 'none';
+  _zbRender();
+  await _zbSaveProgress(false);
+}
+
+/* ── Nav ── */
+async function zikrBookNavNext() {
+  if (_zbSlide < ZIKR_BOOK_TOTAL - 1) {
+    _zbSlide++;
+    await setPdfLastPage(ZIKR_BOOK_IDX_KEY, _zbSlide);
+    await _zbSaveProgress(false);
+    _zbRender();
+  } else {
+    await _zbSaveProgress(true);
+    closeZikrBookReader();
+  }
+}
+
+async function zikrBookNavPrev() {
+  if (_zbSlide > 0) {
+    _zbSlide = Math.max(0, _zbSlide - 1);
+    _zbRender();
+  }
+}
+
+/* ── Save progress ── */
+async function _zbSaveProgress(reachedEnd) {
+  const duasRead = _zbSlide + 1; // 1-based count of how far we've gotten
+  const ratio = Math.min(duasRead / ZIKR_BOOK_TOTAL, 1);
+
+  const data = Object.assign({}, getCached(_zbDK));
+  if (!data['zikrBook_sessions']) data['zikrBook_sessions'] = [];
+
+  // Update/add session entry
+  const lastSess = data['zikrBook_sessions'];
+  const entry = { start: _zbStartSlide + 1, end: _zbSlide + 1, duas: _zbSlide - _zbStartSlide + 1 };
+  if (lastSess.length && lastSess[lastSess.length - 1].start === _zbStartSlide + 1) {
+    lastSess[lastSess.length - 1] = entry;
+  } else if (_zbSlide > _zbStartSlide || reachedEnd) {
+    lastSess.push(entry);
+  }
+
+  const totalDuasToday = lastSess.reduce((s, x) => s + x.duas, 0);
+  data['zikrBook_pagesToday'] = totalDuasToday;
+  data['zikrBook_bonusRatio'] = ratio;
+  data['zikrBook_readerPage'] = _zbSlide + 1;
+
+  _cache[_zbDK] = data;
+  await setStore(_zbDK, data);
+
+  // Auto-fill the duas counter
+  const inp = document.getElementById('zikrBookPages');
+  if (inp) inp.value = duasRead;
+
+  // If reached end, reset global position to start
+  if (reachedEnd) {
+    await setPdfLastPage(ZIKR_BOOK_IDX_KEY, 0);
+  }
+
+  refreshScores();
+  _zbRenderBadge();
+}
+
+/* ── Close ── */
+async function closeZikrBookReader() {
+  document.getElementById('zikrBookReaderOverlay').classList.remove('active');
+  if (!_zbDK) return;
+  await setPdfLastPage(ZIKR_BOOK_IDX_KEY, _zbSlide);
+  await _zbSaveProgress(false);
+}
+
+/* ── Badge ── */
+function _zbRenderBadge() {
+  const badge = document.getElementById('zikrBookReaderBadge');
+  if (!badge) return;
+  const data = getCached(_zbDK || todayKey());
+  const sessions = data['zikrBook_sessions'];
+  if (!sessions || sessions.length === 0) { badge.style.display = 'none'; return; }
+
+  const count = sessions.length;
+  const first = sessions[0];
+  const last = sessions[sessions.length - 1];
+  const totalDuas = sessions.reduce((s, x) => s + x.duas, 0);
+  const bonusRatio = parseFloat(data['zikrBook_bonusRatio']) || 0;
+  const pct = Math.round(bonusRatio * 100);
+  const globalPos = data['zikrBook_readerPage'] || last.end;
+
+  badge.style.display = 'block';
+  badge.innerHTML =
+    '<span style="color:var(--gold);">📖 Today: ' + count + ' session' + (count !== 1 ? 's' : '') + ' &nbsp;·&nbsp; ' + totalDuas + ' dua' + (totalDuas !== 1 ? 's' : '') + ' read (' + pct + '%)</span>' +
+    '<br><span style="font-size:9px;color:var(--text-muted);">Total: Dua ' + first.start + '–' + last.end + ' (' + totalDuas + ' duas today)</span>' +
+    '<br><span style="font-size:9px;color:var(--text-muted);">Last: Duas ' + last.start + '–' + last.end + ' (' + last.duas + ' dua' + (last.duas !== 1 ? 's' : '') + ') · Global dua ' + globalPos + '/' + ZIKR_BOOK_TOTAL + '</span>';
+}
+
+/* ── Keyboard nav ── */
+document.addEventListener('keydown', function(e) {
+  const zb = document.getElementById('zikrBookReaderOverlay');
+  if (!zb || !zb.classList.contains('active')) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); zikrBookNavNext(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); zikrBookNavPrev(); }
+});
+
+/* ── Patch loadDayData to show badge on daily view ── */
+const _origLDDZikrBook = loadDayData;
+loadDayData = function(dk) {
+  _origLDDZikrBook(dk);
+  _zbDK = dk;
+  _zbRenderBadge();
+};
 </script>
 
 </body>

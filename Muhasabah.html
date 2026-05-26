@@ -5773,7 +5773,7 @@ async function pwSend() {
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${_pwApiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${_pwApiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

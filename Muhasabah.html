@@ -78,7 +78,7 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 .import-btn:hover{background:#1a102a;border-color:var(--purple-bright);}
 
 /* ── Modal ── */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:999;align-items:center;justify-content:center;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:999;align-items:center;justify-content:center;overscroll-behavior:contain;}
 .modal-overlay.active{display:flex;}
 .modal{background:var(--surface);border:1px solid var(--red);border-radius:10px;padding:32px;max-width:380px;width:90%;text-align:center;}
 .modal h3{font-family:'Instrument Serif',serif;font-size:22px;color:#c05050;margin-bottom:10px;}
@@ -326,6 +326,9 @@ canvas#qrCanvas{
   0%,100%{box-shadow:0 0 6px rgba(154,106,191,.3);text-shadow:0 0 8px rgba(154,106,191,.4);}
   50%{box-shadow:0 0 16px rgba(154,106,191,.7),0 0 28px rgba(154,106,191,.25);text-shadow:0 0 16px rgba(154,106,191,.9),0 0 28px rgba(154,106,191,.3);}
 }
+
+/* ── Body scroll lock when any overlay is active ── */
+body.overlay-open{overflow:hidden;}
 </style>
 </head>
 <body>
@@ -339,7 +342,7 @@ canvas#qrCanvas{
     <div class="contact-inner">
       <span class="contact-pulse"></span>
       <div class="contact-text">
-        <span class="contact-line1">❓ Question? &nbsp;<a class="contact-num" href="https://wa.me/8801829624608">WhatsApp 01829624608</a></span>
+        <span class="contact-line1">🤲 Support &nbsp;<a class="contact-num" href="https://wa.me/8801829624608">WhatsApp 01829624608</a></span>
         <span class="contact-sep">·</span>
         <span class="contact-line2">❤️ Support Development &nbsp;<span class="contact-num">bKash / Nagad 01829624608</span></span>
       </div>
@@ -387,7 +390,7 @@ canvas#qrCanvas{
 <div class="modal-overlay" id="supportModal">
   <div class="modal support-modal">
     <h3>❤️ Enjoying Muhasabah?</h3>
-    <p>This tracker is free and always will be. If it's helping your daily practice, consider supporting its development.</p>
+    <p>This tracker is free and always will be InShaAllah. If it's helping your daily practice, consider supporting its development.</p>
     <div class="support-bkash">
       <div class="num">01829624608</div>
       <div class="lbl" style="color:var(--text-dim);">bKash &nbsp;·&nbsp; Nagad</div>
@@ -536,8 +539,8 @@ canvas#qrCanvas{
         <input type="number" id="zikrCount" min="0" placeholder="0" oninput="saveAndRefresh()">
         <span class="of-label">Zikr &nbsp;/&nbsp; 1500 Goal</span>
       </div>
-      <div class="sub-label">Every Extra 1500 = +2.5% Bonus</div>
-      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('zikr')">📿 Open Zikr</button>
+      <div class="sub-label">Goal: 1500 Zikr = Full 5% Core &nbsp;·&nbsp; Every Extra 1500 Zikr = +2.5% Bonus</div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('zikr')">📿 Open Zikr Reader</button>
     </div>
 
     <!-- Hadith 5% -->
@@ -550,7 +553,7 @@ canvas#qrCanvas{
         <input type="number" id="hadithManual" min="0" placeholder="0" oninput="saveAndRefresh()">
         <span class="of-label">Hadith &nbsp;/&nbsp; 5 Goal</span>
       </div>
-      <div class="sub-label">Every Extra 5 = +2.5% Bonus</div>
+      <div class="sub-label">Goal: 5 Hadiths = Full 5% Core &nbsp;·&nbsp; Every Extra 5 Hadiths = +2.5% Bonus</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openHadithReader()">📚 Open Hadith Reader</button>
       <div class="qr-session-badge" id="hadithSessionBadge" style="display:none;"></div>
     </div>
@@ -563,9 +566,9 @@ canvas#qrCanvas{
       </div>
       <div class="num-row">
         <input type="number" id="tafsirManual" min="0" placeholder="0" oninput="saveAndRefresh()">
-        <span class="of-label">Verses &nbsp;/&nbsp; 17 Goal</span>
+        <span class="of-label">Verse &nbsp;/&nbsp; 17 Goal</span>
       </div>
-      <div class="sub-label">Every Extra 17 = +2.5% Bonus</div>
+      <div class="sub-label">Goal: 17 Verses = Full 5% Core &nbsp;·&nbsp; Every Extra 17 Verses = +2.5% Bonus</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openTafsirReader()">🔍 Open Quran Meaning Reader</button>
       <div class="qr-session-badge" id="tafsirSessionBadge" style="display:none;"></div>
     </div>
@@ -580,7 +583,7 @@ canvas#qrCanvas{
         <button class="yn-btn yes" data-key="asmaul" data-val="yes" onclick="setYN('asmaul','yes')">Yes</button>
         <button class="yn-btn no"  data-key="asmaul" data-val="no"  onclick="setYN('asmaul','no')">No</button>
       </div>
-      <div class="sub-label">Goal: Read All Names of Allah SWT in 33 Pages = Full 5% Core</div>
+      <div class="sub-label">Goal: Read All Names Of Allah SWT In 33 Pages = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openAsmaulReader()">🌿 Open Asmaul Husna Reader</button>
       <div class="qr-session-badge" id="asmaulSessionBadge" style="display:none;"></div>
     </div>
@@ -588,7 +591,7 @@ canvas#qrCanvas{
     <!-- Zikr Morning 5% -->
     <div class="goal-card" id="card-zikrMorning">
       <div class="goal-top">
-        <div class="goal-name">☀️ Zikr Morning <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-name">☀️ Morning Zikr <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-zikrMorning">0%</div>
       </div>
       <div class="yn-group">
@@ -596,14 +599,14 @@ canvas#qrCanvas{
         <button class="yn-btn no"  data-key="zikrMorning" data-val="no"  onclick="setYN('zikrMorning','no')">No</button>
       </div>
       <div class="sub-label">Goal: Read All 77 Duas = Full 5% Core</div>
-      <button class="qr-open-btn" style="margin-top:8px;" onclick="openZikrReader('morning')">☀️ Open Morning Zikr Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openZikrReader('morning')">☀️ Open Zikr Morning Reader</button>
       <div class="qr-session-badge" id="zikrMorningSessionBadge" style="display:none;"></div>
     </div>
 
     <!-- Zikr Evening 5% -->
     <div class="goal-card" id="card-zikrEvening">
       <div class="goal-top">
-        <div class="goal-name">🌆 Zikr Evening <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-name">🌆 Evening Zikr <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-zikrEvening">0%</div>
       </div>
       <div class="yn-group">
@@ -611,7 +614,7 @@ canvas#qrCanvas{
         <button class="yn-btn no"  data-key="zikrEvening" data-val="no"  onclick="setYN('zikrEvening','no')">No</button>
       </div>
       <div class="sub-label">Goal: Read All 77 Duas = Full 5% Core</div>
-      <button class="qr-open-btn" style="margin-top:8px;" onclick="openZikrReader('evening')">🌆 Open Evening Zikr Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openZikrReader('evening')">🌆 Open Zikr Evening Reader</button>
       <div class="qr-session-badge" id="zikrEveningSessionBadge" style="display:none;"></div>
     </div>
 
@@ -626,7 +629,7 @@ canvas#qrCanvas{
         <button class="yn-btn no"  data-key="surahWaqiah" data-val="no"  onclick="setYN('surahWaqiah','no')">No</button>
       </div>
       <div class="sub-label">Goal: Read Full Surah = Full 5% Core</div>
-      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahWaqiah')">📜 Open Surah Al-Waqiah (Verse Reader)</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahWaqiah')">📜 Open Surah Al-Waqiah Reader</button>
       <div class="qr-session-badge" id="surahWaqiahSessionBadge" style="display:none;"></div>
     </div>
 
@@ -641,7 +644,7 @@ canvas#qrCanvas{
         <button class="yn-btn no"  data-key="surahMulk" data-val="no"  onclick="setYN('surahMulk','no')">No</button>
       </div>
       <div class="sub-label">Goal: Read Full Surah = Full 5% Core</div>
-      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahMulk')">📜 Open Surah Al-Mulk (Verse Reader)</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahMulk')">📜 Open Surah Al-Mulk Reader</button>
       <div class="qr-session-badge" id="surahMulkSessionBadge" style="display:none;"></div>
     </div>
 
@@ -692,7 +695,7 @@ canvas#qrCanvas{
         <input type="number" id="naflRakat" min="0" placeholder="0" oninput="saveAndRefresh()">
         <span class="of-label">Rakat &nbsp;/&nbsp; 50 Max</span>
       </div>
-      <div class="sub-label">+0.2% Per Rakat &nbsp;·&nbsp; Max +10% At 50 Rakat</div>
+      <div class="sub-label">Max +10% At 50 Rakat &nbsp;·&nbsp; +0.2% Per Rakat</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('naflSalah')">✨ Nafl Salah</button>
     </div>
 
@@ -741,6 +744,7 @@ canvas#qrCanvas{
         <button class="yn-btn yes" data-key="exercise" data-val="yes" onclick="setYN('exercise','yes')">Yes</button>
         <button class="yn-btn no"  data-key="exercise" data-val="no"  onclick="setYN('exercise','no')">No</button>
       </div>
+      <div class="sub-label">Goal: 30 Minutes Of Exercise = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('exercise')">🏃 Exercise</button>
     </div>
 
@@ -1425,22 +1429,22 @@ async function pdfReaderRenderPage(pageNum){
 
     const sessionEl = document.getElementById('pdfReaderSessionInfo');
     if(cfg.autoCompleteOnClose){
-      sessionEl.textContent = `Page ${pageNum} of ${pdfReaderLastPage} — Exit & Save to mark complete`;
+      sessionEl.textContent = `Page ${pageNum} Of ${pdfReaderLastPage} — Exit & Save To Mark Complete`;
       sessionEl.style.color = 'var(--gold)';
     } else if(cfg.globalResume){
-      sessionEl.textContent = `Page ${pageNum} of ${pdfReaderLastPage} — progress saved across days`;
+      sessionEl.textContent = `Page ${pageNum} Of ${pdfReaderLastPage}`;
       sessionEl.style.color = 'var(--gold)';
     } else if(cfg.goalKey){
       if(pageNum >= pdfReaderLastPage){
-        sessionEl.textContent = '✓ Last page reached — Exit & Save to complete goal';
+        sessionEl.textContent = '✓ Last Page Reached — Exit & Save To Complete Goal';
         sessionEl.style.color = 'var(--green-bright)';
       } else {
         const rem = pdfReaderLastPage - pageNum;
-        sessionEl.textContent = `${rem} page${rem !== 1 ? 's' : ''} remaining`;
+        sessionEl.textContent = `${rem} Page${rem !== 1 ? 's' : ''} Remaining`;
         sessionEl.style.color = 'var(--gold)';
       }
     } else {
-      sessionEl.textContent = `Reference — Page ${pageNum} of ${pdfReaderLastPage}`;
+      sessionEl.textContent = `Reference — Page ${pageNum} Of ${pdfReaderLastPage}`;
       sessionEl.style.color = 'var(--text-muted)';
     }
 
@@ -2228,16 +2232,45 @@ async function confirmReset(){
 /* ── File System Access API (Chrome/Edge desktop only) ── */
 let _fsFileHandle=null; // remembered handle for the session
 
+let _fsFirstTimeShown = false;
 async function getExportHandle(){
   // Already have a handle for this session — reuse it
   if(_fsFileHandle) return _fsFileHandle;
   // FSA supported?
   if(window.showSaveFilePicker){
+    // Show first-time note before asking for path
+    if(!_fsFirstTimeShown && !localStorage.getItem('mhsb_save_path_set')){
+      _fsFirstTimeShown = true;
+      await new Promise(resolve => {
+        var overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;';
+        overlay.innerHTML =
+          '<div style="background:var(--surface);border:1px solid var(--gold-dim);border-radius:10px;padding:28px;max-width:420px;width:90%;color:var(--text);">' +
+          '<h3 style="font-family:\'Instrument Serif\',serif;font-size:18px;color:var(--gold);margin-bottom:12px;">&#x1F4BE; Choose Your Backup Location</h3>' +
+          '<p style="font-size:12px;color:var(--text-dim);line-height:1.75;margin-bottom:16px;">' +
+          'You\'re setting your save location for the first time. After this, pressing <strong style="color:var(--text);">Save Day</strong> will automatically overwrite the same file \u2014 no prompt needed.' +
+          '</p>' +
+          '<p style="font-size:12px;color:var(--text-dim);line-height:1.75;margin-bottom:16px;">' +
+          'The saved file will be named <strong style="color:var(--gold);font-family:\'DM Mono\',monospace;">Muhasabah.json</strong>. ' +
+          'You can restore your data anytime by importing it using the Import button. ' +
+          'You can also export a copy at any time using the Export button.' +
+          '</p>' +
+          '<button id="_fsNoticeBtn" style="width:100%;padding:11px;background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid var(--gold);color:var(--gold);border-radius:6px;cursor:pointer;font-family:\'DM Mono\',monospace;font-size:12px;letter-spacing:1px;">Choose Save Location</button>' +
+          '</div>';
+        document.body.appendChild(overlay);
+        overlay.querySelector('#_fsNoticeBtn').onclick = function(){
+          document.body.removeChild(overlay);
+          resolve();
+        };
+      });
+    }
     try{
       const handle=await window.showSaveFilePicker({
         suggestedName:'Muhasabah.json',
         types:[{description:'JSON Backup',accept:{'application/json':['.json']}}]
       });
+      localStorage.setItem('mhsb_save_path_set','1');
+      _fsFirstTimeShown = true;
       _fsFileHandle=handle;
       return handle;
     }catch(e){
@@ -2306,8 +2339,16 @@ function closeSupportModal(){document.getElementById('supportModal').classList.r
 
 function supportDonate(){
   localStorage.setItem('mhsb_support','done');
-  closeSupportModal();
-  window.open('https://bKash.com','_blank');
+  // Show thank you instead of navigating away
+  var modal = document.getElementById('supportModal');
+  var inner = modal ? modal.querySelector('.modal') : null;
+  if(inner){
+    inner.innerHTML =
+      '<h3 style="color:var(--green-bright);">&#x2665;&#xFE0F; JazakAllahu Khairan!</h3>' +
+      '<p style="color:var(--text-dim);font-size:12px;line-height:1.8;margin-bottom:8px;">May Allah accept your intention and reward you immeasurably.</p>' +
+      '<p style="color:var(--text-dim);font-size:12px;line-height:1.8;margin-bottom:20px;">You can send to <span style="color:var(--gold);font-family:\'DM Mono\',monospace;">01829624608</span> via bKash or Nagad whenever you are ready.</p>' +
+      '<button class="modal-cancel" onclick="closeSupportModal()" style="width:100%;margin-top:4px;">Close</button>';
+  }
 }
 
 function supportLater(){
@@ -3012,6 +3053,16 @@ loadDayData = function(dk){
   renderTafsirBadge(dk);
   renderBookBadge(dk);
 };
+
+/* ── Scroll lock: prevent background scroll when any overlay is open ── */
+(function(){
+  function updateBodyLock(){
+    var anyActive = document.querySelector('.modal-overlay.active, .quran-reader-overlay.active');
+    document.body.classList.toggle('overlay-open', !!anyActive);
+  }
+  var mo = new MutationObserver(updateBodyLock);
+  mo.observe(document.body, {subtree:true, attributes:true, attributeFilter:['class']});
+})();
 </script>
 
 <script>
@@ -3209,12 +3260,27 @@ function renderBookBadge(dk) {
   const badge = document.getElementById('bookSessionBadge');
   if (!badge) return;
   const data = getCached(dk);
+  const sessions = data['book_sessions'] || [];
+  const ratio = parseFloat(data['book_ratio']) || 0;
+  const lesson = data['book_lesson'];
+  const pct = Math.round(ratio * 100);
   if (data.books === 'yes') {
     badge.style.display = 'block';
-    badge.innerHTML = '<span style="color:var(--green-bright);">📗 Book Completed — Goal Achieved \u2713</span>';
-  } else if (data['book_lesson'] !== undefined && data['book_lesson'] >= 0) {
+    if(sessions.length > 0){
+      const count = sessions.length;
+      const first = sessions[0];
+      const last  = sessions[sessions.length-1];
+      const totalPages = sessions.reduce((s,x)=>s+(x.pages||x.duas||1),0);
+      badge.innerHTML =
+        '<span style="color:var(--green-bright);">📗 Today: '+count+' Session'+(count!==1?'s':'')+' · Completed ✓</span>'+
+        '<br><span style="font-size:9px;color:var(--text-muted);">Total: Pages '+(first.start||1)+'–'+(last.end||lesson+1)+' ('+totalPages+' Pages Today)</span>'+
+        '<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages '+(last.start||1)+'–'+(last.end||lesson+1)+' ('+(last.pages||last.duas||1)+' Pages)</span>';
+    } else {
+      badge.innerHTML = '<span style="color:var(--green-bright);">📗 Book Completed — Goal Achieved ✓</span>';
+    }
+  } else if (lesson !== undefined && lesson >= 0) {
     badge.style.display = 'block';
-    badge.innerHTML = '<span style="color:var(--gold);">📗 Lesson ' + (data['book_lesson']+1) + ' read — in progress</span>';
+    badge.innerHTML = '<span style="color:var(--gold);">📗 Lesson ' + (lesson+1) + ' Read — In Progress ('+pct+'%)</span>';
   } else {
     badge.style.display = 'none';
   }
@@ -3319,9 +3385,9 @@ function renderBookBadge(dk) {
       <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:20px;">
         <div id="tafsirArabic" style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;"></div>
       </div>
-      <div id="tafsirTranslitWrap" style="background:#141008;border:1px solid #2a2010;border-top:2px solid #7a6a40;border-radius:8px;padding:14px 24px;margin-bottom:16px;">
-        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#7a6a40;margin-bottom:8px;font-family:'DM Mono',monospace;">Pronunciation</div>
-        <div id="tafsirTranslit" style="color:#a89060;font-size:0.95rem;line-height:1.85;font-family:'Amiri',serif;font-style:italic;"></div>
+      <div id="tafsirTranslitWrap" style="margin-bottom:16px;">
+        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#7a6a40;margin-bottom:6px;font-family:'DM Mono',monospace;">Pronunciation</div>
+        <div id="tafsirTranslit" style="color:#a89060;font-size:0.95rem;line-height:1.85;font-family:'Amiri',serif;font-style:italic;background:#141008;border:1px solid #2a2010;border-top:2px solid #7a6a40;border-radius:8px;padding:14px 24px;"></div>
       </div>
       <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;font-family:'DM Mono',monospace;">Meaning — Saheeh International</div>
       <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:22px 24px;">
@@ -3353,9 +3419,9 @@ function renderBookBadge(dk) {
       <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:20px;">
         <div id="svArabic" style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;"></div>
       </div>
-      <div id="svTranslitWrap" style="background:#141008;border:1px solid #2a2010;border-top:2px solid #7a6a40;border-radius:8px;padding:14px 24px;margin-bottom:16px;">
-        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#7a6a40;margin-bottom:8px;font-family:'DM Mono',monospace;">Pronunciation</div>
-        <div id="svTranslit" style="color:#a89060;font-size:0.95rem;line-height:1.85;font-family:'Amiri',serif;font-style:italic;"></div>
+      <div id="svTranslitWrap" style="margin-bottom:16px;">
+        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#7a6a40;margin-bottom:6px;font-family:'DM Mono',monospace;">Pronunciation</div>
+        <div id="svTranslit" style="color:#a89060;font-size:0.95rem;line-height:1.85;font-family:'Amiri',serif;font-style:italic;background:#141008;border:1px solid #2a2010;border-top:2px solid #7a6a40;border-radius:8px;padding:14px 24px;"></div>
       </div>
       <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;font-family:'DM Mono',monospace;">Meaning — Saheeh International</div>
       <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:22px 24px;">
@@ -3995,11 +4061,11 @@ document.addEventListener('keydown', function(e){
           <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#a89060;margin-bottom:8px;">Height</div>
           <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:8px;">
-              <input type="number" id="bmi-feet" min="1" max="8" placeholder="5" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:64px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
+              <input type="number" id="bmi-feet" min="0" max="8" placeholder="0" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:64px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
               <span style="font-size:0.78rem;color:#6a5a30;letter-spacing:0.06em;">ft</span>
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
-              <input type="number" id="bmi-inches" min="0" max="11" placeholder="9" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:64px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
+              <input type="number" id="bmi-inches" min="0" max="11" placeholder="0" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:64px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
               <span style="font-size:0.78rem;color:#6a5a30;letter-spacing:0.06em;">in</span>
             </div>
           </div>
@@ -4008,7 +4074,7 @@ document.addEventListener('keydown', function(e){
         <div style="margin-bottom:22px;">
           <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#a89060;margin-bottom:8px;">Weight</div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <input type="number" id="bmi-kg" min="20" max="300" placeholder="75" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:80px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
+            <input type="number" id="bmi-kg" min="0" max="300" placeholder="0" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:80px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
             <span style="font-size:0.78rem;color:#6a5a30;letter-spacing:0.06em;">kg</span>
           </div>
         </div>
@@ -4381,7 +4447,7 @@ function _asmaulRenderSlide(){
 async function openAsmaulReader(){
   _asmaulDK = currentDateKey || todayKey();
   document.getElementById("asmaulReaderOverlay").classList.add("active");
-  document.getElementById("asmaulDayPill").textContent = "99 Names of Allah SWT — Progress resets each day";
+  document.getElementById("asmaulDayPill").textContent = "99 Names Of Allah SWT";
 
   _asmaulCompleted = getCached(_asmaulDK).asmaul === "yes";
   document.getElementById("asmaulDoneNote").style.display = _asmaulCompleted ? "block" : "none";
@@ -4728,7 +4794,7 @@ async function openZikrReader(mode){
   _zikrMode=mode;_zikrDK=currentDateKey||todayKey();
   var title=mode==="morning"?"Morning Zikr - اللهم اني اصبحت":"Evening Zikr - اللهم اني امسيت";
   document.getElementById("zikrReaderTitle").textContent=title;
-  document.getElementById("zikrReaderDayPill").textContent="77 Duas - Progress resets each day";
+  document.getElementById("zikrReaderDayPill").textContent="77 Duas";
   document.getElementById("zikrReaderOverlay").classList.add("active");
   _zikrDone=getCached(_zikrDK)[_zikrGoalKey()]==="yes";
   document.getElementById("zikrReaderDoneNote").style.display=_zikrDone?"block":"none";
@@ -4926,7 +4992,7 @@ function _zbRender() {
 async function openZikrBookReader() {
   _zbDK = currentDateKey || todayKey();
   document.getElementById('zikrBookReaderOverlay').classList.add('active');
-  document.getElementById('zikrBookDayPill').textContent = '123 Duas — Progress saved across days';
+  document.getElementById('zikrBookDayPill').textContent = '123 Duas';
   document.getElementById('zikrBookContent').innerHTML =
     '<div style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:\'DM Mono\',monospace;">Loading Zikr From Book.json…</div>';
 

@@ -5237,87 +5237,217 @@ loadDayData = function(dk) {
 </script>
 
 <!-- ── AI Post Writer Modal ── -->
-<div id="postWriterOverlay" class="modal-overlay" style="z-index:1100;" onclick="if(event.target===this)closePostWriter()">
-  <div style="
-    background:var(--surface);border:1px solid var(--green);border-radius:12px;
-    width:min(680px,95vw);height:min(720px,90vh);
-    display:flex;flex-direction:column;overflow:hidden;position:relative;
-  ">
+<div id="postWriterOverlay" class="modal-overlay" style="z-index:1100;padding:16px;align-items:flex-start;overflow-y:auto;" onclick="if(event.target===this)closePostWriter()">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;min-height:560px;">
+
     <!-- Header -->
-    <div style="
-      padding:16px 20px;border-bottom:1px solid var(--border);
-      display:flex;align-items:center;justify-content:space-between;
-      background:linear-gradient(135deg,#0d1a0f,#141714);flex-shrink:0;
-    ">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;gap:12px;flex-wrap:wrap;">
       <div>
-        <div style="font-family:'Instrument Serif',serif;font-size:18px;color:var(--green-bright);">✦ AI Post Writer</div>
-        <div style="font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px;">Powered by Google Gemini</div>
+        <div style="font-family:'Amiri',serif;font-size:19px;color:#c9a84c;">✦ AI Post Writer</div>
+        <div style="font-size:9px;color:#5a4a28;letter-spacing:2.5px;text-transform:uppercase;margin-top:3px;">Powered by Google Gemini</div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <div id="pwApiKeySection" style="display:flex;gap:6px;align-items:center;">
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        <div id="pwApiKeySection" style="display:flex;gap:5px;align-items:center;">
           <input id="pwApiKeyInput" type="password" placeholder="Paste Gemini API Key…" style="
-            background:var(--surface2);border:1px solid var(--border);color:var(--text);
-            padding:6px 10px;border-radius:var(--radius);font-family:'DM Mono',monospace;
-            font-size:10px;width:190px;outline:none;letter-spacing:.5px;
-          " oninput="pwCheckKey()">
+            background:#1a1610;border:1px solid #2a2010;color:#e8dfc8;
+            padding:6px 10px;border-radius:6px;font-family:'DM Mono',monospace;
+            font-size:10px;width:180px;outline:none;letter-spacing:.5px;
+          " oninput="pwCheckKey()"
+            onfocus="this.style.borderColor='#c9a84c'"
+            onblur="this.style.borderColor='#2a2010'">
           <button onclick="pwSaveKey()" style="
-            background:var(--surface2);border:1px solid var(--green);color:var(--green-bright);
-            padding:6px 10px;border-radius:var(--radius);cursor:pointer;
-            font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;
-          ">Save</button>
+            background:#1a1610;border:1px solid #3a2e18;color:#8a7840;
+            padding:6px 11px;border-radius:6px;cursor:pointer;
+            font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;transition:all .2s;
+          " onmouseover="this.style.borderColor='#c9a84c';this.style.color='#c9a84c'"
+             onmouseout="this.style.borderColor='#3a2e18';this.style.color='#8a7840'">Save</button>
+          <button onclick="openGetKeyModal()" style="
+            background:linear-gradient(135deg,#1a1500,#241c08);border:1px solid #c9a84c;color:#c9a84c;
+            padding:6px 11px;border-radius:6px;cursor:pointer;
+            font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;transition:all .2s;white-space:nowrap;
+          " onmouseover="this.style.background='linear-gradient(135deg,#2a2000,#342c10)'"
+             onmouseout="this.style.background='linear-gradient(135deg,#1a1500,#241c08)'">Get Key</button>
         </div>
         <button onclick="closePostWriter()" style="
-          background:transparent;border:1px solid var(--border);color:var(--text-dim);
-          width:28px;height:28px;border-radius:4px;cursor:pointer;font-size:14px;
-          display:flex;align-items:center;justify-content:center;
-        ">✕</button>
+          background:#1a1610;border:1px solid #2a2010;color:#7a6a40;
+          width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:13px;
+          display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;
+        " onmouseover="this.style.borderColor='#c9a84c';this.style.color='#c9a84c'"
+           onmouseout="this.style.borderColor='#2a2010';this.style.color='#7a6a40'">✕</button>
       </div>
     </div>
 
+    <!-- Divider ornament -->
+    <div style="display:flex;align-items:center;gap:14px;padding:0 20px;background:#0d0b08;flex-shrink:0;">
+      <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c33,transparent);"></div>
+      <span style="color:#3a2e18;font-size:10px;padding:6px 0;">✦</span>
+      <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c33,transparent);"></div>
+    </div>
+
     <!-- Platform tabs -->
-    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface2);">
+    <div style="display:flex;border-bottom:1px solid #2a2010;flex-shrink:0;background:#0f0d0a;">
       <button id="pwTabLI" onclick="pwSetTab('linkedin')" style="
-        flex:1;padding:9px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;
-        border:none;cursor:pointer;transition:all .2s;border-bottom:2px solid var(--green-bright);
-        background:var(--surface);color:var(--green-bright);
+        flex:1;padding:9px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+        border:none;border-bottom:2px solid #c9a84c;cursor:pointer;transition:all .2s;
+        background:#141008;color:#c9a84c;
       ">LinkedIn</button>
       <button id="pwTabFB" onclick="pwSetTab('facebook')" style="
-        flex:1;padding:9px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;
-        border:none;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;
-        background:var(--surface2);color:var(--text-dim);
+        flex:1;padding:9px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+        border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;
+        background:#0f0d0a;color:#5a4a28;
       ">Facebook</button>
     </div>
 
     <!-- Chat area -->
     <div id="pwChat" style="
-      flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;
-      scroll-behavior:smooth;
+      flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:14px;
+      scroll-behavior:smooth;background:#0d0b08;min-height:300px;
     "></div>
 
     <!-- Input -->
     <div style="
-      padding:12px 16px;border-top:1px solid var(--border);
+      padding:14px 20px;border-top:1px solid #2a2010;
       display:flex;gap:8px;align-items:flex-end;flex-shrink:0;
-      background:var(--surface);
+      background:#141008;
     ">
       <textarea id="pwInput" placeholder="Describe your post idea, topic, or paste a draft…"
         rows="2" style="
-          flex:1;background:var(--surface2);border:1px solid var(--border);
-          color:var(--text);padding:10px 12px;border-radius:var(--radius);
+          flex:1;background:#1a1610;border:1px solid #2a2010;
+          color:#e8dfc8;padding:10px 13px;border-radius:6px;
           font-family:'Literata',Georgia,serif;font-size:13px;resize:none;outline:none;
-          line-height:1.5;transition:border-color .2s;
+          line-height:1.6;transition:border-color .2s;
         "
-        onfocus="this.style.borderColor='var(--green)'"
-        onblur="this.style.borderColor='var(--border)'"
+        onfocus="this.style.borderColor='#c9a84c'"
+        onblur="this.style.borderColor='#2a2010'"
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();pwSend()}"
       ></textarea>
       <button onclick="pwSend()" id="pwSendBtn" style="
-        background:linear-gradient(135deg,#1a3a1a,#253a18);
-        border:1px solid var(--green);color:var(--green-bright);
-        padding:10px 16px;border-radius:var(--radius);cursor:pointer;
+        background:linear-gradient(135deg,#1a1500,#2a2000);
+        border:1px solid #c9a84c;color:#c9a84c;
+        padding:10px 18px;border-radius:6px;cursor:pointer;
         font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;
         transition:all .2s;white-space:nowrap;
-      ">Send ↵</button>
+      " onmouseover="this.style.background='linear-gradient(135deg,#2a2000,#3a3000)'"
+         onmouseout="this.style.background='linear-gradient(135deg,#1a1500,#2a2000)'">Send ↵</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Get Key Modal ── -->
+<div id="getKeyOverlay" class="modal-overlay" style="z-index:1200;padding:16px;align-items:flex-start;overflow-y:auto;" onclick="if(event.target===this)closeGetKeyModal()">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:600px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
+      <div>
+        <div style="font-family:'Amiri',serif;font-size:19px;color:#c9a84c;">How to Get Your Gemini API Key</div>
+        <div style="font-size:9px;color:#5a4a28;letter-spacing:2.5px;text-transform:uppercase;margin-top:3px;">Free · 2 minutes · No credit card</div>
+      </div>
+      <button onclick="closeGetKeyModal()" style="
+        background:#1a1610;border:1px solid #2a2010;color:#7a6a40;
+        width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:13px;
+        display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;margin-left:12px;
+      " onmouseover="this.style.borderColor='#c9a84c';this.style.color='#c9a84c'"
+         onmouseout="this.style.borderColor='#2a2010';this.style.color='#7a6a40'">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:28px 26px;color:#e8dfc8;font-family:'Amiri',serif;display:flex;flex-direction:column;gap:0;">
+
+      <!-- Intro -->
+      <p style="line-height:1.85;font-size:1rem;color:#d4c9ae;margin-bottom:1.4em;">The AI Post Writer runs on <strong style="color:#f0e4c0;">Google Gemini</strong> — Google's AI model. The free tier is generous enough for daily use. You'll need a Google account.</p>
+
+      <!-- Gold divider -->
+      <div style="display:flex;align-items:center;gap:14px;margin:4px 0 24px;">
+        <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div>
+        <span style="color:#c9a84c;font-size:12px;">✦</span>
+        <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div>
+      </div>
+
+      <!-- Section label -->
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:18px;">Four Steps</div>
+
+      <!-- Step 1 -->
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:18px 20px;margin-bottom:14px;">
+        <div style="font-size:0.7rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;letter-spacing:.5px;">Step 1</div>
+        <div style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:10px;">Go to Google AI Studio</div>
+        <div style="font-size:0.95rem;color:#b0a07a;line-height:1.7;margin-bottom:12px;">Open your browser and navigate to the official Google AI Studio API key page:</div>
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="
+          display:inline-flex;align-items:center;gap:6px;
+          background:#1a1610;border:1px solid #3a2e18;
+          color:#c9a84c;padding:7px 14px;border-radius:6px;
+          font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;
+          text-decoration:none;transition:all .2s;
+        " onmouseover="this.style.borderColor='#c9a84c';this.style.background='#241c08'"
+           onmouseout="this.style.borderColor='#3a2e18';this.style.background='#1a1610'">
+          ↗ aistudio.google.com/app/apikey
+        </a>
+      </div>
+
+      <!-- Step 2 -->
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:18px 20px;margin-bottom:14px;">
+        <div style="font-size:0.7rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;letter-spacing:.5px;">Step 2</div>
+        <div style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:10px;">Sign In With Google</div>
+        <div style="font-size:0.95rem;color:#b0a07a;line-height:1.7;">If prompted, sign in with any Google account — Gmail works fine. No special permissions or billing setup required.</div>
+      </div>
+
+      <!-- Step 3 -->
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:18px 20px;margin-bottom:14px;">
+        <div style="font-size:0.7rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;letter-spacing:.5px;">Step 3</div>
+        <div style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:10px;">Click "Create API Key"</div>
+        <div style="font-size:0.95rem;color:#b0a07a;line-height:1.7;">You'll see a blue button labeled <span style="font-family:'DM Mono',monospace;color:#e8dfc8;font-size:0.85rem;">+ Create API key</span>. Click it. A key is generated instantly — no project setup needed.</div>
+      </div>
+
+      <!-- Step 4 -->
+      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:18px 20px;margin-bottom:24px;">
+        <div style="font-size:0.7rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;letter-spacing:.5px;">Step 4</div>
+        <div style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:10px;">Copy & Paste Here</div>
+        <div style="font-size:0.95rem;color:#b0a07a;line-height:1.7;">Copy the key (it starts with <span style="font-family:'DM Mono',monospace;color:#e8dfc8;font-size:0.85rem;">AIza…</span>). Come back here, paste it into the API Key field above, and hit <strong style="color:#e8dfc8;">Save</strong>. Stored only in your browser — never sent anywhere except Google.</div>
+      </div>
+
+      <!-- Gold divider -->
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+        <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div>
+        <span style="color:#c9a84c;font-size:12px;">✦</span>
+        <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div>
+      </div>
+
+      <!-- Free tier info box -->
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 22px;margin-bottom:20px;">
+        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;">Free Tier Limits</div>
+        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.8;">
+          · <strong style="color:#e8dfc8;">15 requests / minute</strong> — more than enough for writing posts<br>
+          · <strong style="color:#e8dfc8;">1,500 requests / day</strong> — free, no credit card required<br>
+          · Uses <strong style="color:#e8dfc8;">Gemini 1.5 Flash</strong> — fast and optimized for writing
+        </div>
+      </div>
+
+      <!-- Privacy note -->
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 22px;margin-bottom:28px;">
+        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.8;">
+          <strong style="color:#c9a84c;">Your key stays private.</strong> It is stored only in your browser's local storage. This app never transmits it to any server other than Google's API endpoint.
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="
+        display:block;text-align:center;
+        background:linear-gradient(135deg,#1a1500,#2a2000);
+        border:1px solid #c9a84c;color:#c9a84c;
+        padding:13px 20px;border-radius:6px;
+        font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;
+        text-decoration:none;text-transform:uppercase;
+        transition:all .2s;
+        box-shadow:0 0 16px rgba(201,168,76,.08);
+      " onmouseover="this.style.background='linear-gradient(135deg,#2a2000,#3a3000)';this.style.boxShadow='0 0 24px rgba(201,168,76,.2)'"
+         onmouseout="this.style.background='linear-gradient(135deg,#1a1500,#2a2000)';this.style.boxShadow='0 0 16px rgba(201,168,76,.08)'">
+        ↗ Open Google AI Studio
+      </a>
+
+      <div style="text-align:center;color:#3a2e18;font-size:0.8rem;font-style:italic;margin-top:24px;border-top:1px solid #1e1a10;padding-top:18px;">
+        May this tool help you share what is good. آمين
+      </div>
+
     </div>
   </div>
 </div>
@@ -5365,6 +5495,57 @@ When user gives a topic:
 4. Offer to refine.`
 };
 
+// ── Day key helper ──
+function pwTodayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function pwStorageKey() {
+  return 'pw_chat_' + pwTodayKey() + '_' + _pwTab;
+}
+
+// Save current _pwHistory + rendered HTML to localStorage under today's key
+function pwSaveHistory() {
+  try {
+    const chat = document.getElementById('pwChat');
+    localStorage.setItem(pwStorageKey(), JSON.stringify({
+      history: _pwHistory,
+      html: chat.innerHTML
+    }));
+  } catch(e) {}
+}
+
+// Load today's chat for current tab; returns true if history was found
+function pwLoadTodayHistory() {
+  try {
+    const raw = localStorage.getItem(pwStorageKey());
+    if (!raw) return false;
+    const saved = JSON.parse(raw);
+    if (!saved || !saved.history || saved.history.length === 0) return false;
+    _pwHistory = saved.history;
+    const chat = document.getElementById('pwChat');
+    chat.innerHTML = saved.html || '';
+    chat.scrollTop = chat.scrollHeight;
+
+    // Show a subtle day-header at top if not already present
+    if (!chat.querySelector('.pw-day-header')) {
+      const banner = document.createElement('div');
+      banner.className = 'pw-day-header';
+      banner.style.cssText = `
+        text-align:center;font-family:'DM Mono',monospace;font-size:9px;
+        letter-spacing:2px;text-transform:uppercase;color:#3a2e18;
+        padding:6px 0 14px;
+      `;
+      banner.textContent = '— ' + pwTodayKey() + ' —';
+      chat.insertBefore(banner, chat.firstChild);
+    }
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
 function openPostWriter() {
   const overlay = document.getElementById('postWriterOverlay');
   overlay.classList.add('active');
@@ -5372,10 +5553,11 @@ function openPostWriter() {
   _pwApiKey = localStorage.getItem('pw_gemini_key') || '';
   if (_pwApiKey) {
     document.getElementById('pwApiKeyInput').value = '••••••••••••••••';
-    document.getElementById('pwApiKeySection').style.opacity = '0.5';
+    document.getElementById('pwApiKeySection').style.opacity = '0.6';
   }
-  // Start fresh chat if empty
-  if (_pwHistory.length === 0) pwStartChat();
+  // Load today's history or start fresh
+  const hadHistory = pwLoadTodayHistory();
+  if (!hadHistory) pwStartChat();
   document.getElementById('pwInput').focus();
 }
 
@@ -5389,8 +5571,9 @@ function pwSaveKey() {
   _pwApiKey = val;
   localStorage.setItem('pw_gemini_key', val);
   document.getElementById('pwApiKeyInput').value = '••••••••••••••••';
-  document.getElementById('pwApiKeySection').style.opacity = '0.5';
-  pwAddMsg('system', '✓ API key saved. Ready to write posts.');
+  document.getElementById('pwApiKeySection').style.opacity = '0.6';
+  pwAddMsg('system', '✦ API key saved. Ready to write posts.');
+  pwSaveHistory();
 }
 
 function pwCheckKey() {
@@ -5402,21 +5585,44 @@ function pwSetTab(tab) {
   const li = document.getElementById('pwTabLI');
   const fb = document.getElementById('pwTabFB');
   if (tab === 'linkedin') {
-    li.style.borderBottom = '2px solid var(--green-bright)'; li.style.background = 'var(--surface)'; li.style.color = 'var(--green-bright)';
-    fb.style.borderBottom = '2px solid transparent'; fb.style.background = 'var(--surface2)'; fb.style.color = 'var(--text-dim)';
+    li.style.borderBottom = '2px solid #c9a84c'; li.style.background = '#141008'; li.style.color = '#c9a84c';
+    fb.style.borderBottom = '2px solid transparent'; fb.style.background = '#0f0d0a'; fb.style.color = '#5a4a28';
   } else {
-    fb.style.borderBottom = '2px solid var(--green-bright)'; fb.style.background = 'var(--surface)'; fb.style.color = 'var(--green-bright)';
-    li.style.borderBottom = '2px solid transparent'; li.style.background = 'var(--surface2)'; li.style.color = 'var(--text-dim)';
+    fb.style.borderBottom = '2px solid #c9a84c'; fb.style.background = '#141008'; fb.style.color = '#c9a84c';
+    li.style.borderBottom = '2px solid transparent'; li.style.background = '#0f0d0a'; li.style.color = '#5a4a28';
   }
-  // Reset and restart for new platform
+  // Load today's history for the new tab, or start fresh
   _pwHistory = [];
   document.getElementById('pwChat').innerHTML = '';
-  pwStartChat();
+  const hadHistory = pwLoadTodayHistory();
+  if (!hadHistory) pwStartChat();
+}
+
+function openGetKeyModal() {
+  document.getElementById('getKeyOverlay').classList.add('active');
+}
+
+function closeGetKeyModal() {
+  document.getElementById('getKeyOverlay').classList.remove('active');
 }
 
 function pwStartChat() {
   const platform = _pwTab === 'linkedin' ? 'LinkedIn' : 'Facebook';
+  // Add day header
+  const chat = document.getElementById('pwChat');
+  if (!chat.querySelector('.pw-day-header')) {
+    const banner = document.createElement('div');
+    banner.className = 'pw-day-header';
+    banner.style.cssText = `
+      text-align:center;font-family:'DM Mono',monospace;font-size:9px;
+      letter-spacing:2px;text-transform:uppercase;color:#3a2e18;
+      padding:6px 0 14px;
+    `;
+    banner.textContent = '— ' + pwTodayKey() + ' —';
+    chat.appendChild(banner);
+  }
   pwAddMsg('assistant', `Ready to write a killer <strong>${platform} post</strong> for you.<br><br>Tell me: <strong>what's the topic or idea?</strong> Even a rough sentence works — I'll shape it into something scroll-stopping.`);
+  pwSaveHistory();
 }
 
 function pwAddMsg(role, html) {
@@ -5433,19 +5639,19 @@ function pwAddMsg(role, html) {
 
   if (!isSystem) {
     const label = document.createElement('div');
-    label.style.cssText = `font-size:9px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;padding:0 4px;`;
+    label.style.cssText = `font-size:9px;color:#5a4a28;letter-spacing:1.5px;text-transform:uppercase;padding:0 4px;font-family:'DM Mono',monospace;`;
     label.textContent = isUser ? 'You' : 'AI Writer';
     div.appendChild(label);
   }
 
   const bubble = document.createElement('div');
   bubble.style.cssText = `
-    max-width:88%;padding:11px 14px;border-radius:8px;line-height:1.65;font-size:13px;
+    max-width:88%;padding:12px 15px;border-radius:8px;line-height:1.7;font-size:13px;
     ${isUser
-      ? 'background:linear-gradient(135deg,#1a3a1a,#253a18);border:1px solid var(--green);color:var(--text);font-family:\'Literata\',Georgia,serif;'
+      ? 'background:linear-gradient(135deg,#1a1500,#241c08);border:1px solid #3a2e18;color:#e8dfc8;font-family:\'Amiri\',serif;font-size:14px;'
       : isSystem
-        ? 'background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);font-family:\'DM Mono\',monospace;font-size:11px;'
-        : 'background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:\'Literata\',Georgia,serif;'
+        ? 'background:#141008;border:1px solid #c9a84c55;color:#c9a84c;font-family:\'DM Mono\',monospace;font-size:11px;'
+        : 'background:#141008;border:1px solid #2a2010;color:#d4c9ae;font-family:\'Literata\',Georgia,serif;'
     }
   `;
   bubble.innerHTML = html;
@@ -5455,11 +5661,13 @@ function pwAddMsg(role, html) {
     const copyBtn = document.createElement('button');
     copyBtn.textContent = 'Copy';
     copyBtn.style.cssText = `
-      margin-top:8px;padding:4px 10px;background:var(--surface);
-      border:1px solid var(--border);color:var(--text-muted);
-      border-radius:3px;cursor:pointer;font-family:'DM Mono',monospace;
+      margin-top:8px;padding:4px 10px;background:#1a1610;
+      border:1px solid #3a2e18;color:#8a7840;
+      border-radius:4px;cursor:pointer;font-family:'DM Mono',monospace;
       font-size:9px;letter-spacing:1px;transition:all .2s;display:block;
     `;
+    copyBtn.onmouseover = () => { copyBtn.style.borderColor='#c9a84c'; copyBtn.style.color='#c9a84c'; };
+    copyBtn.onmouseout = () => { copyBtn.style.borderColor='#3a2e18'; copyBtn.style.color='#8a7840'; };
     copyBtn.onclick = () => {
       navigator.clipboard.writeText(bubble.innerText.replace('Copy','').trim());
       copyBtn.textContent = '✓ Copied';
@@ -5479,12 +5687,12 @@ function pwAddTyping() {
   div.id = 'pwTyping';
   div.style.cssText = 'display:flex;flex-direction:column;align-items:flex-start;gap:4px;';
   div.innerHTML = `
-    <div style="font-size:9px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;padding:0 4px;">AI Writer</div>
-    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 16px;">
+    <div style="font-size:9px;color:#5a4a28;letter-spacing:1.5px;text-transform:uppercase;padding:0 4px;font-family:'DM Mono',monospace;">AI Writer</div>
+    <div style="background:#141008;border:1px solid #2a2010;border-radius:8px;padding:11px 16px;">
       <span style="display:inline-flex;gap:4px;align-items:center;">
-        <span style="width:6px;height:6px;background:var(--green-bright);border-radius:50%;animation:pulse 1s infinite;"></span>
-        <span style="width:6px;height:6px;background:var(--green-bright);border-radius:50%;animation:pulse 1s .2s infinite;"></span>
-        <span style="width:6px;height:6px;background:var(--green-bright);border-radius:50%;animation:pulse 1s .4s infinite;"></span>
+        <span style="width:6px;height:6px;background:#c9a84c;border-radius:50%;animation:pulse 1s infinite;opacity:.7;"></span>
+        <span style="width:6px;height:6px;background:#c9a84c;border-radius:50%;animation:pulse 1s .2s infinite;opacity:.7;"></span>
+        <span style="width:6px;height:6px;background:#c9a84c;border-radius:50%;animation:pulse 1s .4s infinite;opacity:.7;"></span>
       </span>
     </div>`;
   chat.appendChild(div);
@@ -5511,6 +5719,7 @@ async function pwSend() {
   pwAddMsg('user', text.replace(/\n/g, '<br>'));
 
   _pwHistory.push({ role: 'user', parts: [{ text }] });
+  pwSaveHistory(); // save after user message
 
   const btn = document.getElementById('pwSendBtn');
   btn.disabled = true; btn.style.opacity = '0.5';
@@ -5549,6 +5758,7 @@ async function pwSend() {
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/\n/g, '<br>');
     pwAddMsg('assistant', formatted);
+    pwSaveHistory(); // save after AI reply
 
   } catch (err) {
     pwRemoveTyping();

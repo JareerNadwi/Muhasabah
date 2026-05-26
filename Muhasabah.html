@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Muhasabah — Daily Tracker 2026</title>
+<title>Muhasabah — Daily Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=Literata:ital,opsz,wght@0,7..72,300;0,7..72,400;0,7..72,500;1,7..72,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -336,13 +336,13 @@ body.overlay-open{overflow:hidden;}
 <div class="header">
   <div>
     <div class="header-title">محاسبة</div>
-    <div class="header-sub">Muhasabah — Daily Tracker 2026</div>
+    <div class="header-sub">Muhasabah — Daily Tracker</div>
   </div>
   <div class="contact-banner">
     <div class="contact-inner">
       <span class="contact-pulse"></span>
       <div class="contact-text">
-        <span class="contact-line1">🤲 Support &nbsp;<a class="contact-num" href="https://wa.me/8801829624608">WhatsApp 01829624608</a></span>
+        <span class="contact-line1">🤝 Support &nbsp;<a class="contact-num" href="https://wa.me/8801829624608">WhatsApp 01829624608</a></span>
         <span class="contact-sep">·</span>
         <span class="contact-line2">❤️ Support Development &nbsp;<span class="contact-num">bKash / Nagad 01829624608</span></span>
       </div>
@@ -2244,19 +2244,19 @@ async function getExportHandle(){
       await new Promise(resolve => {
         var overlay = document.createElement('div');
         overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;';
-        overlay.innerHTML =
-          '<div style="background:var(--surface);border:1px solid var(--gold-dim);border-radius:10px;padding:28px;max-width:420px;width:90%;color:var(--text);">' +
-          '<h3 style="font-family:\'Instrument Serif\',serif;font-size:18px;color:var(--gold);margin-bottom:12px;">&#x1F4BE; Choose Your Backup Location</h3>' +
-          '<p style="font-size:12px;color:var(--text-dim);line-height:1.75;margin-bottom:16px;">' +
-          'You\'re setting your save location for the first time. After this, pressing <strong style="color:var(--text);">Save Day</strong> will automatically overwrite the same file \u2014 no prompt needed.' +
-          '</p>' +
-          '<p style="font-size:12px;color:var(--text-dim);line-height:1.75;margin-bottom:16px;">' +
-          'The saved file will be named <strong style="color:var(--gold);font-family:\'DM Mono\',monospace;">Muhasabah.json</strong>. ' +
-          'You can restore your data anytime by importing it using the Import button. ' +
-          'You can also export a copy at any time using the Export button.' +
-          '</p>' +
-          '<button id="_fsNoticeBtn" style="width:100%;padding:11px;background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid var(--gold);color:var(--gold);border-radius:6px;cursor:pointer;font-family:\'DM Mono\',monospace;font-size:12px;letter-spacing:1px;">Choose Save Location</button>' +
-          '</div>';
+        overlay.innerHTML = `
+          <div style="background:#0d0b08;border:1px solid #2a2010;border-top:3px solid #c9a84c;border-radius:10px;padding:28px 26px;max-width:440px;width:90%;">
+          <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:8px;font-family:'DM Mono',monospace;">First Time Setup</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:1.25rem;color:#f0e4c0;margin-bottom:18px;line-height:1.3;">Choose Your Backup Location</div>
+          <div style="background:#141008;border-left:3px solid #c9a84c;border-radius:0 6px 6px 0;padding:14px 18px;margin-bottom:16px;font-size:0.88rem;color:#c5b98a;line-height:1.75;">
+          After choosing, pressing <strong style="color:#f0e4c0;">Save Day</strong> will automatically overwrite the same file \u2014 no prompt needed.
+          </div>
+          <div style="font-size:0.82rem;color:#7a6a40;line-height:1.7;margin-bottom:20px;">
+          The file will be named <span style="color:#c9a84c;font-family:'DM Mono',monospace;font-size:0.8rem;">Muhasabah.json</span>.
+          You can also import or export your data anytime from the header buttons.
+          </div>
+          <button id="_fsNoticeBtn" style="width:100%;padding:11px;background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid #c9a84c;color:#c9a84c;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;transition:all .2s;">Choose Save Location</button>
+          </div>`;
         document.body.appendChild(overlay);
         overlay.querySelector('#_fsNoticeBtn').onclick = function(){
           document.body.removeChild(overlay);
@@ -2339,15 +2339,21 @@ function closeSupportModal(){document.getElementById('supportModal').classList.r
 
 function supportDonate(){
   localStorage.setItem('mhsb_support','done');
-  // Show thank you instead of navigating away
   var modal = document.getElementById('supportModal');
   var inner = modal ? modal.querySelector('.modal') : null;
   if(inner){
-    inner.innerHTML =
-      '<h3 style="color:var(--green-bright);">&#x2665;&#xFE0F; JazakAllahu Khairan!</h3>' +
-      '<p style="color:var(--text-dim);font-size:12px;line-height:1.8;margin-bottom:8px;">May Allah accept your intention and reward you immeasurably.</p>' +
-      '<p style="color:var(--text-dim);font-size:12px;line-height:1.8;margin-bottom:20px;">You can send to <span style="color:var(--gold);font-family:\'DM Mono\',monospace;">01829624608</span> via bKash or Nagad whenever you are ready.</p>' +
-      '<button class="modal-cancel" onclick="closeSupportModal()" style="width:100%;margin-top:4px;">Close</button>';
+    inner.style.borderColor = '#3a6a40';
+    inner.innerHTML = `
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#4a7c59;margin-bottom:8px;font-family:'DM Mono',monospace;">JazakAllahu Khairan</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:1.4rem;color:#6aab7a;margin-bottom:16px;">♥️ May Allah Accept</div>
+      <div style="background:#071407;border-left:3px solid #4a7c59;border-radius:0 6px 6px 0;padding:14px 18px;margin-bottom:16px;font-size:0.88rem;color:#8abe98;line-height:1.75;">
+        May Allah accept your intention and reward you immeasurably. ❤️
+      </div>
+      <div style="background:#141008;border:1px solid #2a2010;border-radius:6px;padding:12px 16px;margin-bottom:20px;text-align:center;">
+        <div style="font-family:'DM Mono',monospace;font-size:1rem;color:#c9a84c;letter-spacing:0.05em;">01829624608</div>
+        <div style="font-size:0.72rem;color:#5a4a28;margin-top:4px;letter-spacing:0.1em;">bKash · Nagad</div>
+      </div>
+      <button class="modal-cancel" onclick="closeSupportModal()" style="width:100%;">Close</button>`;
   }
 }
 
@@ -2941,7 +2947,14 @@ async function openSurahVerseReader(surahNum, title, goalKey){
     document.getElementById('svLoading').style.display = 'none';
     document.getElementById('svContent').style.display = 'block';
     document.getElementById('svNav').style.display     = 'flex';
-    renderSurahVerse(0);
+    // Resume from next verse after last saved position
+    const _svIdxKey = _svGoalKey + '_readerIdx';
+    const _svSaved  = getCached(_svDK)[_svIdxKey];
+    const _svResume = (_svSaved !== undefined && _svSaved >= 0)
+      ? Math.min(_svSaved, _svSlice.length - 1) : 0;
+    _svStartIdx = _svResume;
+    _svIdx      = _svResume;
+    renderSurahVerse(_svResume);
   } catch(e){
     document.getElementById('svLoading').textContent = '⚠ Failed: ' + e.message;
   }
@@ -2969,23 +2982,93 @@ function renderSurahVerse(idx){
   btn.disabled = false;
 }
 
+let _svStartIdx = 0;  // verse index this session started on (0-based)
+
 async function svNavNext(){
   const total = _svSlice.length;
+  await _saveSvProgress(_svIdx + 1, false);  // save progress up to current verse
   if(_svIdx < total - 1){
-    renderSurahVerse(_svIdx + 1);
+    _svIdx++;
+    renderSurahVerse(_svIdx);
   } else {
-    // Mark done
-    if(_svGoalKey && _svDK){
-      const d = getCached(_svDK);
-      d[_svGoalKey] = 'yes';
-      setCached(_svDK, d);
-      saveAndRefresh();
-    }
+    // Reached end — mark done
+    await _saveSvProgress(total, true);
     closeSurahVerseReader();
   }
 }
+
 function svNavPrev(){ if(_svIdx > 0) renderSurahVerse(_svIdx - 1); }
-function closeSurahVerseReader(){
+
+async function _saveSvProgress(readCount, done){
+  if(!_svDK || !_svGoalKey) return;
+  const total    = _svSlice.length;
+  const sessKey  = _svGoalKey + '_svSessions';
+  const ratioKey = _svGoalKey + '_pdfRatio';
+  const idxKey   = _svGoalKey + '_readerIdx';
+  const data = Object.assign({}, getCached(_svDK));
+  if(!data[sessKey]) data[sessKey] = [];
+  const sessions = data[sessKey];
+  const versesThisSess = readCount - _svStartIdx;
+  if(versesThisSess > 0){
+    const entry = {start: _svStartIdx + 1, end: readCount, verses: versesThisSess};
+    if(sessions.length && sessions[sessions.length-1].start === _svStartIdx + 1)
+      sessions[sessions.length-1] = entry;
+    else sessions.push(entry);
+  }
+  const totalVerses = sessions.reduce((s,x) => s + x.verses, 0);
+  const ratio = done ? 1 : Math.min(totalVerses / total, 1);
+  data[sessKey]  = sessions;
+  data[ratioKey] = ratio;
+  if(done) data[_svGoalKey] = 'yes';
+  _cache[_svDK] = data;
+  await setStore(_svDK, data);
+  if(done){
+    document.querySelectorAll('.yn-btn[data-key="'+_svGoalKey+'"]').forEach(btn =>
+      btn.classList.toggle('active', btn.dataset.val === 'yes')
+    );
+  }
+  refreshScores();
+  _renderSvBadge(_svDK, _svGoalKey);
+}
+
+function _renderSvBadge(dk, goalKey){
+  const badgeMap = { surahWaqiah: 'surahWaqiahSessionBadge', surahMulk: 'surahMulkSessionBadge' };
+  const badgeId = badgeMap[goalKey];
+  if(!badgeId) return;
+  const badge = document.getElementById(badgeId);
+  if(!badge) return;
+  const data     = getCached(dk);
+  const sessKey  = goalKey + '_svSessions';
+  const sessions = data[sessKey];
+  if(!sessions || sessions.length === 0){ badge.style.display = 'none'; return; }
+  const total      = goalKey === 'surahWaqiah' ? 29 : 50;
+  const done       = data[goalKey] === 'yes';
+  const totalVerses = sessions.reduce((s,x) => s + x.verses, 0);
+  const pct        = Math.round((totalVerses / total) * 100);
+  const count      = sessions.length;
+  const first      = sessions[0];
+  const last       = sessions[sessions.length - 1];
+  const icon       = '☀️';
+  const headerTxt  = done
+    ? count + ' Session' + (count!==1?'s':'') + ' · Completed ✓ — ' + total + ' Verse' + (total!==1?'s':'')
+    : count + ' Session' + (count!==1?'s':'') + ' · ' + totalVerses + ' Verse' + (totalVerses!==1?'s':'') + ' Read (' + pct + '%)';
+  badge.style.display = 'block';
+  badge.innerHTML =
+    '<span style="color:var(--gold);">' + icon + ' Today: ' + headerTxt + '</span>' +
+    '<br><span style="font-size:9px;color:var(--text-muted);">Total: Verse ' + first.start + '–' + last.end + ' (' + totalVerses + ' Verse' + (totalVerses!==1?'s':'') + ' Today)</span>' +
+    '<br><span style="font-size:9px;color:var(--text-muted);">Last: Verses ' + last.start + '–' + last.end + ' (' + last.verses + ' Verse' + (last.verses!==1?'s':'') + ')</span>';
+}
+
+async function closeSurahVerseReader(){
+  // Save current progress then store NEXT verse idx so resume starts from there
+  if(_svDK && _svGoalKey && _svSlice.length > 0){
+    await _saveSvProgress(_svIdx + 1, false);
+    const idxKey = _svGoalKey + '_readerIdx';
+    const d = Object.assign({}, getCached(_svDK));
+    d[idxKey] = Math.min(_svIdx + 1, _svSlice.length - 1); // next verse (0-based)
+    _cache[_svDK] = d;
+    await setStore(_svDK, d);
+  }
   document.getElementById('surahVerseReaderOverlay').classList.remove('active');
 }
 
@@ -3259,28 +3342,35 @@ function closeBookReader() {
 function renderBookBadge(dk) {
   const badge = document.getElementById('bookSessionBadge');
   if (!badge) return;
-  const data = getCached(dk);
-  const sessions = data['book_sessions'] || [];
-  const ratio = parseFloat(data['book_ratio']) || 0;
-  const lesson = data['book_lesson'];
-  const pct = Math.round(ratio * 100);
-  if (data.books === 'yes') {
+  const data    = getCached(dk);
+  const ratio   = parseFloat(data['book_ratio']) || 0;
+  const lesson  = data['book_lesson'];  // 0-based lesson index last reached
+  const pct     = Math.round(ratio * 100);
+  const icon    = '☀️';
+
+  if (!data.books && (lesson === undefined || lesson < 0)) {
+    badge.style.display = 'none'; return;
+  }
+
+  // Build a simple single-session display based on lesson position
+  // lesson is 0-based, so "Pages 1–N" = lessons 1..lesson+1
+  const pagesRead  = lesson !== undefined && lesson >= 0 ? lesson + 1 : 0;
+  // We don't have multi-session tracking in the book reader — show what we have
+  const headerPct  = pct;
+  const done       = data.books === 'yes';
+
+  if(done){
     badge.style.display = 'block';
-    if(sessions.length > 0){
-      const count = sessions.length;
-      const first = sessions[0];
-      const last  = sessions[sessions.length-1];
-      const totalPages = sessions.reduce((s,x)=>s+(x.pages||x.duas||1),0);
-      badge.innerHTML =
-        '<span style="color:var(--green-bright);">📗 Today: '+count+' Session'+(count!==1?'s':'')+' · Completed ✓</span>'+
-        '<br><span style="font-size:9px;color:var(--text-muted);">Total: Pages '+(first.start||1)+'–'+(last.end||lesson+1)+' ('+totalPages+' Pages Today)</span>'+
-        '<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages '+(last.start||1)+'–'+(last.end||lesson+1)+' ('+(last.pages||last.duas||1)+' Pages)</span>';
-    } else {
-      badge.innerHTML = '<span style="color:var(--green-bright);">📗 Book Completed — Goal Achieved ✓</span>';
-    }
-  } else if (lesson !== undefined && lesson >= 0) {
+    badge.innerHTML =
+      '<span style="color:var(--green-bright);">' + icon + ' Today: 1 Session · ' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ' Read (' + headerPct + '%) ✓</span>' +
+      '<br><span style="font-size:9px;color:var(--text-muted);">Total: Pages 1–' + pagesRead + ' (' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ' Today)</span>' +
+      '<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages 1–' + pagesRead + ' (' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ')</span>';
+  } else if(pagesRead > 0){
     badge.style.display = 'block';
-    badge.innerHTML = '<span style="color:var(--gold);">📗 Lesson ' + (lesson+1) + ' Read — In Progress ('+pct+'%)</span>';
+    badge.innerHTML =
+      '<span style="color:var(--gold);">' + icon + ' Today: 1 Session · ' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ' Read (' + headerPct + '%)</span>' +
+      '<br><span style="font-size:9px;color:var(--text-muted);">Total: Pages 1–' + pagesRead + ' (' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ' Today)</span>' +
+      '<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages 1–' + pagesRead + ' (' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ')</span>';
   } else {
     badge.style.display = 'none';
   }
@@ -4792,7 +4882,7 @@ function _zikrRender(){
 }
 async function openZikrReader(mode){
   _zikrMode=mode;_zikrDK=currentDateKey||todayKey();
-  var title=mode==="morning"?"Morning Zikr - اللهم اني اصبحت":"Evening Zikr - اللهم اني امسيت";
+  var title=mode==="morning"?"Morning Zikr":"Evening Zikr";
   document.getElementById("zikrReaderTitle").textContent=title;
   document.getElementById("zikrReaderDayPill").textContent="77 Duas";
   document.getElementById("zikrReaderOverlay").classList.add("active");
@@ -4800,10 +4890,11 @@ async function openZikrReader(mode){
   document.getElementById("zikrReaderDoneNote").style.display=_zikrDone?"block":"none";
   var dayData=getCached(_zikrDK);
   var saved=dayData[_zikrIdxKey()];
+  // Resume from saved position (already points to NEXT slide after last close)
   _zikrSlide=(saved!==undefined&&saved>=0)?Math.min(saved,ZIKR_TOTAL-1):0;
   _zikrStartSlide=_zikrSlide;
   _zikrRender();
-  await _saveZikrProgress(false);
+  // Don't call _saveZikrProgress here — let user navigate first
 }
 async function zikrNavNext(){
   if(_zikrSlide<ZIKR_TOTAL-1){_zikrSlide++;await _saveZikrProgress(false);_zikrRender();}
@@ -4826,14 +4917,16 @@ async function closeZikrReader(){
   if(!_zikrDone&&dk){
     var sd=Object.assign({},getCached(dk));
     if(!sd[_zikrSessKey()])sd[_zikrSessKey()]=[];
-    var sr=_zikrSlide-_zikrStartSlide+1;
+    var sr=_zikrSlide-_zikrStartSlide;
     if(sr>0)sd[_zikrSessKey()].push({start:_zikrStartSlide+1,end:_zikrSlide+1,slides:sr});
     _cache[dk]=sd;await setStore(dk,sd);
   }
+  // Save ratio progress first (without advancing slide)
+  if(!_zikrDone){await _saveZikrProgress(false);}
+  // Then save NEXT slide index so next open resumes from there
   var nx=Math.min(_zikrSlide+1,ZIKR_TOTAL-1);
-  var d2=Object.assign({},getCached(dk));d2[_zikrIdxKey()]=nx;
-  _cache[dk]=d2;await setStore(dk,d2);
-  if(!_zikrDone)await _saveZikrProgress(false);
+  var d3=Object.assign({},getCached(dk));d3[_zikrIdxKey()]=nx;
+  _cache[dk]=d3;await setStore(dk,d3);
   document.getElementById("zikrReaderOverlay").classList.remove("active");
   renderZikrBadge(dk,mode);
 }
@@ -4875,7 +4968,13 @@ document.addEventListener("keydown",function(e){
   else if(e.key==="ArrowLeft"||e.key==="ArrowUp"){e.preventDefault();zikrNavPrev();}
 });
 var _origLDDZikr=loadDayData;
-loadDayData=function(dk){_origLDDZikr(dk);renderZikrBadge(dk,"morning");renderZikrBadge(dk,"evening");};
+loadDayData=function(dk){
+  _origLDDZikr(dk);
+  renderZikrBadge(dk,"morning");
+  renderZikrBadge(dk,"evening");
+  _renderSvBadge(dk,"surahWaqiah");
+  _renderSvBadge(dk,"surahMulk");
+};
 </script>
 
 <!-- ══════════════════════════════════════════════════════
@@ -5074,8 +5173,11 @@ async function _zbSaveProgress(reachedEnd) {
 async function closeZikrBookReader() {
   document.getElementById('zikrBookReaderOverlay').classList.remove('active');
   if (!_zbDK) return;
-  await setPdfLastPage(ZIKR_BOOK_IDX_KEY, _zbSlide);
+  // Save current progress first
   await _zbSaveProgress(false);
+  // Then save NEXT dua index so next open resumes from the dua after this one
+  const nextSlide = Math.min(_zbSlide + 1, ZIKR_BOOK_TOTAL - 1);
+  await setPdfLastPage(ZIKR_BOOK_IDX_KEY, nextSlide);
 }
 
 /* ── Badge ── */

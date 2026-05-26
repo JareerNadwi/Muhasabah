@@ -5417,7 +5417,7 @@ loadDayData = function(dk) {
         <div style="font-size:0.9rem;color:#b0a07a;line-height:1.8;">
           · <strong style="color:#e8dfc8;">15 requests / minute</strong> — more than enough for writing posts<br>
           · <strong style="color:#e8dfc8;">1,500 requests / day</strong> — free, no credit card required<br>
-          · Uses <strong style="color:#e8dfc8;">Gemini 1.5 Pro</strong> — higher quality output, optimized for writing
+          · Uses <strong style="color:#e8dfc8;">Gemini 2.5 Flash</strong> — Google's latest and smartest model
         </div>
       </div>
 
@@ -5773,7 +5773,7 @@ async function pwSend() {
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${_pwApiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${_pwApiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

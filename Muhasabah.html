@@ -804,17 +804,7 @@ body.overlay-open{overflow:hidden;}
         </div>
       </div>
       <div class="sub-label">Goal: Write 1 LinkedIn Post + 1 Facebook Post = Full 5% Core</div>
-      <button onclick="openPostWriter()" style="
-        width:100%;padding:9px 14px;margin-top:8px;
-        background:linear-gradient(135deg,#0d1a0f,#1a2a10);
-        border:1px solid var(--green);color:var(--green-bright);
-        border-radius:var(--radius);cursor:pointer;
-        font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;
-        transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;
-      " onmouseover="this.style.background='linear-gradient(135deg,#1a2a10,#253a18)';this.style.boxShadow='0 0 14px rgba(106,171,122,.2)'"
-         onmouseout="this.style.background='linear-gradient(135deg,#0d1a0f,#1a2a10)';this.style.boxShadow='none'">
-        ✦ Open AI Post Writer
-      </button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPostWriter()">✦ Open AI Post Writer</button>
     </div>
 
     <!-- Networking 5% -->
@@ -5837,78 +5827,77 @@ async function pwSend() {
     <!-- Top bar -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;gap:12px;flex-wrap:wrap;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🗣 Daily Language Learner</div>
-      <button onclick="closeLanguageReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+      <button onclick="closeLanguageReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;" onmouseover="this.style.borderColor='#c9a84c';this.style.color='#c9a84c'" onmouseout="this.style.borderColor='#2a2010';this.style.color='#8a7840'">✓ Save &amp; Exit</button>
     </div>
 
-    <!-- Language selector -->
-    <div style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:#141008;border-bottom:1px solid #2a2010;flex-wrap:wrap;">
-      <span style="font-family:'DM Mono',monospace;font-size:9px;color:#5a4a28;letter-spacing:2px;text-transform:uppercase;margin-right:4px;">Language</span>
-      <button class="lr-lang-btn" data-lang="ar" onclick="lrSetLang('ar')" style="background:#1a1500;border:1px solid #c9a84c;color:#c9a84c;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">عربي Arabic</button>
-      <button class="lr-lang-btn" data-lang="en" onclick="lrSetLang('en')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">English</button>
-      <button class="lr-lang-btn" data-lang="bn" onclick="lrSetLang('bn')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">বাংলা Bengali</button>
-      <button class="lr-lang-btn" data-lang="ur" onclick="lrSetLang('ur')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">اردو Urdu</button>
-      <button class="lr-lang-btn" data-lang="hi" onclick="lrSetLang('hi')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">हिन्दी Hindi</button>
-    </div>
-
-    <!-- Word / Verb selector -->
-    <div style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:#0f0e0a;border-bottom:1px solid #2a2010;flex-wrap:wrap;">
-      <span style="font-family:'DM Mono',monospace;font-size:9px;color:#5a4a28;letter-spacing:2px;text-transform:uppercase;margin-right:4px;">Type</span>
-      <button class="lr-type-btn" data-type="word" onclick="lrSetType('word')" style="background:#1a1500;border:1px solid #c9a84c;color:#c9a84c;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">📖 Word</button>
-      <button class="lr-type-btn" data-type="verb" onclick="lrSetType('verb')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">⚡ Verb</button>
+    <!-- Language + Type selector grid -->
+    <div style="padding:12px 18px;background:#141008;border-bottom:1px solid #2a2010;">
+      <!-- Row 1: Languages -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:6px;">
+        <button class="lr-lang-btn" data-lang="ar" onclick="lrSetLang('ar')" style="background:#1a1500;border:1px solid #c9a84c;color:#c9a84c;padding:7px 4px;border-radius:6px;cursor:pointer;font-family:'Amiri',serif;font-size:12px;text-align:center;" onmouseover="if(this.style.borderColor!='rgb(201, 168, 76)')this.style.borderColor='#c9a84c55'" onmouseout="lrSyncBtns()">عربي</button>
+        <button class="lr-lang-btn" data-lang="en" onclick="lrSetLang('en')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 4px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;text-align:center;" onmouseover="if(this.style.borderColor!='rgb(201, 168, 76)')this.style.borderColor='#c9a84c55'" onmouseout="lrSyncBtns()">EN</button>
+        <button class="lr-lang-btn" data-lang="bn" onclick="lrSetLang('bn')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 4px;border-radius:6px;cursor:pointer;font-family:'Literata',Georgia,serif;font-size:12px;text-align:center;" onmouseover="if(this.style.borderColor!='rgb(201, 168, 76)')this.style.borderColor='#c9a84c55'" onmouseout="lrSyncBtns()">বাং</button>
+        <button class="lr-lang-btn" data-lang="ur" onclick="lrSetLang('ur')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 4px;border-radius:6px;cursor:pointer;font-family:'Amiri',serif;font-size:12px;text-align:center;" onmouseover="if(this.style.borderColor!='rgb(201, 168, 76)')this.style.borderColor='#c9a84c55'" onmouseout="lrSyncBtns()">اردو</button>
+        <button class="lr-lang-btn" data-lang="hi" onclick="lrSetLang('hi')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 4px;border-radius:6px;cursor:pointer;font-family:'Literata',Georgia,serif;font-size:12px;text-align:center;" onmouseover="if(this.style.borderColor!='rgb(201, 168, 76)')this.style.borderColor='#c9a84c55'" onmouseout="lrSyncBtns()">हिं</button>
+      </div>
+      <!-- Row 2: Word / Verb — same 5-col grid so they align under languages -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
+        <button class="lr-type-btn" data-type="word" onclick="lrSetType('word')" style="grid-column:1/3;background:#1a1500;border:1px solid #c9a84c;color:#c9a84c;padding:7px 4px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;text-align:center;" onmouseover="if(this.style.borderColor!='rgb(201, 168, 76)')this.style.borderColor='#c9a84c55'" onmouseout="lrSyncBtns()">📖 Word</button>
+        <button class="lr-type-btn" data-type="verb" onclick="lrSetType('verb')" style="grid-column:3/6;background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 4px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;text-align:center;" onmouseover="if(this.style.borderColor!='rgb(201, 168, 76)')this.style.borderColor='#c9a84c55'" onmouseout="lrSyncBtns()">⚡ Verb</button>
+      </div>
     </div>
 
     <!-- Content body -->
-    <div id="lrBody" style="padding:28px 24px;display:flex;flex-direction:column;gap:20px;">
+    <div id="lrBody" style="padding:24px 20px;display:flex;flex-direction:column;gap:18px;">
 
       <div id="lrNoData" style="display:none;text-align:center;padding:40px 20px;font-family:'DM Mono',monospace;font-size:12px;color:#5a4a28;letter-spacing:1px;">No entry found for today.</div>
 
       <!-- Word hero -->
-      <div id="lrHero" style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:28px 32px;text-align:center;">
+      <div id="lrHero" style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px 20px;text-align:center;">
         <div id="lrWordNum" style="font-family:'DM Mono',monospace;font-size:9px;color:#5a4a28;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;">WORD 001</div>
         <div id="lrWordMain" style="font-family:'Amiri',serif;font-size:52px;color:#f0e4c0;line-height:1.2;margin-bottom:6px;">—</div>
         <div id="lrWordRoman" style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:6px;letter-spacing:.5px;font-family:'Literata',Georgia,serif;"></div>
-        <div id="lrWordType" style="font-family:'DM Mono',monospace;font-size:9px;color:#5a4a28;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;"></div>
+        <div id="lrWordType" style="font-family:'DM Mono',monospace;font-size:9px;color:#5a4a28;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;"></div>
         <div id="lrWordMeaning" style="font-family:'Literata',Georgia,serif;font-size:1.1rem;color:#c5b98a;font-style:italic;">—</div>
       </div>
 
-      <div style="display:flex;align-items:center;gap:14px;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="display:flex;align-items:center;gap:14px;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;font-family:'Amiri',serif;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
 
       <!-- Synonym / Antonym -->
-      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:20px 24px;">
-        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;font-family:'DM Mono',monospace;">Synonym &amp; Antonym</div>
+      <div id="lrSynAntPanel" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;">
+        <div style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:12px;font-family:'DM Mono',monospace;">Synonym &amp; Antonym</div>
         <div style="display:flex;flex-direction:column;gap:10px;">
           <div style="display:flex;align-items:baseline;gap:12px;">
-            <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#6aab7a;width:52px;flex-shrink:0;">SYN</span>
+            <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#6aab7a;width:48px;flex-shrink:0;">SYN</span>
             <span id="lrSyn" style="font-family:'DM Mono',monospace;font-size:12px;color:#c5b98a;line-height:1.6;">—</span>
           </div>
           <div style="display:flex;align-items:baseline;gap:12px;">
-            <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#c05050;width:52px;flex-shrink:0;">ANT</span>
+            <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#c05050;width:48px;flex-shrink:0;">ANT</span>
             <span id="lrAnt" style="font-family:'DM Mono',monospace;font-size:12px;color:#c5b98a;line-height:1.6;">—</span>
           </div>
         </div>
       </div>
 
       <!-- Conjugation (verb only) -->
-      <div id="lrConjPanel" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:20px 24px;">
-        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;font-family:'DM Mono',monospace;">Conjugation</div>
+      <div id="lrConjPanel" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;">
+        <div style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:12px;font-family:'DM Mono',monospace;">Conjugation</div>
         <table id="lrConjTable" style="width:100%;border-collapse:collapse;"></table>
       </div>
 
-      <div style="display:flex;align-items:center;gap:14px;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+      <div style="display:flex;align-items:center;gap:14px;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;font-family:'Amiri',serif;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
 
       <!-- Micro story -->
-      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:20px 24px;">
-        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;font-family:'DM Mono',monospace;">Micro Story</div>
+      <div id="lrStoryPanel" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;">
+        <div style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:12px;font-family:'DM Mono',monospace;">Micro Story</div>
         <div id="lrStory" style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c5b98a;line-height:1.9;font-style:italic;">—</div>
       </div>
 
-      <!-- Mark studied — per language + type -->
-      <div style="background:#141008;border:1px solid #2a2010;border-radius:8px;padding:18px 20px;">
-        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;font-family:'DM Mono',monospace;">Mark As Learned Today</div>
-        <div id="lrMarkGrid" style="display:flex;flex-direction:column;gap:8px;"></div>
+      <!-- Single mark learned button for current lang + type -->
+      <div id="lrMarkWrap" style="text-align:center;padding:4px 0 8px;">
+        <button id="lrMarkBtn" onclick="lrMarkStudied()" style="background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid #c9a84c;color:#c9a84c;padding:10px 28px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;" onmouseover="if(!this.dataset.done)this.style.background='linear-gradient(135deg,#2a2000,#3a3000)'" onmouseout="if(!this.dataset.done)this.style.background='linear-gradient(135deg,#1a1500,#2a2000)'">✓ Mark As Learned Today</button>
       </div>
 
-      <div style="text-align:center;color:#5a5030;font-size:0.85rem;font-style:italic;margin-top:4px;border-top:1px solid #1e1a10;padding-top:20px;">May Allah grant us the tawfeeq in all our studies. آمين</div>
+      <div style="text-align:center;color:#5a5030;font-size:0.85rem;font-style:italic;border-top:1px solid #1e1a10;padding-top:16px;font-family:'Literata',Georgia,serif;">May Allah grant us the tawfeeq in all our studies. آمين</div>
 
     </div>
   </div>
@@ -6256,55 +6245,66 @@ const LR_LANGS = ['ar','en','bn','ur','hi'];
 
 // State
 let _lrLang = 'ar';
-let _lrType = 'word'; // 'word' or 'verb'
+let _lrType = 'verb'; // default verb since all current data is verb
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────
 function lrTodayKey() {
   const d = new Date();
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
-
 function lrStudiedKey(lang, type) {
   return 'lr_studied_' + lrTodayKey() + '_' + lang + '_' + type;
 }
-
 function lrGetTodayEntry(type) {
   const d = new Date(); d.setHours(0,0,0,0);
   const start = new Date(d.getFullYear(), 0, 1);
   const dayOfYear = Math.floor((d - start) / 86400000);
-  const pool = LR_WORDS.filter(w => w.type === type);
-  if (!pool.length) return null;
+  // If no entries of that type exist, fall back to verb (all current data is verb)
+  let pool = LR_WORDS.filter(w => w.type === type);
+  if (!pool.length) pool = LR_WORDS;
   return { entry: pool[dayOfYear % pool.length], idx: dayOfYear % pool.length };
 }
 
-// ── Render content ────────────────────────────────────────────────────────
-function lrRender() {
-  const result = lrGetTodayEntry(_lrType);
+// ── Sync button highlights ────────────────────────────────────────────────
+function lrSyncBtns() {
+  document.querySelectorAll('.lr-lang-btn').forEach(b => {
+    const active = b.dataset.lang === _lrLang;
+    b.style.background = active ? '#1a1500' : '#1e1a10';
+    b.style.borderColor = active ? '#c9a84c' : '#2a2010';
+    b.style.color = active ? '#c9a84c' : '#8a7840';
+  });
+  document.querySelectorAll('.lr-type-btn').forEach(b => {
+    const active = b.dataset.type === _lrType;
+    b.style.background = active ? '#1a1500' : '#1e1a10';
+    b.style.borderColor = active ? '#c9a84c' : '#2a2010';
+    b.style.color = active ? '#c9a84c' : '#8a7840';
+  });
+}
 
-  if (!result) {
-    document.getElementById('lrHero').style.display = 'none';
-    document.getElementById('lrConjPanel').style.display = 'none';
-    document.getElementById('lrNoData').style.display = 'block';
-    return;
-  }
+// ── Render ────────────────────────────────────────────────────────────────
+function lrRender() {
+  lrSyncBtns();
+  const { entry, idx } = lrGetTodayEntry(_lrType);
 
   document.getElementById('lrHero').style.display = '';
   document.getElementById('lrNoData').style.display = 'none';
+  document.getElementById('lrSynAntPanel').style.display = '';
+  document.getElementById('lrStoryPanel').style.display = '';
 
-  const { entry, idx } = result;
   const lang = entry.langs[_lrLang];
   const isRTL = LR_RTL.has(_lrLang);
 
   // Hero
-  document.getElementById('lrWordNum').textContent =
-    (_lrType === 'verb' ? 'VERB' : 'WORD') + ' ' + String(idx+1).padStart(3,'0') + ' · ' + LR_LANG_NAMES[_lrLang].toUpperCase();
+  const typeLabel = _lrType === 'verb' ? 'VERB' : 'WORD';
+  document.getElementById('lrWordNum').textContent = typeLabel + ' ' + String(idx+1).padStart(3,'0') + ' · ' + LR_LANG_NAMES[_lrLang].toUpperCase();
   const mainEl = document.getElementById('lrWordMain');
   mainEl.textContent = lang.word;
   mainEl.style.direction = isRTL ? 'rtl' : 'ltr';
   mainEl.style.fontSize = isRTL ? '58px' : '52px';
   document.getElementById('lrWordRoman').textContent = lang.roman;
   document.getElementById('lrWordType').textContent = _lrType === 'verb'
-    ? 'VERB / فعل / ক্রিয়া / فعل / क्रिया' : 'WORD / كلمة / শব্দ / لفظ / शब्द';
+    ? 'VERB / فعل / ক্রিয়া / فعل / क्रिया'
+    : 'WORD / كلمة / শব্দ / لفظ / शब्द';
   document.getElementById('lrWordMeaning').textContent = lang.meaning;
 
   // Syn / Ant
@@ -6318,10 +6318,10 @@ function lrRender() {
   const conjTable = document.getElementById('lrConjTable');
   if (_lrType === 'verb' && lang.conj) {
     conjPanel.style.display = '';
-    const thS = "font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:#7a6a40;padding:5px 10px;text-align:left;font-weight:400;font-family:'DM Mono',monospace;border-bottom:1px solid #2a2010;";
-    const tdP = "font-size:10px;color:#7a6a40;padding:6px 10px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;";
-    const tdN = "font-size:12px;color:#c5b98a;padding:6px 10px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;";
-    const tdR = "font-size:14px;color:#f0e4c0;padding:6px 10px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;";
+    const thS = "font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#7a6a40;padding:5px 8px;text-align:left;font-weight:400;font-family:'DM Mono',monospace;border-bottom:1px solid #2a2010;";
+    const tdP = "font-size:10px;color:#7a6a40;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;";
+    const tdN = "font-size:12px;color:#c5b98a;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;";
+    const tdR = "font-size:14px;color:#f0e4c0;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;";
     const tdF = isRTL ? tdR : tdN;
     let html = '<tr><th style="'+thS+'">Person</th><th style="'+thS+'">'+(isRTL?'ماضي · Past':'Past')+'</th><th style="'+thS+'">'+(isRTL?'مضارع · Present':'Present')+'</th><th style="'+thS+'">'+(isRTL?'مستقبل · Future':'Future')+'</th></tr>';
     for (const row of lang.conj) {
@@ -6337,52 +6337,36 @@ function lrRender() {
   storyEl.textContent = lang.story;
   storyEl.style.direction = isRTL ? 'rtl' : 'ltr';
   storyEl.style.fontFamily = isRTL ? "'Amiri', serif" : "'Literata', Georgia, serif";
-  storyEl.style.fontSize = isRTL ? '1.1rem' : '0.95rem';
+  storyEl.style.fontSize = isRTL ? '1.05rem' : '0.95rem';
   storyEl.style.lineHeight = isRTL ? '2.2' : '1.9';
 
-  // Mark grid — one row per language x type
-  lrRenderMarkGrid();
+  // Mark button — single button for current lang + type
+  lrRenderMarkBtn();
 }
 
-// ── Mark grid ─────────────────────────────────────────────────────────────
-function lrRenderMarkGrid() {
-  const grid = document.getElementById('lrMarkGrid');
-  const types = ['word', 'verb'];
-  const monoFont = 'DM Mono, monospace';
-  let html = '';
-  for (const lang of LR_LANGS) {
-    for (const type of types) {
-      const key = lrStudiedKey(lang, type);
-      const done = localStorage.getItem(key) === '1';
-      const isActive = lang === _lrLang && type === _lrType;
-      const rowBg = isActive ? '#1a1a08' : '#0f0e0a';
-      const borderColor = done ? '#4a7c59' : (isActive ? '#c9a84c' : '#2a2010');
-      const textColor = done ? '#6aab7a' : (isActive ? '#c9a84c' : '#5a4a28');
-      const btnBg = done ? 'linear-gradient(135deg,#0f2010,#182818)' : 'linear-gradient(135deg,#1a1500,#2a2000)';
-      const btnColor = done ? '#6aab7a' : '#c9a84c';
-      const btnBorder = done ? '#4a7c59' : '#c9a84c';
-      const label = (done ? '\u2713 ' : '') + LR_LANG_NAMES[lang] + ' \u2014 ' + (type === 'verb' ? 'Verb' : 'Word');
-      html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:' + rowBg + ';border:1px solid ' + borderColor + ';border-radius:6px;gap:10px;">'
-        + '<span style="font-family:' + monoFont + ';font-size:11px;color:' + textColor + ';letter-spacing:.5px;">' + label + '</span>'
-        + (done
-          ? '<span style="font-family:' + monoFont + ';font-size:10px;color:#4a7c59;letter-spacing:1px;">Learned</span>'
-          : '<button onclick="lrMarkStudied(\''+lang+'\',\''+type+'\')" style="background:' + btnBg + ';border:1px solid ' + btnBorder + ';color:' + btnColor + ';padding:4px 12px;border-radius:4px;cursor:pointer;font-family:' + monoFont + ';font-size:10px;letter-spacing:1px;">Mark Learned</button>'
-        )
-        + '</div>';
-    }
-  }
-  grid.innerHTML = html;
+// ── Single mark button ────────────────────────────────────────────────────
+function lrRenderMarkBtn() {
+  const key = lrStudiedKey(_lrLang, _lrType);
+  const done = localStorage.getItem(key) === '1';
+  const btn = document.getElementById('lrMarkBtn');
+  btn.dataset.done = done ? '1' : '';
+  btn.textContent = done
+    ? '✓ Learned — ' + LR_LANG_NAMES[_lrLang] + ' ' + (_lrType === 'verb' ? 'Verb' : 'Word')
+    : '✓ Mark As Learned Today';
+  btn.style.background = done ? 'linear-gradient(135deg,#0f2010,#182818)' : 'linear-gradient(135deg,#1a1500,#2a2000)';
+  btn.style.borderColor = done ? '#4a7c59' : '#c9a84c';
+  btn.style.color = done ? '#6aab7a' : '#c9a84c';
+  btn.style.cursor = done ? 'default' : 'pointer';
+}
+
+function lrMarkStudied() {
+  const key = lrStudiedKey(_lrLang, _lrType);
+  if (localStorage.getItem(key) === '1') return;
+  localStorage.setItem(key, '1');
+  lrRenderMarkBtn();
   lrUpdateGoalBadge();
-}
-
-// ── Mark studied ──────────────────────────────────────────────────────────
-function lrMarkStudied(lang, type) {
-  localStorage.setItem(lrStudiedKey(lang, type), '1');
-  // If all langs for this type are done, auto-yes the goal
-  const allDone = LR_LANGS.some(l => localStorage.getItem(lrStudiedKey(l, 'word')) === '1')
-    && LR_LANGS.some(l => localStorage.getItem(lrStudiedKey(l, 'verb')) === '1');
-  if (allDone) { try { setYN('language','yes'); } catch(e) {} }
-  lrRenderMarkGrid();
+  // Auto-yes language goal if any lang+type is done
+  try { setYN('language','yes'); } catch(e) {}
 }
 
 // ── Goal card badge ───────────────────────────────────────────────────────
@@ -6397,7 +6381,7 @@ function lrUpdateGoalBadge() {
     else if (wDone) learned.push(LR_LANG_NAMES[lang] + ' (W)');
     else if (vDone) learned.push(LR_LANG_NAMES[lang] + ' (V)');
   }
-  if (learned.length > 0) {
+  if (learned.length) {
     badge.style.display = 'block';
     badge.textContent = 'Today: ' + learned.join(' · ');
   } else {
@@ -6408,48 +6392,26 @@ function lrUpdateGoalBadge() {
 // ── Lang / Type selectors ─────────────────────────────────────────────────
 function lrSetLang(lang) {
   _lrLang = lang;
-  document.querySelectorAll('.lr-lang-btn').forEach(b => {
-    const active = b.dataset.lang === lang;
-    b.style.background = active ? '#1a1500' : '#1e1a10';
-    b.style.borderColor = active ? '#c9a84c' : '#2a2010';
-    b.style.color = active ? '#c9a84c' : '#8a7840';
-  });
   try { localStorage.setItem('lr_lang', lang); } catch(e) {}
   lrRender();
 }
-
 function lrSetType(type) {
   _lrType = type;
-  document.querySelectorAll('.lr-type-btn').forEach(b => {
-    const active = b.dataset.type === type;
-    b.style.background = active ? '#1a1500' : '#1e1a10';
-    b.style.borderColor = active ? '#c9a84c' : '#2a2010';
-    b.style.color = active ? '#c9a84c' : '#8a7840';
-  });
   lrRender();
 }
 
 // ── Open / Close ──────────────────────────────────────────────────────────
 function openLanguageReader() {
-  // Restore saved language
   try {
     const saved = localStorage.getItem('lr_lang');
-    if (saved && LR_LANGS.includes(saved)) { _lrLang = saved; }
+    if (saved && LR_LANGS.includes(saved)) _lrLang = saved;
   } catch(e) {}
-  // Sync lang buttons
-  document.querySelectorAll('.lr-lang-btn').forEach(b => {
-    const active = b.dataset.lang === _lrLang;
-    b.style.background = active ? '#1a1500' : '#1e1a10';
-    b.style.borderColor = active ? '#c9a84c' : '#2a2010';
-    b.style.color = active ? '#c9a84c' : '#8a7840';
-  });
   lrRender();
-  document.getElementById('langOverlay').classList.add('active');
-  document.getElementById('langOverlay').scrollTop = 0;
-  // NO window.scrollTo — keep page position intact (fix #6)
+  const overlay = document.getElementById('langOverlay');
+  overlay.classList.add('active');
+  overlay.scrollTop = 0;
   document.body.style.overflow = 'hidden';
 }
-
 function closeLanguageReader() {
   document.getElementById('langOverlay').classList.remove('active');
   document.body.style.overflow = '';

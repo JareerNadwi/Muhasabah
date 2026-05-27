@@ -3413,7 +3413,7 @@ function renderBookBadge(dk) {
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="bookProgressPill" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
-        <button onclick="closeBookReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Save & Exit</button>
+        <button class="qr-close" onclick="closeBookReader()">✕ Save & Exit</button>
       </div>
     </div>
     <!-- Already done note -->
@@ -3462,7 +3462,7 @@ function renderBookBadge(dk) {
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="hadithCounter" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
-        <button onclick="closeHadithReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Save & Exit</button>
+        <button class="qr-close" onclick="closeHadithReader()">✕ Save & Exit</button>
       </div>
     </div>
     <div id="hadithDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">✓ You've already completed today's hadiths</div>
@@ -3490,7 +3490,7 @@ function renderBookBadge(dk) {
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="tafsirCounter" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
-        <button onclick="closeTafsirReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Save & Exit</button>
+        <button class="qr-close" onclick="closeTafsirReader()">✕ Save & Exit</button>
       </div>
     </div>
     <div id="tafsirDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">✓ You've already completed today's Quran Meaning</div>
@@ -3526,7 +3526,7 @@ function renderBookBadge(dk) {
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="svCounter" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
-        <button onclick="closeSurahVerseReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+        <button class="qr-close" onclick="closeSurahVerseReader()">✕ Close</button>
       </div>
     </div>
     <div id="svLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:'DM Mono',monospace;background:#0d0b08;">Loading verses…</div>
@@ -3556,7 +3556,7 @@ function renderBookBadge(dk) {
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🕌 The Pillar of Salah</div>
-      <button onclick="closeSalahArticle()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+      <button class="qr-close" onclick="closeSalahArticle()">✕ Close</button>
     </div>
     <!-- Body -->
     <div style="padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
@@ -3732,7 +3732,7 @@ function closeSalahArticle(){
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🌙 The Night Prayer — Tahajjud</div>
-      <button onclick="closeArticle('tahajjud')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+      <button class="qr-close" onclick="closeArticle('tahajjud')">✕ Close</button>
     </div>
     <div style="padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
       <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Tahajjud is the voluntary night prayer performed after sleeping and waking before Fajr. It is the highest of the voluntary prayers in rank, and the most beloved of the nawāfil to Allah. The Prophet ﷺ never abandoned it throughout his life, whether in health or in travel.</p>
@@ -3794,7 +3794,7 @@ function closeSalahArticle(){
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🌙 Sawm — The Fast</div>
-      <button onclick="closeArticle('sawm')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+      <button class="qr-close" onclick="closeArticle('sawm')">✕ Close</button>
     </div>
     <div style="padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
       <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Sawm — fasting — is the fourth pillar of Islam, obligatory upon every Muslim in the month of Ramadan and recommended throughout the year on designated days. It is not merely abstaining from food and drink. The Prophet ﷺ warned that whoever does not abandon falsehood and acting upon it, Allah has no need of him giving up his food and drink.</p>
@@ -3849,7 +3849,7 @@ function closeSalahArticle(){
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🌿 Sunnah Salah — The Confirmed Prayers</div>
-      <button onclick="closeArticle('sunnahSalah')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+      <button class="qr-close" onclick="closeArticle('sunnahSalah')">✕ Close</button>
     </div>
     <div style="padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
       <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">The Sunnah prayers are the voluntary prayers the Prophet ﷺ consistently performed alongside the obligatory prayers. They are of two types: the Rawātib — the confirmed sunnahs attached to the five daily prayers — and the non-attached sunnahs performed at other times.</p>
@@ -3894,7 +3894,7 @@ function closeSalahArticle(){
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">✨ Nafl Salah — The Supererogatory Prayer</div>
-      <button onclick="closeArticle('naflSalah')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+      <button class="qr-close" onclick="closeArticle('naflSalah')">✕ Close</button>
     </div>
     <div style="padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
       <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Nafl Salah refers to any voluntary prayer beyond the obligatory and the confirmed Sunnah prayers. It is the overflow of a heart that cannot get enough of standing before Allah — praying not out of obligation or routine, but out of love and longing.</p>
@@ -3949,7 +3949,7 @@ function closeSalahArticle(){
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">💛 Sadaqah — Voluntary Charity</div>
-      <button onclick="closeArticle('sadaqah')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+      <button class="qr-close" onclick="closeArticle('sadaqah')">✕ Close</button>
     </div>
     <div style="padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
       <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Sadaqah is voluntary charity given for the sake of Allah alone — beyond the obligatory Zakat. It is one of the greatest deeds a Muslim can perform, extinguishing sin as water extinguishes fire, warding off calamity, and multiplying in reward with Allah in ways the mind cannot measure.</p>
@@ -4014,7 +4014,7 @@ function closeSalahArticle(){
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">📿 Zikr</div>
-      <button onclick="closeArticle('zikr')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+      <button class="qr-close" onclick="closeArticle('zikr')">✕ Close</button>
     </div>
 
     <!-- Body -->
@@ -4129,7 +4129,7 @@ document.addEventListener('keydown', function(e){
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🏃 Exercise — The Body's Right</div>
-      <button onclick="closeArticle('exercise')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+      <button class="qr-close" onclick="closeArticle('exercise')">✕ Close</button>
     </div>
     <div style="padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
 
@@ -4277,7 +4277,7 @@ function calcBMI(){
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="asmaulProgressPill" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
-        <button onclick="closeAsmaulReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Save & Exit</button>
+        <button class="qr-close" onclick="closeAsmaulReader()">✕ Save & Exit</button>
       </div>
     </div>
     <!-- Session info -->
@@ -4697,7 +4697,7 @@ loadDayData = function(dk){
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="zikrReaderProgressPill" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
-        <button onclick="closeZikrReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">X Save &amp; Exit</button>
+        <button class="qr-close" onclick="closeZikrReader()">✕ Save &amp; Exit</button>
       </div>
     </div>
     <div id="zikrReaderSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#0d0b08;"></div>
@@ -5017,7 +5017,7 @@ loadDayData=function(dk){
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="zikrBookProgressPill" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
-        <button onclick="closeZikrBookReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Save & Exit</button>
+        <button class="qr-close" onclick="closeZikrBookReader()">✕ Save & Exit</button>
       </div>
     </div>
     <div id="zikrBookSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#0d0b08;"></div>

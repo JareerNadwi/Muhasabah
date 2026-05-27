@@ -5827,7 +5827,7 @@ async function pwSend() {
 
     <!-- Top bar -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;gap:12px;flex-wrap:wrap;">
-      <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🗣 Daily Language Learner</div>
+      <div id="lrTitle" style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🗣 Daily Language Learner</div>
       <button class="qr-close" onclick="closeLanguageReader()">✕ Save &amp; Exit</button>
     </div>
 
@@ -5835,16 +5835,16 @@ async function pwSend() {
     <div style="padding:12px 18px;background:#141008;border-bottom:1px solid #2a2010;">
       <!-- Row 1: Languages -->
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:6px;">
-        <button class="lr-lang-btn" data-lang="ar" onclick="lrSetLang('ar')" style="background:#1a1500;border:1px solid #c9a84c;color:#c9a84c;padding:7px 4px;border-radius:6px;cursor:pointer;font-family:'Amiri',serif;font-size:13px;text-align:center;" onmouseout="lrSyncBtns()">عَرَبِي</button>
-        <button class="lr-lang-btn" data-lang="en" onclick="lrSetLang('en')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 4px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;text-align:center;" onmouseout="lrSyncBtns()">English</button>
-        <button class="lr-lang-btn" data-lang="bn" onclick="lrSetLang('bn')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 4px;border-radius:6px;cursor:pointer;font-family:'Literata',Georgia,serif;font-size:12px;text-align:center;" onmouseout="lrSyncBtns()">বাংলা</button>
-        <button class="lr-lang-btn" data-lang="ur" onclick="lrSetLang('ur')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 4px;border-radius:6px;cursor:pointer;font-family:'Amiri',serif;font-size:13px;text-align:center;" onmouseout="lrSyncBtns()">اُردُو</button>
-        <button class="lr-lang-btn" data-lang="hi" onclick="lrSetLang('hi')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 4px;border-radius:6px;cursor:pointer;font-family:'Literata',Georgia,serif;font-size:12px;text-align:center;" onmouseout="lrSyncBtns()">हिन्दी</button>
+        <button class="lr-lang-btn" data-lang="ar" onclick="lrSetLang('ar')" style="background:#1a1500;border:1px solid #c9a84c;color:#c9a84c;height:34px;border-radius:6px;cursor:pointer;font-family:'Amiri',serif;font-size:13px;text-align:center;" onmouseout="lrSyncBtns()">عَرَبِي</button>
+        <button class="lr-lang-btn" data-lang="en" onclick="lrSetLang('en')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;height:34px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;text-align:center;" onmouseout="lrSyncBtns()">English</button>
+        <button class="lr-lang-btn" data-lang="bn" onclick="lrSetLang('bn')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;height:34px;border-radius:6px;cursor:pointer;font-family:'Literata',Georgia,serif;font-size:12px;text-align:center;" onmouseout="lrSyncBtns()">বাংলা</button>
+        <button class="lr-lang-btn" data-lang="ur" onclick="lrSetLang('ur')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;height:34px;border-radius:6px;cursor:pointer;font-family:'Amiri',serif;font-size:13px;text-align:center;" onmouseout="lrSyncBtns()">اُردُو</button>
+        <button class="lr-lang-btn" data-lang="hi" onclick="lrSetLang('hi')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;height:34px;border-radius:6px;cursor:pointer;font-family:'Literata',Georgia,serif;font-size:12px;text-align:center;" onmouseout="lrSyncBtns()">हिन्दी</button>
       </div>
-      <!-- Row 2: Word / Verb — dynamic labels per language -->
+      <!-- Row 2: Word / Verb — dynamic labels per language, same height as row 1 -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-        <button class="lr-type-btn" id="lrWordBtn" data-type="word" onclick="lrSetType('word')" style="background:#1a1500;border:1px solid #c9a84c;color:#c9a84c;padding:7px 4px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;text-align:center;" onmouseout="lrSyncBtns()">📖 Word</button>
-        <button class="lr-type-btn" id="lrVerbBtn" data-type="verb" onclick="lrSetType('verb')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 4px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;text-align:center;" onmouseout="lrSyncBtns()">⚡ Verb</button>
+        <button class="lr-type-btn" id="lrWordBtn" data-type="word" onclick="lrSetType('word')" style="background:#1a1500;border:1px solid #c9a84c;color:#c9a84c;height:34px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;text-align:center;" onmouseout="lrSyncBtns()">📖 Word</button>
+        <button class="lr-type-btn" id="lrVerbBtn" data-type="verb" onclick="lrSetType('verb')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;height:34px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;text-align:center;" onmouseout="lrSyncBtns()">⚡ Verb</button>
       </div>
     </div>
 
@@ -5898,7 +5898,7 @@ async function pwSend() {
         <button id="lrMarkBtn" onclick="lrMarkStudied()" style="background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid #c9a84c;color:#c9a84c;padding:10px 28px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;" onmouseover="if(!this.dataset.done)this.style.background='linear-gradient(135deg,#2a2000,#3a3000)'" onmouseout="if(!this.dataset.done)this.style.background='linear-gradient(135deg,#1a1500,#2a2000)'">✓ Mark As Learned Today</button>
       </div>
 
-      <div style="text-align:center;color:#5a5030;font-size:0.85rem;font-style:italic;border-top:1px solid #1e1a10;padding-top:16px;font-family:'Literata',Georgia,serif;">May Allah grant us the tawfeeq in all our studies. آمين</div>
+      <div id="lrDua" style="text-align:center;color:#5a5030;font-size:0.85rem;font-style:italic;border-top:1px solid #1e1a10;padding-top:16px;font-family:'Literata',Georgia,serif;">May Allah grant us the tawfeeq in all our studies. آمين</div>
 
     </div>
   </div>
@@ -6267,34 +6267,97 @@ function lrGetTodayEntry(type) {
 }
 
 // ── Sync button highlights ────────────────────────────────────────────────
-// Word & Verb labels per language
-const LR_TYPE_LABELS = {
-  ar: { word: '📖 مفرد', verb: '⚡ فعل',  font: "'Amiri', serif",           size: '13px' },
-  en: { word: '📖 Word', verb: '⚡ Verb',  font: "'DM Mono', monospace",     size: '10px' },
-  bn: { word: '📖 শব্দ',  verb: '⚡ ক্রিয়া', font: "'Literata', Georgia, serif", size: '12px' },
-  ur: { word: '📖 مفرد', verb: '⚡ فعل',  font: "'Amiri', serif",           size: '13px' },
-  hi: { word: '📖 शब्द', verb: '⚡ क्रिया', font: "'Literata', Georgia, serif", size: '12px' },
+// Per-language UI strings
+const LR_UI = {
+  ar: {
+    title:    '🗣 المتعلم اليومي للغات',
+    saveExit: '✕ حفظ والخروج',
+    wordBtn:  { label: '📖 مفرد', font: "'Amiri', serif",            size: '13px' },
+    verbBtn:  { label: '⚡ فعل',  font: "'Amiri', serif",            size: '13px' },
+    markBtn:  'تعلّمت هذا اليوم ✓',
+    learnedLabel: (type) => 'تعلّمت — ' + (type === 'verb' ? 'فعل' : 'مفرد') + ' ✓',
+    undoLabel:    (type) => 'إلغاء — ' + (type === 'verb' ? 'فعل' : 'مفرد'),
+    dua:      'اللهم اجعل علمنا نافعاً. آمين',
+    rtl: true,
+  },
+  en: {
+    title:    '🗣 Daily Language Learner',
+    saveExit: '✕ Save & Exit',
+    wordBtn:  { label: '📖 Word',  font: "'DM Mono', monospace",      size: '10px' },
+    verbBtn:  { label: '⚡ Verb',  font: "'DM Mono', monospace",      size: '10px' },
+    markBtn:  '✓ Mark As Learned Today',
+    learnedLabel: (type) => '✓ Learned — ' + (type === 'verb' ? 'Verb' : 'Word'),
+    undoLabel:    (type) => '↩ Undo — ' + (type === 'verb' ? 'Verb' : 'Word'),
+    dua:      'May Allah grant us tawfeeq in all our studies. آمين',
+    rtl: false,
+  },
+  bn: {
+    title:    '🗣 দৈনিক ভাষা শিক্ষা',
+    saveExit: '✕ সংরক্ষণ ও প্রস্থান',
+    wordBtn:  { label: '📖 শব্দ',   font: "'Literata', Georgia, serif", size: '12px' },
+    verbBtn:  { label: '⚡ ক্রিয়া', font: "'Literata', Georgia, serif", size: '12px' },
+    markBtn:  '✓ আজ শিখেছি হিসেবে চিহ্নিত করুন',
+    learnedLabel: (type) => '✓ শেখা হয়েছে — ' + (type === 'verb' ? 'ক্রিয়া' : 'শব্দ'),
+    undoLabel:    (type) => '↩ পূর্বাবস্থায় ফিরুন — ' + (type === 'verb' ? 'ক্রিয়া' : 'শব্দ'),
+    dua:      'আল্লাহ আমাদের সকল পড়াশোনায় তাওফিক দিন। আমিন',
+    rtl: false,
+  },
+  ur: {
+    title:    '🗣 روزانہ زبان سیکھنا',
+    saveExit: '✕ محفوظ کریں اور باہر نکلیں',
+    wordBtn:  { label: '📖 لفظ',  font: "'Amiri', serif",            size: '13px' },
+    verbBtn:  { label: '⚡ فعل',  font: "'Amiri', serif",            size: '13px' },
+    markBtn:  'آج سیکھا ✓',
+    learnedLabel: (type) => 'سیکھ لیا — ' + (type === 'verb' ? 'فعل' : 'لفظ') + ' ✓',
+    undoLabel:    (type) => 'واپس کریں — ' + (type === 'verb' ? 'فعل' : 'لفظ'),
+    dua:      'اللہ ہمیں علم میں توفیق عطا فرمائے۔ آمین',
+    rtl: true,
+  },
+  hi: {
+    title:    '🗣 दैनिक भाषा सीखना',
+    saveExit: '✕ सहेजें और बाहर निकलें',
+    wordBtn:  { label: '📖 शब्द',  font: "'Literata', Georgia, serif", size: '12px' },
+    verbBtn:  { label: '⚡ क्रिया', font: "'Literata', Georgia, serif", size: '12px' },
+    markBtn:  '✓ आज सीखा के रूप में चिह्नित करें',
+    learnedLabel: (type) => '✓ सीखा — ' + (type === 'verb' ? 'क्रिया' : 'शब्द'),
+    undoLabel:    (type) => '↩ पूर्ववत करें — ' + (type === 'verb' ? 'क्रिया' : 'शब्द'),
+    dua:      'अल्लाह हमें सभी अध्ययन में तौफ़ीक़ दे। आमीन',
+    rtl: false,
+  },
 };
 
+function lrGetUI() { return LR_UI[_lrLang] || LR_UI.en; }
+
 function lrSyncBtns() {
+  const ui = lrGetUI();
+  // Lang buttons
   document.querySelectorAll('.lr-lang-btn').forEach(b => {
     const active = b.dataset.lang === _lrLang;
     b.style.background = active ? '#1a1500' : '#1e1a10';
     b.style.borderColor = active ? '#c9a84c' : '#2a2010';
     b.style.color = active ? '#c9a84c' : '#8a7840';
   });
+  // Type buttons
   document.querySelectorAll('.lr-type-btn').forEach(b => {
     const active = b.dataset.type === _lrType;
     b.style.background = active ? '#1a1500' : '#1e1a10';
     b.style.borderColor = active ? '#c9a84c' : '#2a2010';
     b.style.color = active ? '#c9a84c' : '#8a7840';
   });
-  // Update word/verb button labels to current language
-  const labels = LR_TYPE_LABELS[_lrLang] || LR_TYPE_LABELS.en;
-  const wordBtn = document.getElementById('lrWordBtn');
-  const verbBtn = document.getElementById('lrVerbBtn');
-  if (wordBtn) { wordBtn.textContent = labels.word; wordBtn.style.fontFamily = labels.font; wordBtn.style.fontSize = labels.size; }
-  if (verbBtn) { verbBtn.textContent = labels.verb; verbBtn.style.fontFamily = labels.font; verbBtn.style.fontSize = labels.size; }
+  // Word/Verb button labels
+  const wb = document.getElementById('lrWordBtn');
+  const vb = document.getElementById('lrVerbBtn');
+  if (wb) { wb.textContent = ui.wordBtn.label; wb.style.fontFamily = ui.wordBtn.font; wb.style.fontSize = ui.wordBtn.size; }
+  if (vb) { vb.textContent = ui.verbBtn.label; vb.style.fontFamily = ui.verbBtn.font; vb.style.fontSize = ui.verbBtn.size; }
+  // Title
+  const title = document.getElementById('lrTitle');
+  if (title) title.textContent = ui.title;
+  // Save & Exit button
+  const closeBtn = document.querySelector('#langOverlay .qr-close');
+  if (closeBtn) closeBtn.textContent = ui.saveExit;
+  // Dua footer
+  const dua = document.getElementById('lrDua');
+  if (dua) { dua.textContent = ui.dua; dua.style.direction = ui.rtl ? 'rtl' : 'ltr'; }
 }
 
 // ── Render ────────────────────────────────────────────────────────────────
@@ -6360,29 +6423,47 @@ function lrRender() {
   lrRenderMarkBtn();
 }
 
-// ── Single mark button ────────────────────────────────────────────────────
+// ── Single mark button — with undo toggle ────────────────────────────────
 function lrRenderMarkBtn() {
   const key = lrStudiedKey(_lrLang, _lrType);
   const done = localStorage.getItem(key) === '1';
+  const ui = lrGetUI();
   const btn = document.getElementById('lrMarkBtn');
   btn.dataset.done = done ? '1' : '';
-  btn.textContent = done
-    ? '✓ Learned — ' + LR_LANG_NAMES[_lrLang] + ' ' + (_lrType === 'verb' ? 'Verb' : 'Word')
-    : '✓ Mark As Learned Today';
-  btn.style.background = done ? 'linear-gradient(135deg,#0f2010,#182818)' : 'linear-gradient(135deg,#1a1500,#2a2000)';
-  btn.style.borderColor = done ? '#4a7c59' : '#c9a84c';
-  btn.style.color = done ? '#6aab7a' : '#c9a84c';
-  btn.style.cursor = done ? 'default' : 'pointer';
+  if (done) {
+    // Show "Learned" state with a subtle undo hint on hover via title
+    btn.textContent = ui.learnedLabel(_lrType);
+    btn.title = 'Tap again to undo';
+    btn.style.background = 'linear-gradient(135deg,#0f2010,#182818)';
+    btn.style.borderColor = '#4a7c59';
+    btn.style.color = '#6aab7a';
+    btn.style.cursor = 'pointer';
+    btn.onmouseover = () => { btn.textContent = ui.undoLabel(_lrType); btn.style.background = 'linear-gradient(135deg,#2a1010,#3a1818)'; btn.style.borderColor = '#c05050'; btn.style.color = '#c07070'; };
+    btn.onmouseout  = () => { btn.textContent = ui.learnedLabel(_lrType); btn.style.background = 'linear-gradient(135deg,#0f2010,#182818)'; btn.style.borderColor = '#4a7c59'; btn.style.color = '#6aab7a'; };
+  } else {
+    btn.textContent = ui.markBtn;
+    btn.title = '';
+    btn.style.background = 'linear-gradient(135deg,#1a1500,#2a2000)';
+    btn.style.borderColor = '#c9a84c';
+    btn.style.color = '#c9a84c';
+    btn.style.cursor = 'pointer';
+    btn.onmouseover = () => { btn.style.background = 'linear-gradient(135deg,#2a2000,#3a3000)'; };
+    btn.onmouseout  = () => { btn.style.background = 'linear-gradient(135deg,#1a1500,#2a2000)'; };
+  }
 }
 
 function lrMarkStudied() {
   const key = lrStudiedKey(_lrLang, _lrType);
-  if (localStorage.getItem(key) === '1') return;
-  localStorage.setItem(key, '1');
+  const done = localStorage.getItem(key) === '1';
+  if (done) {
+    // Undo
+    localStorage.removeItem(key);
+  } else {
+    localStorage.setItem(key, '1');
+    try { setYN('language','yes'); } catch(e) {}
+  }
   lrRenderMarkBtn();
   lrUpdateGoalBadge();
-  // Auto-yes language goal if any lang+type is done
-  try { setYN('language','yes'); } catch(e) {}
 }
 
 // ── Goal card badge ───────────────────────────────────────────────────────

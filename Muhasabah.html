@@ -5830,22 +5830,14 @@ async function pwSend() {
 }
 </script>
 
-<!-- LANGUAGE READER OVERLAY -->
+<!-- DAILY LANGUAGE LEARNER OVERLAY -->
 <div class="lr-overlay" id="langOverlay">
-  <div style="display:flex;flex-direction:column;width:100%;max-width:760px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:760px;margin:20px auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;">
 
     <!-- Top bar -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;gap:12px;flex-wrap:wrap;">
-      <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🗣 Language Learner — Word &amp; Verb Of The Day</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;gap:12px;flex-wrap:wrap;">
+      <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🗣 Daily Language Learner</div>
       <button onclick="closeLanguageReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
-    </div>
-
-    <!-- Day navigation -->
-    <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 18px;background:#0f110f;border-bottom:1px solid #2a2010;flex-shrink:0;flex-wrap:wrap;">
-      <button id="lrPrevBtn" onclick="lrChangeDay(-1)" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 18px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;" onmouseover="this.style.borderColor='#c9a84c';this.style.color='#c9a84c'" onmouseout="this.style.borderColor='#2a2010';this.style.color='#8a7840'">← Prev</button>
-      <div id="lrDayLabel" style="font-family:'DM Mono',monospace;font-size:12px;color:#c5b98a;min-width:200px;text-align:center;letter-spacing:.5px;">—</div>
-      <button id="lrNextBtn" onclick="lrChangeDay(1)" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 18px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;" onmouseover="this.style.borderColor='#c9a84c';this.style.color='#c9a84c'" onmouseout="this.style.borderColor='#2a2010';this.style.color='#8a7840'">Next →</button>
-      <button onclick="lrGoToday()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;" onmouseover="this.style.borderColor='#c9a84c';this.style.color='#c9a84c'" onmouseout="this.style.borderColor='#2a2010';this.style.color='#8a7840'">Today</button>
     </div>
 
     <!-- Language selector -->
@@ -5858,10 +5850,17 @@ async function pwSend() {
       <button class="lr-lang-btn" data-lang="hi" onclick="lrSetLang('hi')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">हिन्दी Hindi</button>
     </div>
 
+    <!-- Word / Verb selector -->
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:#0f0e0a;border-bottom:1px solid #2a2010;flex-wrap:wrap;">
+      <span style="font-family:'DM Mono',monospace;font-size:9px;color:#5a4a28;letter-spacing:2px;text-transform:uppercase;margin-right:4px;">Type</span>
+      <button class="lr-type-btn" data-type="word" onclick="lrSetType('word')" style="background:#1a1500;border:1px solid #c9a84c;color:#c9a84c;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">📖 Word</button>
+      <button class="lr-type-btn" data-type="verb" onclick="lrSetType('verb')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">⚡ Verb</button>
+    </div>
+
     <!-- Content body -->
     <div id="lrBody" style="padding:28px 24px;display:flex;flex-direction:column;gap:20px;">
 
-      <div id="lrNoData" style="display:none;text-align:center;padding:40px 20px;font-family:'DM Mono',monospace;font-size:12px;color:#5a4a28;letter-spacing:1px;">No word found for this day.</div>
+      <div id="lrNoData" style="display:none;text-align:center;padding:40px 20px;font-family:'DM Mono',monospace;font-size:12px;color:#5a4a28;letter-spacing:1px;">No entry found for today.</div>
 
       <!-- Word hero -->
       <div id="lrHero" style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:28px 32px;text-align:center;">
@@ -5889,7 +5888,7 @@ async function pwSend() {
         </div>
       </div>
 
-      <!-- Conjugation -->
+      <!-- Conjugation (verb only) -->
       <div id="lrConjPanel" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:20px 24px;">
         <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;font-family:'DM Mono',monospace;">Conjugation</div>
         <table id="lrConjTable" style="width:100%;border-collapse:collapse;"></table>
@@ -5903,13 +5902,13 @@ async function pwSend() {
         <div id="lrStory" style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c5b98a;line-height:1.9;font-style:italic;">—</div>
       </div>
 
-      <!-- Mark button -->
-      <div style="text-align:center;padding:8px 0 4px;">
-        <div id="lrSessionInfo" style="font-family:'DM Mono',monospace;font-size:10px;color:#5a4a28;letter-spacing:.5px;margin-bottom:14px;">—</div>
-        <button id="lrMarkBtn" onclick="lrMarkStudied()" style="background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid #c9a84c;color:#c9a84c;padding:10px 28px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;" onmouseover="if(!this.classList.contains('marked'))this.style.background='linear-gradient(135deg,#2a2000,#3a3000)'" onmouseout="if(!this.classList.contains('marked'))this.style.background='linear-gradient(135deg,#1a1500,#2a2000)'">✓ Mark As Studied Today</button>
+      <!-- Mark studied — per language + type -->
+      <div style="background:#141008;border:1px solid #2a2010;border-radius:8px;padding:18px 20px;">
+        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;font-family:'DM Mono',monospace;">Mark As Learned Today</div>
+        <div id="lrMarkGrid" style="display:flex;flex-direction:column;gap:8px;"></div>
       </div>
 
-      <div style="text-align:center;color:#5a5030;font-size:0.85rem;font-style:italic;margin-top:8px;border-top:1px solid #1e1a10;padding-top:20px;">May Allah grant us the tawfeeq in all our studies. آمين</div>
+      <div style="text-align:center;color:#5a5030;font-size:0.85rem;font-style:italic;margin-top:4px;border-top:1px solid #1e1a10;padding-top:20px;">May Allah grant us the tawfeeq in all our studies. آمين</div>
 
     </div>
   </div>
@@ -5917,13 +5916,8 @@ async function pwSend() {
 
 <script>
 /* ══════════════════════════════════════════
-   LANGUAGE READER — DATA & LOGIC
+   DAILY LANGUAGE LEARNER — DATA & LOGIC
 ══════════════════════════════════════════ */
-
-// ── Word Bank ──────────────────────────────────────────────────────────────
-// Each entry: { type: 'verb'|'noun'|'adj', langs: { ar, en, bn, ur, hi } }
-// Each lang: { word, roman, meaning, syn, ant, conj (verb only), story }
-// conj: [ {person, past, present, future} ]
 
 const LR_WORDS = [
   {
@@ -6257,58 +6251,37 @@ const LR_WORDS = [
 
 // RTL languages
 const LR_RTL = new Set(['ar', 'ur']);
-
-// Lang display names
 const LR_LANG_NAMES = { ar:'Arabic', en:'English', bn:'Bengali', ur:'Urdu', hi:'Hindi' };
+const LR_LANGS = ['ar','en','bn','ur','hi'];
 
 // State
 let _lrLang = 'ar';
-let _lrDayOffset = 0; // 0 = today
+let _lrType = 'word'; // 'word' or 'verb'
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-function lrGetDateForOffset(offset) {
-  const d = new Date();
-  d.setHours(0,0,0,0);
-  d.setDate(d.getDate() + offset);
-  return d;
-}
-
-function lrGetWordForDate(date) {
-  const start = new Date(date.getFullYear(), 0, 1);
-  const dayOfYear = Math.floor((date - start) / 86400000); // 0-based
-  const idx = dayOfYear % LR_WORDS.length;
-  return { word: LR_WORDS[idx], idx };
-}
-
-function lrFormatDate(date) {
-  return date.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'long', year:'numeric' });
-}
-
 function lrTodayKey() {
   const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
-function lrIsToday() {
-  return _lrDayOffset === 0;
+function lrStudiedKey(lang, type) {
+  return 'lr_studied_' + lrTodayKey() + '_' + lang + '_' + type;
 }
 
-// ── Render ────────────────────────────────────────────────────────────────
+function lrGetTodayEntry(type) {
+  const d = new Date(); d.setHours(0,0,0,0);
+  const start = new Date(d.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((d - start) / 86400000);
+  const pool = LR_WORDS.filter(w => w.type === type);
+  if (!pool.length) return null;
+  return { entry: pool[dayOfYear % pool.length], idx: dayOfYear % pool.length };
+}
+
+// ── Render content ────────────────────────────────────────────────────────
 function lrRender() {
-  const date = lrGetDateForOffset(_lrDayOffset);
-  const { word: entry, idx } = lrGetWordForDate(date);
+  const result = lrGetTodayEntry(_lrType);
 
-  // Nav label
-  document.getElementById('lrDayLabel').textContent =
-    (_lrDayOffset === 0 ? '📅 Today — ' : '') + lrFormatDate(date);
-
-  // Next button disable state
-  const nextBtn = document.getElementById('lrNextBtn');
-  nextBtn.disabled = _lrDayOffset >= 0;
-  nextBtn.style.opacity = _lrDayOffset >= 0 ? '.3' : '1';
-  nextBtn.style.cursor = _lrDayOffset >= 0 ? 'not-allowed' : 'pointer';
-
-  if (!entry) {
+  if (!result) {
     document.getElementById('lrHero').style.display = 'none';
     document.getElementById('lrConjPanel').style.display = 'none';
     document.getElementById('lrNoData').style.display = 'block';
@@ -6318,48 +6291,48 @@ function lrRender() {
   document.getElementById('lrHero').style.display = '';
   document.getElementById('lrNoData').style.display = 'none';
 
+  const { entry, idx } = result;
   const lang = entry.langs[_lrLang];
   const isRTL = LR_RTL.has(_lrLang);
 
   // Hero
   document.getElementById('lrWordNum').textContent =
-    `WORD ${String(idx + 1).padStart(3,'0')} · ${entry.type.toUpperCase()} · ${LR_LANG_NAMES[_lrLang].toUpperCase()}`;
+    (_lrType === 'verb' ? 'VERB' : 'WORD') + ' ' + String(idx+1).padStart(3,'0') + ' · ' + LR_LANG_NAMES[_lrLang].toUpperCase();
   const mainEl = document.getElementById('lrWordMain');
   mainEl.textContent = lang.word;
   mainEl.style.direction = isRTL ? 'rtl' : 'ltr';
   mainEl.style.fontSize = isRTL ? '58px' : '52px';
   document.getElementById('lrWordRoman').textContent = lang.roman;
-  document.getElementById('lrWordType').textContent = entry.type === 'verb' ? 'VERB / فعل / ক্রিয়া / فعل / क्रिया' : entry.type.toUpperCase();
+  document.getElementById('lrWordType').textContent = _lrType === 'verb'
+    ? 'VERB / فعل / ক্রিয়া / فعل / क्रिया' : 'WORD / كلمة / শব্দ / لفظ / शब्द';
   document.getElementById('lrWordMeaning').textContent = lang.meaning;
 
   // Syn / Ant
   const synEl = document.getElementById('lrSyn');
   const antEl = document.getElementById('lrAnt');
-  synEl.textContent = lang.syn;
-  antEl.textContent = lang.ant;
-  synEl.style.direction = isRTL ? 'rtl' : 'ltr';
-  antEl.style.direction = isRTL ? 'rtl' : 'ltr';
+  synEl.textContent = lang.syn; synEl.style.direction = isRTL ? 'rtl' : 'ltr';
+  antEl.textContent = lang.ant; antEl.style.direction = isRTL ? 'rtl' : 'ltr';
 
   // Conjugation
   const conjPanel = document.getElementById('lrConjPanel');
   const conjTable = document.getElementById('lrConjTable');
-  if (entry.type === 'verb' && lang.conj) {
+  if (_lrType === 'verb' && lang.conj) {
     conjPanel.style.display = '';
     const thS = "font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:#7a6a40;padding:5px 10px;text-align:left;font-weight:400;font-family:'DM Mono',monospace;border-bottom:1px solid #2a2010;";
     const tdP = "font-size:10px;color:#7a6a40;padding:6px 10px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;";
     const tdN = "font-size:12px;color:#c5b98a;padding:6px 10px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;";
     const tdR = "font-size:14px;color:#f0e4c0;padding:6px 10px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;";
     const tdF = isRTL ? tdR : tdN;
-    let html = `<tr><th style="${thS}">Person</th><th style="${thS}">${isRTL ? 'ماضي · Past' : 'Past'}</th><th style="${thS}">${isRTL ? 'مضارع · Present' : 'Present'}</th><th style="${thS}">${isRTL ? 'مستقبل · Future' : 'Future'}</th></tr>`;
+    let html = '<tr><th style="'+thS+'">Person</th><th style="'+thS+'">'+(isRTL?'ماضي · Past':'Past')+'</th><th style="'+thS+'">'+(isRTL?'مضارع · Present':'Present')+'</th><th style="'+thS+'">'+(isRTL?'مستقبل · Future':'Future')+'</th></tr>';
     for (const row of lang.conj) {
-      html += `<tr><td style="${tdP}">${row.person}</td><td style="${tdF}">${row.past}</td><td style="${tdF}">${row.present}</td><td style="${tdF}">${row.future}</td></tr>`;
+      html += '<tr><td style="'+tdP+'">'+row.person+'</td><td style="'+tdF+'">'+row.past+'</td><td style="'+tdF+'">'+row.present+'</td><td style="'+tdF+'">'+row.future+'</td></tr>';
     }
     conjTable.innerHTML = html;
   } else {
     conjPanel.style.display = 'none';
   }
 
-  // Micro story
+  // Story
   const storyEl = document.getElementById('lrStory');
   storyEl.textContent = lang.story;
   storyEl.style.direction = isRTL ? 'rtl' : 'ltr';
@@ -6367,39 +6340,72 @@ function lrRender() {
   storyEl.style.fontSize = isRTL ? '1.1rem' : '0.95rem';
   storyEl.style.lineHeight = isRTL ? '2.2' : '1.9';
 
-  // Mark button state
-  const key = 'lr_studied_' + lrTodayKey();
-  const studied = localStorage.getItem(key) === '1';
-  const markBtn = document.getElementById('lrMarkBtn');
-  if (lrIsToday()) {
-    markBtn.style.display = '';
-    markBtn.textContent = studied ? '✓ Studied Today' : '✓ Mark As Studied Today';
-    if (studied) {
-      markBtn.style.background = 'linear-gradient(135deg,#0f2010,#182818)';
-      markBtn.style.borderColor = '#4a7c59';
-      markBtn.style.color = '#6aab7a';
-    } else {
-      markBtn.style.background = 'linear-gradient(135deg,#1a1500,#2a2000)';
-      markBtn.style.borderColor = '#c9a84c';
-      markBtn.style.color = '#c9a84c';
+  // Mark grid — one row per language x type
+  lrRenderMarkGrid();
+}
+
+// ── Mark grid ─────────────────────────────────────────────────────────────
+function lrRenderMarkGrid() {
+  const grid = document.getElementById('lrMarkGrid');
+  const types = ['word', 'verb'];
+  const monoFont = 'DM Mono, monospace';
+  let html = '';
+  for (const lang of LR_LANGS) {
+    for (const type of types) {
+      const key = lrStudiedKey(lang, type);
+      const done = localStorage.getItem(key) === '1';
+      const isActive = lang === _lrLang && type === _lrType;
+      const rowBg = isActive ? '#1a1a08' : '#0f0e0a';
+      const borderColor = done ? '#4a7c59' : (isActive ? '#c9a84c' : '#2a2010');
+      const textColor = done ? '#6aab7a' : (isActive ? '#c9a84c' : '#5a4a28');
+      const btnBg = done ? 'linear-gradient(135deg,#0f2010,#182818)' : 'linear-gradient(135deg,#1a1500,#2a2000)';
+      const btnColor = done ? '#6aab7a' : '#c9a84c';
+      const btnBorder = done ? '#4a7c59' : '#c9a84c';
+      const label = (done ? '\u2713 ' : '') + LR_LANG_NAMES[lang] + ' \u2014 ' + (type === 'verb' ? 'Verb' : 'Word');
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:' + rowBg + ';border:1px solid ' + borderColor + ';border-radius:6px;gap:10px;">'
+        + '<span style="font-family:' + monoFont + ';font-size:11px;color:' + textColor + ';letter-spacing:.5px;">' + label + '</span>'
+        + (done
+          ? '<span style="font-family:' + monoFont + ';font-size:10px;color:#4a7c59;letter-spacing:1px;">Learned</span>'
+          : '<button onclick="lrMarkStudied(\''+lang+'\',\''+type+'\')" style="background:' + btnBg + ';border:1px solid ' + btnBorder + ';color:' + btnColor + ';padding:4px 12px;border-radius:4px;cursor:pointer;font-family:' + monoFont + ';font-size:10px;letter-spacing:1px;">Mark Learned</button>'
+        )
+        + '</div>';
     }
-  } else {
-    markBtn.style.display = 'none';
   }
+  grid.innerHTML = html;
+  lrUpdateGoalBadge();
+}
 
-  // Session info
-  document.getElementById('lrSessionInfo').textContent =
-    `Word ${idx + 1} of ${LR_WORDS.length} · Day ${Math.floor((date - new Date(date.getFullYear(),0,1))/86400000)+1} of year`;
+// ── Mark studied ──────────────────────────────────────────────────────────
+function lrMarkStudied(lang, type) {
+  localStorage.setItem(lrStudiedKey(lang, type), '1');
+  // If all langs for this type are done, auto-yes the goal
+  const allDone = LR_LANGS.some(l => localStorage.getItem(lrStudiedKey(l, 'word')) === '1')
+    && LR_LANGS.some(l => localStorage.getItem(lrStudiedKey(l, 'verb')) === '1');
+  if (allDone) { try { setYN('language','yes'); } catch(e) {} }
+  lrRenderMarkGrid();
+}
 
-  // Update session badge in goal card
+// ── Goal card badge ───────────────────────────────────────────────────────
+function lrUpdateGoalBadge() {
   const badge = document.getElementById('langSessionBadge');
-  if (studied) {
+  if (!badge) return;
+  const learned = [];
+  for (const lang of LR_LANGS) {
+    const wDone = localStorage.getItem(lrStudiedKey(lang, 'word')) === '1';
+    const vDone = localStorage.getItem(lrStudiedKey(lang, 'verb')) === '1';
+    if (wDone && vDone) learned.push(LR_LANG_NAMES[lang] + ' ✓');
+    else if (wDone) learned.push(LR_LANG_NAMES[lang] + ' (W)');
+    else if (vDone) learned.push(LR_LANG_NAMES[lang] + ' (V)');
+  }
+  if (learned.length > 0) {
     badge.style.display = 'block';
-    badge.textContent = '✓ Studied — Word ' + (idx+1) + ' · ' + LR_LANG_NAMES[_lrLang];
+    badge.textContent = 'Today: ' + learned.join(' · ');
+  } else {
+    badge.style.display = 'none';
   }
 }
 
-// ── Controls ──────────────────────────────────────────────────────────────
+// ── Lang / Type selectors ─────────────────────────────────────────────────
 function lrSetLang(lang) {
   _lrLang = lang;
   document.querySelectorAll('.lr-lang-btn').forEach(b => {
@@ -6408,62 +6414,50 @@ function lrSetLang(lang) {
     b.style.borderColor = active ? '#c9a84c' : '#2a2010';
     b.style.color = active ? '#c9a84c' : '#8a7840';
   });
-  lrRender();
   try { localStorage.setItem('lr_lang', lang); } catch(e) {}
-}
-
-function lrChangeDay(delta) {
-  const next = _lrDayOffset + delta;
-  if (next > 0) return;
-  _lrDayOffset = next;
   lrRender();
 }
 
-function lrGoToday() {
-  _lrDayOffset = 0;
-  lrRender();
-}
-
-function lrMarkStudied() {
-  const key = 'lr_studied_' + lrTodayKey();
-  const already = localStorage.getItem(key) === '1';
-  if (!already) {
-    localStorage.setItem(key, '1');
-    // Auto-set yes on language goal
-    try { setYN('language', 'yes'); } catch(e) {}
-  }
+function lrSetType(type) {
+  _lrType = type;
+  document.querySelectorAll('.lr-type-btn').forEach(b => {
+    const active = b.dataset.type === type;
+    b.style.background = active ? '#1a1500' : '#1e1a10';
+    b.style.borderColor = active ? '#c9a84c' : '#2a2010';
+    b.style.color = active ? '#c9a84c' : '#8a7840';
+  });
   lrRender();
 }
 
 // ── Open / Close ──────────────────────────────────────────────────────────
 function openLanguageReader() {
+  // Restore saved language
   try {
     const saved = localStorage.getItem('lr_lang');
-    if (saved && ['ar','en','bn','ur','hi'].includes(saved)) {
-      _lrLang = saved;
-      document.querySelectorAll('.lr-lang-btn').forEach(b => {
-        const active = b.dataset.lang === saved;
-        b.style.background = active ? '#1a1500' : '#1e1a10';
-        b.style.borderColor = active ? '#c9a84c' : '#2a2010';
-        b.style.color = active ? '#c9a84c' : '#8a7840';
-      });
-    }
+    if (saved && LR_LANGS.includes(saved)) { _lrLang = saved; }
   } catch(e) {}
-  _lrDayOffset = 0;
+  // Sync lang buttons
+  document.querySelectorAll('.lr-lang-btn').forEach(b => {
+    const active = b.dataset.lang === _lrLang;
+    b.style.background = active ? '#1a1500' : '#1e1a10';
+    b.style.borderColor = active ? '#c9a84c' : '#2a2010';
+    b.style.color = active ? '#c9a84c' : '#8a7840';
+  });
   lrRender();
-  const overlay = document.getElementById('langOverlay');
-  overlay.classList.add('active');
-  overlay.scrollTop = 0;
-  window.scrollTo(0, 0);
+  document.getElementById('langOverlay').classList.add('active');
+  document.getElementById('langOverlay').scrollTop = 0;
+  // NO window.scrollTo — keep page position intact (fix #6)
   document.body.style.overflow = 'hidden';
 }
 
 function closeLanguageReader() {
   document.getElementById('langOverlay').classList.remove('active');
   document.body.style.overflow = '';
-  // Refresh session badge
-  try { lrRender(); } catch(e) {}
+  lrUpdateGoalBadge();
 }
+
+// Init badge on load
+lrUpdateGoalBadge();
 </script>
 
 </body>

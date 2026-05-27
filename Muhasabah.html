@@ -1773,7 +1773,10 @@ function scoreDay(data){
   // books 5% — proportional via book_ratio
   const bkRatio = data['book_ratio'];
   core += bkRatio !== undefined ? Math.min(bkRatio * 5, 5) : (data.books === 'yes' ? 5 : 0);
-  yn('exercise',5); yn('language',5);
+  yn('exercise',5);
+  // language 5% — proportional via language_ratio
+  const langRatio = data['language_ratio'];
+  core += langRatio !== undefined ? Math.min(langRatio * 5, 5) : (data.language==='yes' ? 5 : 0);
   yn('writingLinkedin',2.5); yn('writingFacebook',2.5);
   yn('netConnected',2.5); yn('netCommented',2.5);
 
@@ -1881,7 +1884,11 @@ function goalScore(data,key){
       const bkRatio = data['book_ratio'];
       return bkRatio !== undefined ? Math.min(Math.round(bkRatio * 100), 100) : (data.books === 'yes' ? 100 : 0);
     }
-    case 'language':    return data.language==='yes'?100:0;
+    case 'language': {
+      const lr = data['language_ratio'];
+      if (lr !== undefined) return Math.min(Math.round(lr * 100), 100);
+      return data.language==='yes' ? 100 : 0;
+    }
     case 'writing':     return Math.round(((data.writingLinkedin==='yes'?1:0)+(data.writingFacebook==='yes'?1:0))/2*100);
     case 'networking':  return Math.round(((data.netConnected==='yes'?1:0)+(data.netCommented==='yes'?1:0))/2*100);
     default: return 0;
@@ -6456,14 +6463,42 @@ function lrMarkStudied() {
   const key = lrStudiedKey(_lrLang, _lrType);
   const done = localStorage.getItem(key) === '1';
   if (done) {
-    // Undo
     localStorage.removeItem(key);
   } else {
     localStorage.setItem(key, '1');
-    try { setYN('language','yes'); } catch(e) {}
   }
   lrRenderMarkBtn();
   lrUpdateGoalBadge();
+  lrSaveRatioToDay();
+}
+
+function lrSaveRatioToDay() {
+  // 10 total slots: 5 langs × word + 5 langs × verb. Each = 0.5% of 5% goal.
+  const totalSlots = LR_LANGS.length * 2; // 10
+  let done = 0;
+  for (const lang of LR_LANGS) {
+    if (localStorage.getItem(lrStudiedKey(lang, 'word')) === '1') done++;
+    if (localStorage.getItem(lrStudiedKey(lang, 'verb')) === '1') done++;
+  }
+  const ratio = done / totalSlots; // 0.0 – 1.0
+  const allDone = ratio >= 1;
+  if (!currentDateKey) return;
+  const data = {...getCached(currentDateKey)};
+  if (ratio > 0) {
+    data['language_ratio'] = ratio;
+    data['language'] = allDone ? 'yes' : undefined;
+    if (!allDone) delete data['language'];
+  } else {
+    delete data['language_ratio'];
+    delete data['language'];
+  }
+  _cache[currentDateKey] = data;
+  // Update Yes/No button visual state
+  const yesVal = allDone ? 'yes' : null;
+  document.querySelectorAll('.yn-btn[data-key="language"]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.val === yesVal);
+  });
+  setStore(currentDateKey, data).then(() => refreshScores());
 }
 
 // ── Goal card badge ───────────────────────────────────────────────────────

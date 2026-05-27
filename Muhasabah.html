@@ -19,6 +19,8 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
+.lr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;overflow-y:auto;padding:16px;box-sizing:border-box;}
+.lr-overlay.active{display:block;}
 
 /* ── Contact Banner ── */
 .contact-banner{
@@ -774,6 +776,9 @@ body.overlay-open{overflow:hidden;}
         <button class="yn-btn yes" data-key="language" data-val="yes" onclick="setYN('language','yes')">Yes</button>
         <button class="yn-btn no"  data-key="language" data-val="no"  onclick="setYN('language','no')">No</button>
       </div>
+      <div class="sub-label">Goal: Study Today's Word In Your Language(s) = Full 5% Core</div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openLanguageReader()">🗣 Open Language Learner</button>
+      <div class="qr-session-badge" id="langSessionBadge" style="display:none;"></div>
     </div>
 
     <!-- Writing 5% -->
@@ -5822,6 +5827,642 @@ async function pwSend() {
 
   btn.disabled = false; btn.style.opacity = '1';
   input.focus();
+}
+</script>
+
+<!-- LANGUAGE READER OVERLAY -->
+<div class="lr-overlay" id="langOverlay">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:760px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
+
+    <!-- Top bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;gap:12px;flex-wrap:wrap;">
+      <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🗣 Language Learner — Word &amp; Verb Of The Day</div>
+      <button onclick="closeLanguageReader()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;">✕ Close</button>
+    </div>
+
+    <!-- Day navigation -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 18px;background:#0f110f;border-bottom:1px solid #2a2010;flex-shrink:0;flex-wrap:wrap;">
+      <button id="lrPrevBtn" onclick="lrChangeDay(-1)" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 18px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;" onmouseover="this.style.borderColor='#c9a84c';this.style.color='#c9a84c'" onmouseout="this.style.borderColor='#2a2010';this.style.color='#8a7840'">← Prev</button>
+      <div id="lrDayLabel" style="font-family:'DM Mono',monospace;font-size:12px;color:#c5b98a;min-width:200px;text-align:center;letter-spacing:.5px;">—</div>
+      <button id="lrNextBtn" onclick="lrChangeDay(1)" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 18px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;" onmouseover="this.style.borderColor='#c9a84c';this.style.color='#c9a84c'" onmouseout="this.style.borderColor='#2a2010';this.style.color='#8a7840'">Next →</button>
+      <button onclick="lrGoToday()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:7px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;" onmouseover="this.style.borderColor='#c9a84c';this.style.color='#c9a84c'" onmouseout="this.style.borderColor='#2a2010';this.style.color='#8a7840'">Today</button>
+    </div>
+
+    <!-- Language selector -->
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:#141008;border-bottom:1px solid #2a2010;flex-wrap:wrap;">
+      <span style="font-family:'DM Mono',monospace;font-size:9px;color:#5a4a28;letter-spacing:2px;text-transform:uppercase;margin-right:4px;">Language</span>
+      <button class="lr-lang-btn" data-lang="ar" onclick="lrSetLang('ar')" style="background:#1a1500;border:1px solid #c9a84c;color:#c9a84c;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">عربي Arabic</button>
+      <button class="lr-lang-btn" data-lang="en" onclick="lrSetLang('en')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">English</button>
+      <button class="lr-lang-btn" data-lang="bn" onclick="lrSetLang('bn')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">বাংলা Bengali</button>
+      <button class="lr-lang-btn" data-lang="ur" onclick="lrSetLang('ur')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">اردو Urdu</button>
+      <button class="lr-lang-btn" data-lang="hi" onclick="lrSetLang('hi')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:5px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">हिन्दी Hindi</button>
+    </div>
+
+    <!-- Content body -->
+    <div id="lrBody" style="padding:28px 24px;display:flex;flex-direction:column;gap:20px;">
+
+      <div id="lrNoData" style="display:none;text-align:center;padding:40px 20px;font-family:'DM Mono',monospace;font-size:12px;color:#5a4a28;letter-spacing:1px;">No word found for this day.</div>
+
+      <!-- Word hero -->
+      <div id="lrHero" style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:28px 32px;text-align:center;">
+        <div id="lrWordNum" style="font-family:'DM Mono',monospace;font-size:9px;color:#5a4a28;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;">WORD 001</div>
+        <div id="lrWordMain" style="font-family:'Amiri',serif;font-size:52px;color:#f0e4c0;line-height:1.2;margin-bottom:6px;">—</div>
+        <div id="lrWordRoman" style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:6px;letter-spacing:.5px;font-family:'Literata',Georgia,serif;"></div>
+        <div id="lrWordType" style="font-family:'DM Mono',monospace;font-size:9px;color:#5a4a28;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;"></div>
+        <div id="lrWordMeaning" style="font-family:'Literata',Georgia,serif;font-size:1.1rem;color:#c5b98a;font-style:italic;">—</div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:14px;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+
+      <!-- Synonym / Antonym -->
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:20px 24px;">
+        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;font-family:'DM Mono',monospace;">Synonym &amp; Antonym</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:baseline;gap:12px;">
+            <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#6aab7a;width:52px;flex-shrink:0;">SYN</span>
+            <span id="lrSyn" style="font-family:'DM Mono',monospace;font-size:12px;color:#c5b98a;line-height:1.6;">—</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:12px;">
+            <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#c05050;width:52px;flex-shrink:0;">ANT</span>
+            <span id="lrAnt" style="font-family:'DM Mono',monospace;font-size:12px;color:#c5b98a;line-height:1.6;">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conjugation -->
+      <div id="lrConjPanel" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:20px 24px;">
+        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;font-family:'DM Mono',monospace;">Conjugation</div>
+        <table id="lrConjTable" style="width:100%;border-collapse:collapse;"></table>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:14px;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+
+      <!-- Micro story -->
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:20px 24px;">
+        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;font-family:'DM Mono',monospace;">Micro Story</div>
+        <div id="lrStory" style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c5b98a;line-height:1.9;font-style:italic;">—</div>
+      </div>
+
+      <!-- Mark button -->
+      <div style="text-align:center;padding:8px 0 4px;">
+        <div id="lrSessionInfo" style="font-family:'DM Mono',monospace;font-size:10px;color:#5a4a28;letter-spacing:.5px;margin-bottom:14px;">—</div>
+        <button id="lrMarkBtn" onclick="lrMarkStudied()" style="background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid #c9a84c;color:#c9a84c;padding:10px 28px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;" onmouseover="if(!this.classList.contains('marked'))this.style.background='linear-gradient(135deg,#2a2000,#3a3000)'" onmouseout="if(!this.classList.contains('marked'))this.style.background='linear-gradient(135deg,#1a1500,#2a2000)'">✓ Mark As Studied Today</button>
+      </div>
+
+      <div style="text-align:center;color:#5a5030;font-size:0.85rem;font-style:italic;margin-top:8px;border-top:1px solid #1e1a10;padding-top:20px;">May Allah grant us the tawfeeq in all our studies. آمين</div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   LANGUAGE READER — DATA & LOGIC
+══════════════════════════════════════════ */
+
+// ── Word Bank ──────────────────────────────────────────────────────────────
+// Each entry: { type: 'verb'|'noun'|'adj', langs: { ar, en, bn, ur, hi } }
+// Each lang: { word, roman, meaning, syn, ant, conj (verb only), story }
+// conj: [ {person, past, present, future} ]
+
+const LR_WORDS = [
+  {
+    type: 'verb',
+    langs: {
+      ar: {
+        word: 'كَتَبَ', roman: 'kataba', meaning: 'to write',
+        syn: 'خَطَّ، سَجَّلَ', ant: 'مَحَا، حَذَفَ',
+        conj: [
+          {person:'أنا (I)',       past:'كَتَبْتُ',   present:'أَكْتُبُ',   future:'سَأَكْتُبُ'},
+          {person:'أنتَ (You)',    past:'كَتَبْتَ',   present:'تَكْتُبُ',   future:'سَتَكْتُبُ'},
+          {person:'هو (He)',       past:'كَتَبَ',     present:'يَكْتُبُ',   future:'سَيَكْتُبُ'},
+          {person:'هي (She)',      past:'كَتَبَتْ',   present:'تَكْتُبُ',   future:'سَتَكْتُبُ'},
+          {person:'نحن (We)',      past:'كَتَبْنَا',  present:'نَكْتُبُ',   future:'سَنَكْتُبُ'},
+        ],
+        story: 'جَلَسَ الطَّالِبُ وَكَتَبَ رِسَالَةً إِلَى أُمِّهِ. كَتَبَ فِيهَا عَنْ أَحْلَامِهِ وَطُمُوحَاتِهِ. وَعَدَهَا أَنَّهُ سَيَكْتُبُ كُلَّ أُسْبُوعٍ.'
+      },
+      en: {
+        word: 'Write', roman: 'raɪt', meaning: 'to form letters, words or symbols on a surface',
+        syn: 'inscribe, compose, draft', ant: 'erase, delete, speak',
+        conj: [
+          {person:'I',     past:'wrote',    present:'write',  future:'will write'},
+          {person:'You',   past:'wrote',    present:'write',  future:'will write'},
+          {person:'He/She',past:'wrote',    present:'writes', future:'will write'},
+          {person:'We',    past:'wrote',    present:'write',  future:'will write'},
+          {person:'They',  past:'wrote',    present:'write',  future:'will write'},
+        ],
+        story: 'Sara sat down to write a letter to her mother. She wrote about her dreams and ambitions, filling three whole pages. She promised she would write every single week.'
+      },
+      bn: {
+        word: 'লেখা', roman: 'lekha', meaning: 'লিখতে, শব্দ বা অক্ষর তৈরি করতে',
+        syn: 'রচনা করা, লিপিবদ্ধ করা', ant: 'মুছে ফেলা, কথা বলা',
+        conj: [
+          {person:'আমি (I)',      past:'লিখেছিলাম', present:'লিখি',    future:'লিখব'},
+          {person:'তুমি (You)',   past:'লিখেছিলে',  present:'লেখো',   future:'লিখবে'},
+          {person:'সে (He/She)', past:'লিখেছিল',   present:'লেখে',   future:'লিখবে'},
+          {person:'আমরা (We)',   past:'লিখেছিলাম', present:'লিখি',   future:'লিখব'},
+          {person:'তারা (They)', past:'লিখেছিল',   present:'লেখে',   future:'লিখবে'},
+        ],
+        story: 'রাহেলা তার মায়ের কাছে একটি চিঠি লেখা শুরু করল। সে তার স্বপ্ন আর আশার কথা লিখল তিনটি পাতা ভরে। সে প্রতিশ্রুতি দিল যে প্রতি সপ্তাহে লিখবে।'
+      },
+      ur: {
+        word: 'لِکھنا', roman: 'likhna', meaning: 'لکھنا، الفاظ یا حروف بنانا',
+        syn: 'تحریر کرنا، درج کرنا', ant: 'مٹانا، حذف کرنا',
+        conj: [
+          {person:'میں (I)',     past:'لکھا',      present:'لکھتا ہوں',  future:'لکھوں گا'},
+          {person:'تم (You)',   past:'لکھا',      present:'لکھتے ہو',   future:'لکھو گے'},
+          {person:'وہ (He/She)',past:'لکھا',      present:'لکھتا ہے',   future:'لکھے گا'},
+          {person:'ہم (We)',    past:'لکھا',      present:'لکھتے ہیں',  future:'لکھیں گے'},
+          {person:'وہ (They)', past:'لکھا',      present:'لکھتے ہیں',  future:'لکھیں گے'},
+        ],
+        story: 'سارہ نے اپنی ماں کو خط لکھنا شروع کیا۔ اس نے اپنے خوابوں اور امنگوں کے بارے میں لکھا، تین پورے صفحے بھر دیے۔ اس نے وعدہ کیا کہ وہ ہر ہفتے لکھے گی۔'
+      },
+      hi: {
+        word: 'लिखना', roman: 'likhna', meaning: 'अक्षर, शब्द या चिह्न बनाना',
+        syn: 'रचना करना, दर्ज करना', ant: 'मिटाना, बोलना',
+        conj: [
+          {person:'मैं (I)',      past:'लिखा',     present:'लिखता हूँ',  future:'लिखूँगा'},
+          {person:'तुम (You)',    past:'लिखा',     present:'लिखते हो',   future:'लिखोगे'},
+          {person:'वह (He/She)', past:'लिखा',     present:'लिखता है',   future:'लिखेगा'},
+          {person:'हम (We)',     past:'लिखा',     present:'लिखते हैं',  future:'लिखेंगे'},
+          {person:'वे (They)',   past:'लिखा',     present:'लिखते हैं',  future:'लिखेंगे'},
+        ],
+        story: 'सारा अपनी माँ को एक पत्र लिखने बैठ गई। उसने अपने सपनों और इच्छाओं के बारे में लिखा, पूरे तीन पन्ने भर दिए। उसने वादा किया कि वह हर हफ्ते लिखेगी।'
+      }
+    }
+  },
+  {
+    type: 'verb',
+    langs: {
+      ar: {
+        word: 'قَرَأَ', roman: 'qara\'a', meaning: 'to read',
+        syn: 'تَلَا، دَرَسَ', ant: 'أَهْمَلَ، تَجَاهَلَ',
+        conj: [
+          {person:'أنا (I)',    past:'قَرَأْتُ',  present:'أَقْرَأُ',  future:'سَأَقْرَأُ'},
+          {person:'أنتَ (You)', past:'قَرَأْتَ',  present:'تَقْرَأُ',  future:'سَتَقْرَأُ'},
+          {person:'هو (He)',    past:'قَرَأَ',    present:'يَقْرَأُ',  future:'سَيَقْرَأُ'},
+          {person:'هي (She)',   past:'قَرَأَتْ',  present:'تَقْرَأُ',  future:'سَتَقْرَأُ'},
+          {person:'نحن (We)',   past:'قَرَأْنَا', present:'نَقْرَأُ',  future:'سَنَقْرَأُ'},
+        ],
+        story: 'قَرَأَ الشَّيْخُ الْكِتَابَ بِتَمَعُّنٍ شَدِيدٍ. كُلَّمَا قَرَأَ صَفْحَةً ازْدَادَ عِلْمُهُ. وَعَزَمَ أَنْ يَقْرَأَ كِتَابًا كَامِلًا كُلَّ أُسْبُوعٍ.'
+      },
+      en: {
+        word: 'Read', roman: 'riːd', meaning: 'to look at and comprehend written text',
+        syn: 'peruse, study, scan', ant: 'ignore, skim, overlook',
+        conj: [
+          {person:'I',      past:'read',   present:'read',  future:'will read'},
+          {person:'You',    past:'read',   present:'read',  future:'will read'},
+          {person:'He/She', past:'read',   present:'reads', future:'will read'},
+          {person:'We',     past:'read',   present:'read',  future:'will read'},
+          {person:'They',   past:'read',   present:'read',  future:'will read'},
+        ],
+        story: 'The old scholar read the ancient book with great attention. Each time he read a new page, his understanding deepened. He resolved that he would read a full book every single week.'
+      },
+      bn: {
+        word: 'পড়া', roman: 'pora', meaning: 'লেখা বোঝার জন্য দেখা',
+        syn: 'পাঠ করা, অধ্যয়ন করা', ant: 'উপেক্ষা করা, এড়িয়ে যাওয়া',
+        conj: [
+          {person:'আমি (I)',     past:'পড়েছিলাম', present:'পড়ি',   future:'পড়ব'},
+          {person:'তুমি (You)',  past:'পড়েছিলে',  present:'পড়ো',  future:'পড়বে'},
+          {person:'সে (He/She)',past:'পড়েছিল',   present:'পড়ে',  future:'পড়বে'},
+          {person:'আমরা (We)',  past:'পড়েছিলাম', present:'পড়ি',  future:'পড়ব'},
+          {person:'তারা (They)',past:'পড়েছিল',   present:'পড়ে',  future:'পড়বে'},
+        ],
+        story: 'বৃদ্ধ আলেম মনোযোগ দিয়ে প্রাচীন বইটি পড়লেন। যতবার তিনি একটি নতুন পাতা পড়েছিলেন, ততই তার জ্ঞান গভীর হয়েছে। তিনি সিদ্ধান্ত নিলেন প্রতি সপ্তাহে একটি সম্পূর্ণ বই পড়বেন।'
+      },
+      ur: {
+        word: 'پڑھنا', roman: 'parhna', meaning: 'تحریر کو سمجھنے کے لیے دیکھنا',
+        syn: 'مطالعہ کرنا، پڑھنا', ant: 'نظرانداز کرنا، چھوڑنا',
+        conj: [
+          {person:'میں (I)',     past:'پڑھا',     present:'پڑھتا ہوں', future:'پڑھوں گا'},
+          {person:'تم (You)',   past:'پڑھا',     present:'پڑھتے ہو',  future:'پڑھو گے'},
+          {person:'وہ (He/She)',past:'پڑھا',     present:'پڑھتا ہے',  future:'پڑھے گا'},
+          {person:'ہم (We)',    past:'پڑھا',     present:'پڑھتے ہیں', future:'پڑھیں گے'},
+          {person:'وہ (They)', past:'پڑھا',     present:'پڑھتے ہیں', future:'پڑھیں گے'},
+        ],
+        story: 'بوڑھے عالم نے پرانی کتاب بڑے غور سے پڑھی۔ جب بھی اس نے کوئی نیا صفحہ پڑھا، اس کی سمجھ گہری ہوتی گئی۔ اس نے عزم کیا کہ وہ ہر ہفتے ایک پوری کتاب پڑھے گا۔'
+      },
+      hi: {
+        word: 'पढ़ना', roman: 'padhna', meaning: 'लिखे हुए को समझने के लिए देखना',
+        syn: 'अध्ययन करना, पाठ करना', ant: 'नज़रअंदाज़ करना, छोड़ना',
+        conj: [
+          {person:'मैं (I)',     past:'पढ़ा',    present:'पढ़ता हूँ',  future:'पढ़ूँगा'},
+          {person:'तुम (You)',  past:'पढ़ा',    present:'पढ़ते हो',  future:'पढ़ोगे'},
+          {person:'वह (He/She)',past:'पढ़ा',    present:'पढ़ता है',  future:'पढ़ेगा'},
+          {person:'हम (We)',    past:'पढ़ा',    present:'पढ़ते हैं', future:'पढ़ेंगे'},
+          {person:'वे (They)',  past:'पढ़ा',    present:'पढ़ते हैं', future:'पढ़ेंगे'},
+        ],
+        story: 'बुज़ुर्ग विद्वान ने पुरानी किताब बड़े ध्यान से पढ़ी। जब भी उन्होंने एक नया पन्ना पढ़ा, उनकी समझ और गहरी होती गई। उन्होंने संकल्प लिया कि वे हर हफ्ते एक पूरी किताब पढ़ेंगे।'
+      }
+    }
+  },
+  {
+    type: 'verb',
+    langs: {
+      ar: {
+        word: 'سَمِعَ', roman: 'sami\'a', meaning: 'to hear / listen',
+        syn: 'أَنْصَتَ، أَصْغَى', ant: 'تَجَاهَلَ، صَمَّ عَن',
+        conj: [
+          {person:'أنا (I)',    past:'سَمِعْتُ',  present:'أَسْمَعُ',  future:'سَأَسْمَعُ'},
+          {person:'أنتَ (You)', past:'سَمِعْتَ',  present:'تَسْمَعُ',  future:'سَتَسْمَعُ'},
+          {person:'هو (He)',    past:'سَمِعَ',    present:'يَسْمَعُ',  future:'سَيَسْمَعُ'},
+          {person:'هي (She)',   past:'سَمِعَتْ',  present:'تَسْمَعُ',  future:'سَتَسْمَعُ'},
+          {person:'نحن (We)',   past:'سَمِعْنَا', present:'نَسْمَعُ',  future:'سَنَسْمَعُ'},
+        ],
+        story: 'سَمِعَ الْوَلَدُ صَوْتَ أُمِّهِ مِنْ بَعِيدٍ. أَسْرَعَ نَحْوَهَا لِأَنَّهُ سَمِعَ الْحُزْنَ فِي نَبْرَتِهَا. مَنْ يَسْمَعُ بِقَلْبِهِ يَفْهَمُ مَا لَا تَقُولُهُ الْكَلِمَاتُ.'
+      },
+      en: {
+        word: 'Listen', roman: 'ˈlɪs.ən', meaning: 'to pay attention to sound',
+        syn: 'hear, attend, heed', ant: 'ignore, tune out, disregard',
+        conj: [
+          {person:'I',      past:'listened',   present:'listen',  future:'will listen'},
+          {person:'You',    past:'listened',   present:'listen',  future:'will listen'},
+          {person:'He/She', past:'listened',   present:'listens', future:'will listen'},
+          {person:'We',     past:'listened',   present:'listen',  future:'will listen'},
+          {person:'They',   past:'listened',   present:'listen',  future:'will listen'},
+        ],
+        story: 'The boy listened to his mother\'s voice from far away. He ran toward her because he had listened carefully and heard the sadness in her tone. Those who listen with their heart understand what words cannot say.'
+      },
+      bn: {
+        word: 'শোনা', roman: 'shona', meaning: 'শব্দে মনোযোগ দেওয়া',
+        syn: 'কান দেওয়া, মনোযোগ দেওয়া', ant: 'উপেক্ষা করা, এড়িয়ে যাওয়া',
+        conj: [
+          {person:'আমি (I)',     past:'শুনেছিলাম', present:'শুনি',   future:'শুনব'},
+          {person:'তুমি (You)',  past:'শুনেছিলে',  present:'শুনো',  future:'শুনবে'},
+          {person:'সে (He/She)',past:'শুনেছিল',   present:'শোনে',  future:'শুনবে'},
+          {person:'আমরা (We)',  past:'শুনেছিলাম', present:'শুনি',  future:'শুনব'},
+          {person:'তারা (They)',past:'শুনেছিল',   present:'শোনে',  future:'শুনবে'},
+        ],
+        story: 'ছেলেটি দূর থেকে তার মায়ের গলা শুনল। সে দৌড়ে গেল কারণ সে শুনতে পেয়েছিল মায়ের কণ্ঠে বেদনার সুর। যারা হৃদয় দিয়ে শোনে, তারা বোঝে যা কথায় বলা যায় না।'
+      },
+      ur: {
+        word: 'سننا', roman: 'sunna', meaning: 'آواز پر دھیان دینا',
+        syn: 'کان لگانا، توجہ دینا', ant: 'نظرانداز کرنا، بے توجہی',
+        conj: [
+          {person:'میں (I)',     past:'سنا',     present:'سنتا ہوں', future:'سنوں گا'},
+          {person:'تم (You)',   past:'سنا',     present:'سنتے ہو',  future:'سنو گے'},
+          {person:'وہ (He/She)',past:'سنا',     present:'سنتا ہے',  future:'سنے گا'},
+          {person:'ہم (We)',    past:'سنا',     present:'سنتے ہیں', future:'سنیں گے'},
+          {person:'وہ (They)', past:'سنا',     present:'سنتے ہیں', future:'سنیں گے'},
+        ],
+        story: 'لڑکے نے دور سے اپنی ماں کی آواز سنی۔ وہ اس کی طرف دوڑا کیونکہ اس نے اس کی آواز میں اداسی سنی تھی۔ جو دل سے سنتا ہے وہ وہ سمجھتا ہے جو الفاظ نہیں کہہ سکتے۔'
+      },
+      hi: {
+        word: 'सुनना', roman: 'sunna', meaning: 'आवाज़ पर ध्यान देना',
+        syn: 'ध्यान लगाना, कान देना', ant: 'नज़रअंदाज़ करना, अनसुना करना',
+        conj: [
+          {person:'मैं (I)',     past:'सुना',    present:'सुनता हूँ',  future:'सुनूँगा'},
+          {person:'तुम (You)',  past:'सुना',    present:'सुनते हो',  future:'सुनोगे'},
+          {person:'वह (He/She)',past:'सुना',    present:'सुनता है',  future:'सुनेगा'},
+          {person:'हम (We)',    past:'सुना',    present:'सुनते हैं', future:'सुनेंगे'},
+          {person:'वे (They)',  past:'सुना',    present:'सुनते हैं', future:'सुनेंगे'},
+        ],
+        story: 'लड़के ने दूर से अपनी माँ की आवाज़ सुनी। वह उसकी तरफ दौड़ा क्योंकि उसने आवाज़ में उदासी सुनी थी। जो दिल से सुनता है वो वो समझता है जो शब्द नहीं कह सकते।'
+      }
+    }
+  },
+  {
+    type: 'verb',
+    langs: {
+      ar: {
+        word: 'عَمِلَ', roman: '\'amila', meaning: 'to work / do',
+        syn: 'فَعَلَ، اشْتَغَلَ', ant: 'تَكَاسَلَ، أَهْمَلَ',
+        conj: [
+          {person:'أنا (I)',    past:'عَمِلْتُ',  present:'أَعْمَلُ',  future:'سَأَعْمَلُ'},
+          {person:'أنتَ (You)', past:'عَمِلْتَ',  present:'تَعْمَلُ',  future:'سَتَعْمَلُ'},
+          {person:'هو (He)',    past:'عَمِلَ',    present:'يَعْمَلُ',  future:'سَيَعْمَلُ'},
+          {person:'هي (She)',   past:'عَمِلَتْ',  present:'تَعْمَلُ',  future:'سَتَعْمَلُ'},
+          {person:'نحن (We)',   past:'عَمِلْنَا', present:'نَعْمَلُ',  future:'سَنَعْمَلُ'},
+        ],
+        story: 'عَمِلَ الرَّجُلُ طَوَالَ النَّهَارِ دُونَ تَوَقُّفٍ. عَمِلَ لِأَجْلِ أُسْرَتِهِ وَمُسْتَقْبَلِ أَوْلَادِهِ. وَعَدَ أَنَّهُ سَيَعْمَلُ بِإِخْلَاصٍ حَتَّى يَبْلُغَ هَدَفَهُ.'
+      },
+      en: {
+        word: 'Work', roman: 'wɜːrk', meaning: 'to do activity that requires effort',
+        syn: 'labor, toil, strive', ant: 'idle, laze, neglect',
+        conj: [
+          {person:'I',      past:'worked',   present:'work',  future:'will work'},
+          {person:'You',    past:'worked',   present:'work',  future:'will work'},
+          {person:'He/She', past:'worked',   present:'works', future:'will work'},
+          {person:'We',     past:'worked',   present:'work',  future:'will work'},
+          {person:'They',   past:'worked',   present:'work',  future:'will work'},
+        ],
+        story: 'The man worked all day without stopping. He worked for his family and the future of his children. He vowed that he would work with full dedication until he reached his goal.'
+      },
+      bn: {
+        word: 'কাজ করা', roman: 'kaj kora', meaning: 'পরিশ্রমের কাজ করা',
+        syn: 'পরিশ্রম করা, চেষ্টা করা', ant: 'আলসেমি করা, অবহেলা করা',
+        conj: [
+          {person:'আমি (I)',     past:'কাজ করেছিলাম', present:'কাজ করি',   future:'কাজ করব'},
+          {person:'তুমি (You)',  past:'কাজ করেছিলে',  present:'কাজ করো',  future:'কাজ করবে'},
+          {person:'সে (He/She)',past:'কাজ করেছিল',   present:'কাজ করে',  future:'কাজ করবে'},
+          {person:'আমরা (We)',  past:'কাজ করেছিলাম', present:'কাজ করি',  future:'কাজ করব'},
+          {person:'তারা (They)',past:'কাজ করেছিল',   present:'কাজ করে',  future:'কাজ করবে'},
+        ],
+        story: 'লোকটি সারাদিন না থেমে কাজ করল। সে পরিবারের জন্য এবং সন্তানদের ভবিষ্যতের জন্য কাজ করেছিল। সে প্রতিজ্ঞা করল যতক্ষণ লক্ষ্যে পৌঁছাবে না, সে নিষ্ঠার সাথে কাজ করবে।'
+      },
+      ur: {
+        word: 'کام کرنا', roman: 'kaam karna', meaning: 'محنت کا کام کرنا',
+        syn: 'محنت کرنا، جدوجہد کرنا', ant: 'سستی کرنا، نظرانداز کرنا',
+        conj: [
+          {person:'میں (I)',     past:'کام کیا',   present:'کام کرتا ہوں', future:'کام کروں گا'},
+          {person:'تم (You)',   past:'کام کیا',   present:'کام کرتے ہو',  future:'کام کرو گے'},
+          {person:'وہ (He/She)',past:'کام کیا',   present:'کام کرتا ہے',  future:'کام کرے گا'},
+          {person:'ہم (We)',    past:'کام کیا',   present:'کام کرتے ہیں', future:'کام کریں گے'},
+          {person:'وہ (They)', past:'کام کیا',   present:'کام کرتے ہیں', future:'کام کریں گے'},
+        ],
+        story: 'آدمی نے بغیر رکے سارا دن کام کیا۔ اس نے اپنے خاندان اور بچوں کے مستقبل کے لیے کام کیا۔ اس نے عہد کیا کہ وہ اپنا ہدف حاصل کرنے تک پوری لگن سے کام کرے گا۔'
+      },
+      hi: {
+        word: 'काम करना', roman: 'kaam karna', meaning: 'मेहनत का काम करना',
+        syn: 'परिश्रम करना, जद्दोजहद करना', ant: 'आलस करना, उपेक्षा करना',
+        conj: [
+          {person:'मैं (I)',     past:'काम किया',  present:'काम करता हूँ',  future:'काम करूँगा'},
+          {person:'तुम (You)',  past:'काम किया',  present:'काम करते हो',  future:'काम करोगे'},
+          {person:'वह (He/She)',past:'काम किया',  present:'काम करता है',  future:'काम करेगा'},
+          {person:'हम (We)',    past:'काम किया',  present:'काम करते हैं', future:'काम करेंगे'},
+          {person:'वे (They)',  past:'काम किया',  present:'काम करते हैं', future:'काम करेंगे'},
+        ],
+        story: 'आदमी ने बिना रुके पूरे दिन काम किया। उसने अपने परिवार और बच्चों के भविष्य के लिए काम किया। उसने प्रण लिया कि जब तक अपना लक्ष्य नहीं पाएगा, पूरी लगन से काम करेगा।'
+      }
+    }
+  },
+  {
+    type: 'verb',
+    langs: {
+      ar: {
+        word: 'ذَهَبَ', roman: 'dhahaba', meaning: 'to go',
+        syn: 'انْطَلَقَ، تَوَجَّهَ', ant: 'جَاءَ، عَادَ',
+        conj: [
+          {person:'أنا (I)',    past:'ذَهَبْتُ',  present:'أَذْهَبُ',  future:'سَأَذْهَبُ'},
+          {person:'أنتَ (You)', past:'ذَهَبْتَ',  present:'تَذْهَبُ',  future:'سَتَذْهَبُ'},
+          {person:'هو (He)',    past:'ذَهَبَ',    present:'يَذْهَبُ',  future:'سَيَذْهَبُ'},
+          {person:'هي (She)',   past:'ذَهَبَتْ',  present:'تَذْهَبُ',  future:'سَتَذْهَبُ'},
+          {person:'نحن (We)',   past:'ذَهَبْنَا', present:'نَذْهَبُ',  future:'سَنَذْهَبُ'},
+        ],
+        story: 'ذَهَبَ الطِّفْلُ إِلَى الْمَدْرَسَةِ وَحِيدًا لِأَوَّلِ مَرَّةٍ. ذَهَبَ بِخُطُوَاتٍ مُتَرَدِّدَةٍ ثُمَّ ثَابِتَةٍ. غَدًا سَيَذْهَبُ بِابْتِسَامَةٍ وَاسِعَةٍ.'
+      },
+      en: {
+        word: 'Go', roman: 'ɡoʊ', meaning: 'to move from one place to another',
+        syn: 'proceed, move, travel', ant: 'stay, come, return',
+        conj: [
+          {person:'I',      past:'went',   present:'go',   future:'will go'},
+          {person:'You',    past:'went',   present:'go',   future:'will go'},
+          {person:'He/She', past:'went',   present:'goes', future:'will go'},
+          {person:'We',     past:'went',   present:'go',   future:'will go'},
+          {person:'They',   past:'went',   present:'go',   future:'will go'},
+        ],
+        story: 'The child went to school alone for the very first time. He went with hesitant steps that slowly became confident. Tomorrow he would go with a wide and fearless smile.'
+      },
+      bn: {
+        word: 'যাওয়া', roman: 'jaoa', meaning: 'এক স্থান থেকে অন্য স্থানে যাওয়া',
+        syn: 'চলে যাওয়া, রওনা হওয়া', ant: 'থাকা, আসা, ফেরা',
+        conj: [
+          {person:'আমি (I)',     past:'গিয়েছিলাম', present:'যাই',    future:'যাব'},
+          {person:'তুমি (You)',  past:'গিয়েছিলে',  present:'যাও',   future:'যাবে'},
+          {person:'সে (He/She)',past:'গিয়েছিল',   present:'যায়',   future:'যাবে'},
+          {person:'আমরা (We)',  past:'গিয়েছিলাম', present:'যাই',   future:'যাব'},
+          {person:'তারা (They)',past:'গিয়েছিল',   present:'যায়',   future:'যাবে'},
+        ],
+        story: 'শিশুটি প্রথমবারের মতো একা স্কুলে গেল। সে দ্বিধাগ্রস্ত পদক্ষেপে গিয়েছিল, যা ধীরে ধীরে আত্মবিশ্বাসী হয়ে উঠল। আগামীকাল সে চওড়া হাসি নিয়ে যাবে।'
+      },
+      ur: {
+        word: 'جانا', roman: 'jaana', meaning: 'ایک جگہ سے دوسری جگہ جانا',
+        syn: 'چلے جانا، روانہ ہونا', ant: 'رہنا، آنا، واپس آنا',
+        conj: [
+          {person:'میں (I)',     past:'گیا',     present:'جاتا ہوں', future:'جاؤں گا'},
+          {person:'تم (You)',   past:'گئے',     present:'جاتے ہو',  future:'جاؤ گے'},
+          {person:'وہ (He/She)',past:'گیا',     present:'جاتا ہے',  future:'جائے گا'},
+          {person:'ہم (We)',    past:'گئے',     present:'جاتے ہیں', future:'جائیں گے'},
+          {person:'وہ (They)', past:'گئے',     present:'جاتے ہیں', future:'جائیں گے'},
+        ],
+        story: 'بچہ پہلی بار اکیلے اسکول گیا۔ وہ ہچکچاتے قدموں سے گیا جو آہستہ آہستہ پراعتماد ہو گئے۔ کل وہ چوڑی مسکراہٹ کے ساتھ جائے گا۔'
+      },
+      hi: {
+        word: 'जाना', roman: 'jaana', meaning: 'एक स्थान से दूसरे स्थान पर जाना',
+        syn: 'चले जाना, प्रस्थान करना', ant: 'रहना, आना, लौटना',
+        conj: [
+          {person:'मैं (I)',     past:'गया',    present:'जाता हूँ',  future:'जाऊँगा'},
+          {person:'तुम (You)',  past:'गए',     present:'जाते हो',  future:'जाओगे'},
+          {person:'वह (He/She)',past:'गया',    present:'जाता है',  future:'जाएगा'},
+          {person:'हम (We)',    past:'गए',     present:'जाते हैं', future:'जाएँगे'},
+          {person:'वे (They)',  past:'गए',     present:'जाते हैं', future:'जाएँगे'},
+        ],
+        story: 'बच्चा पहली बार अकेले स्कूल गया। वह हिचकिचाते कदमों से गया जो धीरे-धीरे आत्मविश्वास से भर गए। कल वह चौड़ी मुस्कान के साथ जाएगा।'
+      }
+    }
+  },
+  // ── Add more words below following the same pattern ──
+  // Words 6-365 can be added by the user in this array
+];
+
+// RTL languages
+const LR_RTL = new Set(['ar', 'ur']);
+
+// Lang display names
+const LR_LANG_NAMES = { ar:'Arabic', en:'English', bn:'Bengali', ur:'Urdu', hi:'Hindi' };
+
+// State
+let _lrLang = 'ar';
+let _lrDayOffset = 0; // 0 = today
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function lrGetDateForOffset(offset) {
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + offset);
+  return d;
+}
+
+function lrGetWordForDate(date) {
+  const start = new Date(date.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((date - start) / 86400000); // 0-based
+  const idx = dayOfYear % LR_WORDS.length;
+  return { word: LR_WORDS[idx], idx };
+}
+
+function lrFormatDate(date) {
+  return date.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'long', year:'numeric' });
+}
+
+function lrTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function lrIsToday() {
+  return _lrDayOffset === 0;
+}
+
+// ── Render ────────────────────────────────────────────────────────────────
+function lrRender() {
+  const date = lrGetDateForOffset(_lrDayOffset);
+  const { word: entry, idx } = lrGetWordForDate(date);
+
+  // Nav label
+  document.getElementById('lrDayLabel').textContent =
+    (_lrDayOffset === 0 ? '📅 Today — ' : '') + lrFormatDate(date);
+
+  // Next button disable state
+  const nextBtn = document.getElementById('lrNextBtn');
+  nextBtn.disabled = _lrDayOffset >= 0;
+  nextBtn.style.opacity = _lrDayOffset >= 0 ? '.3' : '1';
+  nextBtn.style.cursor = _lrDayOffset >= 0 ? 'not-allowed' : 'pointer';
+
+  if (!entry) {
+    document.getElementById('lrHero').style.display = 'none';
+    document.getElementById('lrConjPanel').style.display = 'none';
+    document.getElementById('lrNoData').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('lrHero').style.display = '';
+  document.getElementById('lrNoData').style.display = 'none';
+
+  const lang = entry.langs[_lrLang];
+  const isRTL = LR_RTL.has(_lrLang);
+
+  // Hero
+  document.getElementById('lrWordNum').textContent =
+    `WORD ${String(idx + 1).padStart(3,'0')} · ${entry.type.toUpperCase()} · ${LR_LANG_NAMES[_lrLang].toUpperCase()}`;
+  const mainEl = document.getElementById('lrWordMain');
+  mainEl.textContent = lang.word;
+  mainEl.style.direction = isRTL ? 'rtl' : 'ltr';
+  mainEl.style.fontSize = isRTL ? '58px' : '52px';
+  document.getElementById('lrWordRoman').textContent = lang.roman;
+  document.getElementById('lrWordType').textContent = entry.type === 'verb' ? 'VERB / فعل / ক্রিয়া / فعل / क्रिया' : entry.type.toUpperCase();
+  document.getElementById('lrWordMeaning').textContent = lang.meaning;
+
+  // Syn / Ant
+  const synEl = document.getElementById('lrSyn');
+  const antEl = document.getElementById('lrAnt');
+  synEl.textContent = lang.syn;
+  antEl.textContent = lang.ant;
+  synEl.style.direction = isRTL ? 'rtl' : 'ltr';
+  antEl.style.direction = isRTL ? 'rtl' : 'ltr';
+
+  // Conjugation
+  const conjPanel = document.getElementById('lrConjPanel');
+  const conjTable = document.getElementById('lrConjTable');
+  if (entry.type === 'verb' && lang.conj) {
+    conjPanel.style.display = '';
+    const thS = "font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:#7a6a40;padding:5px 10px;text-align:left;font-weight:400;font-family:'DM Mono',monospace;border-bottom:1px solid #2a2010;";
+    const tdP = "font-size:10px;color:#7a6a40;padding:6px 10px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;";
+    const tdN = "font-size:12px;color:#c5b98a;padding:6px 10px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;";
+    const tdR = "font-size:14px;color:#f0e4c0;padding:6px 10px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;";
+    const tdF = isRTL ? tdR : tdN;
+    let html = `<tr><th style="${thS}">Person</th><th style="${thS}">${isRTL ? 'ماضي · Past' : 'Past'}</th><th style="${thS}">${isRTL ? 'مضارع · Present' : 'Present'}</th><th style="${thS}">${isRTL ? 'مستقبل · Future' : 'Future'}</th></tr>`;
+    for (const row of lang.conj) {
+      html += `<tr><td style="${tdP}">${row.person}</td><td style="${tdF}">${row.past}</td><td style="${tdF}">${row.present}</td><td style="${tdF}">${row.future}</td></tr>`;
+    }
+    conjTable.innerHTML = html;
+  } else {
+    conjPanel.style.display = 'none';
+  }
+
+  // Micro story
+  const storyEl = document.getElementById('lrStory');
+  storyEl.textContent = lang.story;
+  storyEl.style.direction = isRTL ? 'rtl' : 'ltr';
+  storyEl.style.fontFamily = isRTL ? "'Amiri', serif" : "'Literata', Georgia, serif";
+  storyEl.style.fontSize = isRTL ? '1.1rem' : '0.95rem';
+  storyEl.style.lineHeight = isRTL ? '2.2' : '1.9';
+
+  // Mark button state
+  const key = 'lr_studied_' + lrTodayKey();
+  const studied = localStorage.getItem(key) === '1';
+  const markBtn = document.getElementById('lrMarkBtn');
+  if (lrIsToday()) {
+    markBtn.style.display = '';
+    markBtn.textContent = studied ? '✓ Studied Today' : '✓ Mark As Studied Today';
+    if (studied) {
+      markBtn.style.background = 'linear-gradient(135deg,#0f2010,#182818)';
+      markBtn.style.borderColor = '#4a7c59';
+      markBtn.style.color = '#6aab7a';
+    } else {
+      markBtn.style.background = 'linear-gradient(135deg,#1a1500,#2a2000)';
+      markBtn.style.borderColor = '#c9a84c';
+      markBtn.style.color = '#c9a84c';
+    }
+  } else {
+    markBtn.style.display = 'none';
+  }
+
+  // Session info
+  document.getElementById('lrSessionInfo').textContent =
+    `Word ${idx + 1} of ${LR_WORDS.length} · Day ${Math.floor((date - new Date(date.getFullYear(),0,1))/86400000)+1} of year`;
+
+  // Update session badge in goal card
+  const badge = document.getElementById('langSessionBadge');
+  if (studied) {
+    badge.style.display = 'block';
+    badge.textContent = '✓ Studied — Word ' + (idx+1) + ' · ' + LR_LANG_NAMES[_lrLang];
+  }
+}
+
+// ── Controls ──────────────────────────────────────────────────────────────
+function lrSetLang(lang) {
+  _lrLang = lang;
+  document.querySelectorAll('.lr-lang-btn').forEach(b => {
+    const active = b.dataset.lang === lang;
+    b.style.background = active ? '#1a1500' : '#1e1a10';
+    b.style.borderColor = active ? '#c9a84c' : '#2a2010';
+    b.style.color = active ? '#c9a84c' : '#8a7840';
+  });
+  lrRender();
+  try { localStorage.setItem('lr_lang', lang); } catch(e) {}
+}
+
+function lrChangeDay(delta) {
+  const next = _lrDayOffset + delta;
+  if (next > 0) return;
+  _lrDayOffset = next;
+  lrRender();
+}
+
+function lrGoToday() {
+  _lrDayOffset = 0;
+  lrRender();
+}
+
+function lrMarkStudied() {
+  const key = 'lr_studied_' + lrTodayKey();
+  const already = localStorage.getItem(key) === '1';
+  if (!already) {
+    localStorage.setItem(key, '1');
+    // Auto-set yes on language goal
+    try { setYN('language', 'yes'); } catch(e) {}
+  }
+  lrRender();
+}
+
+// ── Open / Close ──────────────────────────────────────────────────────────
+function openLanguageReader() {
+  try {
+    const saved = localStorage.getItem('lr_lang');
+    if (saved && ['ar','en','bn','ur','hi'].includes(saved)) {
+      _lrLang = saved;
+      document.querySelectorAll('.lr-lang-btn').forEach(b => {
+        const active = b.dataset.lang === saved;
+        b.style.background = active ? '#1a1500' : '#1e1a10';
+        b.style.borderColor = active ? '#c9a84c' : '#2a2010';
+        b.style.color = active ? '#c9a84c' : '#8a7840';
+      });
+    }
+  } catch(e) {}
+  _lrDayOffset = 0;
+  lrRender();
+  const overlay = document.getElementById('langOverlay');
+  overlay.classList.add('active');
+  overlay.scrollTop = 0;
+  window.scrollTo(0, 0);
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLanguageReader() {
+  document.getElementById('langOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+  // Refresh session badge
+  try { lrRender(); } catch(e) {}
 }
 </script>
 

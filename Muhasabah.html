@@ -5916,7 +5916,22 @@ async function pwSend() {
    DAILY LANGUAGE LEARNER — DATA & LOGIC
 ══════════════════════════════════════════ */
 
-const LR_WORDS = [];
+let LR_WORDS = [];
+let _lrDataLoaded = false;
+let _lrDataError = false;
+
+async function lrLoadData() {
+  if (_lrDataLoaded) return;
+  try {
+    const res = await fetch('Language Learner.json');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    LR_WORDS = await res.json();
+    _lrDataLoaded = true;
+  } catch(e) {
+    _lrDataError = true;
+    console.error('[LR] Failed to load Language Learner.json:', e);
+  }
+}
 
 // RTL languages
 const LR_RTL = new Set(['ar', 'ur']);
@@ -6063,6 +6078,19 @@ function lrRender() {
 
   const lang = entry.langs[_lrLang];
   const isRTL = LR_RTL.has(_lrLang);
+
+  // If this language has no data for today, show a friendly message
+  if (!lang) {
+    document.getElementById('lrHero').style.display = 'none';
+    document.getElementById('lrConjPanel').style.display = 'none';
+    document.getElementById('lrSynAntPanel').style.display = 'none';
+    document.getElementById('lrStoryPanel').style.display = 'none';
+    document.getElementById('lrMarkWrap').style.display = 'none';
+    const nd = document.getElementById('lrNoData');
+    nd.style.display = 'block';
+    nd.textContent = 'No ' + LR_LANG_NAMES[_lrLang] + ' entry yet. English is ready!';
+    return;
+  }
 
   // Hero
   const typeLabel = _lrType === 'verb' ? 'VERB' : 'WORD';
@@ -6217,16 +6245,31 @@ function lrSetType(type) {
 }
 
 // ── Open / Close ──────────────────────────────────────────────────────────
-function openLanguageReader() {
+async function openLanguageReader() {
   // Always open in English Word by default
   _lrLang = 'en';
   _lrType = 'word';
   try { localStorage.setItem('lr_lang', 'en'); } catch(e) {}
-  lrRender();
   const overlay = document.getElementById('langOverlay');
   overlay.classList.add('active');
   overlay.scrollTop = 0;
   document.body.style.overflow = 'hidden';
+  // Show loading state while data fetches
+  if (!_lrDataLoaded && !_lrDataError) {
+    document.getElementById('lrNoData').style.display = 'block';
+    document.getElementById('lrNoData').textContent = 'Loading…';
+    document.getElementById('lrHero').style.display = 'none';
+    document.getElementById('lrConjPanel').style.display = 'none';
+    document.getElementById('lrSynAntPanel').style.display = 'none';
+    document.getElementById('lrStoryPanel').style.display = 'none';
+    document.getElementById('lrMarkWrap').style.display = 'none';
+    await lrLoadData();
+  }
+  if (_lrDataError) {
+    document.getElementById('lrNoData').textContent = 'Could not load Language Learner.json. Make sure the file is in the same folder as this HTML.';
+    return;
+  }
+  lrRender();
 }
 function closeLanguageReader() {
   document.getElementById('langOverlay').classList.remove('active');

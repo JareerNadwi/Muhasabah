@@ -5965,10 +5965,6 @@ const LR_LANGS = ['ar','en','bn','ur','hi'];
 let _lrLang = 'ar';
 let _lrType = 'verb';
 
-// Session cache — entry calculated once per overlay open, never changes while overlay is open
-// This prevents the word from changing after marking as learned
-const _lrEntryCache = {};
-
 // ── Helpers ───────────────────────────────────────────────────────────────
 function lrTodayKey() {
   const d = new Date();
@@ -5978,31 +5974,13 @@ function lrStudiedKey(lang, type) {
   return 'lr_studied_' + lrTodayKey() + '_' + lang + '_' + type;
 }
 function lrGetTodayEntry(type) {
-  // Serve from cache — word must not change while overlay is open
-  const cacheKey = _lrLang + '_' + type;
-  if (_lrEntryCache[cacheKey] !== undefined) return _lrEntryCache[cacheKey];
-
-  const pool = (LR_DATA[_lrLang] || []).filter(w => w.type === type);
-  if (!pool.length) { _lrEntryCache[cacheKey] = null; return null; }
-
-  // Robust 1-indexed day of year: Jan 1 = 1, Jan 2 = 2, Jan 30 = 30
-  // Uses explicit midnight timestamps to avoid setHours/DST edge cases
+  const data = LR_DATA[_lrLang];
+  if (!data || !data.length) return null;
   const now   = new Date();
-  const jan1  = new Date(now.getFullYear(), 0, 1).getTime();   // Jan 1 local midnight
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime(); // today local midnight
-  const dayOfYear = Math.round((today - jan1) / 86400000) + 1; // Jan 1 = 1
-
-  // pool is ordered day 1…N; use direct index (no .find needed)
-  // dayOfYear 1 → pool[0], day 2 → pool[1], etc.
-  if (dayOfYear > pool.length) { _lrEntryCache[cacheKey] = null; return null; }
-
-  const idx   = dayOfYear - 1;
-  const entry = pool[idx];
-  if (!entry) { _lrEntryCache[cacheKey] = null; return null; }
-
-  const result = { entry, idx };
-  _lrEntryCache[cacheKey] = result;
-  return result;
+  const start = new Date(now.getFullYear(), 0, 1);
+  const day   = Math.floor((now - start) / 86400000) + 1; // Jan 1 = 1
+  const entry = data.find(e => e.type === type && e.day === day);
+  return entry ? { entry, idx: day - 1 } : null;
 }
 
 // ── Sync button highlights ────────────────────────────────────────────────
@@ -6322,8 +6300,6 @@ function lrPreloadAll() {
 }
 
 async function openLanguageReader() {
-  // Clear session cache — fresh entry calculation each time overlay is opened
-  Object.keys(_lrEntryCache).forEach(k => delete _lrEntryCache[k]);
   _lrLang = 'en';
   _lrType = 'word';
   try { localStorage.setItem('lr_lang', 'en'); } catch(e) {}

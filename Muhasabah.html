@@ -19,7 +19,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
-.lr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;overflow-y:auto;padding:16px;box-sizing:border-box;}
+.lr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;overflow-y:auto;padding:16px;box-sizing:border-box;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;}
 .lr-overlay.active{display:block;}
 
 /* ── Contact Banner ── */
@@ -6255,28 +6255,13 @@ function lrUpdateGoalBadge() {
 async function lrSetLang(lang) {
   _lrLang = lang;
   try { localStorage.setItem('lr_lang', lang); } catch(e) {}
+  lrSyncBtns(); // instant button highlight — no waiting
   if (!LR_LOADED[lang] && !LR_ERROR[lang]) {
-    document.getElementById('lrNoData').style.display = 'block';
-    document.getElementById('lrNoData').textContent = 'Loading…';
-    document.getElementById('lrHero').style.display = 'none';
-    document.getElementById('lrConjPanel').style.display = 'none';
-    document.getElementById('lrSynAntPanel').style.display = 'none';
-    document.getElementById('lrCollPanel').style.display = 'none';
-    document.getElementById('lrStoryPanel').style.display = 'none';
-    document.getElementById('lrChallengePanel').style.display = 'none';
-    document.getElementById('lrMarkWrap').style.display = 'none';
+    lrShowSkeleton('Loading ' + LR_LANG_NAMES[lang] + '\u2026');
     await lrLoadLang(lang);
   }
   if (LR_ERROR[lang]) {
-    document.getElementById('lrNoData').style.display = 'block';
-    document.getElementById('lrNoData').textContent = LR_LANG_NAMES[lang] + ' is not available yet. Coming soon — wait patiently. 🕌';
-    document.getElementById('lrHero').style.display = 'none';
-    document.getElementById('lrConjPanel').style.display = 'none';
-    document.getElementById('lrSynAntPanel').style.display = 'none';
-    document.getElementById('lrCollPanel').style.display = 'none';
-    document.getElementById('lrStoryPanel').style.display = 'none';
-    document.getElementById('lrChallengePanel').style.display = 'none';
-    document.getElementById('lrMarkWrap').style.display = 'none';
+    lrShowSkeleton(LR_LANG_NAMES[lang] + ' is not available yet. Coming soon \u2014 wait patiently. \uD83D\uDD4C');
     return;
   }
   lrRender();
@@ -6287,33 +6272,48 @@ function lrSetType(type) {
 }
 
 // ── Open / Close ──────────────────────────────────────────────────────────
+function lrShowSkeleton(msg) {
+  const noData = document.getElementById('lrNoData');
+  noData.style.display = 'block';
+  noData.innerHTML = '<span style="opacity:0.5;animation:pulse 1s ease-in-out infinite;display:inline-block;">' + (msg || 'Loading\u2026') + '</span>';
+  document.getElementById('lrHero').style.display = 'none';
+  document.getElementById('lrConjPanel').style.display = 'none';
+  document.getElementById('lrSynAntPanel').style.display = 'none';
+  document.getElementById('lrCollPanel').style.display = 'none';
+  document.getElementById('lrStoryPanel').style.display = 'none';
+  document.getElementById('lrChallengePanel').style.display = 'none';
+  document.getElementById('lrMarkWrap').style.display = 'none';
+}
+
+function lrPreloadAll() {
+  for (const lang of LR_LANGS) {
+    if (!LR_LOADED[lang] && !LR_ERROR[lang]) {
+      lrLoadLang(lang);
+    }
+  }
+}
+
 async function openLanguageReader() {
-  _lrLang = 'en';
+  let savedLang = 'en';
+  try { savedLang = localStorage.getItem('lr_lang') || 'en'; } catch(e) {}
+  if (!LR_LANGS.includes(savedLang)) savedLang = 'en';
+  _lrLang = savedLang;
   _lrType = 'word';
-  try { localStorage.setItem('lr_lang', 'en'); } catch(e) {}
   const overlay = document.getElementById('langOverlay');
   overlay.classList.add('active');
   overlay.scrollTop = 0;
   document.body.style.overflow = 'hidden';
-  if (!LR_LOADED['en'] && !LR_ERROR['en']) {
-    document.getElementById('lrNoData').style.display = 'block';
-    document.getElementById('lrNoData').textContent = 'Loading…';
-    document.getElementById('lrHero').style.display = 'none';
-    document.getElementById('lrConjPanel').style.display = 'none';
-    document.getElementById('lrSynAntPanel').style.display = 'none';
-    document.getElementById('lrCollPanel').style.display = 'none';
-    document.getElementById('lrStoryPanel').style.display = 'none';
-    document.getElementById('lrChallengePanel').style.display = 'none';
-    document.getElementById('lrMarkWrap').style.display = 'none';
-    await lrLoadLang('en');
+  if (!LR_LOADED[_lrLang] && !LR_ERROR[_lrLang]) {
+    lrShowSkeleton('Loading\u2026');
+    await lrLoadLang(_lrLang);
   }
-  if (LR_ERROR['en']) {
-    document.getElementById('lrNoData').style.display = 'block';
-    document.getElementById('lrNoData').textContent = 'English content is not available yet. Coming soon — wait patiently. 🕌';
-    document.getElementById('lrHero').style.display = 'none';
+  if (LR_ERROR[_lrLang]) {
+    lrShowSkeleton(LR_LANG_NAMES[_lrLang] + ' is not available yet. Coming soon \u2014 wait patiently. \uD83D\uDD4C');
+    lrPreloadAll();
     return;
   }
   lrRender();
+  lrPreloadAll();
 }
 function closeLanguageReader() {
   document.getElementById('langOverlay').classList.remove('active');

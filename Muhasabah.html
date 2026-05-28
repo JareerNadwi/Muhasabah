@@ -6301,6 +6301,7 @@ async function openLanguageReader() {
   _lrLang = 'en';
   _lrType = 'word';
   try { localStorage.setItem('lr_lang', 'en'); } catch(e) {}
+  lrSyncBtns(); // highlight English tab immediately on open
   const overlay = document.getElementById('langOverlay');
   overlay.classList.add('active');
   overlay.scrollTop = 0;

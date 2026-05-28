@@ -5985,22 +5985,21 @@ function lrGetTodayEntry(type) {
   const pool = (LR_DATA[_lrLang] || []).filter(w => w.type === type);
   if (!pool.length) { _lrEntryCache[cacheKey] = null; return null; }
 
-  // 1-indexed day of year: Jan 1 = 1, Jan 2 = 2, Jan 30 = 30, etc.
-  const d = new Date(); d.setHours(0,0,0,0);
-  const start = new Date(d.getFullYear(), 0, 1);
-  const dayOfYear = Math.floor((d - start) / 86400000) + 1;
+  // Robust 1-indexed day of year: Jan 1 = 1, Jan 2 = 2, Jan 30 = 30
+  // Uses explicit midnight timestamps to avoid setHours/DST edge cases
+  const now   = new Date();
+  const jan1  = new Date(now.getFullYear(), 0, 1).getTime();   // Jan 1 local midnight
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime(); // today local midnight
+  const dayOfYear = Math.round((today - jan1) / 86400000) + 1; // Jan 1 = 1
 
-  // Highest day number available in current dataset
-  const maxAvailableDay = Math.max(...pool.map(e => Number(e.day)));
+  // pool is ordered day 1…N; use direct index (no .find needed)
+  // dayOfYear 1 → pool[0], day 2 → pool[1], etc.
+  if (dayOfYear > pool.length) { _lrEntryCache[cacheKey] = null; return null; }
 
-  // Beyond available data — return null so lrRender shows wait message
-  if (dayOfYear > maxAvailableDay) { _lrEntryCache[cacheKey] = null; return null; }
-
-  // Match today's exact day number in the dataset
-  const entry = pool.find(e => Number(e.day) === dayOfYear) || null;
+  const idx   = dayOfYear - 1;
+  const entry = pool[idx];
   if (!entry) { _lrEntryCache[cacheKey] = null; return null; }
 
-  const idx = pool.indexOf(entry);
   const result = { entry, idx };
   _lrEntryCache[cacheKey] = result;
   return result;

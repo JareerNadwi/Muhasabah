@@ -5978,8 +5978,12 @@ function lrGetTodayEntry(type) {
   if (!pool.length) return null;
   const d = new Date(); d.setHours(0,0,0,0);
   const start = new Date(d.getFullYear(), 0, 1);
-  const dayOfYear = Math.floor((d - start) / 86400000);
-  return { entry: pool[dayOfYear % pool.length], idx: dayOfYear % pool.length };
+  const dayOfYear = Math.floor((d - start) / 86400000) + 1; // 1-indexed: Jan 1 = 1
+  const maxDay = pool[pool.length - 1].day;
+  const target = Math.min(dayOfYear, maxDay);
+  const entry = pool.find(e => e.day === target) || pool[pool.length - 1];
+  const idx = pool.indexOf(entry);
+  return { entry, idx };
 }
 
 // ── Sync button highlights ────────────────────────────────────────────────
@@ -6105,15 +6109,13 @@ function lrRender() {
 
   // Hero
   const typeLabel = _lrType === 'verb' ? 'VERB' : 'WORD';
-  document.getElementById('lrWordNum').textContent = typeLabel + ' ' + String(idx+1).padStart(3,'0') + ' · ' + LR_LANG_NAMES[_lrLang].toUpperCase();
+  document.getElementById('lrWordNum').textContent = '';
   const mainEl = document.getElementById('lrWordMain');
   mainEl.textContent = lang.word;
   mainEl.style.direction = isRTL ? 'rtl' : 'ltr';
   mainEl.style.fontSize = isRTL ? '58px' : '52px';
   document.getElementById('lrWordRoman').textContent = lang.roman;
-  document.getElementById('lrWordType').textContent = _lrType === 'verb'
-    ? 'VERB / فعل / ক্রিয়া / فعل / क्रिया'
-    : 'WORD / كلمة / শব্দ / لفظ / शब्द';
+  document.getElementById('lrWordType').textContent = '';
   document.getElementById('lrWordMeaning').textContent = lang.meaning;
 
   const simpleMeaningEl = document.getElementById('lrSimpleMeaning');

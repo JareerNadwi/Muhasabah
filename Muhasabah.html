@@ -6290,6 +6290,13 @@ function lrSetType(type) {
 }
 
 // ── Open / Close ──────────────────────────────────────────────────────────
+// Fire-and-forget: preload all language files in parallel in the background
+function lrPreloadAll() {
+  for (const lang of LR_LANGS) {
+    if (!LR_LOADED[lang] && !LR_ERROR[lang]) lrLoadLang(lang);
+  }
+}
+
 async function openLanguageReader() {
   _lrLang = 'en';
   _lrType = 'word';
@@ -6314,9 +6321,13 @@ async function openLanguageReader() {
     document.getElementById('lrNoData').style.display = 'block';
     document.getElementById('lrNoData').textContent = 'English content is not available yet. Coming soon — wait patiently. 🕌';
     document.getElementById('lrHero').style.display = 'none';
+    // Still preload others in background even if EN failed
+    lrPreloadAll();
     return;
   }
   lrRender();
+  // Preload all other languages in background — no await, fire-and-forget
+  lrPreloadAll();
 }
 function closeLanguageReader() {
   document.getElementById('langOverlay').classList.remove('active');

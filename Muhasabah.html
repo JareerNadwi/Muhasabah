@@ -18,6 +18,8 @@
   --radius:6px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{-webkit-overflow-scrolling:touch;}
 body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
 .lr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;overflow-y:auto;padding:16px;box-sizing:border-box;}
 .lr-overlay.active{display:block;}
@@ -3172,7 +3174,7 @@ loadDayData = function(dk){
 /* ── Scroll lock: prevent background scroll when any overlay is open ── */
 (function(){
   function updateBodyLock(){
-    var anyActive = document.querySelector('.modal-overlay.active, .quran-reader-overlay.active');
+    var anyActive = document.querySelector('.modal-overlay.active, .quran-reader-overlay.active, .lr-overlay.active');
     document.body.classList.toggle('overlay-open', !!anyActive);
   }
   var mo = new MutationObserver(updateBodyLock);
@@ -6255,6 +6257,7 @@ function lrUpdateGoalBadge() {
 async function lrSetLang(lang) {
   _lrLang = lang;
   try { localStorage.setItem('lr_lang', lang); } catch(e) {}
+  lrSyncBtns(); // update button highlights immediately before any async work
   if (!LR_LOADED[lang] && !LR_ERROR[lang]) {
     document.getElementById('lrNoData').style.display = 'block';
     document.getElementById('lrNoData').textContent = 'Loading…';
@@ -6294,7 +6297,7 @@ async function openLanguageReader() {
   const overlay = document.getElementById('langOverlay');
   overlay.classList.add('active');
   overlay.scrollTop = 0;
-  document.body.style.overflow = 'hidden';
+  document.body.classList.add('overlay-open');
   if (!LR_LOADED['en'] && !LR_ERROR['en']) {
     document.getElementById('lrNoData').style.display = 'block';
     document.getElementById('lrNoData').textContent = 'Loading…';
@@ -6317,7 +6320,7 @@ async function openLanguageReader() {
 }
 function closeLanguageReader() {
   document.getElementById('langOverlay').classList.remove('active');
-  document.body.style.overflow = '';
+  document.body.classList.remove('overlay-open');
   lrUpdateGoalBadge();
 }
 

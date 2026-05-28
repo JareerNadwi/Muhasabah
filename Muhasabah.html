@@ -5971,15 +5971,20 @@ function lrTodayKey() {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 function lrStudiedKey(lang, type) {
-  return 'lr_studied_' + lrTodayKey() + '_' + lang + '_' + type;
+  const dk = currentDateKey || lrTodayKey();
+  return 'lr_studied_' + dk + '_' + lang + '_' + type;
 }
 function lrGetTodayEntry(type) {
   const data = LR_DATA[_lrLang];
   if (!data || !data.length) return null;
-  const now   = new Date();
-  const start = new Date(now.getFullYear(), 0, 1);
-  const day   = Math.floor((now - start) / 86400000) + 1; // Jan 1 = 1
-  const entry = data.find(e => e.type === type && e.day === day);
+  // Use the selected calendar date (currentDateKey = "YYYY-MM-DD")
+  // Falls back to today if no day is selected
+  const dk = currentDateKey || lrTodayKey();
+  const [y, m, d] = dk.split('-').map(Number);
+  const selected = new Date(y, m - 1, d);
+  const jan1    = new Date(y, 0, 1);
+  const day     = Math.floor((selected - jan1) / 86400000) + 1; // Jan 1 = 1
+  const entry   = data.find(e => e.type === type && e.day === day);
   return entry ? { entry, idx: day - 1 } : null;
 }
 

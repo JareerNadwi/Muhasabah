@@ -5867,6 +5867,13 @@ async function pwSend() {
         <div id="lrWordRoman" style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:6px;letter-spacing:.5px;font-family:'Literata',Georgia,serif;"></div>
         <div id="lrWordType" style="font-family:'DM Mono',monospace;font-size:9px;color:#5a4a28;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;"></div>
         <div id="lrWordMeaning" style="font-family:'Literata',Georgia,serif;font-size:1.1rem;color:#c5b98a;font-style:italic;">—</div>
+        <div id="lrSimpleMeaning" style="font-family:'Literata',Georgia,serif;font-size:0.85rem;color:#7a6a40;margin-top:10px;font-style:italic;line-height:1.6;"></div>
+      </div>
+
+      <!-- Collocations -->
+      <div id="lrCollPanel" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:14px 20px;">
+        <div style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:8px;font-family:'DM Mono',monospace;">Collocations</div>
+        <div id="lrCollocations" style="font-family:'DM Mono',monospace;font-size:11px;color:#c5b98a;line-height:1.8;letter-spacing:0.3px;"></div>
       </div>
 
       <div style="display:flex;align-items:center;gap:14px;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;font-family:'Amiri',serif;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
@@ -5900,6 +5907,12 @@ async function pwSend() {
         <div id="lrStory" style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c5b98a;line-height:1.9;font-style:italic;">—</div>
       </div>
 
+      <!-- Speaking Challenge -->
+      <div id="lrChallengePanel" style="background:#141008;border:1px solid #2a2010;border-left:3px solid #6aab7a;border-radius:0 8px 8px 0;padding:14px 20px;">
+        <div style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#6aab7a;margin-bottom:8px;font-family:'DM Mono',monospace;">Speaking Challenge</div>
+        <div id="lrSpeakingChallenge" style="font-family:'Literata',Georgia,serif;font-size:0.92rem;color:#c5b98a;line-height:1.8;font-style:italic;"></div>
+      </div>
+
       <!-- Single mark learned button for current lang + type -->
       <div id="lrMarkWrap" style="text-align:center;padding:4px 0 8px;">
         <button id="lrMarkBtn" onclick="lrMarkStudied()" style="background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid #c9a84c;color:#c9a84c;padding:10px 28px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;" onmouseover="if(!this.dataset.done)this.style.background='linear-gradient(135deg,#2a2000,#3a3000)'" onmouseout="if(!this.dataset.done)this.style.background='linear-gradient(135deg,#1a1500,#2a2000)'">✓ Mark As Learned Today</button>
@@ -5916,20 +5929,28 @@ async function pwSend() {
    DAILY LANGUAGE LEARNER — DATA & LOGIC
 ══════════════════════════════════════════ */
 
-let LR_WORDS = [];
-let _lrDataLoaded = false;
-let _lrDataError = false;
+const LR_DATA   = { ar: null, en: null, bn: null, ur: null, hi: null };
+const LR_LOADED = { ar: false, en: false, bn: false, ur: false, hi: false };
+const LR_ERROR  = { ar: false, en: false, bn: false, ur: false, hi: false };
 
-async function lrLoadData() {
-  if (_lrDataLoaded) return;
+const LR_FILES  = {
+  en: BASE_URL + 'Language%20Learner%20EN.json',
+  ar: BASE_URL + 'Language%20Learner%20AR.json',
+  bn: BASE_URL + 'Language%20Learner%20BN.json',
+  ur: BASE_URL + 'Language%20Learner%20UR.json',
+  hi: BASE_URL + 'Language%20Learner%20HI.json',
+};
+
+async function lrLoadLang(lang) {
+  if (LR_LOADED[lang]) return;
   try {
-    const res = await fetch('Language Learner.json');
+    const res = await fetch(LR_FILES[lang]);
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    LR_WORDS = await res.json();
-    _lrDataLoaded = true;
+    LR_DATA[lang] = await res.json();
+    LR_LOADED[lang] = true;
   } catch(e) {
-    _lrDataError = true;
-    console.error('[LR] Failed to load Language Learner.json:', e);
+    LR_ERROR[lang] = true;
+    console.error('[LR] Failed to load ' + LR_FILES[lang] + ':', e);
   }
 }
 
@@ -5951,12 +5972,11 @@ function lrStudiedKey(lang, type) {
   return 'lr_studied_' + lrTodayKey() + '_' + lang + '_' + type;
 }
 function lrGetTodayEntry(type) {
+  const pool = (LR_DATA[_lrLang] || []).filter(w => w.type === type);
+  if (!pool.length) return null;
   const d = new Date(); d.setHours(0,0,0,0);
   const start = new Date(d.getFullYear(), 0, 1);
   const dayOfYear = Math.floor((d - start) / 86400000);
-  let pool = LR_WORDS.filter(w => w.type === type);
-  if (!pool.length) pool = LR_WORDS;
-  if (!pool.length) return null;
   return { entry: pool[dayOfYear % pool.length], idx: dayOfYear % pool.length };
 }
 
@@ -6072,25 +6092,14 @@ function lrRender() {
   const { entry, idx } = result;
   document.getElementById('lrHero').style.display = '';
   document.getElementById('lrNoData').style.display = 'none';
+  document.getElementById('lrCollPanel').style.display = '';
   document.getElementById('lrSynAntPanel').style.display = '';
   document.getElementById('lrStoryPanel').style.display = '';
+  document.getElementById('lrChallengePanel').style.display = '';
   document.getElementById('lrMarkWrap').style.display = '';
 
-  const lang = entry.langs[_lrLang];
+  const lang = entry;
   const isRTL = LR_RTL.has(_lrLang);
-
-  // If this language has no data for today, show a friendly message
-  if (!lang) {
-    document.getElementById('lrHero').style.display = 'none';
-    document.getElementById('lrConjPanel').style.display = 'none';
-    document.getElementById('lrSynAntPanel').style.display = 'none';
-    document.getElementById('lrStoryPanel').style.display = 'none';
-    document.getElementById('lrMarkWrap').style.display = 'none';
-    const nd = document.getElementById('lrNoData');
-    nd.style.display = 'block';
-    nd.textContent = 'No ' + LR_LANG_NAMES[_lrLang] + ' entry yet. English is ready!';
-    return;
-  }
 
   // Hero
   const typeLabel = _lrType === 'verb' ? 'VERB' : 'WORD';
@@ -6104,6 +6113,15 @@ function lrRender() {
     ? 'VERB / فعل / ক্রিয়া / فعل / क्रिया'
     : 'WORD / كلمة / শব্দ / لفظ / शब्द';
   document.getElementById('lrWordMeaning').textContent = lang.meaning;
+
+  const simpleMeaningEl = document.getElementById('lrSimpleMeaning');
+  if (simpleMeaningEl) simpleMeaningEl.textContent = lang.simpleMeaning || '';
+
+  const collEl = document.getElementById('lrCollocations');
+  if (collEl) collEl.textContent = lang.collocations || '';
+
+  const challengeEl = document.getElementById('lrSpeakingChallenge');
+  if (challengeEl) challengeEl.textContent = lang.speakingChallenge || '';
 
   // Syn / Ant
   const synEl = document.getElementById('lrSyn');
@@ -6234,9 +6252,33 @@ function lrUpdateGoalBadge() {
 }
 
 // ── Lang / Type selectors ─────────────────────────────────────────────────
-function lrSetLang(lang) {
+async function lrSetLang(lang) {
   _lrLang = lang;
   try { localStorage.setItem('lr_lang', lang); } catch(e) {}
+  if (!LR_LOADED[lang] && !LR_ERROR[lang]) {
+    document.getElementById('lrNoData').style.display = 'block';
+    document.getElementById('lrNoData').textContent = 'Loading…';
+    document.getElementById('lrHero').style.display = 'none';
+    document.getElementById('lrConjPanel').style.display = 'none';
+    document.getElementById('lrSynAntPanel').style.display = 'none';
+    document.getElementById('lrCollPanel').style.display = 'none';
+    document.getElementById('lrStoryPanel').style.display = 'none';
+    document.getElementById('lrChallengePanel').style.display = 'none';
+    document.getElementById('lrMarkWrap').style.display = 'none';
+    await lrLoadLang(lang);
+  }
+  if (LR_ERROR[lang]) {
+    document.getElementById('lrNoData').style.display = 'block';
+    document.getElementById('lrNoData').textContent = LR_LANG_NAMES[lang] + ' is not available yet. Coming soon — wait patiently. 🕌';
+    document.getElementById('lrHero').style.display = 'none';
+    document.getElementById('lrConjPanel').style.display = 'none';
+    document.getElementById('lrSynAntPanel').style.display = 'none';
+    document.getElementById('lrCollPanel').style.display = 'none';
+    document.getElementById('lrStoryPanel').style.display = 'none';
+    document.getElementById('lrChallengePanel').style.display = 'none';
+    document.getElementById('lrMarkWrap').style.display = 'none';
+    return;
+  }
   lrRender();
 }
 function lrSetType(type) {
@@ -6246,7 +6288,6 @@ function lrSetType(type) {
 
 // ── Open / Close ──────────────────────────────────────────────────────────
 async function openLanguageReader() {
-  // Always open in English Word by default
   _lrLang = 'en';
   _lrType = 'word';
   try { localStorage.setItem('lr_lang', 'en'); } catch(e) {}
@@ -6254,19 +6295,22 @@ async function openLanguageReader() {
   overlay.classList.add('active');
   overlay.scrollTop = 0;
   document.body.style.overflow = 'hidden';
-  // Show loading state while data fetches
-  if (!_lrDataLoaded && !_lrDataError) {
+  if (!LR_LOADED['en'] && !LR_ERROR['en']) {
     document.getElementById('lrNoData').style.display = 'block';
     document.getElementById('lrNoData').textContent = 'Loading…';
     document.getElementById('lrHero').style.display = 'none';
     document.getElementById('lrConjPanel').style.display = 'none';
     document.getElementById('lrSynAntPanel').style.display = 'none';
+    document.getElementById('lrCollPanel').style.display = 'none';
     document.getElementById('lrStoryPanel').style.display = 'none';
+    document.getElementById('lrChallengePanel').style.display = 'none';
     document.getElementById('lrMarkWrap').style.display = 'none';
-    await lrLoadData();
+    await lrLoadLang('en');
   }
-  if (_lrDataError) {
-    document.getElementById('lrNoData').textContent = 'Could not load Language Learner.json. Make sure the file is in the same folder as this HTML.';
+  if (LR_ERROR['en']) {
+    document.getElementById('lrNoData').style.display = 'block';
+    document.getElementById('lrNoData').textContent = 'English content is not available yet. Coming soon — wait patiently. 🕌';
+    document.getElementById('lrHero').style.display = 'none';
     return;
   }
   lrRender();

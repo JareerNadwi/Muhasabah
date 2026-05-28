@@ -5963,7 +5963,11 @@ const LR_LANGS = ['ar','en','bn','ur','hi'];
 
 // State
 let _lrLang = 'ar';
-let _lrType = 'verb'; // default verb since all current data is verb
+let _lrType = 'verb';
+
+// Session cache — entry calculated once per overlay open, never changes while overlay is open
+// This prevents the word from changing after marking as learned
+const _lrEntryCache = {};
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 function lrTodayKey() {
@@ -5974,16 +5978,32 @@ function lrStudiedKey(lang, type) {
   return 'lr_studied_' + lrTodayKey() + '_' + lang + '_' + type;
 }
 function lrGetTodayEntry(type) {
+  // Serve from cache — word must not change while overlay is open
+  const cacheKey = _lrLang + '_' + type;
+  if (_lrEntryCache[cacheKey] !== undefined) return _lrEntryCache[cacheKey];
+
   const pool = (LR_DATA[_lrLang] || []).filter(w => w.type === type);
-  if (!pool.length) return null;
+  if (!pool.length) { _lrEntryCache[cacheKey] = null; return null; }
+
+  // 1-indexed day of year: Jan 1 = 1, Jan 2 = 2, Jan 30 = 30, etc.
   const d = new Date(); d.setHours(0,0,0,0);
   const start = new Date(d.getFullYear(), 0, 1);
-  const dayOfYear = Math.floor((d - start) / 86400000) + 1; // 1-indexed: Jan 1 = 1
-  const maxDay = pool[pool.length - 1].day;
-  const target = Math.min(dayOfYear, maxDay);
-  const entry = pool.find(e => e.day === target) || pool[pool.length - 1];
+  const dayOfYear = Math.floor((d - start) / 86400000) + 1;
+
+  // Highest day number available in current dataset
+  const maxAvailableDay = Math.max(...pool.map(e => Number(e.day)));
+
+  // Beyond available data — return null so lrRender shows wait message
+  if (dayOfYear > maxAvailableDay) { _lrEntryCache[cacheKey] = null; return null; }
+
+  // Match today's exact day number in the dataset
+  const entry = pool.find(e => Number(e.day) === dayOfYear) || null;
+  if (!entry) { _lrEntryCache[cacheKey] = null; return null; }
+
   const idx = pool.indexOf(entry);
-  return { entry, idx };
+  const result = { entry, idx };
+  _lrEntryCache[cacheKey] = result;
+  return result;
 }
 
 // ── Sync button highlights ────────────────────────────────────────────────
@@ -6089,9 +6109,12 @@ function lrRender() {
     document.getElementById('lrHero').style.display = 'none';
     document.getElementById('lrConjPanel').style.display = 'none';
     document.getElementById('lrSynAntPanel').style.display = 'none';
+    document.getElementById('lrCollPanel').style.display = 'none';
     document.getElementById('lrStoryPanel').style.display = 'none';
+    document.getElementById('lrChallengePanel').style.display = 'none';
     document.getElementById('lrMarkWrap').style.display = 'none';
     document.getElementById('lrNoData').style.display = 'block';
+    document.getElementById('lrNoData').textContent = "Today\'s word is not yet available. New words are added regularly — wait patiently. \uD83D\uDD4C";
     return;
   }
 
@@ -6300,6 +6323,8 @@ function lrPreloadAll() {
 }
 
 async function openLanguageReader() {
+  // Clear session cache — fresh entry calculation each time overlay is opened
+  Object.keys(_lrEntryCache).forEach(k => delete _lrEntryCache[k]);
   _lrLang = 'en';
   _lrType = 'word';
   try { localStorage.setItem('lr_lang', 'en'); } catch(e) {}

@@ -5522,4 +5522,830 @@ YOUR WORKFLOW:
 2. Produce 2 versions:
    - Version A: Story-led (emotional arc, personal feel)
    - Version B: Opinion/insight-led (take a stance, invite debate)
-3. After each post, write ONE l
+3. After each post, write ONE line: "Engagement mechanic: [what specific element will drive comments and why]"
+4. Then ask: "Want me to make this more personal, more controversial, or tighten the hook?"
+
+If user gives an existing draft: "Hook issue: [problem]. Rewritten:" — fix it first, then show the full post.
+
+RULE: A Facebook post that doesn't make someone want to tag a friend or share their own story has failed. That is your standard.`
+};
+
+// ── History navigation ──
+
+
+// ── Day key helper ──
+function pwActiveDateKey() {
+  // Use the calendar's currently viewed date, not necessarily real today
+  if (typeof currentDateKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(currentDateKey)) {
+    return currentDateKey;
+  }
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function pwStorageKey() {
+  return 'pw_chat_' + pwActiveDateKey() + '_' + _pwTab;
+}
+
+// Save current _pwHistory + rendered HTML to localStorage under today's key
+function pwSaveHistory() {
+  try {
+    const chat = document.getElementById('pwChat');
+    localStorage.setItem(pwStorageKey(), JSON.stringify({
+      history: _pwHistory,
+      html: chat.innerHTML
+    }));
+  } catch(e) {}
+}
+
+// Load today's chat for current tab; returns true if history was found
+function pwLoadTodayHistory() {
+  try {
+    const raw = localStorage.getItem(pwStorageKey());
+    if (!raw) return false;
+    const saved = JSON.parse(raw);
+    if (!saved || !saved.history || saved.history.length === 0) return false;
+    _pwHistory = saved.history;
+    const chat = document.getElementById('pwChat');
+    chat.innerHTML = saved.html || '';
+    chat.scrollTop = chat.scrollHeight;
+
+    // Show a subtle day-header at top if not already present
+    if (!chat.querySelector('.pw-day-header')) {
+      const banner = document.createElement('div');
+      banner.className = 'pw-day-header';
+      banner.style.cssText = `
+        text-align:center;font-family:'DM Mono',monospace;font-size:9px;
+        letter-spacing:2px;text-transform:uppercase;color:#3a2e18;
+        padding:6px 0 14px;
+      `;
+      banner.textContent = '— ' + pwActiveDateKey() + ' —';
+      chat.insertBefore(banner, chat.firstChild);
+    }
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+// Single entry point: load the active calendar date's chat for current tab
+function pwLoadActiveDate() {
+  const activeDate = pwActiveDateKey();
+
+  const chat = document.getElementById('pwChat');
+  chat.innerHTML = '';
+  _pwHistory = [];
+
+  const raw = localStorage.getItem(pwStorageKey());
+  if (raw) {
+    try {
+      const saved = JSON.parse(raw);
+      if (saved && saved.history && saved.history.length > 0) {
+        _pwHistory = saved.history;
+        chat.innerHTML = saved.html || '';
+        chat.scrollTop = chat.scrollHeight;
+                return;
+      }
+    } catch(e) {}
+  }
+  // No history for this date → start fresh
+  pwStartChat();
+}
+
+function openPostWriter() {
+  document.getElementById('postWriterOverlay').classList.add('active');
+  // Load saved key
+  _pwApiKey = localStorage.getItem('pw_gemini_key') || '';
+  if (_pwApiKey) {
+    document.getElementById('pwApiKeyInput').value = '••••••••••••••••';
+    document.getElementById('pwApiKeySection').style.opacity = '0.6';
+  }
+  // Load the active calendar date's chat (fresh, no leftovers)
+  pwLoadActiveDate();
+  document.getElementById('pwInput').focus();
+}
+
+function closePostWriter() {
+  document.getElementById('postWriterOverlay').classList.remove('active');
+}
+
+function pwSaveKey() {
+  const val = document.getElementById('pwApiKeyInput').value.trim();
+  if (!val || val.startsWith('•')) return;
+  _pwApiKey = val;
+  localStorage.setItem('pw_gemini_key', val);
+  document.getElementById('pwApiKeyInput').value = '••••••••••••••••';
+  document.getElementById('pwApiKeySection').style.opacity = '0.6';
+  pwAddMsg('system', '✦ API key saved. Ready to write posts.');
+  pwSaveHistory();
+}
+
+function pwCheckKey() {
+  document.getElementById('pwApiKeySection').style.opacity = '1';
+}
+
+function pwSetTab(tab) {
+  _pwTab = tab;
+  const li = document.getElementById('pwTabLI');
+  const fb = document.getElementById('pwTabFB');
+  if (tab === 'linkedin') {
+    li.style.borderBottom = '2px solid #c9a84c'; li.style.background = '#141008'; li.style.color = '#c9a84c';
+    fb.style.borderBottom = '2px solid transparent'; fb.style.background = '#0f0d0a'; fb.style.color = '#5a4a28';
+  } else {
+    fb.style.borderBottom = '2px solid #c9a84c'; fb.style.background = '#141008'; fb.style.color = '#c9a84c';
+    li.style.borderBottom = '2px solid transparent'; li.style.background = '#0f0d0a'; li.style.color = '#5a4a28';
+  }
+  // Load fresh chat for new tab
+  pwLoadActiveDate();
+}
+
+function openGetKeyModal() {
+  document.getElementById('getKeyOverlay').classList.add('active');
+}
+
+function closeGetKeyModal() {
+  document.getElementById('getKeyOverlay').classList.remove('active');
+}
+
+function pwStartChat() {
+  const platform = _pwTab === 'linkedin' ? 'LinkedIn' : 'Facebook';
+  // Add day header
+  const chat = document.getElementById('pwChat');
+  if (!chat.querySelector('.pw-day-header')) {
+    const banner = document.createElement('div');
+    banner.className = 'pw-day-header';
+    banner.style.cssText = `
+      text-align:center;font-family:'DM Mono',monospace;font-size:9px;
+      letter-spacing:2px;text-transform:uppercase;color:#3a2e18;
+      padding:6px 0 14px;
+    `;
+    banner.textContent = '— ' + pwActiveDateKey() + ' —';
+    chat.appendChild(banner);
+  }
+  pwAddMsg('assistant', `Ready to write a killer <strong>${platform} post</strong> for you.<br><br>Tell me: <strong>what's the topic or idea?</strong> Even a rough sentence works — I'll shape it into something scroll-stopping.`);
+  pwSaveHistory();
+}
+
+function pwAddMsg(role, html) {
+  const chat = document.getElementById('pwChat');
+  const isUser = role === 'user';
+  const isSystem = role === 'system';
+
+  const div = document.createElement('div');
+  div.style.cssText = `
+    display:flex;flex-direction:column;
+    align-items:${isUser ? 'flex-end' : 'flex-start'};
+    gap:4px;
+  `;
+
+  if (!isSystem) {
+    const label = document.createElement('div');
+    label.style.cssText = `font-size:9px;color:#5a4a28;letter-spacing:1.5px;text-transform:uppercase;padding:0 4px;font-family:'DM Mono',monospace;`;
+    label.textContent = isUser ? 'You' : 'AI Writer';
+    div.appendChild(label);
+  }
+
+  const bubble = document.createElement('div');
+  bubble.style.cssText = `
+    max-width:88%;padding:12px 15px;border-radius:8px;line-height:1.7;font-size:13px;
+    ${isUser
+      ? 'background:linear-gradient(135deg,#1a1500,#241c08);border:1px solid #3a2e18;color:#e8dfc8;font-family:\'Amiri\',serif;font-size:14px;'
+      : isSystem
+        ? 'background:#141008;border:1px solid #c9a84c55;color:#c9a84c;font-family:\'DM Mono\',monospace;font-size:11px;'
+        : 'background:#141008;border:1px solid #2a2010;color:#d4c9ae;font-family:\'Literata\',Georgia,serif;'
+    }
+  `;
+  bubble.innerHTML = html;
+
+  // Copy button for AI messages
+  if (!isUser && !isSystem) {
+    const copyBtn = document.createElement('button');
+    copyBtn.textContent = 'Copy';
+    copyBtn.style.cssText = `
+      margin-top:8px;padding:4px 10px;background:#1a1610;
+      border:1px solid #3a2e18;color:#8a7840;
+      border-radius:4px;cursor:pointer;font-family:'DM Mono',monospace;
+      font-size:9px;letter-spacing:1px;transition:all .2s;display:block;
+    `;
+    copyBtn.onmouseover = () => { copyBtn.style.borderColor='#c9a84c'; copyBtn.style.color='#c9a84c'; };
+    copyBtn.onmouseout = () => { copyBtn.style.borderColor='#3a2e18'; copyBtn.style.color='#8a7840'; };
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(bubble.innerText.replace('Copy','').trim());
+      copyBtn.textContent = '✓ Copied';
+      setTimeout(() => copyBtn.textContent = 'Copy', 2000);
+    };
+    bubble.appendChild(copyBtn);
+  }
+
+  div.appendChild(bubble);
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function pwAddTyping() {
+  const chat = document.getElementById('pwChat');
+  const div = document.createElement('div');
+  div.id = 'pwTyping';
+  div.style.cssText = 'display:flex;flex-direction:column;align-items:flex-start;gap:4px;';
+  div.innerHTML = `
+    <div style="font-size:9px;color:#5a4a28;letter-spacing:1.5px;text-transform:uppercase;padding:0 4px;font-family:'DM Mono',monospace;">AI Writer</div>
+    <div style="background:#141008;border:1px solid #2a2010;border-radius:8px;padding:11px 16px;">
+      <span style="display:inline-flex;gap:4px;align-items:center;">
+        <span style="width:6px;height:6px;background:#c9a84c;border-radius:50%;animation:pulse 1s infinite;opacity:.7;"></span>
+        <span style="width:6px;height:6px;background:#c9a84c;border-radius:50%;animation:pulse 1s .2s infinite;opacity:.7;"></span>
+        <span style="width:6px;height:6px;background:#c9a84c;border-radius:50%;animation:pulse 1s .4s infinite;opacity:.7;"></span>
+      </span>
+    </div>`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function pwRemoveTyping() {
+  const t = document.getElementById('pwTyping');
+  if (t) t.remove();
+}
+
+async function pwSend() {
+  const input = document.getElementById('pwInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  if (!_pwApiKey) {
+    pwAddMsg('system', '⚠ Please paste your Gemini API key above first.');
+    return;
+  }
+
+  input.value = '';
+  input.style.height = 'auto';
+  pwAddMsg('user', text.replace(/\n/g, '<br>'));
+
+  _pwHistory.push({ role: 'user', parts: [{ text }] });
+  pwSaveHistory(); // save after user message
+
+  const btn = document.getElementById('pwSendBtn');
+  btn.disabled = true; btn.style.opacity = '0.5';
+  pwAddTyping();
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${_pwApiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: PW_SYSTEM[_pwTab] }] },
+          contents: _pwHistory,
+          generationConfig: { temperature: 0.93, maxOutputTokens: 8000 }
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.error) {
+      pwRemoveTyping();
+      pwAddMsg('system', `⚠ API Error: ${data.error.message}`);
+      btn.disabled = false; btn.style.opacity = '1';
+      return;
+    }
+
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    const reply = parts.map(p => p.text || '').join('').trim() || 'No response.';
+    _pwHistory.push({ role: 'model', parts: [{ text: reply }] });
+
+    pwRemoveTyping();
+    // Convert markdown-ish to HTML
+    const formatted = reply
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br>');
+    pwAddMsg('assistant', formatted);
+    pwSaveHistory(); // save after AI reply
+
+  } catch (err) {
+    pwRemoveTyping();
+    pwAddMsg('system', `⚠ Network error: ${err.message}`);
+  }
+
+  btn.disabled = false; btn.style.opacity = '1';
+  input.focus();
+}
+</script>
+
+<!-- DAILY LANGUAGE LEARNER OVERLAY -->
+<div class="lr-overlay" id="langOverlay">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:760px;margin:20px auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;">
+
+    <!-- Top bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;gap:12px;flex-wrap:wrap;">
+      <div id="lrTitle" style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🗣 Daily Language Learner</div>
+      <button class="qr-close" onclick="closeLanguageReader()">✕ Save &amp; Exit</button>
+    </div>
+
+    <!-- Language + Type selector grid -->
+    <div style="padding:12px 18px;background:#141008;border-bottom:1px solid #2a2010;">
+      <!-- Row 1: Languages -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:6px;">
+        <button class="lr-lang-btn" data-lang="ar" onclick="lrSetLang('ar')" style="background:#1a1500;border:1px solid #c9a84c;color:#c9a84c;height:34px;border-radius:6px;cursor:pointer;font-family:'Amiri',serif;font-size:13px;text-align:center;" onmouseout="lrSyncBtns()">عربي</button>
+        <button class="lr-lang-btn" data-lang="en" onclick="lrSetLang('en')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;height:34px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;text-align:center;" onmouseout="lrSyncBtns()">English</button>
+        <button class="lr-lang-btn" data-lang="bn" onclick="lrSetLang('bn')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;height:34px;border-radius:6px;cursor:pointer;font-family:'Literata',Georgia,serif;font-size:12px;text-align:center;" onmouseout="lrSyncBtns()">বাংলা</button>
+        <button class="lr-lang-btn" data-lang="ur" onclick="lrSetLang('ur')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;height:34px;border-radius:6px;cursor:pointer;font-family:'Amiri',serif;font-size:13px;text-align:center;" onmouseout="lrSyncBtns()">اردو</button>
+        <button class="lr-lang-btn" data-lang="hi" onclick="lrSetLang('hi')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;height:34px;border-radius:6px;cursor:pointer;font-family:'Literata',Georgia,serif;font-size:12px;text-align:center;" onmouseout="lrSyncBtns()">हिन्दी</button>
+      </div>
+      <!-- Row 2: Word / Verb — dynamic labels per language, same height as row 1 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <button class="lr-type-btn" id="lrWordBtn" data-type="word" onclick="lrSetType('word')" style="background:#1a1500;border:1px solid #c9a84c;color:#c9a84c;height:34px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;text-align:center;" onmouseout="lrSyncBtns()">📖 Word</button>
+        <button class="lr-type-btn" id="lrVerbBtn" data-type="verb" onclick="lrSetType('verb')" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;height:34px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;text-align:center;" onmouseout="lrSyncBtns()">⚡ Verb</button>
+      </div>
+    </div>
+
+    <!-- Content body -->
+    <div id="lrBody" style="padding:24px 20px;display:flex;flex-direction:column;gap:18px;">
+
+      <div id="lrNoData" style="display:none;text-align:center;padding:40px 20px;font-family:'DM Mono',monospace;font-size:12px;color:#5a4a28;letter-spacing:1px;">No entry found for today.</div>
+
+      <!-- Word hero -->
+      <div id="lrHero" style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px 20px;text-align:center;">
+        <div id="lrWordNum" style="font-family:'DM Mono',monospace;font-size:9px;color:#5a4a28;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;">WORD 001</div>
+        <div id="lrWordMain" style="font-family:'Amiri',serif;font-size:52px;color:#f0e4c0;line-height:1.2;margin-bottom:6px;">—</div>
+        <div id="lrWordRoman" style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:6px;letter-spacing:.5px;font-family:'Literata',Georgia,serif;"></div>
+        <div id="lrWordType" style="font-family:'DM Mono',monospace;font-size:9px;color:#5a4a28;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;"></div>
+        <div id="lrWordMeaning" style="font-family:'Literata',Georgia,serif;font-size:1.1rem;color:#c5b98a;font-style:italic;">—</div>
+        <div id="lrSimpleMeaning" style="font-family:'Literata',Georgia,serif;font-size:0.85rem;color:#7a6a40;margin-top:10px;font-style:italic;line-height:1.6;"></div>
+      </div>
+
+      <!-- Collocations -->
+      <div id="lrCollPanel" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:14px 20px;">
+        <div style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:8px;font-family:'DM Mono',monospace;">Collocations</div>
+        <div id="lrCollocations" style="font-family:'DM Mono',monospace;font-size:11px;color:#c5b98a;line-height:1.8;letter-spacing:0.3px;"></div>
+      </div>
+
+      <!-- Conjugation (verb only) -->
+      <div id="lrConjPanel" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;">
+        <div style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:12px;font-family:'DM Mono',monospace;">Conjugation</div>
+        <table id="lrConjTable" style="width:100%;border-collapse:collapse;"></table>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:14px;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;font-family:'Amiri',serif;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+
+      <!-- Micro story -->
+      <div id="lrStoryPanel" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;">
+        <div style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:12px;font-family:'DM Mono',monospace;">Micro Story</div>
+        <div id="lrStory" style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c5b98a;line-height:1.9;font-style:italic;">—</div>
+      </div>
+
+      <!-- Synonym / Antonym -->
+      <div id="lrSynAntPanel" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;">
+        <div style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:12px;font-family:'DM Mono',monospace;">Synonym &amp; Antonym</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:baseline;gap:12px;">
+            <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#6aab7a;width:48px;flex-shrink:0;">SYN</span>
+            <span id="lrSyn" style="font-family:'DM Mono',monospace;font-size:12px;color:#c5b98a;line-height:1.6;">—</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:12px;">
+            <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#c05050;width:48px;flex-shrink:0;">ANT</span>
+            <span id="lrAnt" style="font-family:'DM Mono',monospace;font-size:12px;color:#c5b98a;line-height:1.6;">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Speaking Challenge -->
+      <div id="lrChallengePanel" style="background:#141008;border:1px solid #2a2010;border-left:3px solid #6aab7a;border-radius:0 8px 8px 0;padding:14px 20px;">
+        <div style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#6aab7a;margin-bottom:8px;font-family:'DM Mono',monospace;">Speaking Challenge</div>
+        <div id="lrSpeakingChallenge" style="font-family:'Literata',Georgia,serif;font-size:0.92rem;color:#c5b98a;line-height:1.8;font-style:italic;"></div>
+      </div>
+
+      <!-- Single mark learned button for current lang + type -->
+      <div id="lrMarkWrap" style="text-align:center;padding:4px 0 8px;">
+        <button id="lrMarkBtn" onclick="lrMarkStudied()" style="background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid #c9a84c;color:#c9a84c;padding:10px 28px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;" onmouseover="if(!this.dataset.done)this.style.background='linear-gradient(135deg,#2a2000,#3a3000)'" onmouseout="if(!this.dataset.done)this.style.background='linear-gradient(135deg,#1a1500,#2a2000)'">✓ Mark As Learned Today</button>
+      </div>
+
+      <div id="lrDua" style="text-align:center;color:#5a5030;font-size:0.85rem;font-style:italic;border-top:1px solid #1e1a10;padding-top:16px;font-family:'Literata',Georgia,serif;">May Allah grant us the tawfeeq in all our studies. آمين</div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   DAILY LANGUAGE LEARNER — DATA & LOGIC
+══════════════════════════════════════════ */
+
+const LR_DATA   = { ar: null, en: null, bn: null, ur: null, hi: null };
+const LR_LOADED = { ar: false, en: false, bn: false, ur: false, hi: false };
+const LR_ERROR  = { ar: false, en: false, bn: false, ur: false, hi: false };
+
+const LR_FILES  = {
+  en: BASE_URL + 'Language%20Learner%20EN.json',
+  ar: BASE_URL + 'Language%20Learner%20AR.json',
+  bn: BASE_URL + 'Language%20Learner%20BN.json',
+  ur: BASE_URL + 'Language%20Learner%20UR.json',
+  hi: BASE_URL + 'Language%20Learner%20HI.json',
+};
+
+async function lrLoadLang(lang) {
+  if (LR_LOADED[lang]) return;
+  try {
+    const res = await fetch(LR_FILES[lang]);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    LR_DATA[lang] = await res.json();
+    LR_LOADED[lang] = true;
+  } catch(e) {
+    LR_ERROR[lang] = true;
+    console.error('[LR] Failed to load ' + LR_FILES[lang] + ':', e);
+  }
+}
+
+// RTL languages
+const LR_RTL = new Set(['ar', 'ur']);
+const LR_LANG_NAMES = { ar:'Arabic', en:'English', bn:'Bengali', ur:'Urdu', hi:'Hindi' };
+const LR_LANGS = ['ar','en','bn','ur','hi'];
+
+// State
+let _lrLang = 'ar';
+let _lrType = 'verb';
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function lrTodayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function lrStudiedKey(lang, type) {
+  const dk = currentDateKey || lrTodayKey();
+  return 'lr_studied_' + dk + '_' + lang + '_' + type;
+}
+function lrGetTodayEntry(type) {
+  const data = LR_DATA[_lrLang];
+  if (!data || !data.length) return null;
+  // Use the selected calendar date (currentDateKey = "YYYY-MM-DD")
+  // Falls back to today if no day is selected
+  const dk = currentDateKey || lrTodayKey();
+  const [y, m, d] = dk.split('-').map(Number);
+  const selected = new Date(y, m - 1, d);
+  const jan1    = new Date(y, 0, 1);
+  const day     = Math.floor((selected - jan1) / 86400000) + 1; // Jan 1 = 1
+  const entry   = data.find(e => e.type === type && e.day === day);
+  return entry ? { entry, idx: day - 1 } : null;
+}
+
+// ── Sync button highlights ────────────────────────────────────────────────
+// Per-language UI strings
+const LR_UI = {
+  ar: {
+    title:    '🗣 المتعلم اليومي للغات',
+    saveExit: '✕ حفظ والخروج',
+    wordBtn:  { label: '📖 مفرد', font: "'Amiri', serif",            size: '13px' },
+    verbBtn:  { label: '⚡ فعل',  font: "'Amiri', serif",            size: '13px' },
+    markBtn:  'تعلّمت هذا اليوم ✓',
+    learnedLabel: (type) => 'تعلّمت — ' + (type === 'verb' ? 'فعل' : 'مفرد') + ' ✓',
+    undoLabel:    (type) => 'إلغاء — ' + (type === 'verb' ? 'فعل' : 'مفرد'),
+    dua:      'اللهم اجعل علمنا نافعاً. آمين',
+    rtl: true,
+  },
+  en: {
+    title:    '🗣 Daily Language Learner',
+    saveExit: '✕ Save & Exit',
+    wordBtn:  { label: '📖 Word',  font: "'DM Mono', monospace",      size: '10px' },
+    verbBtn:  { label: '⚡ Verb',  font: "'DM Mono', monospace",      size: '10px' },
+    markBtn:  '✓ Mark As Learned Today',
+    learnedLabel: (type) => '✓ Learned — ' + (type === 'verb' ? 'Verb' : 'Word'),
+    undoLabel:    (type) => '↩ Undo — ' + (type === 'verb' ? 'Verb' : 'Word'),
+    dua:      'May Allah grant us tawfeeq in all our studies. آمين',
+    rtl: false,
+  },
+  bn: {
+    title:    '🗣 দৈনিক ভাষা শিক্ষা',
+    saveExit: '✕ সংরক্ষণ ও প্রস্থান',
+    wordBtn:  { label: '📖 শব্দ',   font: "'Literata', Georgia, serif", size: '12px' },
+    verbBtn:  { label: '⚡ ক্রিয়া', font: "'Literata', Georgia, serif", size: '12px' },
+    markBtn:  '✓ আজ শিখেছি হিসেবে চিহ্নিত করুন',
+    learnedLabel: (type) => '✓ শেখা হয়েছে — ' + (type === 'verb' ? 'ক্রিয়া' : 'শব্দ'),
+    undoLabel:    (type) => '↩ পূর্বাবস্থায় ফিরুন — ' + (type === 'verb' ? 'ক্রিয়া' : 'শব্দ'),
+    dua:      'আল্লাহ আমাদের সকল পড়াশোনায় তাওফিক দিন। আমিন',
+    rtl: false,
+  },
+  ur: {
+    title:    '🗣 روزانہ زبان سیکھنا',
+    saveExit: '✕ محفوظ کریں اور باہر نکلیں',
+    wordBtn:  { label: '📖 لفظ',  font: "'Amiri', serif",            size: '13px' },
+    verbBtn:  { label: '⚡ فعل',  font: "'Amiri', serif",            size: '13px' },
+    markBtn:  'آج سیکھا ✓',
+    learnedLabel: (type) => 'سیکھ لیا — ' + (type === 'verb' ? 'فعل' : 'لفظ') + ' ✓',
+    undoLabel:    (type) => 'واپس کریں — ' + (type === 'verb' ? 'فعل' : 'لفظ'),
+    dua:      'اللہ ہمیں علم میں توفیق عطا فرمائے۔ آمین',
+    rtl: true,
+  },
+  hi: {
+    title:    '🗣 दैनिक भाषा सीखना',
+    saveExit: '✕ सहेजें और बाहर निकलें',
+    wordBtn:  { label: '📖 शब्द',  font: "'Literata', Georgia, serif", size: '12px' },
+    verbBtn:  { label: '⚡ क्रिया', font: "'Literata', Georgia, serif", size: '12px' },
+    markBtn:  '✓ आज सीखा के रूप में चिह्नित करें',
+    learnedLabel: (type) => '✓ सीखा — ' + (type === 'verb' ? 'क्रिया' : 'शब्द'),
+    undoLabel:    (type) => '↩ पूर्ववत करें — ' + (type === 'verb' ? 'क्रिया' : 'शब्द'),
+    dua:      'अल्लाह हमें सभी अध्ययन में तौफ़ीक़ दे। आमीन',
+    rtl: false,
+  },
+};
+
+function lrGetUI() { return LR_UI[_lrLang] || LR_UI.en; }
+
+function lrSyncBtns() {
+  const ui = lrGetUI();
+  // Lang buttons
+  document.querySelectorAll('.lr-lang-btn').forEach(b => {
+    const active = b.dataset.lang === _lrLang;
+    b.style.background = active ? '#1a1500' : '#1e1a10';
+    b.style.borderColor = active ? '#c9a84c' : '#2a2010';
+    b.style.color = active ? '#c9a84c' : '#8a7840';
+  });
+  // Type buttons
+  document.querySelectorAll('.lr-type-btn').forEach(b => {
+    const active = b.dataset.type === _lrType;
+    b.style.background = active ? '#1a1500' : '#1e1a10';
+    b.style.borderColor = active ? '#c9a84c' : '#2a2010';
+    b.style.color = active ? '#c9a84c' : '#8a7840';
+  });
+  // Word/Verb button labels
+  const wb = document.getElementById('lrWordBtn');
+  const vb = document.getElementById('lrVerbBtn');
+  if (wb) { wb.textContent = ui.wordBtn.label; wb.style.fontFamily = ui.wordBtn.font; wb.style.fontSize = ui.wordBtn.size; }
+  if (vb) { vb.textContent = ui.verbBtn.label; vb.style.fontFamily = ui.verbBtn.font; vb.style.fontSize = ui.verbBtn.size; }
+  // Title
+  const title = document.getElementById('lrTitle');
+  if (title) title.textContent = ui.title;
+  // Save & Exit button
+  const closeBtn = document.querySelector('#langOverlay .qr-close');
+  if (closeBtn) closeBtn.textContent = ui.saveExit;
+  // Dua footer
+  const dua = document.getElementById('lrDua');
+  if (dua) { dua.textContent = ui.dua; dua.style.direction = ui.rtl ? 'rtl' : 'ltr'; }
+}
+
+// ── Render ────────────────────────────────────────────────────────────────
+function lrRender() {
+  lrSyncBtns();
+  const result = lrGetTodayEntry(_lrType);
+
+  if (!result) {
+    document.getElementById('lrHero').style.display = 'none';
+    document.getElementById('lrConjPanel').style.display = 'none';
+    document.getElementById('lrSynAntPanel').style.display = 'none';
+    document.getElementById('lrCollPanel').style.display = 'none';
+    document.getElementById('lrStoryPanel').style.display = 'none';
+    document.getElementById('lrChallengePanel').style.display = 'none';
+    document.getElementById('lrMarkWrap').style.display = 'none';
+    document.getElementById('lrNoData').style.display = 'block';
+    document.getElementById('lrNoData').textContent = "Today\'s word is not yet available. New words are added regularly — wait patiently. \uD83D\uDD4C";
+    return;
+  }
+
+  const { entry, idx } = result;
+  document.getElementById('lrHero').style.display = '';
+  document.getElementById('lrNoData').style.display = 'none';
+  document.getElementById('lrCollPanel').style.display = '';
+  document.getElementById('lrSynAntPanel').style.display = '';
+  document.getElementById('lrStoryPanel').style.display = '';
+  document.getElementById('lrChallengePanel').style.display = '';
+  document.getElementById('lrMarkWrap').style.display = '';
+
+  const lang = entry;
+  const isRTL = LR_RTL.has(_lrLang);
+
+  // Hero
+  const typeLabel = _lrType === 'verb' ? 'VERB' : 'WORD';
+  document.getElementById('lrWordNum').textContent = '';
+  const mainEl = document.getElementById('lrWordMain');
+  mainEl.textContent = lang.word;
+  mainEl.style.direction = isRTL ? 'rtl' : 'ltr';
+  mainEl.style.fontSize = isRTL ? '58px' : '52px';
+  document.getElementById('lrWordRoman').textContent = lang.roman;
+  document.getElementById('lrWordType').textContent = '';
+  document.getElementById('lrWordMeaning').textContent = lang.meaning;
+
+  const simpleMeaningEl = document.getElementById('lrSimpleMeaning');
+  if (simpleMeaningEl) simpleMeaningEl.textContent = lang.simpleMeaning || '';
+
+  const collEl = document.getElementById('lrCollocations');
+  if (collEl) collEl.textContent = lang.collocations || '';
+
+  const challengeEl = document.getElementById('lrSpeakingChallenge');
+  if (challengeEl) challengeEl.textContent = lang.speakingChallenge || '';
+
+  // Syn / Ant
+  const synEl = document.getElementById('lrSyn');
+  const antEl = document.getElementById('lrAnt');
+  synEl.textContent = lang.syn; synEl.style.direction = isRTL ? 'rtl' : 'ltr';
+  antEl.textContent = lang.ant; antEl.style.direction = isRTL ? 'rtl' : 'ltr';
+
+  // Conjugation
+  const conjPanel = document.getElementById('lrConjPanel');
+  const conjTable = document.getElementById('lrConjTable');
+  if (_lrType === 'verb' && lang.conj) {
+    conjPanel.style.display = '';
+    const thS = "font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#7a6a40;padding:5px 8px;text-align:left;font-weight:400;font-family:'DM Mono',monospace;border-bottom:1px solid #2a2010;";
+    const tdP = "font-size:10px;color:#7a6a40;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;";
+    const tdN = "font-size:12px;color:#c5b98a;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;";
+    const tdR = "font-size:14px;color:#f0e4c0;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;";
+    const tdF = isRTL ? tdR : tdN;
+    let html = '<tr><th style="'+thS+'">Person</th><th style="'+thS+'">'+(isRTL?'ماضي · Past':'Past')+'</th><th style="'+thS+'">'+(isRTL?'مضارع · Present':'Present')+'</th><th style="'+thS+'">'+(isRTL?'مستقبل · Future':'Future')+'</th></tr>';
+    for (const row of lang.conj) {
+      html += '<tr><td style="'+tdP+'">'+row.person+'</td><td style="'+tdF+'">'+row.past+'</td><td style="'+tdF+'">'+row.present+'</td><td style="'+tdF+'">'+row.future+'</td></tr>';
+    }
+    conjTable.innerHTML = html;
+  } else {
+    conjPanel.style.display = 'none';
+  }
+
+  // Story
+  const storyEl = document.getElementById('lrStory');
+  storyEl.textContent = lang.story;
+  storyEl.style.direction = isRTL ? 'rtl' : 'ltr';
+  storyEl.style.fontFamily = isRTL ? "'Amiri', serif" : "'Literata', Georgia, serif";
+  storyEl.style.fontSize = isRTL ? '1.05rem' : '0.95rem';
+  storyEl.style.lineHeight = isRTL ? '2.2' : '1.9';
+
+  // Mark button — single button for current lang + type
+  lrRenderMarkBtn();
+}
+
+// ── Single mark button — with undo toggle ────────────────────────────────
+function lrRenderMarkBtn() {
+  const key = lrStudiedKey(_lrLang, _lrType);
+  const done = localStorage.getItem(key) === '1';
+  const ui = lrGetUI();
+  const btn = document.getElementById('lrMarkBtn');
+  btn.dataset.done = done ? '1' : '';
+  if (done) {
+    // Show "Learned" state with a subtle undo hint on hover via title
+    btn.textContent = ui.learnedLabel(_lrType);
+    btn.title = 'Tap again to undo';
+    btn.style.background = 'linear-gradient(135deg,#0f2010,#182818)';
+    btn.style.borderColor = '#4a7c59';
+    btn.style.color = '#6aab7a';
+    btn.style.cursor = 'pointer';
+    btn.onmouseover = () => { btn.textContent = ui.undoLabel(_lrType); btn.style.background = 'linear-gradient(135deg,#2a1010,#3a1818)'; btn.style.borderColor = '#c05050'; btn.style.color = '#c07070'; };
+    btn.onmouseout  = () => { btn.textContent = ui.learnedLabel(_lrType); btn.style.background = 'linear-gradient(135deg,#0f2010,#182818)'; btn.style.borderColor = '#4a7c59'; btn.style.color = '#6aab7a'; };
+  } else {
+    btn.textContent = ui.markBtn;
+    btn.title = '';
+    btn.style.background = 'linear-gradient(135deg,#1a1500,#2a2000)';
+    btn.style.borderColor = '#c9a84c';
+    btn.style.color = '#c9a84c';
+    btn.style.cursor = 'pointer';
+    btn.onmouseover = () => { btn.style.background = 'linear-gradient(135deg,#2a2000,#3a3000)'; };
+    btn.onmouseout  = () => { btn.style.background = 'linear-gradient(135deg,#1a1500,#2a2000)'; };
+  }
+}
+
+function lrMarkStudied() {
+  const key = lrStudiedKey(_lrLang, _lrType);
+  const done = localStorage.getItem(key) === '1';
+  if (done) {
+    localStorage.removeItem(key);
+  } else {
+    localStorage.setItem(key, '1');
+  }
+  lrRenderMarkBtn();
+  lrUpdateGoalBadge();
+  lrSaveRatioToDay();
+}
+
+function lrSaveRatioToDay() {
+  // 10 total slots: 5 langs × word + 5 langs × verb. Each = 0.5% of 5% goal.
+  const totalSlots = LR_LANGS.length * 2; // 10
+  let done = 0;
+  for (const lang of LR_LANGS) {
+    if (localStorage.getItem(lrStudiedKey(lang, 'word')) === '1') done++;
+    if (localStorage.getItem(lrStudiedKey(lang, 'verb')) === '1') done++;
+  }
+  const ratio = done / totalSlots; // 0.0 – 1.0
+  const allDone = ratio >= 1;
+  if (!currentDateKey) return;
+  const data = {...getCached(currentDateKey)};
+  if (ratio > 0) {
+    data['language_ratio'] = ratio;
+    data['language'] = allDone ? 'yes' : undefined;
+    if (!allDone) delete data['language'];
+  } else {
+    delete data['language_ratio'];
+    delete data['language'];
+  }
+  _cache[currentDateKey] = data;
+  // Update Yes/No button visual state
+  const yesVal = allDone ? 'yes' : null;
+  document.querySelectorAll('.yn-btn[data-key="language"]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.val === yesVal);
+  });
+  setStore(currentDateKey, data).then(() => refreshScores());
+}
+
+// ── Goal card badge ───────────────────────────────────────────────────────
+function lrUpdateGoalBadge() {
+  const badge = document.getElementById('langSessionBadge');
+  if (!badge) return;
+  const learned = [];
+  for (const lang of LR_LANGS) {
+    const wDone = localStorage.getItem(lrStudiedKey(lang, 'word')) === '1';
+    const vDone = localStorage.getItem(lrStudiedKey(lang, 'verb')) === '1';
+    if (wDone && vDone) learned.push(LR_LANG_NAMES[lang] + ' ✓');
+    else if (wDone) learned.push(LR_LANG_NAMES[lang] + ' (W)');
+    else if (vDone) learned.push(LR_LANG_NAMES[lang] + ' (V)');
+  }
+  if (learned.length) {
+    badge.style.display = 'block';
+    badge.textContent = 'Today: ' + learned.join(' · ');
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// ── Lang / Type selectors ─────────────────────────────────────────────────
+async function lrSetLang(lang) {
+  _lrLang = lang;
+  try { localStorage.setItem('lr_lang', lang); } catch(e) {}
+  lrSyncBtns(); // update button highlights immediately before any async work
+  if (!LR_LOADED[lang] && !LR_ERROR[lang]) {
+    document.getElementById('lrNoData').style.display = 'block';
+    document.getElementById('lrNoData').textContent = 'Loading…';
+    document.getElementById('lrHero').style.display = 'none';
+    document.getElementById('lrConjPanel').style.display = 'none';
+    document.getElementById('lrSynAntPanel').style.display = 'none';
+    document.getElementById('lrCollPanel').style.display = 'none';
+    document.getElementById('lrStoryPanel').style.display = 'none';
+    document.getElementById('lrChallengePanel').style.display = 'none';
+    document.getElementById('lrMarkWrap').style.display = 'none';
+    await lrLoadLang(lang);
+  }
+  if (LR_ERROR[lang]) {
+    document.getElementById('lrNoData').style.display = 'block';
+    document.getElementById('lrNoData').textContent = LR_LANG_NAMES[lang] + ' is not available yet. Coming soon — wait patiently. 🕌';
+    document.getElementById('lrHero').style.display = 'none';
+    document.getElementById('lrConjPanel').style.display = 'none';
+    document.getElementById('lrSynAntPanel').style.display = 'none';
+    document.getElementById('lrCollPanel').style.display = 'none';
+    document.getElementById('lrStoryPanel').style.display = 'none';
+    document.getElementById('lrChallengePanel').style.display = 'none';
+    document.getElementById('lrMarkWrap').style.display = 'none';
+    return;
+  }
+  lrRender();
+}
+function lrSetType(type) {
+  _lrType = type;
+  lrRender();
+}
+
+// ── Open / Close ──────────────────────────────────────────────────────────
+// Fire-and-forget: preload all language files in parallel in the background
+function lrPreloadAll() {
+  for (const lang of LR_LANGS) {
+    if (!LR_LOADED[lang] && !LR_ERROR[lang]) lrLoadLang(lang);
+  }
+}
+
+async function openLanguageReader() {
+  _lrLang = 'en';
+  _lrType = 'word';
+  try { localStorage.setItem('lr_lang', 'en'); } catch(e) {}
+  lrSyncBtns(); // highlight English tab immediately on open
+  const overlay = document.getElementById('langOverlay');
+  overlay.classList.add('active');
+  overlay.scrollTop = 0;
+  document.body.classList.add('overlay-open');
+  if (!LR_LOADED['en'] && !LR_ERROR['en']) {
+    document.getElementById('lrNoData').style.display = 'block';
+    document.getElementById('lrNoData').textContent = 'Loading…';
+    document.getElementById('lrHero').style.display = 'none';
+    document.getElementById('lrConjPanel').style.display = 'none';
+    document.getElementById('lrSynAntPanel').style.display = 'none';
+    document.getElementById('lrCollPanel').style.display = 'none';
+    document.getElementById('lrStoryPanel').style.display = 'none';
+    document.getElementById('lrChallengePanel').style.display = 'none';
+    document.getElementById('lrMarkWrap').style.display = 'none';
+    await lrLoadLang('en');
+  }
+  if (LR_ERROR['en']) {
+    document.getElementById('lrNoData').style.display = 'block';
+    document.getElementById('lrNoData').textContent = 'English content is not available yet. Coming soon — wait patiently. 🕌';
+    document.getElementById('lrHero').style.display = 'none';
+    // Still preload others in background even if EN failed
+    lrPreloadAll();
+    return;
+  }
+  lrRender();
+  // Preload all other languages in background — no await, fire-and-forget
+  lrPreloadAll();
+}
+function closeLanguageReader() {
+  document.getElementById('langOverlay').classList.remove('active');
+  document.body.classList.remove('overlay-open');
+  lrUpdateGoalBadge();
+}
+
+// Init badge on load
+lrUpdateGoalBadge();
+</script>
+
+</body>
+</html>

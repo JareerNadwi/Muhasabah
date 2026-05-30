@@ -719,6 +719,21 @@ body.overlay-open{overflow:hidden;}
       <div class="qr-session-badge" id="zikrBookReaderBadge" style="display:none;"></div>
     </div>
 
+    <!-- Surah Al-Kahf +10% bonus -->
+    <div class="goal-card bonus-card" id="card-surahKahf">
+      <div class="goal-top">
+        <div class="goal-name">📜 Surah Al-Kahf <span class="weight-hint">(Bonus)</span></div>
+        <div class="goal-pct-badge bonus" id="pct-surahKahf">+0%</div>
+      </div>
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="surahKahf" data-val="yes" onclick="setYN('surahKahf','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="surahKahf" data-val="no"  onclick="setYN('surahKahf','no')">No</button>
+      </div>
+      <div class="sub-label">Max +10% Bonus At Full Surah</div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahKahf')">📜 Open Surah Al-Kahf Reader</button>
+      <div class="qr-session-badge" id="surahKahfSessionBadge" style="display:none;"></div>
+    </div>
+
     <!-- Sadaqah +10% max -->
     <div class="goal-card bonus-card" id="card-sadaqah">
       <div class="goal-top">
@@ -1309,6 +1324,16 @@ const PDF_READER_CONFIG = {
     autoCompleteOnClose: false,
     globalResume:     false,
   },
+  surahKahf: {
+    pdfPath:          'Surah%20Al-Kahf.pdf',
+    title:            '📜 Surah Al-Kahf',
+    resume:           true,    // per-day resume (resets each day)
+    goalKey:          'surahKahf',
+    badgeId:          'surahKahfSessionBadge',
+    idbKey:           '_pdf_lastpage_surahKahf',
+    autoCompleteOnClose: false,
+    globalResume:     false,
+  },
 };
 
 let pdfReaderType      = null;
@@ -1346,6 +1371,7 @@ async function openPdfReader(type){
   // Surah Waqiah and Mulk use the verse reader, not PDF
   if(type === 'surahWaqiah'){ openSurahVerseReader(56, '📜 Surah Al-Waqiah', 'surahWaqiah'); return; }
   if(type === 'surahMulk'){   openSurahVerseReader(67, '📜 Surah Al-Mulk',   'surahMulk');   return; }
+  if(type === 'surahKahf'){   openSurahVerseReader(18, '📜 Surah Al-Kahf',   'surahKahf');   return; }
   if(type === 'zikrBook'){ openZikrBookReader(); return; }
   pdfReaderType = type;
   const cfg = PDF_READER_CONFIG[type];
@@ -1819,6 +1845,10 @@ function scoreDay(data){
     bonus+=Math.min((parseInt(data.zikrBookPages)||0)*(10/123),10);
   }
 
+  // surahKahf +10% bonus — proportional over 110 verses
+  const skRatio = data['surahKahf_pdfRatio'];
+  bonus += skRatio !== undefined ? Math.min(skRatio * 10, 10) : (data.surahKahf==='yes'?10:0);
+
   // Sadaqah: max +10% at 50,000 units
   bonus+=Math.min((parseInt(data.sadaqahUnits)||0)*(10/50000),10);
 
@@ -1921,6 +1951,10 @@ function bonusScore(data,key){
         : Math.min(Math.round((parseInt(data.zikrBookPages)||0)*(10/123)*10)/10, 10);
     }
     case 'sadaqah':     return Math.min(Math.round((parseInt(data.sadaqahUnits)||0)*(10/50000)*10)/10,10);
+    case 'surahKahf': {
+      const r = data['surahKahf_pdfRatio'];
+      return r !== undefined ? Math.min(Math.round(r * 10 * 10) / 10, 10) : (data.surahKahf==='yes'?10:0);
+    }
     default: return 0;
   }
 }
@@ -2115,7 +2149,7 @@ function loadDayData(dk){
   });
 
   ['hadith','tafsir','asmaul','zikrMorning','zikrEvening','surahWaqiah','surahMulk','sawm',
-   'exercise','books','language','writingLinkedin','writingFacebook','netConnected','netCommented']
+   'exercise','books','language','writingLinkedin','writingFacebook','netConnected','netCommented','surahKahf']
     .forEach(key=>{
       document.querySelectorAll(`.yn-btn[data-key="${key}"]`).forEach(btn=>btn.classList.toggle('active',btn.dataset.val===data[key]));
     });
@@ -2192,7 +2226,7 @@ function refreshScores(){
     });
 
   // Bonus badges
-  ['sawm','sunnahSalah','naflSalah','zikrBook','sadaqah'].forEach(key=>{
+  ['sawm','sunnahSalah','naflSalah','zikrBook','sadaqah','surahKahf'].forEach(key=>{
     const val=bonusScore(data,key);
     const badge=document.getElementById('pct-'+key);
     const card=document.getElementById('card-'+key);
@@ -3067,7 +3101,7 @@ async function _saveSvProgress(readCount, done){
 }
 
 function _renderSvBadge(dk, goalKey){
-  const badgeMap = { surahWaqiah: 'surahWaqiahSessionBadge', surahMulk: 'surahMulkSessionBadge' };
+  const badgeMap = { surahWaqiah: 'surahWaqiahSessionBadge', surahMulk: 'surahMulkSessionBadge', surahKahf: 'surahKahfSessionBadge' };
   const badgeId = badgeMap[goalKey];
   if(!badgeId) return;
   const badge = document.getElementById(badgeId);
@@ -3076,7 +3110,8 @@ function _renderSvBadge(dk, goalKey){
   const sessKey  = goalKey + '_svSessions';
   const sessions = data[sessKey];
   if(!sessions || sessions.length === 0){ badge.style.display = 'none'; return; }
-  const total      = goalKey === 'surahWaqiah' ? 29 : 50;
+  const totalMap = { surahWaqiah: 29, surahMulk: 50, surahKahf: 110 };
+  const total      = totalMap[goalKey] || SURAH_LENGTHS[(goalKey === 'surahWaqiah' ? 55 : goalKey === 'surahMulk' ? 66 : 17)];
   const done       = data[goalKey] === 'yes';
   const totalVerses = sessions.reduce((s,x) => s + x.verses, 0);
   const pct        = Math.round((totalVerses / total) * 100);
@@ -5012,6 +5047,7 @@ loadDayData=function(dk){
   renderZikrBadge(dk,"evening");
   _renderSvBadge(dk,"surahWaqiah");
   _renderSvBadge(dk,"surahMulk");
+  _renderSvBadge(dk,"surahKahf");
 };
 </script>
 

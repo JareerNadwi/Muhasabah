@@ -13,32 +13,32 @@
     "speakingChallenge": "You are presenting a project review to your manager. Describe what happened, what went wrong, and what the final outcome was. Use the word at least twice."
   },
   {
-    "day": 1,
-    "type": "verb",
-    "word": "align",
-    "roman": "uh-LYN",
-    "meaning": "To bring people, goals, or processes into agreement and coordination with each other.",
-    "simpleMeaning": "To make sure things or people match and work together toward the same goal.",
-    "collocations": "align with goals, align teams, align expectations, align on strategy, align stakeholders",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "aligned",
-        "present": "align",
-        "future": "will align"
-      },
-      {
-        "person": "He / She / It",
-        "past": "aligned",
-        "present": "aligns",
-        "future": "will align"
-      }
-    ],
-    "story": "Before the product launch, the director called a meeting to align every department on the timeline and success criteria. It took two hours, but by the end the entire group managed to align on what needed to happen and in what order. In fast-moving organizations, leaders who fail to align their teams early end up fixing confusion later at a much higher cost.",
-    "syn": "coordinate, synchronize",
-    "ant": "conflict, diverge",
-    "speakingChallenge": "Your team and a partner department are working on the same client but pulling in different directions. Call a quick meeting and explain why everyone needs to align before the next client interaction."
-  },
+  "day": 1,
+  "type": "verb",
+  "word": "broach",
+  "roman": "BROHCH",
+  "meaning": "To raise a sensitive, difficult, or important subject for the first time in a conversation or meeting.",
+  "simpleMeaning": "To bring up a topic — especially one that is awkward or uncomfortable — for the first time.",
+  "collocations": "broach a subject, broach a sensitive topic, broach the issue, broach the question, broach it carefully",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "broached",
+      "present": "broach",
+      "future": "will broach"
+    },
+    {
+      "person": "He / She / It",
+      "past": "broached",
+      "present": "broaches",
+      "future": "will broach"
+    }
+  ],
+  "story": "She had been waiting for the right moment to broach the subject of the missed deadline with her manager, knowing that timing and tone would determine whether it led to a productive conversation or a defensive one. He finally broached the question of a salary review after eighteen months of consistently exceeding his targets. The ability to broach difficult subjects calmly and directly is one of the most valuable communication skills in any professional environment.",
+  "syn": "raise, introduce",
+  "ant": "suppress, avoid",
+  "speakingChallenge": "You need to broach a performance concern with a colleague who is senior to you and known to react defensively. How do you open the conversation in a way that is direct but does not put them immediately on the defensive?"
+},
   {
     "day": 2,
     "type": "word",
@@ -77,7 +77,7 @@
     "story": "A confident manager knows when to delegate and when a task genuinely requires personal attention. When the regional director decided to delegate all vendor calls to her assistant, it freed up nearly five hours a week for higher-level work. The hardest thing about learning to delegate is accepting that someone else may do the job differently — and that different does not always mean worse.",
     "syn": "assign, entrust",
     "ant": "micromanage, retain",
-    "speakingChallenge": "You are overloaded this week with two critical deadlines. Tell a team member you are delegating a specific task to them — explain what the task is, what a good result looks like, and when you need it done."
+    "speakingChallenge": "You are overloaded this week with two critical deadlines. Tell a team member you are going to delegate a specific task to them — explain what the task is, what a good result looks like, and when you need it done. Use the word delegate at least once directly."
   },
   {
     "day": 3,
@@ -277,7 +277,7 @@
     "story": "It took three rounds of meetings to negotiate the final contract terms with the new logistics partner. She had learned from experience that the best time to negotiate is when you have real alternatives — not when you are desperate. When both sides came to the table ready to negotiate honestly, they reached an agreement in half the time anyone had predicted.",
     "syn": "bargain, discuss",
     "ant": "demand, force",
-    "speakingChallenge": "A key supplier has just announced a 15% price increase effective next month. Describe how you would open the negotiation, what you would offer in return, and where your bottom line is."
+    "speakingChallenge": "A key supplier has just announced a 15% price increase effective next month. Describe how you would negotiate with them — what you would open with, what you would offer in return, and where your bottom line is. Use the word negotiate at least twice."
   },
   {
     "day": 8,
@@ -610,7 +610,7 @@
     "story": "Customer retention was declared the company's top priority for the year, which changed how budgets were allocated across every department. When everything is treated as a priority, nothing truly is — and that is when teams start moving fast on the wrong things. He shared his single non-negotiable priority every Monday morning, which gave his team a clear signal about where to focus their energy.",
     "syn": "importance, urgency",
     "ant": "afterthought, secondary concern",
-    "speakingChallenge": "Your manager has given you four goals for the quarter but only enough time and resources to do three of them well. Have the conversation about which one should be deprioritized and why."
+    "speakingChallenge": "Your manager has given you four goals for the quarter but only enough time and resources to do three of them well. Have the conversation about which one should not be a priority and explain your reasoning. Use the word priority at least twice."
   },
   {
     "day": 16,
@@ -1253,32 +1253,32 @@
     "speakingChallenge": "A new client wants to sign a contract that would increase your team's workload by 40%. Explain to your manager whether you have the capacity to absorb this and what would need to change if you do not."
   },
   {
-    "day": 32,
-    "type": "verb",
-    "word": "propose",
-    "roman": "pruh-POHZ",
-    "meaning": "To put forward a plan, idea, or suggestion for others to consider.",
-    "simpleMeaning": "To suggest something as a plan or solution for other people to think about.",
-    "collocations": "propose a solution, propose a change, propose a plan, propose an alternative, propose to a client",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "proposed",
-        "present": "propose",
-        "future": "will propose"
-      },
-      {
-        "person": "He / She / It",
-        "past": "proposed",
-        "present": "proposes",
-        "future": "will propose"
-      }
-    ],
-    "story": "She stood up in the quarterly review and proposed a complete restructure of the onboarding process based on data she had collected over three months. When the client rejected the first draft, the team did not go back to the drawing board — instead, they proposed a modified version that addressed the main objections without compromising the core approach. The ability to propose ideas clearly and confidently, even in a room full of senior people, is a skill that separates good professionals from great ones.",
-    "syn": "suggest, recommend",
-    "ant": "reject, withdraw",
-    "speakingChallenge": "Your team has been told to cut costs by 15% this quarter. Propose one specific change to your manager — explain what you are suggesting, why it will work, and what the expected impact will be."
-  },
+  "day": 32,
+  "type": "verb",
+  "word": "stipulate",
+  "roman": "STIP-yoo-layt",
+  "meaning": "To demand or specify something as a required condition of an agreement, contract, or arrangement.",
+  "simpleMeaning": "To clearly state something as a requirement or condition that must be met.",
+  "collocations": "stipulate conditions, stipulate terms, stipulate a deadline, stipulate requirements, stipulate in a contract",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "stipulated",
+      "present": "stipulate",
+      "future": "will stipulate"
+    },
+    {
+      "person": "He / She / It",
+      "past": "stipulated",
+      "present": "stipulates",
+      "future": "will stipulate"
+    }
+  ],
+  "story": "The client chose to stipulate a maximum response time of four hours in the service level agreement, which forced the operations team to restructure their support rota entirely. When you stipulate conditions upfront, you reduce the likelihood of disputes arising later when expectations have already diverged. The contract stipulated that all deliverables be reviewed by both legal teams before implementation — a clause that proved its value when the project scope changed midway through.",
+  "syn": "specify, require",
+  "ant": "imply, suggest",
+  "speakingChallenge": "You are entering a partnership agreement and want to stipulate clear conditions around intellectual property ownership. How do you raise and justify these conditions in a negotiation without making the other party feel distrusted?"
+},
   {
     "day": 33,
     "type": "word",
@@ -1460,6 +1460,20 @@
     "meaning": "To give a valid reason or explanation that makes something seem acceptable or necessary.",
     "simpleMeaning": "To explain why something was done or why it is right or necessary.",
     "collocations": "justify a decision, justify the cost, justify an action, justify a request, justify your position",
+    "conj": [
+      {
+        "person": "I / You / We / They",
+        "past": "justified",
+        "present": "justify",
+        "future": "will justify"
+      },
+      {
+        "person": "He / She / It",
+        "past": "justified",
+        "present": "justifies",
+        "future": "will justify"
+      }
+    ],
     "story": "She was asked to justify the additional headcount request in financial terms before the board would consider approving it. He found it difficult to justify the delay to the client because the reason was internal and something they could have anticipated earlier. When you cannot clearly justify a decision to someone outside the room, it is often a sign that the decision was not as clear as it felt at the time.",
     "syn": "explain, defend",
     "ant": "conceal, abandon",
@@ -1526,6 +1540,20 @@
     "meaning": "To draw attention to something important, usually a concern or risk, so others are aware.",
     "simpleMeaning": "To point something out so that others know it needs attention.",
     "collocations": "flag a concern, flag a risk, flag an issue, flag something early, flag to management",
+    "conj": [
+      {
+        "person": "I / You / We / They",
+        "past": "flagged",
+        "present": "flag",
+        "future": "will flag"
+      },
+      {
+        "person": "He / She / It",
+        "past": "flagged",
+        "present": "flags",
+        "future": "will flag"
+      }
+    ],
     "story": "She made it a rule to flag any potential delay to the client at least 48 hours before it happened, rather than waiting until the deadline had already passed. He had been trained early in his career to flag problems the moment he saw them, which built a reputation for reliability that his quieter colleagues lacked. The professionals who flag issues early are not the ones who cause problems — they are the ones who prevent them.",
     "syn": "highlight, raise",
     "ant": "ignore, hide",
@@ -2609,7 +2637,7 @@
     "story": "The CEO was able to articulate the company's direction in a way that energized the entire organization. Not every leader could articulate a complex strategy in simple terms, but she made it look effortless. The board appreciated that she could articulate risks and opportunities with equal precision.",
     "syn": "express, convey",
     "ant": "mumble, confuse",
-    "speakingChallenge": "Practice articulating your professional value proposition in under 60 seconds as if speaking to a new potential client."
+    "speakingChallenge": "A new potential client asks what makes your team different from competitors. Articulate your professional value proposition clearly in under 60 seconds. Then explain what made it difficult to articulate and how you would sharpen it further."
   },
   {
     "day": 67,
@@ -2662,7 +2690,7 @@
     "story": "The HR team developed a competency framework to define what excellence looked like in each role. During performance reviews, managers assessed each employee's competency level against clear benchmarks. The organization invested heavily in training because it believed that competency was the foundation of sustainable growth.",
     "syn": "skill, capability",
     "ant": "incompetence, weakness",
-    "speakingChallenge": "Identify three core competencies that define you as a professional and explain how you have demonstrated each one in your career."
+    "speakingChallenge": "Your manager asks you to self-assess before your annual review. Identify the core competency that you consider your strongest, one competency you are still developing, and explain how each has shown up in your work this year."
   },
   {
     "day": 68,
@@ -3089,7 +3117,7 @@
     "story": "The team had a strong plan, but the real challenge was finding the discipline to execute it consistently over several months. The project manager built daily check-ins to ensure they could execute without losing momentum as new distractions emerged. When they finally managed to execute every phase on schedule, the results validated months of careful preparation.",
     "syn": "perform, carry out",
     "ant": "plan only, abandon",
-    "speakingChallenge": "Describe a situation where execution was the biggest challenge, not the planning. What did you do to stay on track?"
+    "speakingChallenge": "Your team has a solid plan but is struggling to execute it on time. Walk a new team member through exactly what it means to execute well on this project — what good looks like, what failure looks like, and what your role is. Use the word execute at least twice."
   },
   {
     "day": 79,
@@ -3209,7 +3237,7 @@
     "story": "The regional manager spent three years working to build a distribution network from scratch across five provinces. She had to build trust with local partners before any formal agreements could be signed. Every successful partnership they managed to build later depended on the groundwork she had laid in those early years.",
     "syn": "develop, construct",
     "ant": "destroy, dismantle",
-    "speakingChallenge": "Walk through how you built something professionally from the ground up — a team, a process, a client relationship, or a system."
+    "speakingChallenge": "You are pitching yourself for a leadership role. Describe one thing you have worked to build professionally — a team, a process, a client relationship, or a system — and explain what you would build next if given this role."
   },
   {
     "day": 82,
@@ -3782,7 +3810,7 @@
     "story": "The newsletter's value came not from its own writing but from the quality of its curation — readers trusted that every link had been carefully chosen. The team spent more time on curation than on creation, because selecting the right three articles was harder than writing ten average ones. Good curation, the editor believed, was a skill that required deep understanding of what the audience truly needed.",
     "syn": "selection, editing",
     "ant": "randomness, dumping",
-    "speakingChallenge": "How do you curate information when preparing for a client meeting, strategy session, or important presentation?"
+    "speakingChallenge": "A junior team member asks how you prepare for important meetings and presentations. Explain your approach to curation — how you decide what information to include, what to leave out, and what curation looks like in practice for you."
   },
   {
     "day": 96,
@@ -4265,32 +4293,32 @@
     "speakingChallenge": "Describe a professional situation where you made a key inference from indirect or limited information. How did you present it and was it correct?"
   },
   {
-    "day": 108,
-    "type": "verb",
-    "word": "initiate",
-    "roman": "ih-NISH-ee-ayt",
-    "meaning": "To begin or set something in motion, especially a process, conversation, or formal action",
-    "simpleMeaning": "Start something or be the one who gets it going",
-    "collocations": "initiate a conversation, initiate the process, initiate contact, initiate a review, initiate change",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "initiated",
-        "present": "initiate",
-        "future": "will initiate"
-      },
-      {
-        "person": "He / She / It",
-        "past": "initiated",
-        "present": "initiates",
-        "future": "will initiate"
-      }
-    ],
-    "story": "The account manager decided to initiate a check-in call with the client rather than waiting for the quarterly review. She always tried to initiate difficult conversations early, before they became unavoidable. The decision to initiate the discussion about contract renewal three months ahead of schedule gave both sides more time and significantly reduced the pressure on both teams.",
-    "syn": "begin, start",
-    "ant": "postpone, delay",
-    "speakingChallenge": "Describe a situation where you proactively chose to initiate a difficult or sensitive conversation. What was the outcome?"
-  },
+  "day": 108,
+  "type": "verb",
+  "word": "reconvene",
+  "roman": "ree-kun-VEEN",
+  "meaning": "To come together again as a group after a break or adjournment, typically to continue a discussion, meeting, or process.",
+  "simpleMeaning": "To meet again after a pause or break in a meeting or process.",
+  "collocations": "reconvene the meeting, reconvene after lunch, reconvene next week, reconvene the committee, reconvene to finalize",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "reconvened",
+      "present": "reconvene",
+      "future": "will reconvene"
+    },
+    {
+      "person": "He / She / It",
+      "past": "reconvened",
+      "present": "reconvenes",
+      "future": "will reconvene"
+    }
+  ],
+  "story": "The board agreed to reconvene the following morning once both sides had had time to review the revised terms with their respective legal teams. When a meeting becomes too heated to be productive, the most effective chair will call a recess and reconvene once the room has had time to reset. They reconvened three weeks after the initial workshop and found that the gap between the two departments had narrowed significantly simply because people had had time to reflect.",
+  "syn": "reassemble, regroup",
+  "ant": "adjourn, disperse",
+  "speakingChallenge": "A critical decision-making meeting has run over time and key stakeholders need to leave. You need to reconvene the group within 48 hours. How do you close the current session and set up the next one in a way that maintains momentum and ensures all parties return prepared?"
+},
   {
     "day": 109,
     "type": "word",
@@ -5025,32 +5053,32 @@
     "speakingChallenge": "Describe how you have managed or would manage operational decisions during a period of high market or demand volatility."
   },
   {
-    "day": 127,
-    "type": "verb",
-    "word": "discern",
-    "roman": "dih-SERN",
-    "meaning": "To perceive, recognize, or judge something with careful thought — especially when it is not immediately obvious.",
-    "simpleMeaning": "To notice or understand something that is not obvious, using careful thought or judgment.",
-    "collocations": "discern a pattern, discern intent, discern quality, discern the difference, discern from context",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "discerned",
-        "present": "discern",
-        "future": "will discern"
-      },
-      {
-        "person": "He / She / It",
-        "past": "discerned",
-        "present": "discerns",
-        "future": "will discern"
-      }
-    ],
-    "story": "After years of reviewing client proposals, she had developed the ability to discern within minutes whether a vendor truly understood the brief or was simply filling a template. The experienced negotiator could discern from subtle shifts in the counterpart's language when the real objection had finally surfaced. One of the most valuable professional skills is the ability to discern what someone actually means versus what they literally say — especially when the stakes are high.",
-    "syn": "perceive, distinguish",
-    "ant": "overlook, confuse",
-    "speakingChallenge": "Describe a situation where you needed to discern the real reason behind a client's or colleague's stated concern. How did you read between the lines?"
-  },
+  "day": 127,
+  "type": "verb",
+  "word": "glean",
+  "roman": "GLEEN",
+  "meaning": "To gather information, knowledge, or insight gradually from various sources, often when it is not directly or easily available.",
+  "simpleMeaning": "To collect useful information bit by bit from different places or observations.",
+  "collocations": "glean insights, glean information, glean from data, glean from experience, glean what you can",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "gleaned",
+      "present": "glean",
+      "future": "will glean"
+    },
+    {
+      "person": "He / She / It",
+      "past": "gleaned",
+      "present": "gleams",
+      "future": "will glean"
+    }
+  ],
+  "story": "From a single client conversation, an experienced account manager can glean far more about the health of the relationship than any satisfaction survey is designed to capture. She gleaned enough from the informal hallway conversations to understand that the restructuring had been poorly received long before the official feedback arrived. The ability to glean actionable insight from ambiguous or incomplete information is what separates an analytical thinker from someone who simply waits for clear data.",
+  "syn": "gather, extract",
+  "ant": "overlook, miss",
+  "speakingChallenge": "You have just attended a client meeting where very little was stated explicitly, but a great deal was communicated through tone and hesitation. What did you glean from the conversation, and how would you present those observations to your team without overstating conclusions?"
+},
   {
     "day": 128,
     "type": "word",
@@ -5345,32 +5373,32 @@
     "speakingChallenge": "Describe how you build a productive working relationship with a counterpart in another department or organization, especially when your incentives are not perfectly aligned."
   },
   {
-    "day": 135,
-    "type": "verb",
-    "word": "delineate",
-    "roman": "dih-LIN-ee-ayt",
-    "meaning": "To describe, define, or mark the boundaries of something — a role, a scope, a responsibility, or a concept — with precision and clarity.",
-    "simpleMeaning": "To clearly define or spell out the boundaries of something so there is no confusion.",
-    "collocations": "delineate responsibilities, delineate scope, delineate roles, clearly delineate, delineate the boundaries",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "delineated",
-        "present": "delineate",
-        "future": "will delineate"
-      },
-      {
-        "person": "He / She / It",
-        "past": "delineated",
-        "present": "delineates",
-        "future": "will delineate"
-      }
-    ],
-    "story": "Before the project kicked off, she insisted on a session to delineate exactly who owned each workstream and what decision rights each person held. The failure to delineate responsibilities in the early phase of the merger led to months of duplication and confusion that cost the integration team significant goodwill. A good organizational designer knows that the goal is not just to delineate who does what, but to ensure the boundaries between roles create collaboration rather than silos.",
-    "syn": "define, specify",
-    "ant": "blur, confuse",
-    "speakingChallenge": "Two team members keep stepping on each other's work because their roles overlap. How do you delineate their responsibilities in a way both parties accept?"
-  },
+  "day": 135,
+  "type": "verb",
+  "word": "curtail",
+  "roman": "kur-TAYL",
+  "meaning": "To reduce, limit, or restrict something — cutting it short of its intended or previous scope.",
+  "simpleMeaning": "To cut back or reduce something, especially something that was larger or more extensive before.",
+  "collocations": "curtail spending, curtail activities, curtail freedom, curtail a program, curtail operations",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "curtailed",
+      "present": "curtail",
+      "future": "will curtail"
+    },
+    {
+      "person": "He / She / It",
+      "past": "curtailed",
+      "present": "curtails",
+      "future": "will curtail"
+    }
+  ],
+  "story": "The finance committee voted to curtail discretionary spending across all departments until the revenue picture for the second half of the year became clearer. Curtailing a program that has strong internal advocates requires more than budget justification — it requires a communication strategy that addresses the human side of the decision. When market conditions deteriorated rapidly, the leadership team had to curtail expansion plans that had taken over a year to develop.",
+  "syn": "restrict, reduce",
+  "ant": "expand, extend",
+  "speakingChallenge": "You have been asked to curtail a project your team has invested significant time and energy in due to budget constraints. How do you communicate this decision to your team in a way that acknowledges their effort while maintaining their engagement on what remains?"
+},
   {
     "day": 136,
     "type": "word",
@@ -5792,6 +5820,20 @@
     "meaning": "To voluntarily give up control, power, a position, or a responsibility — often after holding it for some time.",
     "simpleMeaning": "To give up something you have — like control, authority, or a role — often deliberately.",
     "collocations": "relinquish control, relinquish authority, relinquish a role, relinquish ownership, relinquish the lead",
+    "conj": [
+      {
+        "person": "I / You / We / They",
+        "past": "relinquished",
+        "present": "relinquish",
+        "future": "will relinquish"
+      },
+      {
+        "person": "He / She / It",
+        "past": "relinquished",
+        "present": "relinquishes",
+        "future": "will relinquish"
+      }
+    ],
     "story": "The founder found it genuinely difficult to relinquish operational control even after bringing in a professional CEO, which created confusion about who was actually making decisions. She had to relinquish her role as the team's primary technical expert and accept that her job was now to develop others who could do it better than she could. The ability to relinquish authority gracefully and at the right moment is one of the most underrated skills in leadership — holding on too long is often more damaging than letting go too early.",
     "syn": "surrender, yield",
     "ant": "retain, hold",
@@ -5971,32 +6013,32 @@
     "speakingChallenge": "Tell a new team member why final approval is the manager's prerogative while still making them feel their input is genuinely valued."
   },
   {
-    "day": 151,
-    "type": "verb",
-    "word": "reckon",
-    "roman": "REK-un",
-    "meaning": "To calculate or estimate something carefully; to have a considered opinion about a matter",
-    "simpleMeaning": "To think carefully and reach a conclusion",
-    "collocations": "reckon with reality, reckon the cost, reckon on support, reckon without opposition, reckon by experience",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "reckoned",
-        "present": "reckon",
-        "future": "will reckon"
-      },
-      {
-        "person": "He / She / It",
-        "past": "reckoned",
-        "present": "reckons",
-        "future": "will reckon"
-      }
-    ],
-    "story": "The operations director chose to reckon the true cost of the delay at twice what finance had projected. She had failed to reckon with the hidden penalties buried in the vendor contract. After that experience, she would reckon every deal against a worst-case scenario before signing.",
-    "syn": "estimate, calculate",
-    "ant": "ignore, overlook",
-    "speakingChallenge": "In a team meeting, use 'reckon' to give your honest estimate of how long a delayed project will actually take and why."
-  },
+  "day": 151,
+  "type": "verb",
+  "word": "gauge",
+  "roman": "GAYJ",
+  "meaning": "To assess, estimate, or measure something — particularly the level, extent, or nature of a situation, reaction, or feeling.",
+  "simpleMeaning": "To judge or estimate how large, strong, or serious something is.",
+  "collocations": "gauge reaction, gauge sentiment, gauge performance, gauge interest, gauge the situation",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "gauged",
+      "present": "gauge",
+      "future": "will gauge"
+    },
+    {
+      "person": "He / She / It",
+      "past": "gauged",
+      "present": "gauges",
+      "future": "will gauge"
+    }
+  ],
+  "story": "Before presenting the restructuring plan to the full team, she spent two days in informal one-on-ones specifically to gauge how much resistance she was likely to face and from whom. It is difficult to gauge the true sentiment of a room when everyone is being careful about what they say in front of leadership. He had learned to gauge a client's level of satisfaction not by what they said in the formal review but by how quickly they responded to his emails between sessions.",
+  "syn": "assess, measure",
+  "ant": "ignore, overlook",
+  "speakingChallenge": "You are about to pitch a significant change in strategy to a skeptical leadership team. Before the meeting, how would you gauge their current sentiment, and how would that information change your approach in the room?"
+},
   {
     "day": 152,
     "type": "word",
@@ -6171,32 +6213,32 @@
     "speakingChallenge": "Make the case to a finance committee for pay parity adjustments, framing it as a retention and productivity issue rather than a cost."
   },
   {
-    "day": 156,
-    "type": "verb",
-    "word": "sanction",
-    "roman": "SANK-shun",
-    "meaning": "To officially approve or authorize something; or to penalize a party for violations of agreed rules",
-    "simpleMeaning": "To officially allow something — or to officially punish someone",
-    "collocations": "sanction a decision, sanction a vendor, sanction the plan, formally sanction, sanction non-compliance",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "sanctioned",
-        "present": "sanction",
-        "future": "will sanction"
-      },
-      {
-        "person": "He / She / It",
-        "past": "sanctioned",
-        "present": "sanctions",
-        "future": "will sanction"
-      }
-    ],
-    "story": "The board chose to sanction the expansion into two new markets after reviewing the feasibility study. The compliance team later moved to sanction the vendor for failing to meet the agreed audit requirements. The dual meaning reflected the organization's philosophy: it would sanction bold moves, but never tolerate dishonest ones.",
-    "syn": "authorize, penalize",
-    "ant": "forbid, excuse",
-    "speakingChallenge": "Explain to your team what behaviors your organization will sanction in the sense of approving, and what it will sanction in the sense of penalizing."
-  },
+  "day": 156,
+  "type": "verb",
+  "word": "proscribe",
+  "roman": "proh-SKRYB",
+  "meaning": "To officially forbid or prohibit something, especially by authority or law; to denounce or condemn a practice as unacceptable.",
+  "simpleMeaning": "To officially ban or forbid something.",
+  "collocations": "proscribe a practice, proscribe certain behaviour, proscribed by law, proscribed activity, proscribe an organization",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "proscribed",
+      "present": "proscribe",
+      "future": "will proscribe"
+    },
+    {
+      "person": "He / She / It",
+      "past": "proscribed",
+      "present": "proscribes",
+      "future": "will proscribe"
+    }
+  ],
+  "story": "The new compliance framework explicitly moved to proscribe any form of undisclosed commission between vendors and procurement staff. Several practices that had been tolerated for years were now proscribed outright, with immediate consequences for any violation. When an organization chooses to proscribe a behaviour rather than merely discourage it, it signals that tolerance has run out.",
+  "syn": "forbid, prohibit",
+  "ant": "permit, sanction",
+  "speakingChallenge": "Your company has decided to proscribe a common informal practice that many employees rely on. How do you communicate this new restriction to your team in a way that is firm but not demoralizing? Use the word at least twice."
+},
   {
     "day": 157,
     "type": "word",
@@ -6371,32 +6413,32 @@
     "speakingChallenge": "Describe to a mentor a high-pressure situation you recently faced and explain how you maintained equanimity when those around you were losing theirs."
   },
   {
-    "day": 161,
-    "type": "verb",
-    "word": "recalibrate",
-    "roman": "ree-KAL-ih-brayt",
-    "meaning": "To adjust or reset a plan, expectation, or approach in response to new information or changed conditions",
-    "simpleMeaning": "To readjust your thinking or plan after something significant changes",
-    "collocations": "recalibrate expectations, recalibrate the strategy, recalibrate priorities, recalibrate after setback, recalibrate the approach",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "recalibrated",
-        "present": "recalibrate",
-        "future": "will recalibrate"
-      },
-      {
-        "person": "He / She / It",
-        "past": "recalibrated",
-        "present": "recalibrates",
-        "future": "will recalibrate"
-      }
-    ],
-    "story": "After the market shifted, leadership moved to recalibrate its revenue targets for the second half of the year. The CEO chose to recalibrate the entire go-to-market strategy rather than defending a plan the data no longer supported. She told the board that the willingness to recalibrate quickly was not indecision — it was discipline.",
-    "syn": "readjust, reset",
-    "ant": "persist, fixate",
-    "speakingChallenge": "Explain to your team why you need to recalibrate the quarterly plan and how you will communicate the change to clients without losing their confidence."
-  },
+  "day": 161,
+  "type": "verb",
+  "word": "postulate",
+  "roman": "POS-choo-layt",
+  "meaning": "To suggest or assume something as a basis for reasoning or argument, even before it has been proven.",
+  "simpleMeaning": "To put forward an idea or assumption as a starting point for discussion or analysis.",
+  "collocations": "postulate a theory, postulate a hypothesis, postulate that, postulate an explanation, postulate a model",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "postulated",
+      "present": "postulate",
+      "future": "will postulate"
+    },
+    {
+      "person": "He / She / It",
+      "past": "postulated",
+      "present": "postulates",
+      "future": "will postulate"
+    }
+  ],
+  "story": "The consultant postulated that the root cause of the retention problem was not compensation but a lack of visible career progression — a hypothesis that the subsequent data analysis largely confirmed. It is reasonable to postulate a connection between the two trends, but the team was careful not to treat the assumption as fact until the evidence had been properly examined. When building a business case under uncertainty, you often have to postulate certain market conditions and be transparent with your audience about which parts of the argument rest on assumption.",
+  "syn": "hypothesize, propose",
+  "ant": "prove, confirm",
+  "speakingChallenge": "In a strategy session, you want to postulate that a competitor's recent move signals a shift in their long-term positioning. How do you present this as a working hypothesis rather than a stated fact, while still making a convincing case for why the team should take it seriously?"
+},
   {
     "day": 162,
     "type": "word",
@@ -6491,32 +6533,32 @@
     "speakingChallenge": "Describe a situation where maintaining professional propriety required you to hold back a reaction you felt strongly about, and explain what you did instead."
   },
   {
-    "day": 164,
-    "type": "verb",
-    "word": "defer",
-    "roman": "dih-FUR",
-    "meaning": "To put something off to a later time; or to submit respectfully to another's judgment or expertise",
-    "simpleMeaning": "To delay something — or to let someone else decide out of respect",
-    "collocations": "defer a decision, defer to expertise, defer payment, defer judgment, defer to leadership",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "deferred",
-        "present": "defer",
-        "future": "will defer"
-      },
-      {
-        "person": "He / She / It",
-        "past": "deferred",
-        "present": "defers",
-        "future": "will defer"
-      }
-    ],
-    "story": "The team chose to defer the vendor selection until the procurement audit was complete. The regional director deferred to legal counsel on all matters involving cross-border contract exposure, and expected her leads to defer similarly on matters outside their expertise. In practice, she knew when to decide and when to defer — and that distinction was what made her trusted.",
-    "syn": "postpone, yield",
-    "ant": "advance, insist",
-    "speakingChallenge": "Explain to your team why you are choosing to defer a hiring decision until Q3 and how you will manage the workload gap in the interim."
-  },
+  "day": 164,
+  "type": "verb",
+  "word": "exhort",
+  "roman": "ig-ZORT",
+  "meaning": "To strongly urge, encourage, or appeal to someone to do something — often with urgency or moral conviction.",
+  "simpleMeaning": "To strongly encourage or urge someone to take a particular action.",
+  "collocations": "exhort the team, exhort to action, exhort colleagues, exhort staff to, exhort people to act",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "exhorted",
+      "present": "exhort",
+      "future": "will exhort"
+    },
+    {
+      "person": "He / She / It",
+      "past": "exhorted",
+      "present": "exhorts",
+      "future": "will exhort"
+    }
+  ],
+  "story": "The regional director used the annual conference not merely to update the team on targets but to exhort them to hold themselves to a higher standard of client service than the market currently demanded. He would exhort his managers to think like owners rather than employees — a phrase that lost its impact through repetition but still reflected a genuine expectation. Leaders who can exhort without appearing to lecture have typically earned the credibility to make the appeal land as inspiration rather than pressure.",
+  "syn": "urge, implore",
+  "ant": "discourage, deter",
+  "speakingChallenge": "Your team has been delivering adequate but uninspired work for several months. In a team meeting, you want to exhort them to raise their standard without making them feel criticized. What do you say and how do you frame it?"
+},
   {
     "day": 165,
     "type": "word",
@@ -6731,32 +6773,32 @@
     "speakingChallenge": "Explain to a colleague how you distinguish genuine profundity of thinking from language that sounds deep but offers no real insight."
   },
   {
-    "day": 170,
-    "type": "verb",
-    "word": "iterate",
-    "roman": "IT-er-ayt",
-    "meaning": "To repeat a process with the aim of approaching a desired outcome with each successive cycle",
-    "simpleMeaning": "To keep improving something through repeated cycles",
-    "collocations": "iterate on a design, iterate quickly, iterate based on input, iterate toward a solution, iterate and refine",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "iterated",
-        "present": "iterate",
-        "future": "will iterate"
-      },
-      {
-        "person": "He / She / It",
-        "past": "iterated",
-        "present": "iterates",
-        "future": "will iterate"
-      }
-    ],
-    "story": "The product team chose to iterate through five versions of the onboarding flow before the drop-off rate fell below the target. She insisted the team iterate in public — sharing rough versions with clients — because real-world input was worth more than internal polish. Each time they iterate, they introduced only one change so they could isolate what was actually working.",
-    "syn": "cycle, refine",
-    "ant": "finalize, abandon",
-    "speakingChallenge": "Explain to a client used to receiving finished deliverables why you prefer to iterate openly with them rather than presenting a final product without intermediate input."
-  },
+  "day": 170,
+  "type": "verb",
+  "word": "fabricate",
+  "roman": "FAB-rih-kayt",
+  "meaning": "To invent or construct something false — such as a story, excuse, or evidence — with the intent to deceive; also used literally to mean manufacturing or assembling something.",
+  "simpleMeaning": "To make up something false in order to deceive; or to physically construct something.",
+  "collocations": "fabricate evidence, fabricate a story, fabricate an excuse, fabricate records, fabricate a reason",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "fabricated",
+      "present": "fabricate",
+      "future": "will fabricate"
+    },
+    {
+      "person": "He / She / It",
+      "past": "fabricated",
+      "present": "fabricates",
+      "future": "will fabricate"
+    }
+  ],
+  "story": "The investigation found that several of the performance reports had been fabricated to show results that were never actually achieved, which led to the termination of three senior managers. When the pressure to show progress becomes intense enough, some individuals begin to fabricate small details — a pattern that, once started, tends to expand until it collapses. The ability to identify when data or narratives have been fabricated is an underappreciated analytical skill, particularly in high-stakes reporting environments.",
+  "syn": "invent, falsify",
+  "ant": "confirm, verify",
+  "speakingChallenge": "You suspect a team member has fabricated parts of a progress report to cover a missed milestone. You do not yet have definitive proof. How do you approach the situation — what do you investigate first, and how do you raise the concern without making a premature accusation?"
+},
   {
     "day": 171,
     "type": "word",
@@ -6811,32 +6853,32 @@
     "speakingChallenge": "Describe how you managed a negotiation that was beginning to descend into personal acrimony, and explain the technique you used to redirect it toward a productive resolution."
   },
   {
-    "day": 172,
-    "type": "verb",
-    "word": "acquiesce",
-    "roman": "ak-wee-ES",
-    "meaning": "To accept or agree to something without protest, often reluctantly",
-    "simpleMeaning": "To go along with something without openly objecting",
-    "collocations": "acquiesce to a demand, acquiesce reluctantly, acquiesce in silence, acquiesce to pressure, eventually acquiesce",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "acquiesced",
-        "present": "acquiesce",
-        "future": "will acquiesce"
-      },
-      {
-        "person": "He / She / It",
-        "past": "acquiesced",
-        "present": "acquiesces",
-        "future": "will acquiesce"
-      }
-    ],
-    "story": "The regional director chose to acquiesce to the revised timeline without voicing the reservations his team had clearly stated in writing. Most of the committee had chosen to acquiesce to the majority position not out of agreement but out of exhaustion. She told her direct reports that knowing when to strategically acquiesce — and when to hold firm — was one of the most consequential professional skills they could develop.",
-    "syn": "comply, submit",
-    "ant": "resist, object",
-    "speakingChallenge": "Explain the difference between choosing to acquiesce strategically to save a relationship and simply lacking the courage to push back — and describe how you tell the two apart in practice."
-  },
+  "day": 172,
+  "type": "verb",
+  "word": "mollify",
+  "roman": "MOL-ih-fy",
+  "meaning": "To appease or calm someone who is angry, upset, or dissatisfied — typically by making concessions or offering reassurance.",
+  "simpleMeaning": "To calm someone down or make them less upset, often by giving them something they want.",
+  "collocations": "mollify a client, mollify concerns, mollify an angry stakeholder, mollify the situation, attempt to mollify",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "mollified",
+      "present": "mollify",
+      "future": "will mollify"
+    },
+    {
+      "person": "He / She / It",
+      "past": "mollified",
+      "present": "mollifies",
+      "future": "will mollify"
+    }
+  ],
+  "story": "The account director flew out personally to mollify the client after the system failure, understanding that an email apology would not come close to repairing the level of trust that had been broken. Offering a discount can mollify a dissatisfied customer in the short term but rarely addresses the underlying service issue that caused the complaint. He found that the most effective way to mollify a frustrated colleague was not to justify the decision but simply to acknowledge the impact it had on their work.",
+  "syn": "appease, pacify",
+  "ant": "aggravate, provoke",
+  "speakingChallenge": "A key client is furious after a miscommunication caused them to miss a critical deadline. Your job is to mollify them in a call without making promises your team cannot keep. What is your approach and what do you actually say in the first two minutes of that conversation?"
+},
   {
     "day": 173,
     "type": "word",
@@ -8011,32 +8053,32 @@
     "speakingChallenge": "An unexpected client demand has created an exigency that will require your team to work through the weekend. How do you communicate this to your team in a way that acknowledges the burden while maintaining morale?"
   },
   {
-    "day": 202,
-    "type": "verb",
-    "word": "infer",
-    "roman": "in-FUR",
-    "meaning": "To deduce or conclude information from evidence and reasoning rather than from explicit statements",
-    "simpleMeaning": "To figure something out from clues rather than being told directly",
-    "collocations": "infer from context, infer a conclusion, infer intent, infer meaning, reasonably infer",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "inferred",
-        "present": "infer",
-        "future": "will infer"
-      },
-      {
-        "person": "He / She / It",
-        "past": "inferred",
-        "present": "infers",
-        "future": "will infer"
-      }
-    ],
-    "story": "From the pattern of questions the client asked, the account manager was able to infer that a competitive offer was already on the table. Skilled negotiators learn to infer the other party's real priorities from what they choose not to say as much as from what they do say. The analyst warned that to infer causation from correlation in the dataset would lead to conclusions the data simply could not support.",
-    "syn": "deduce, conclude",
-    "ant": "assume, guess",
-    "speakingChallenge": "A key client has gone unusually quiet after your last proposal. What can you reasonably infer from their behavior, and how does that shape your next move?"
-  },
+  "day": 202,
+  "type": "verb",
+  "word": "refute",
+  "roman": "rih-FYOOT",
+  "meaning": "To prove that a statement, claim, or argument is wrong or false, typically through evidence or reasoned counter-argument.",
+  "simpleMeaning": "To prove that something is wrong or untrue.",
+  "collocations": "refute a claim, refute an argument, refute allegations, refute the evidence, refute a position",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "refuted",
+      "present": "refute",
+      "future": "will refute"
+    },
+    {
+      "person": "He / She / It",
+      "past": "refuted",
+      "present": "refutes",
+      "future": "will refute"
+    }
+  ],
+  "story": "The data team was able to refute the competitor's market share claims within 48 hours by presenting independently verified figures that told a significantly different story. She prepared carefully for the board meeting specifically because she anticipated being challenged and wanted to be in a position to refute any objection with evidence rather than assertion. The ability to refute a weak argument without being dismissive of the person making it is a discipline that takes years to develop in professional settings.",
+  "syn": "disprove, counter",
+  "ant": "confirm, validate",
+  "speakingChallenge": "In a leadership meeting, a colleague presents data that supports a conclusion you believe is fundamentally flawed. How do you refute their argument in a way that is rigorous and evidence-based without making the exchange feel personal or adversarial?"
+},
   {
     "day": 203,
     "type": "word",
@@ -8075,7 +8117,7 @@
     "story": "Regulatory uncertainty continued to stymie the product launch for three consecutive quarters. The internal approval process was so layered that it would routinely stymie even straightforward decisions for weeks at a time. The consultant's first observation was that the organization's culture of over-verification had begun to stymie the very agility the leadership team claimed to value.",
     "syn": "obstruct, thwart",
     "ant": "enable, advance",
-    "speakingChallenge": "A cross-departmental approval process keeps stymying your team's work. How do you escalate this issue without appearing to undermine the process itself?"
+    "speakingChallenge": "A slow approval chain continues to stymie your team's momentum on a high-priority project. Walk your manager through specifically what is being blocked, why it continues to stymie progress, and what you are proposing to fix it."
   },
   {
     "day": 204,
@@ -8178,6 +8220,20 @@
     "meaning": "To cause or give rise to a feeling, situation, or condition",
     "simpleMeaning": "To create or produce something, especially a feeling or outcome",
     "collocations": "engender trust, engender loyalty, engender conflict, engender a culture, engender resentment",
+    "conj": [
+      {
+        "person": "I / You / We / They",
+        "past": "engendered",
+        "present": "engender",
+        "future": "will engender"
+      },
+      {
+        "person": "He / She / It",
+        "past": "engendered",
+        "present": "engenders",
+        "future": "will engender"
+      }
+    ],
     "story": "The transparency of the CEO's communication style served to engender a level of trust that had been absent from the organization for years. Poorly managed change processes consistently engender the kind of anxiety that makes talented people look for exits. A leader who takes time to understand individual motivations will engender commitment that no bonus structure alone can replicate.",
     "syn": "generate, produce",
     "ant": "suppress, destroy",
@@ -8204,6 +8260,20 @@
     "meaning": "To come together to form one mass or whole; to unite or merge",
     "simpleMeaning": "To join together and form something unified",
     "collocations": "coalesce around a vision, coalesce into a team, coalesce support, coalesce ideas, coalesce around a decision",
+    "conj": [
+      {
+        "person": "I / You / We / They",
+        "past": "coalesced",
+        "present": "coalesce",
+        "future": "will coalesce"
+      },
+      {
+        "person": "He / She / It",
+        "past": "coalesced",
+        "present": "coalesces",
+        "future": "will coalesce"
+      }
+    ],
     "story": "After months of fragmented debate, the leadership team finally began to coalesce around a shared strategic direction. It took an external threat \u2014 a new market entrant \u2014 to coalesce the competing factions into a single coordinated response. When a strong enough purpose is present, diverse teams tend to coalesce naturally without needing to be forced into alignment.",
     "syn": "converge, unite",
     "ant": "fragment, divide",
@@ -8367,7 +8437,7 @@
     "story": "The senior sales director recognized that the most effective way to undermine a proposal was not through direct opposition but through selective briefing of key decision-makers before the formal presentation. She had seen colleagues undermine projects this way before and knew the only defense was to build broad visibility early. Her team adopted a pre-briefing protocol specifically designed to prevent any individual from using early access to undermine the work before it had a fair hearing.",
     "syn": "sabotage, erode",
     "ant": "reinforce, bolster",
-    "speakingChallenge": "You discover a peer has been undermining your project by sharing incomplete data with leadership. How do you address this professionally without escalating into open conflict?"
+    "speakingChallenge": "You have noticed that a peer's behaviour is starting to undermine your team's credibility with leadership. Address this directly with the peer — explain what you have observed, why it continues to undermine trust, and what you expect to change."
   },
   {
     "day": 212,
@@ -8383,32 +8453,32 @@
     "speakingChallenge": "Your team shows clear reticence during sprint reviews — nobody raises concerns openly. How would you diagnose the cause and create conditions where people speak more freely?"
   },
   {
-    "day": 212,
-    "type": "verb",
-    "word": "assert",
-    "roman": "ah-SERT",
-    "meaning": "To state or claim something confidently and with authority; or to exercise a right or position with deliberate force.",
-    "simpleMeaning": "To say or claim something firmly and clearly.",
-    "collocations": "assert authority, assert a position, assert dominance, assert one's rights, assert control",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "asserted",
-        "present": "assert",
-        "future": "will assert"
-      },
-      {
-        "person": "He / She / It",
-        "past": "asserted",
-        "present": "asserts",
-        "future": "will assert"
-      }
-    ],
-    "story": "During the vendor renegotiation, the procurement lead paused, then chose to assert that the agreed payment terms were non-negotiable. She had learned that the right moment to assert a position was immediately after the other party tested it — hesitation read as flexibility. By the time both parties left the table, she had used every opportunity to assert the company's position firmly, and the vendor conceded the three terms that mattered most.",
-    "syn": "declare, maintain",
-    "ant": "concede, withdraw",
-    "speakingChallenge": "In a cross-functional meeting, a director from another department keeps overriding your team's decisions. How would you assert your team's authority without creating a political conflict?"
-  },
+  "day": 212,
+  "type": "verb",
+  "word": "admonish",
+  "roman": "ad-MON-ish",
+  "meaning": "To firmly warn, reprimand, or advise someone about their behavior or actions — typically with the intent to correct rather than punish.",
+  "simpleMeaning": "To firmly warn or criticize someone so that they correct their behavior.",
+  "collocations": "admonish a team member, admonish for misconduct, admonish publicly, admonish privately, admonish firmly but fairly",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "admonished",
+      "present": "admonish",
+      "future": "will admonish"
+    },
+    {
+      "person": "He / She / It",
+      "past": "admonished",
+      "present": "admonishes",
+      "future": "will admonish"
+    }
+  ],
+  "story": "The manager chose to admonish the team member privately rather than in the group meeting, understanding that public criticism rarely changes behavior and usually only damages trust. She had been admonished early in her career for going around her direct manager to escalate a concern — a lesson that shaped how carefully she navigated organizational hierarchy from that point forward. To admonish effectively is to make the person feel the weight of the correction without making them feel diminished as a professional.",
+  "syn": "reprimand, caution",
+  "ant": "praise, commend",
+  "speakingChallenge": "A team member has repeatedly missed agreed deadlines without communicating proactively. You need to admonish them clearly while keeping the conversation constructive. What do you say, and how do you ensure the conversation ends with a clear mutual understanding rather than resentment?"
+},
   {
     "day": 213,
     "type": "word",
@@ -8463,31 +8533,31 @@
     "speakingChallenge": "You are presenting to leadership after a project failure. How would you demonstrate fortitude in both your language and your body language while still taking full accountability?"
   },
   {
-    "day": 214,
-    "type": "verb",
-    "word": "coerce",
-    "roman": "koh-ERS",
-    "meaning": "To persuade or force someone to do something through pressure, threats, or the use of power — rather than through genuine agreement.",
-    "simpleMeaning": "To force or pressure someone into doing something.",
-    "collocations": "coerce into signing, coerce compliance, coerce a decision, coerce through fear, coerce a team",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "coerced",
-        "present": "coerce",
-        "future": "will coerce"
-      },
-      {
-        "person": "He / She / It",
-        "past": "coerced",
-        "present": "coerces",
-        "future": "will coerce"
-      }
-    ],
-    "story": "The regional VP later admitted that the vendor had attempted to coerce the procurement team into accepting unfavorable terms by creating an artificial deadline. When he saw that the tactic had begun to coerce team members into premature agreement, he restructured the negotiation timeline unilaterally. Once leadership recognized how the vendor had tried to coerce the team, they built a supplier diversification policy specifically designed to eliminate this kind of pressure in future negotiations.",
-    "syn": "compel, intimidate",
-    "ant": "persuade, liberate",
-    "speakingChallenge": "You suspect a senior colleague is coercing junior team members into agreeing with decisions they privately oppose. How do you surface this without making accusations?"
+  "day": 214,
+  "type": "verb",
+  "word": "espouse",
+  "roman": "ih-SPOWZ",
+  "meaning": "To publicly adopt, support, or advocate for a belief, cause, or position — often with conviction and commitment.",
+  "simpleMeaning": "To openly support and promote a belief or idea as your own.",
+  "collocations": "espouse a philosophy, espouse a cause, espouse values, espouse a position, espouse a particular view",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "espoused",
+      "present": "espouse",
+      "future": "will espouse"
+    },
+    {
+      "person": "He / She / It",
+      "past": "espoused",
+      "present": "espouses",
+      "future": "will espouse"
+    }
+  ],
+  "story": "The incoming director made it clear from day one that she espoused a philosophy of radical transparency, even when the news was difficult to deliver. It is easy to espouse collaboration in a town hall setting; the real test is whether you practice it when resources are constrained and credit is being distributed. Leaders who espouse values they do not model are often more damaging to culture than those who never articulate values at all.",
+  "syn": "advocate, champion",
+  "ant": "oppose, reject",
+  "speakingChallenge": "In a leadership meeting, you are asked to present the company's position on a controversial operational change that you personally have reservations about. How do you espouse the official position professionally while remaining authentic to your own standards?"
   },
   {
     "day": 215,
@@ -8743,32 +8813,32 @@
     "speakingChallenge": "You need to signal to a client that your terms are firm without stating it aggressively. How would you use subtlety in your language to communicate this?"
   },
   {
-    "day": 221,
-    "type": "verb",
-    "word": "deliberate",
-    "roman": "dih-LIB-er-ayt",
-    "meaning": "To think carefully and thoroughly about a decision or course of action before committing to it.",
-    "simpleMeaning": "To think something through carefully before deciding.",
-    "collocations": "deliberate carefully, deliberate over options, deliberate before acting, deliberate with the team, deliberate on a decision",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "deliberated",
-        "present": "deliberate",
-        "future": "will deliberate"
-      },
-      {
-        "person": "He / She / It",
-        "past": "deliberated",
-        "present": "deliberates",
-        "future": "will deliberate"
-      }
-    ],
-    "story": "The executive committee chose to deliberate for two full sessions before approving the partnership framework, recognizing that the downstream implications were too significant for a single-meeting decision. They needed to deliberate carefully on jurisdictional complexity that none of them had encountered in quite this form before. When they finally finished the process to deliberate on every contested clause, the resulting framework was stronger for the additional time the team had invested.",
-    "syn": "contemplate, consider",
-    "ant": "react, rush",
-    "speakingChallenge": "Your manager wants an immediate decision on a vendor selection. You believe the team needs more time to deliberate. How do you make that case without appearing indecisive?"
-  },
+  "day": 221,
+  "type": "verb",
+  "word": "bolster",
+  "roman": "BOHL-ster",
+  "meaning": "To strengthen, reinforce, or support something that needs to be made more solid, credible, or effective.",
+  "simpleMeaning": "To support or strengthen something so that it becomes more effective or more likely to succeed.",
+  "collocations": "bolster confidence, bolster a case, bolster support, bolster a team, bolster credibility",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "bolstered",
+      "present": "bolster",
+      "future": "will bolster"
+    },
+    {
+      "person": "He / She / It",
+      "past": "bolstered",
+      "present": "bolsters",
+      "future": "will bolster"
+    }
+  ],
+  "story": "The CFO brought in three additional case studies specifically to bolster the financial argument before presenting it to the investment committee. When a team is going through a period of repeated setbacks, a leader's most important job is often simply to bolster morale — not through empty reassurance but through visible, specific recognition of what is still working. The partnership announcement was timed deliberately to bolster investor confidence during a quarter when the underlying numbers were weaker than anticipated.",
+  "syn": "reinforce, strengthen",
+  "ant": "undermine, weaken",
+  "speakingChallenge": "You are preparing to present a business case that you know has a weak section. How do you bolster that section before the presentation, and how transparent should you be about its limitations when you are in the room?"
+},
   {
     "day": 222,
     "type": "word",
@@ -8783,32 +8853,32 @@
     "speakingChallenge": "You want to initiate a partnership conversation with a company that has historically viewed your organization as a competitor. How would you structure your overture to make it non-threatening and worth their attention?"
   },
   {
-    "day": 222,
-    "type": "verb",
-    "word": "convey",
-    "roman": "kun-VAY",
-    "meaning": "To communicate or express a meaning, feeling, or idea clearly to another person — either through words, tone, or non-verbal signals.",
-    "simpleMeaning": "To communicate or express something clearly.",
-    "collocations": "convey a message, convey confidence, convey urgency, convey sincerity, convey complex ideas simply",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "conveyed",
-        "present": "convey",
-        "future": "will convey"
-      },
-      {
-        "person": "He / She / It",
-        "past": "conveyed",
-        "present": "conveys",
-        "future": "will convey"
-      }
-    ],
-    "story": "The department head made it his central concern to convey not just information but genuine confidence in every communication the team sent. He coached his leads to convey ideas through layered signals — not only words, but pacing, structure, and the care taken in responses. After months of deliberate practice, the team began to convey a consistency of tone that clients commented on independently, describing it as one of the qualities that most differentiated the firm from its competitors.",
-    "syn": "communicate, transmit",
-    "ant": "conceal, withhold",
-    "speakingChallenge": "You need to convey to a long-term client that your pricing is increasing — without losing the relationship. What language and framing would you use?"
-  },
+  "day": 222,
+  "type": "verb",
+  "word": "thwart",
+  "roman": "THWORT",
+  "meaning": "To prevent someone from accomplishing something or to obstruct a plan, effort, or goal from succeeding.",
+  "simpleMeaning": "To stop someone or something from succeeding or achieving a goal.",
+  "collocations": "thwart an attempt, thwart a plan, thwart progress, thwart ambition, thwart a competitor",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "thwarted",
+      "present": "thwart",
+      "future": "will thwart"
+    },
+    {
+      "person": "He / She / It",
+      "past": "thwarted",
+      "present": "thwarts",
+      "future": "will thwart"
+    }
+  ],
+  "story": "The approval process was so layered with bureaucratic sign-offs that it thwarted even the most straightforward operational decisions, costing the team weeks they could not afford to lose. She had worked hard to build cross-functional support for the initiative specifically to prevent any single department head from being able to thwart it at the final stage. Competitors do not always thwart growth through direct confrontation — sometimes the more effective move is to make the regulatory environment inhospitable.",
+  "syn": "obstruct, hinder",
+  "ant": "facilitate, enable",
+  "speakingChallenge": "A stakeholder with significant internal influence is actively trying to thwart a project you are leading, but their opposition has not been made explicit. How do you identify what is driving their resistance and what steps do you take to neutralize it without making the conflict public?"
+},
   {
     "day": 223,
     "type": "word",
@@ -8863,31 +8933,31 @@
     "speakingChallenge": "A client has mentioned a difficult internal challenge during a call. How do you express solicitude in a way that is genuine and professional rather than intrusive?"
   },
   {
-    "day": 224,
-    "type": "verb",
-    "word": "defer",
-    "roman": "dih-FER",
-    "meaning": "To put off action or a decision to a later time; or to yield respectfully to another person's judgment or authority.",
-    "simpleMeaning": "To delay something or to let someone else decide out of respect.",
-    "collocations": "defer to expertise, defer a decision, defer judgment, defer to the committee, defer to senior leadership",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "deferred",
-        "present": "defer",
-        "future": "will defer"
-      },
-      {
-        "person": "He / She / It",
-        "past": "deferred",
-        "present": "defers",
-        "future": "will defer"
-      }
-    ],
-    "story": "The newly appointed operations manager chose to defer to the senior logistics coordinator on routing decisions during the first three months, recognizing that institutional knowledge of the market took years to build. He would defer not out of passivity but as a deliberate strategy to observe before acting. Once he had learned enough through observation, his own decisions were markedly better-informed — and the team respected both the humility that had led him to defer and the judgment he eventually demonstrated.",
-    "syn": "postpone, yield",
-    "ant": "assert, accelerate",
-    "speakingChallenge": "In a technical discussion, you realize your colleague has far more expertise than you. How do you defer to their judgment in a way that shows confidence rather than weakness?"
+  "day": 224,
+  "type": "verb",
+  "word": "supersede",
+  "roman": "soo-per-SEED",
+  "meaning": "To replace something or someone that is considered outdated, inferior, or no longer relevant, typically by something newer or more authoritative.",
+  "simpleMeaning": "To take the place of something older or less effective and make it no longer used.",
+  "collocations": "supersede a policy, supersede an agreement, supersede previous guidance, be superseded by regulation, supersede an earlier decision",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "superseded",
+      "present": "supersede",
+      "future": "will supersede"
+    },
+    {
+      "person": "He / She / It",
+      "past": "superseded",
+      "present": "supersedes",
+      "future": "will supersede"
+    }
+  ],
+  "story": "The new data protection regulation was designed to supersede the fragmented set of guidelines that different departments had been operating under for years. When a more rigorous methodology was introduced, it quickly superseded the manual process that the team had relied on since the company's founding. Understanding which rules currently supersede earlier versions is one of the most underestimated compliance skills in any organization.",
+  "syn": "replace, override",
+  "ant": "retain, uphold",
+  "speakingChallenge": "A policy you helped design two years ago is being superseded by a new company-wide framework. A colleague asks you whether the old process still applies in certain edge cases. How do you explain the transition clearly and ensure they follow the current guidance?"
   },
   {
     "day": 225,
@@ -8943,32 +9013,32 @@
     "speakingChallenge": "Your team wants to celebrate a project milestone with a large event while another department is under a budget freeze. How do you address the optics of this decision with your manager?"
   },
   {
-    "day": 226,
-    "type": "verb",
-    "word": "implicate",
-    "roman": "IM-plih-kayt",
-    "meaning": "To show or suggest that someone or something is involved in — or connected to — a particular situation, problem, or conclusion; to draw in as a contributing factor.",
-    "simpleMeaning": "To show that someone or something is connected to a problem or outcome.",
-    "collocations": "implicate a party, implicate a process, implicate the data, implicate leadership, implicate in a failure",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "implicated",
-        "present": "implicate",
-        "future": "will implicate"
-      },
-      {
-        "person": "He / She / It",
-        "past": "implicated",
-        "present": "implicates",
-        "future": "will implicate"
-      }
-    ],
-    "story": "The post-incident review found evidence that would implicate three separate process failures rather than a single human error. Investigators did not implicate the field supervisor without also examining whether systemic conditions had served to implicate every layer of the approval chain. Once all three failure points had been formally identified, the conversation shifted from blame to structural redesign — which was the only response that could prevent a recurrence.",
-    "syn": "involve, incriminate",
-    "ant": "absolve, exonerate",
-    "speakingChallenge": "A process audit implicates your team's approval workflow in a compliance gap. How do you present this finding to leadership in a way that is honest, constructive, and forward-looking?"
-  },
+  "day": 226,
+  "type": "verb",
+  "word": "quell",
+  "roman": "KWEL",
+  "meaning": "To suppress, put an end to, or calm something — such as a disturbance, fear, rumor, or strong emotion.",
+  "simpleMeaning": "To stop or calm something that is growing or causing disruption.",
+  "collocations": "quell fears, quell unrest, quell a rumor, quell opposition, quell anxiety",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "quelled",
+      "present": "quell",
+      "future": "will quell"
+    },
+    {
+      "person": "He / She / It",
+      "past": "quelled",
+      "present": "quells",
+      "future": "will quell"
+    }
+  ],
+  "story": "The CEO held an all-hands meeting specifically to quell the speculation that had been spreading through the organization since the acquisition announcement was leaked. Transparent and timely communication is almost always more effective at quelling anxiety than waiting for the official message to be perfectly crafted. The manager's calm presence during the crisis did more to quell panic among the junior staff than any formal statement that came from above.",
+  "syn": "suppress, calm",
+  "ant": "incite, inflame",
+  "speakingChallenge": "A rumor is circulating among your team that a round of redundancies is coming. You do not have full information but you need to quell the anxiety before it starts affecting performance. What do you say, and how do you handle follow-up questions you cannot yet answer?"
+},
   {
     "day": 227,
     "type": "word",
@@ -9583,31 +9653,31 @@
     "speakingChallenge": "During a performance review, how would you diplomatically raise a team member's proclivity for bypassing formal approval channels without making it sound like a personal attack?"
   },
   {
-    "day": 242,
-    "type": "verb",
-    "word": "exacerbate",
-    "roman": "ig-ZAS-er-bayt",
-    "meaning": "To make a problem, bad situation, or negative feeling worse.",
-    "simpleMeaning": "To make something worse.",
-    "collocations": "exacerbate the problem, exacerbate tensions, exacerbate a crisis, exacerbate the divide, exacerbate existing issues",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "exacerbated",
-        "present": "exacerbate",
-        "future": "will exacerbate"
-      },
-      {
-        "person": "He / She / It",
-        "past": "exacerbated",
-        "present": "exacerbates",
-        "future": "will exacerbate"
-      }
-    ],
-    "story": "The rushed rollout of the new ERP system served only to exacerbate the team's frustration rather than relieve it. Poor training materials continued to exacerbate the adoption gap between departments for months after the go-live date. The consultants eventually acknowledged that their compressed timeline had been the single decision most likely to exacerbate every downstream challenge the client faced.",
-    "syn": "aggravate, intensify",
-    "ant": "alleviate, ease",
-    "speakingChallenge": "A colleague proposes a quick-fix solution that you believe will exacerbate the underlying issue. How do you argue against it in a team meeting without dismissing their effort?"
+  "day": 242,
+  "type": "verb",
+  "word": "contravene",
+  "roman": "kon-truh-VEEN",
+  "meaning": "To act in direct conflict with a rule, law, agreement, or established principle — effectively violating or overriding it.",
+  "simpleMeaning": "To go against or break a rule, law, or agreement.",
+  "collocations": "contravene a policy, contravene regulations, contravene an agreement, contravene the terms, contravene company guidelines",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "contravened",
+      "present": "contravene",
+      "future": "will contravene"
+    },
+    {
+      "person": "He / She / It",
+      "past": "contravened",
+      "present": "contravenes",
+      "future": "will contravene"
+    }
+  ],
+  "story": "The vendor's revised proposal contravened several clauses in the original contract, which forced the legal team to pause negotiations until the discrepancies were formally addressed. When a line manager overrides a process that was centrally mandated, they may not realize they are contravening an agreement that the organization made at a much higher level. The most costly compliance failures are rarely deliberate — they happen when individuals do not know which rules they are contravening until after the fact.",
+  "syn": "violate, infringe",
+  "ant": "comply, uphold",
+  "speakingChallenge": "During an audit, it is discovered that a process your team has been running for eighteen months contravenes a regulatory requirement. You were not aware of this when the process was designed. How do you communicate this to leadership and what immediate steps do you propose?"
   },
   {
     "day": 243,
@@ -9623,32 +9693,32 @@
     "speakingChallenge": "In a strategic planning session, how would you explain to your team that the right time to launch is now because of a unique confluence of market conditions?"
   },
   {
-    "day": 243,
-    "type": "verb",
-    "word": "equivocate",
-    "roman": "ih-KWIV-oh-kayt",
-    "meaning": "To use vague or ambiguous language in order to avoid committing to a position or to mislead.",
-    "simpleMeaning": "To speak unclearly on purpose to avoid giving a real answer.",
-    "collocations": "equivocate on a decision, equivocate under pressure, refuse to equivocate, equivocate publicly, equivocate when asked",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "equivocated",
-        "present": "equivocate",
-        "future": "will equivocate"
-      },
-      {
-        "person": "He / She / It",
-        "past": "equivocated",
-        "present": "equivocates",
-        "future": "will equivocate"
-      }
-    ],
-    "story": "The department head chose to equivocate when the board asked whether the project could meet its deadline. He continued to equivocate through two follow-up meetings, citing variables and dependencies rather than giving a clear status. The board ultimately lost confidence not because of the delay itself, but because a leader who would equivocate under pressure was seen as one who could not be trusted in a crisis.",
-    "syn": "prevaricate, hedge",
-    "ant": "commit, declare",
-    "speakingChallenge": "A senior stakeholder asks you directly whether you support a proposed strategy. You have reservations but no definitive view. How do you respond without appearing to equivocate or be evasive?"
-  },
+  "day": 243,
+  "type": "verb",
+  "word": "dispel",
+  "roman": "dih-SPEL",
+  "meaning": "To make a feeling, belief, or misconception disappear by proving it to be unfounded or by providing clarity.",
+  "simpleMeaning": "To remove a false belief, fear, or misunderstanding by showing it is not true.",
+  "collocations": "dispel a myth, dispel concerns, dispel doubt, dispel misconceptions, dispel rumors",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "dispelled",
+      "present": "dispel",
+      "future": "will dispel"
+    },
+    {
+      "person": "He / She / It",
+      "past": "dispelled",
+      "present": "dispels",
+      "future": "will dispel"
+    }
+  ],
+  "story": "The operations director opened the town hall by directly addressing the three most common misconceptions about the merger, making a deliberate effort to dispel them before the formal presentation began. A single well-evidenced case study can dispel more skepticism than an hour of theoretical argument in a boardroom. She understood that her credibility as a new leader depended partly on her ability to dispel the assumption that she had been brought in to implement cuts rather than to build.",
+  "syn": "eliminate, dismiss",
+  "ant": "reinforce, spread",
+  "speakingChallenge": "A persistent misconception about your team's role and capability has taken hold among senior stakeholders. How do you dispel it without coming across as defensive, and what evidence or narrative would you use to shift their perception?"
+},
   {
     "day": 244,
     "type": "word",
@@ -9807,7 +9877,7 @@
     "story": "The sales director tried to rationalize the missed targets by pointing to market headwinds, but the data did not support the claim. He had a long habit of using external factors to rationalize internal failures, a pattern the regional VP had documented over two review cycles. The coaching conversation that followed was direct: the ability to rationalize a situation was a useful skill, but using it to avoid accountability was a leadership disqualifier.",
     "syn": "justify, excuse",
     "ant": "accept responsibility, acknowledge",
-    "speakingChallenge": "You made a hiring decision that didn't work out. In a debrief with HR, how do you reflect honestly without simply rationalizing the original choice to protect yourself?"
+    "speakingChallenge": "A decision you championed did not deliver the expected results. In a debrief with your manager, walk through what happened honestly — without trying to rationalize the original choice. Explain what you would do differently and why it is tempting to rationalize but counterproductive."
   },
   {
     "day": 248,
@@ -9870,6 +9940,20 @@
     "meaning": "To treat something as a commercial product or commodity, often losing its original value, meaning, or uniqueness in the process.",
     "simpleMeaning": "To turn something into just another product sold for money.",
     "collocations": "commodify a service, commodify talent, commodify relationships, commodify innovation, risk commodifying",
+    "conj": [
+      {
+        "person": "I / You / We / They",
+        "past": "commodified",
+        "present": "commodify",
+        "future": "will commodify"
+      },
+      {
+        "person": "He / She / It",
+        "past": "commodified",
+        "present": "commodifies",
+        "future": "will commodify"
+      }
+    ],
     "story": "The industry's rapid move to automated platforms began to commodify services that had previously required specialized expertise. Companies that had built reputations on bespoke consulting found it difficult to resist the pressure to commodify their offerings in order to compete on price. Once you chose to commodify what was once considered premium, regaining that positioning in the market required significant time and investment.",
     "syn": "commercialize, standardize",
     "ant": "differentiate, specialize",
@@ -10726,7 +10810,7 @@
     "story": "The minister's press conference was a masterclass in circumlocution — he spoke for forty minutes without once answering the core question. His advisors had trained him in circumlocution specifically to blunt the sharpness of hostile journalists. By the end, the room had grown so weary of the circumlocution that reporters simply filed their own interpretations.",
     "syn": "verbosity, evasiveness",
     "ant": "directness, conciseness",
-    "speakingChallenge": "A client keeps asking why the project is delayed. Your manager has told you not to reveal the real reason. How do you respond honestly enough without causing panic?"
+    "speakingChallenge": "A client directly asks why their project has been delayed three times. You have been instructed not to reveal the real cause. Respond in a way that avoids circumlocution — be clear and direct about what you can say — and reflect afterward on where circumlocution would have been the easier but weaker choice."
   },
   {
     "day": 271,
@@ -10753,7 +10837,7 @@
     "story": "The junior analyst supplicated before the board to give the startup one more funding cycle. He supplicated not out of weakness but out of calculated necessity — he knew the numbers would vindicate him within ninety days. His willingness to supplicate openly impressed the chairman, who saw in it the rare quality of ego-free conviction.",
     "syn": "implore, beseech",
     "ant": "demand, command",
-    "speakingChallenge": "Your department's budget has been cut by 40%. You need to appeal to the CFO for a restoration. How do you make the case without appearing weak or desperate?"
+    "speakingChallenge": "Your department's budget has been cut by 40% and critical work is at risk. You need to supplicate the CFO for a partial restoration. Practise how you would supplicate — what tone, what evidence, and what framing would make your appeal land without appearing desperate."
   },
   {
     "day": 272,
@@ -10766,7 +10850,7 @@
     "story": "The merger talks collapsed not because of financials but because of the personal animus between the two CEOs, which had festered since a failed deal a decade prior. Every clause in the contract became a battlefield once the animus surfaced in the negotiating room. A neutral mediator was brought in specifically to separate the business logic from the animus that had hijacked the process.",
     "syn": "hostility, antagonism",
     "ant": "goodwill, affinity",
-    "speakingChallenge": "Two of your top managers clearly dislike each other, and it is affecting team output. How do you address this in a one-on-one with each of them without taking sides?"
+    "speakingChallenge": "Two senior team members have clear animus toward each other, and it is affecting collaboration. You are meeting with one of them now. Acknowledge that you have noticed the animus without naming it as such to them, and describe how you would navigate this conversation to reduce it without taking sides."
   },
   {
     "day": 272,
@@ -10809,31 +10893,31 @@
     "speakingChallenge": "A key vendor refuses to adjust their payment terms despite the fact that your company's cash flow has changed significantly. How do you break through their obstinacy without ending the relationship?"
   },
   {
-    "day": 273,
-    "type": "verb",
-    "word": "impugn",
-    "roman": "im-PYOON",
-    "meaning": "To dispute the truth, validity, or honesty of something; to call into question someone's motives or integrity.",
-    "simpleMeaning": "To challenge or attack someone's honesty or the truth of something.",
-    "collocations": "impugn someone's motives, impugn a decision, impugn credibility, impugn the evidence, impugn a colleague's integrity",
-    "conj": [
-      {
-        "person": "I / You / We / They",
-        "past": "impugned",
-        "present": "impugn",
-        "future": "will impugn"
-      },
-      {
-        "person": "He / She / It",
-        "past": "impugned",
-        "present": "impugns",
-        "future": "will impugn"
-      }
-    ],
-    "story": "The auditor's report impugned the CFO's accounting decisions in terms so pointed that the board demanded an emergency session. The CFO's lawyer argued that the report impugned her client without citing a single regulatory violation — only judgment calls made under pressure. The episode impugned the entire finance department's reputation, regardless of where individual fault lay.",
-    "syn": "challenge, dispute",
-    "ant": "vindicate, validate",
-    "speakingChallenge": "A competitor publicly questions your company's data in a joint industry report. How do you respond professionally without escalating into a public dispute?"
+  "day": 273,
+  "type": "verb",
+  "word": "foment",
+  "roman": "foh-MENT",
+  "meaning": "To instigate or stir up trouble, unrest, conflict, or strong emotion — usually deliberately and often covertly.",
+  "simpleMeaning": "To deliberately stir up or encourage something negative, like conflict or discontent.",
+  "collocations": "foment unrest, foment division, foment conflict, foment resentment, foment dissent",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "fomented",
+      "present": "foment",
+      "future": "will foment"
+    },
+    {
+      "person": "He / She / It",
+      "past": "fomented",
+      "present": "foments",
+      "future": "will foment"
+    }
+  ],
+  "story": "The restructuring announcement was so poorly timed and communicated that it inadvertently fomented the kind of anxiety and speculation that HR spent weeks trying to contain afterward. A manager who plays team members against each other may not realize they are fomenting the very dysfunction that reduces the performance they are trying to improve. Recognizing when organizational change is fomenting unrest — before it becomes visible — is one of the more valuable skills a senior leader can develop.",
+  "syn": "incite, provoke",
+  "ant": "suppress, pacify",
+  "speakingChallenge": "You have noticed that a colleague's communication style is fomenting tension between two departments without them appearing to do so deliberately. How do you address this with your manager without making an accusation you cannot fully substantiate?"
   },
   {
     "day": 274,
@@ -10846,7 +10930,7 @@
     "story": "The founder's insouciance during the investor meeting unsettled the room — he had arrived without slides and spoke from memory with a calm that bordered on recklessness. Some interpreted his insouciance as confidence; the more experienced investors recognized it as either genius or denial. After the company collapsed eighteen months later, analysts wrote that his insouciance had blinded him to signals the data had been broadcasting for years.",
     "syn": "nonchalance, indifference",
     "ant": "anxiety, concern",
-    "speakingChallenge": "You are presenting a high-risk strategy to senior leadership. How do you project calm confidence without coming across as dismissive of real concerns?"
+    "speakingChallenge": "You are presenting a high-risk strategic recommendation to the board. Some members are worried you are showing insouciance about the downside scenarios. How do you project calm confidence while making it clear your insouciance is not indifference — that you have genuinely weighed the risks?"
   },
   {
     "day": 274,
@@ -10886,7 +10970,7 @@
     "story": "The consultant's presentation had all the verisimilitude of a rigorous analysis — polished charts, confident delivery, precise language — yet the underlying data had been cherry-picked. The client later realized the verisimilitude had substituted for substance, and the recommendations had no operational grounding. This case became a cautionary study in how verisimilitude could pass through procurement filters that tested for form rather than depth.",
     "syn": "plausibility, believability",
     "ant": "implausibility, absurdity",
-    "speakingChallenge": "You are reviewing a proposal from a vendor whose pitch sounds compelling but whose evidence feels thin. How do you probe for substance without insulting their presentation?"
+    "speakingChallenge": "A vendor's proposal sounds impressive but something feels off — the data is vague and the case studies lack detail. Ask three probing questions that test the verisimilitude of their claims. Then explain to a colleague what verisimilitude means and why it matters when evaluating vendor pitches."
   },
   {
     "day": 275,
@@ -10913,7 +10997,7 @@
     "story": "The senior economist expatiated on the geopolitical risks embedded in the supply chain model for nearly an hour, losing the room halfway through. His habit of expatiating whenever given the floor had earned him the quiet reputation of a person who could not edit his own thinking. The chairman finally interrupted and asked him to expatiate only on the two points that directly affected the board's decision that day.",
     "syn": "elaborate, expand",
     "ant": "summarize, condense",
-    "speakingChallenge": "You have been given ten minutes to present your quarterly findings to the executive committee, but you have thirty minutes of material. How do you decide what to cut?"
+    "speakingChallenge": "You have ten minutes to present quarterly findings to the executive committee, but you tend to expatiate when you are nervous. Outline what you would say and then explain specifically where you are most tempted to expatiate — and how you would stop yourself."
   },
   {
     "day": 276,
@@ -10926,7 +11010,7 @@
     "story": "The head office announced the restructuring as a fait accompli, sending division managers a memo that left no room for input or reversal. The employees felt that the decision had been designed as a fait accompli precisely to bypass the resistance that proper consultation would have generated. In hindsight, the fait accompli approach saved time in the short term but created implementation friction that lasted years.",
     "syn": "done deal, accomplished fact",
     "ant": "open question, pending decision",
-    "speakingChallenge": "Your organization has just announced a change that directly affects your team, and you had no say in it. How do you communicate this to your team while maintaining their confidence in leadership?"
+    "speakingChallenge": "A major restructuring has been presented to your team as a fait accompli — the decision was made without their input. How do you communicate this fait accompli in a way that is honest about the lack of consultation while still maintaining confidence in the direction?"
   },
   {
     "day": 276,
@@ -11033,7 +11117,7 @@
     "story": "No one in the room could gainsay the data — three consecutive quarters of decline, each worse than the one before. The regional head tried to gainsay the analyst's interpretation, but the underlying numbers were too clean to reframe. Eventually even the most optimistic board member stopped trying to gainsay the need for structural change and agreed to authorize the review.",
     "syn": "contradict, dispute",
     "ant": "affirm, concede",
-    "speakingChallenge": "A consultant presents findings that contradict your team's internal report. The room is watching you. How do you respond without appearing defensive or dismissing evidence you haven't fully reviewed?"
+    "speakingChallenge": "A consultant presents findings that directly contradict your team's internal report. The room expects you to respond. Acknowledge what is valid in their findings — but also gainsay the parts you believe are flawed. Explain what evidence you would use to gainsay their central conclusion."
   },
   {
     "day": 279,
@@ -11113,7 +11197,7 @@
     "story": "The division head arrogated final approval authority on vendor contracts, bypassing the CFO's office without formal authorization. He had arrogated this power gradually — first for small decisions, then for progressively larger ones — until the deviation from protocol became too large to ignore. The board's investigation concluded that he had arrogated a level of financial authority equivalent to a C-suite role while holding a mid-level title.",
     "syn": "usurp, seize",
     "ant": "relinquish, surrender",
-    "speakingChallenge": "You notice a colleague has begun making decisions that fall within your own area of responsibility. How do you address this without creating a damaging territorial dispute?"
+    "speakingChallenge": "A colleague has begun making decisions that fall clearly within your area of responsibility — they are starting to arrogate your role without acknowledging it. Address this directly with them: explain what you have observed, name that they appear to arrogate decisions that are not theirs, and propose a clear boundary going forward."
   },
   {
     "day": 281,
@@ -11286,7 +11370,7 @@
     "story": "He terminated the contract without compunction, citing performance data and documented warnings that had been ignored over six months. Those who knew him noted that he was not without compunction in private — he had simply learned to separate the emotional cost from the operational necessity. The absence of visible compunction in a leader can read as strength or callousness, depending entirely on the trust the organization has in their judgment.",
     "syn": "remorse, scruple",
     "ant": "indifference, shamelessness",
-    "speakingChallenge": "You have had to make a decision that was necessary for the business but hurt people you respect. A colleague asks how you feel about it. How do you respond honestly without undermining the decision?"
+    "speakingChallenge": "You had to let go of a team member who was well-liked but consistently underperforming. A colleague asks how you feel about it. Respond honestly — express the compunction you feel without suggesting the decision was wrong, and explain why compunction in these moments is a sign of healthy judgment, not weakness."
   },
   {
     "day": 285,
@@ -11313,7 +11397,7 @@
     "story": "The audit report suggested that the CFO had dissembled during the board's quarterly review, presenting a picture of stability while privately communicating very different projections to the lending bank. Whether she had chosen to dissemble deliberately or had convinced herself that the two pictures could coexist was a question the investigation never cleanly resolved. A leader who dissemble consistently eventually loses the ability to read the room, because they have trained everyone around them to do the same.",
     "syn": "dissimulate, misrepresent",
     "ant": "disclose, reveal",
-    "speakingChallenge": "You are asked in a town hall whether there will be layoffs, and you know there will be — but nothing has been announced. How do you respond honestly without dissembling and without breaching confidentiality?"
+    "speakingChallenge": "You are asked in a town hall whether there will be layoffs, and you know there will be — but nothing has been announced. How do you respond honestly without choosing to dissemble, and without breaching confidentiality? Explain exactly where the line is between protecting sensitive information and choosing to dissemble."
   },
   {
     "day": 286,
@@ -11473,7 +11557,7 @@
     "story": "The new approval framework managed to convolute what had been a four-step process into a seventeen-step labyrinth that none of the operating teams fully understood. Every additional safeguard they added seemed to convolute the system further, until the overhead cost of compliance exceeded the cost of the errors the framework was designed to prevent. A good process designer knows that to convolute is not to protect — it is to transfer risk from one point to seventeen others.",
     "syn": "complicate, entangle",
     "ant": "simplify, clarify",
-    "speakingChallenge": "You are reviewing a process your team designed, and it is clear that it has become too complex. How do you facilitate a redesign conversation without blaming the people who built it?"
+    "speakingChallenge": "You are reviewing a process your team designed six months ago, and it is clear it has started to convolute beyond what the task requires. Facilitate a redesign conversation — explain to the team where the process has begun to convolute, without assigning blame, and propose how to simplify it together."
   },
   {
     "day": 290,
@@ -11526,7 +11610,7 @@
     "story": "The board approved the divestiture of the consumer goods division after a two-year strategic review concluded that the core business would perform better without it. The divestiture was executed over nine months — a timeline considered aggressive given the size of the operation — and the proceeds were reinvested in the software platform that management had identified as the real growth engine. The market responded positively to the divestiture announcement, treating it as a signal of strategic clarity rather than retreat.",
     "syn": "sale, disposal",
     "ant": "acquisition, retention",
-    "speakingChallenge": "Your company is divesting a unit that your team has been managing. How do you maintain team morale and productivity through the transition period?"
+    "speakingChallenge": "Your company has announced a divestiture of the unit your team manages. Speak to your team about what this divestiture means for them, what is still uncertain, and how you plan to lead through it. Use the word divestiture at least twice — your team needs to understand and not fear the term."
   },
   {
     "day": 291,
@@ -11726,7 +11810,7 @@
     "story": "The market entry had stalled not because of regulatory complexity but because every point of contact in the licensing process was venal — each functionary expected a payment before the file moved. Operating in a venal environment forces companies to choose between ethical compromise, competitive disadvantage, or withdrawal, and none of these options is without serious cost. The compliance officer's report concluded that the environment was so venal that no amount of process redesign would allow the company to operate there without systematic exposure.",
     "syn": "corrupt, mercenary",
     "ant": "incorruptible, principled",
-    "speakingChallenge": "You are operating in a market where the standard practice involves unofficial payments. Your company has a strict no-bribes policy. How do you navigate this without losing the business or violating policy?"
+    "speakingChallenge": "You are operating in a market where unofficial payments are common practice, and a local partner implies that refusing will cost you the deal. Explain to your regional director how you navigated this situation — and describe the pressure without suggesting you or your team acted in any venal way. Reflect on how you would identify and manage a venal actor within your own organisation."
   },
   {
     "day": 296,
@@ -13219,22 +13303,32 @@
     "speakingChallenge": "Reflect on the vicissitude your professional field has experienced over the past five years and explain how your organization has adapted."
   },
   {
-    "day": 344,
-    "type": "verb",
-    "word": "exculpate",
-    "roman": "EK-skul-payt",
-    "meaning": "To show or declare that someone is not guilty of wrongdoing; to clear from blame.",
-    "simpleMeaning": "To prove someone is not guilty or at fault",
-    "collocations": "exculpate a colleague, fully exculpate, exculpate from liability, evidence to exculpate, exculpate in court",
-    "conj": [
-      { "person": "I / You / We / They", "past": "exculpated", "present": "exculpate", "future": "will exculpate" },
-      { "person": "He / She / It", "past": "exculpated", "present": "exculpates", "future": "will exculpate" }
-    ],
-    "story": "The internal review was conducted specifically to exculpate the operations team from allegations of procedural misconduct. The audit findings did, in fact, exculpate the team, placing responsibility instead with a third-party vendor's reporting errors. Legal counsel noted that the documentation produced to exculpate the team also provided a strong basis for a contractual claim against the vendor.",
-    "syn": "absolve, vindicate",
-    "ant": "implicate, inculpate",
-    "speakingChallenge": "Describe how you would structure an internal investigation to fairly exculpate or implicate a team member accused of a serious compliance breach."
-  },
+  "day": 344,
+  "type": "verb",
+  "word": "jettison",
+  "roman": "JET-ih-sun",
+  "meaning": "To deliberately discard or abandon something — a plan, idea, process, or asset — that has become a burden or is no longer useful.",
+  "simpleMeaning": "To throw away or abandon something that is no longer useful or is holding you back.",
+  "collocations": "jettison a strategy, jettison dead weight, jettison a product line, jettison old processes, jettison an approach",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "jettisoned",
+      "present": "jettison",
+      "future": "will jettison"
+    },
+    {
+      "person": "He / She / It",
+      "past": "jettisoned",
+      "present": "jettisons",
+      "future": "will jettison"
+    }
+  ],
+  "story": "The new CEO's first major decision was to jettison the three product lines that had been consuming a disproportionate share of resources while contributing less than eight percent of total revenue. Organizations often wait far too long to jettison failing initiatives because the people who championed them are still in the room and the political cost of abandoning them feels higher than the operational cost of continuing. Knowing when to jettison a plan that once made sense requires the same analytical rigor as knowing when to launch one.",
+  "syn": "discard, abandon",
+  "ant": "retain, preserve",
+  "speakingChallenge": "A project you personally initiated eighteen months ago has consistently underperformed. The data now clearly suggests it is time to jettison it. How do you make the case to leadership to shut it down — and how do you frame your own role in its failure constructively?"
+},
   {
     "day": 345,
     "type": "word",
@@ -13489,22 +13583,32 @@
     "speakingChallenge": "Discuss how organizations can build structural safeguards against the hubris of their most successful leaders before it causes institutional damage."
   },
   {
-    "day": 353,
-    "type": "verb",
-    "word": "importune",
-    "roman": "im-por-TYOON",
-    "meaning": "To ask someone persistently and urgently for something, often to the point of irritation.",
-    "simpleMeaning": "To pester someone repeatedly with requests",
-    "collocations": "importune a client, importune for resources, importune relentlessly, importune beyond reason, importune for approval",
-    "conj": [
-      { "person": "I / You / We / They", "past": "importuned", "present": "importune", "future": "will importune" },
-      { "person": "He / She / It", "past": "importuned", "present": "importunes", "future": "will importune" }
-    ],
-    "story": "The junior partner had a tendency to importune the managing committee for additional project resources without first demonstrating the impact of the current allocation. His colleagues observed that to importune leadership repeatedly without data was a fast route to losing credibility. Senior advisors told him that executives who importune without evidence are rarely heard — while those who prepare rigorously are rarely denied.",
-    "syn": "pester, beseech",
-    "ant": "withdraw, refrain",
-    "speakingChallenge": "Describe how you would coach a team member who tends to importune senior leadership for decisions that should be resolved at their own level."
-  },
+  "day": 353,
+  "type": "verb",
+  "word": "forge",
+  "roman": "FORJ",
+  "meaning": "To build or create something strong and lasting through sustained effort — such as a relationship, alliance, or agreement; also to move forward steadily despite difficulty.",
+  "simpleMeaning": "To build something strong through effort, or to move forward with determination.",
+  "collocations": "forge a partnership, forge an alliance, forge relationships, forge a path, forge ahead",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "forged",
+      "present": "forge",
+      "future": "will forge"
+    },
+    {
+      "person": "He / She / It",
+      "past": "forged",
+      "present": "forges",
+      "future": "will forge"
+    }
+  ],
+  "story": "Over the course of two years, she managed to forge a genuine working relationship with a counterpart who had initially been hostile to any form of cross-departmental collaboration. The company used the industry conference not just for visibility but as a deliberate opportunity to forge the kind of informal connections that formal procurement processes rarely allow. The partnerships that endure are almost always forged during moments of shared difficulty rather than shared success.",
+  "syn": "build, establish",
+  "ant": "sever, dissolve",
+  "speakingChallenge": "You have been tasked with opening a relationship with an organisation that has historically been a competitor. Describe step by step how you would forge this partnership — what the first conversation looks like, and what you would do in the first 90 days to forge something real rather than just a signed agreement."
+},
   {
     "day": 354,
     "type": "word",
@@ -13849,20 +13953,30 @@
     "speakingChallenge": "Describe how you would diagnose and resolve an internecine conflict between two business units that are competing for the same internal resources."
   },
   {
-    "day": 365,
-    "type": "verb",
-    "word": "derogate",
-    "roman": "DAIR-uh-gayt",
-    "meaning": "To detract from or disparage something; to deviate from a standard, law, or expectation in a way that diminishes it.",
-    "simpleMeaning": "To belittle something or deviate from a standard in a harmful way",
-    "collocations": "derogate from a standard, derogate from the agreement, derogate the contribution of, derogate from policy, not derogate from",
-    "conj": [
-      { "person": "I / You / We / They", "past": "derogated", "present": "derogate", "future": "will derogate" },
-      { "person": "He / She / It", "past": "derogated", "present": "derogates", "future": "will derogate" }
-    ],
-    "story": "The committee ruled that the subsidiary's local practices were not permitted to derogate from the group's established compliance framework. Legal counsel argued that to allow any regional entity to derogate from core standards would undermine the integrity of the entire governance structure. The matter was closed with a directive stating that no local authority could derogate from the parent's code of conduct regardless of market-specific conditions.",
-    "syn": "detract, diminish",
-    "ant": "uphold, enhance",
-    "speakingChallenge": "Explain to regional managers why local adaptations to global policy are acceptable only when they do not derogate from the foundational principles of the group's compliance framework."
-  }
+  "day": 365,
+  "type": "verb",
+  "word": "warrant",
+  "roman": "WOR-unt",
+  "meaning": "To justify or make something necessary; to provide sufficient reason for an action, decision, or level of attention.",
+  "simpleMeaning": "To justify or deserve something — to give a good enough reason for it to happen.",
+  "collocations": "warrant attention, warrant investigation, warrant action, warrant concern, warrant a response",
+  "conj": [
+    {
+      "person": "I / You / We / They",
+      "past": "warranted",
+      "present": "warrant",
+      "future": "will warrant"
+    },
+    {
+      "person": "He / She / It",
+      "past": "warranted",
+      "present": "warrants",
+      "future": "will warrant"
+    }
+  ],
+  "story": "The pattern in the customer complaint data was unusual enough to warrant a full operational review rather than the standard monthly report. Not every disagreement warrants escalation — part of professional maturity is knowing which issues to absorb and which ones genuinely require intervention from above. She made the case that the market shift was significant enough to warrant a complete revision of the pricing strategy, not just an incremental adjustment.",
+  "syn": "justify, merit",
+  "ant": "undermine, invalidate",
+  "speakingChallenge": "You believe a situation in your team warrants escalation to senior leadership, but you are aware that escalating too frequently damages your credibility. How do you decide whether this particular issue truly warrants it, and how do you frame the escalation if you proceed?"
+}
 ]

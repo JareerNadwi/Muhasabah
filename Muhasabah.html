@@ -798,29 +798,18 @@ body.overlay-open{overflow:hidden;}
       <div class="qr-session-badge" id="langSessionBadge" style="display:none;color:#c9a84c;"></div>
     </div>
 
-    <!-- Networking 5% -->
-    <div class="goal-card" id="card-networking">
+    <!-- Tafakkur 5% -->
+    <div class="goal-card" id="card-tafakkur">
       <div class="goal-top">
-        <div class="goal-name">🤝 Networking <span class="weight-hint">(5% Of Core)</span></div>
-        <div class="goal-pct-badge" id="pct-networking">0%</div>
+        <div class="goal-name">🌿 Tafakkur <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-tafakkur">0%</div>
       </div>
-      <div class="net-sub">
-        <div class="net-sub-row">
-          <span class="net-sub-label">Connected With 5+ People <span class="weight-hint">(2.5%)</span></span>
-          <div class="yn-mini">
-            <button class="yn-btn yes" data-key="netConnected" data-val="yes" onclick="setYN('netConnected','yes')">Yes</button>
-            <button class="yn-btn no"  data-key="netConnected" data-val="no"  onclick="setYN('netConnected','no')">No</button>
-          </div>
-        </div>
-        <div class="net-sub-row">
-          <span class="net-sub-label">Built Rapport With 5+ People <span class="weight-hint">(2.5%)</span></span>
-          <div class="yn-mini">
-            <button class="yn-btn yes" data-key="netCommented" data-val="yes" onclick="setYN('netCommented','yes')">Yes</button>
-            <button class="yn-btn no"  data-key="netCommented" data-val="no"  onclick="setYN('netCommented','no')">No</button>
-          </div>
-        </div>
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="tafakkur" data-val="yes" onclick="setYN('tafakkur','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="tafakkur" data-val="no"  onclick="setYN('tafakkur','no')">No</button>
       </div>
-      <button class="qr-open-btn" style="margin-top:8px;" onclick="alert('📒 Contact Book — Coming Soon')">📒 Open Contact Book</button>
+      <div class="sub-label">Goal: Reflect &amp; Contemplate Today = Full 5% Core</div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('tafakkur')">🌿 Open Tafakkur Article</button>
     </div>
 
     <!-- Writing 5% -->
@@ -849,18 +838,30 @@ body.overlay-open{overflow:hidden;}
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openPostWriter()">✦ Open AI Post Writer</button>
     </div>
 
-    <!-- Tafakkur 5% -->
-    <div class="goal-card" id="card-tafakkur">
+    <!-- Networking 5% -->
+    <div class="goal-card" id="card-networking">
       <div class="goal-top">
-        <div class="goal-name">🌿 Tafakkur <span class="weight-hint">(5% Of Core)</span></div>
-        <div class="goal-pct-badge" id="pct-tafakkur">0%</div>
+        <div class="goal-name">🤝 Networking <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-networking">0%</div>
       </div>
-      <div class="yn-group">
-        <button class="yn-btn yes" data-key="tafakkur" data-val="yes" onclick="setYN('tafakkur','yes')">Yes</button>
-        <button class="yn-btn no"  data-key="tafakkur" data-val="no"  onclick="setYN('tafakkur','no')">No</button>
+      <div class="net-sub">
+        <div class="net-sub-row">
+          <span class="net-sub-label">Connected With 5+ People <span class="weight-hint">(2.5%)</span></span>
+          <div class="yn-mini">
+            <button class="yn-btn yes" data-key="netConnected" data-val="yes" onclick="setYN('netConnected','yes')">Yes</button>
+            <button class="yn-btn no"  data-key="netConnected" data-val="no"  onclick="setYN('netConnected','no')">No</button>
+          </div>
+        </div>
+        <div class="net-sub-row">
+          <span class="net-sub-label">Built Rapport With 5+ People <span class="weight-hint">(2.5%)</span></span>
+          <div class="yn-mini">
+            <button class="yn-btn yes" data-key="netCommented" data-val="yes" onclick="setYN('netCommented','yes')">Yes</button>
+            <button class="yn-btn no"  data-key="netCommented" data-val="no"  onclick="setYN('netCommented','no')">No</button>
+          </div>
+        </div>
       </div>
-      <div class="sub-label">Goal: Reflect &amp; Contemplate Today = Full 5% Core</div>
-      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('tafakkur')">🌿 Open Tafakkur Article</button>
+      <div class="sub-label">Goal: Connect &amp; Build Rapport With 5+ People = Full 5% Core</div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="alert('📒 Contact Book — Coming Soon')">📒 Open Contact Book</button>
     </div>
 
   </div><!-- /growth -->

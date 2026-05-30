@@ -452,7 +452,7 @@ body.overlay-open{overflow:hidden;}
     <!-- Salah 15% -->
     <div class="goal-card full" id="card-salah">
       <div class="goal-top">
-        <div class="goal-name">🕌 Salah <span class="weight-hint">(15% Of Core)</span></div>
+        <div class="goal-name">🕌 Salah <span class="weight-hint">(10% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-salah">0%</div>
       </div>
       <div class="salah-grid" id="salahGrid"></div>
@@ -848,6 +848,20 @@ body.overlay-open{overflow:hidden;}
       </div>
     </div>
 
+    <!-- Tafakkur 5% -->
+    <div class="goal-card" id="card-tafakkur">
+      <div class="goal-top">
+        <div class="goal-name">🌿 Tafakkur <span class="weight-hint">(5% Of Core)</span></div>
+        <div class="goal-pct-badge" id="pct-tafakkur">0%</div>
+      </div>
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="tafakkur" data-val="yes" onclick="setYN('tafakkur','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="tafakkur" data-val="no"  onclick="setYN('tafakkur','no')">No</button>
+      </div>
+      <div class="sub-label">Goal: Reflect &amp; Contemplate Today = Full 5% Core</div>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('tafakkur')">🌿 Open Tafakkur Article</button>
+    </div>
+
   </div><!-- /growth -->
 
   <button class="save-btn" onclick="saveDayAndExport()">Save Day</button>
@@ -907,7 +921,7 @@ body.overlay-open{overflow:hidden;}
 /* ══════════════════════════════════════════════════════════
    CORE WEIGHTS — Total = 100%
    ──────────────────────────────────────────────────────────
-   Salah          15%  (5 prayers × 3%: jamaah=3, munfarid=2.25, qaza=0.75, missed=0)
+   Salah          10%  (5 prayers × 2%: jamaah=2, munfarid=1.5, qaza=0.5, missed=0)
    Quran          10%  goal=1 juzz; extra juzz = +5% bonus each (quarters proportional)
    Tahajjud       10%  goal=4 rakat; every extra 4 rakat = +5% bonus
    Zikr            5%  goal=1500; every extra 1500 = +2.5% bonus
@@ -922,7 +936,8 @@ body.overlay-open{overflow:hidden;}
    Books           5%  yes/no
    Language        5%  yes/no
    Writing         5%  (LinkedIn 2.5% + Facebook 2.5%)
-   Networking      5%  (Connected 2.5% + Commented 2.5%)
+   Networking      5%  yes/no
+   Tafakkur        5%  yes/no
    ──────────────────────────────────────────────────────────
    TOTAL = 100%
 
@@ -1742,13 +1757,13 @@ function all2026Keys(toToday=true){
 function scoreDay(data){
   let core=0;
 
-  // Salah 15% (5 × 3%)
+  // Salah 10% (5 × 2%)
   const salahs=data.salahs||{};
   SALAHS.forEach(s=>{
     const v=salahs[s]||'';
-    if(v==='jamaah')        core+=3;
-    else if(v==='munfarid') core+=2.25;
-    else if(v==='qaza')     core+=0.75;
+    if(v==="jamaah")        core+=2;
+    else if(v==='munfarid') core+=1.5;
+    else if(v==='qaza')     core+=0.5;
   });
 
   // Quran 10% — PDF reader wins over manual dropdown
@@ -1807,6 +1822,7 @@ function scoreDay(data){
   core += langRatio !== undefined ? Math.min(langRatio * 5, 5) : (data.language==='yes' ? 5 : 0);
   yn('writingLinkedin',2.5); yn('writingFacebook',2.5);
   yn('netConnected',2.5); yn('netCommented',2.5);
+  yn('tafakkur',5);
 
   core=Math.min(core,100);
 
@@ -1912,6 +1928,7 @@ function goalScore(data,key){
       return r !== undefined ? Math.min(Math.round(r * 100), 100) : (data.surahMulk==='yes'?100:0);
     }
     case 'exercise':    return data.exercise==='yes'?100:0;
+    case 'tafakkur':    return data.tafakkur==='yes'?100:0;
     case 'books': {
       const bkRatio = data['book_ratio'];
       return bkRatio !== undefined ? Math.min(Math.round(bkRatio * 100), 100) : (data.books === 'yes' ? 100 : 0);
@@ -2149,7 +2166,7 @@ function loadDayData(dk){
   });
 
   ['hadith','tafsir','asmaul','zikrMorning','zikrEvening','surahWaqiah','surahMulk','sawm',
-   'exercise','books','language','writingLinkedin','writingFacebook','netConnected','netCommented','surahKahf']
+   'exercise','books','language','writingLinkedin','writingFacebook','netConnected','netCommented','surahKahf','tafakkur']
     .forEach(key=>{
       document.querySelectorAll(`.yn-btn[data-key="${key}"]`).forEach(btn=>btn.classList.toggle('active',btn.dataset.val===data[key]));
     });
@@ -2216,7 +2233,7 @@ function refreshScores(){
 
   // Core badges
   ['salah','quran','tahajjud','zikr','hadith','tafsir','asmaul','zikrMorning','zikrEvening',
-   'surahWaqiah','surahMulk','exercise','books','language','writing','networking']
+   'surahWaqiah','surahMulk','exercise','books','language','writing','networking','tafakkur']
     .forEach(key=>{
       const pct=goalScore(data,key);
       const badge=document.getElementById('pct-'+key);
@@ -4306,6 +4323,94 @@ function calcBMI(){
   resDiv.style.display='block';
 }
 </script>
+
+<!-- ══════════════════════════════════════════════════════
+     TAFAKKUR — DELIBERATE REFLECTION ARTICLE OVERLAY
+══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="tafakkurArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
+      <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🌿 Tafakkur — Deliberate Reflection</div>
+      <button class="qr-close" onclick="closeArticle('tafakkur')">✕ Close</button>
+    </div>
+    <div style="padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
+
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Tafakkur — deliberate, purposeful contemplation — is one of the highest acts of worship in Islam. It is not passive daydreaming. It is the conscious turning of the mind toward Allah's signs: in creation, in the self, in the day that has just passed, and in the reality of what awaits.</p>
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">The scholars considered a single hour of sincere tafakkur more valuable than a night of optional worship. It is the act that converts knowledge into conviction, and conviction into action. A person who reads but never reflects remains informed. A person who reflects becomes transformed.</p>
+      <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.8em;">Muhasabah — the very purpose of this app — is incomplete without tafakkur. You cannot account for yourself honestly if you have not first sat with your day, examined it, and felt the weight of what you did and did not do before Allah.</p>
+
+      <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">The Quran on Tafakkur</div>
+      <div style="font-family:'Literata',Georgia,serif;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">Those Who Reflect</div>
+
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">إِنَّ فِي خَلْقِ السَّمَاوَاتِ وَالْأَرْضِ وَاخْتِلَافِ اللَّيْلِ وَالنَّهَارِ لَآيَاتٍ لِّأُولِي الْأَلْبَابِ ٱلَّذِينَ يَذْكُرُونَ ٱللَّهَ قِيَٰمًا وَقُعُودًا وَعَلَىٰ جُنُوبِهِمْ وَيَتَفَكَّرُونَ فِى خَلْقِ ٱلسَّمَٰوَٰتِ وَٱلْأَرْضِ</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Inna fī khalqi l-samāwāti wa-l-arḍi wa-khtilaāfi l-layli wa-l-nahāri la-āyātin li-ulī l-albāb. Alladhīna yadhkurūna Llāha qiyāman wa-quʿūdan wa-ʿalā junūbihim wa-yatafakkarūna fī khalqi l-samāwāti wa-l-arḍ</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"Indeed, in the creation of the heavens and the earth and the alternation of the night and the day are signs for those of understanding — those who remember Allah while standing, sitting, and lying on their sides, and reflect on the creation of the heavens and the earth."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Surah Ali 'Imran 3:190–191</div>
+      </div>
+
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:28px;">
+        <div style="font-family:'Amiri',serif;font-size:1.6rem;line-height:2.2;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">أَوَلَمْ يَتَفَكَّرُوا فِي أَنفُسِهِم</div>
+        <div style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:8px;line-height:1.6;">Awalam yatafakkarū fī anfusihim</div>
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;border-top:1px solid #2a2418;padding-top:10px;margin-top:10px;">"Do they not reflect within themselves?"</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Surah Ar-Rum 30:8</div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">The Sunnah on Tafakkur</div>
+      <div style="font-family:'Literata',Georgia,serif;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">What the Prophet ﷺ Taught</div>
+
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:18px;">
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;">"Reflect on the creation of Allah, but do not reflect on the essence of Allah, for you will not be able to encompass that."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Reported by Abu Nu'aym in Hilyat al-Awliya</div>
+      </div>
+
+      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:28px;">
+        <div style="color:#c5b98a;font-size:0.95rem;line-height:1.7;">Ibn al-Qayyim رحمه الله said: "The heart will not find true rest and felicity except through the remembrance of Allah — and tafakkur is the key to that remembrance. It is what turns abstract knowledge of Allah into living certainty felt in the chest."</div>
+        <div style="font-size:0.78rem;color:#7a6a40;margin-top:8px;text-align:right;">Ibn al-Qayyim — Miftah Dar al-Sa'adah</div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:14px;margin:28px 0;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
+
+      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">How To Practice It</div>
+      <div style="font-family:'Literata',Georgia,serif;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">A Daily Tafakkur Practice</div>
+
+      <div style="background:#1a1610;border-radius:8px;padding:22px 26px;margin-bottom:18px;">
+        <div style="color:#c9a84c;font-size:0.8rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:14px;">The Three Questions</div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <div style="background:#c9a84c;color:#0d0b08;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;margin-top:2px;">١</div>
+            <div>
+              <div style="color:#e8dfc8;font-size:0.95rem;font-weight:600;margin-bottom:4px;">What did I do today?</div>
+              <div style="color:#a89060;font-size:0.88rem;line-height:1.6;">Review your actions honestly — in worship, in dealings with people, in your private moments. What pleased Allah? What did not?</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <div style="background:#c9a84c;color:#0d0b08;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;margin-top:2px;">٢</div>
+            <div>
+              <div style="color:#e8dfc8;font-size:0.95rem;font-weight:600;margin-bottom:4px;">What is Allah showing me?</div>
+              <div style="color:#a89060;font-size:0.88rem;line-height:1.6;">Look at the events of the day as signs. A difficulty, a blessing, an encounter — what is the lesson? What is Allah drawing your attention toward?</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <div style="background:#c9a84c;color:#0d0b08;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;margin-top:2px;">٣</div>
+            <div>
+              <div style="color:#e8dfc8;font-size:0.95rem;font-weight:600;margin-bottom:4px;">What will I do tomorrow?</div>
+              <div style="color:#a89060;font-size:0.88rem;line-height:1.6;">Turn the reflection into intention. Set one concrete thing you will do differently, or one thing you will protect and repeat. Do not let the night end without a resolution.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;color:#5a5030;font-size:0.85rem;font-style:italic;margin-top:32px;border-top:1px solid #1e1a10;padding-top:20px;">
+        The one who reflects on his day is already ahead of the one who simply lives through it.
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ══════════════════════════════════════════════════════
      ASMAUL HUSNA READER OVERLAY

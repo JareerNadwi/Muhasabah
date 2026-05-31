@@ -6320,19 +6320,21 @@ function lrRender() {
 
   const meaningEl = document.getElementById('lrWordMeaning');
   meaningEl.textContent = pickF('meaning', 'meaningDiacritized') || '—';
+  meaningEl.style.direction = isRTL ? 'rtl' : 'ltr';
   meaningEl.style.textAlign = isRTL ? 'right' : 'left';
   const simpleMeaningEl = document.getElementById('lrSimpleMeaning');
   if (simpleMeaningEl) {
     simpleMeaningEl.textContent = pickF('simpleMeaning', 'simpleMeaningDiacritized');
+    simpleMeaningEl.style.direction = isRTL ? 'rtl' : 'ltr';
     simpleMeaningEl.style.textAlign = isRTL ? 'right' : 'left';
   }
 
   const collEl = document.getElementById('lrCollocations');
   if (collEl) {
     collEl.textContent = pickF('collocations', 'collocationsDiacritized');
-    collEl.style.fontFamily  = "'Amiri',serif";
+    collEl.style.fontFamily  = isRTL ? "'Amiri',serif" : "'Literata',Georgia,serif";
     collEl.style.fontSize    = isRTL ? '17px' : '15px';
-    collEl.style.direction   = 'rtl';
+    collEl.style.direction   = isRTL ? 'rtl' : 'ltr';
     collEl.style.textAlign   = isRTL ? 'right' : 'left';
     collEl.style.lineHeight  = '2.1';
   }
@@ -6340,17 +6342,17 @@ function lrRender() {
   const challengeEl = document.getElementById('lrSpeakingChallenge');
   if (challengeEl) {
     challengeEl.textContent = pickF('speakingChallenge', 'speakingChallengeDiacritized');
-    challengeEl.style.fontFamily = "'Amiri',serif";
+    challengeEl.style.fontFamily = isRTL ? "'Amiri',serif" : "'Literata',Georgia,serif";
     challengeEl.style.fontSize   = isRTL ? '1.15rem' : '1.05rem';
-    challengeEl.style.direction  = 'rtl';
+    challengeEl.style.direction  = isRTL ? 'rtl' : 'ltr';
     challengeEl.style.textAlign  = isRTL ? 'right' : 'left';
   }
 
   // Syn / Ant
   const synEl = document.getElementById('lrSyn');
   const antEl = document.getElementById('lrAnt');
-  synEl.textContent = lang.syn || '—'; synEl.style.direction = 'rtl'; synEl.style.textAlign = isRTL ? 'right' : 'left'; synEl.style.fontFamily = "'Amiri',serif"; synEl.style.fontSize = isRTL ? '17px' : '15px';
-  antEl.textContent = lang.ant || '—'; antEl.style.direction = 'rtl'; antEl.style.textAlign = isRTL ? 'right' : 'left'; antEl.style.fontFamily = "'Amiri',serif"; antEl.style.fontSize = isRTL ? '17px' : '15px';
+  synEl.textContent = lang.syn || '—'; synEl.style.direction = isRTL?'rtl':'ltr'; synEl.style.textAlign = isRTL?'right':'left'; synEl.style.fontFamily = isRTL?"'Amiri',serif":"'DM Mono',monospace"; synEl.style.fontSize = isRTL?'17px':'15px';
+  antEl.textContent = lang.ant || '—'; antEl.style.direction = isRTL?'rtl':'ltr'; antEl.style.textAlign = isRTL?'right':'left'; antEl.style.fontFamily = isRTL?"'Amiri',serif":"'DM Mono',monospace"; antEl.style.fontSize = isRTL?'17px':'15px';
 
   // Conjugation
   const conjPanel = document.getElementById('lrConjPanel');
@@ -6389,12 +6391,14 @@ function lrRender() {
         + '<th style="'+thS+'">Person</th>'
         + '<th style="'+thS+'">Past</th>'
         + '<th style="'+thS+'">Present</th>'
+        + '<th style="'+thS+'">Future</th>'
         + '</tr>';
       for (const row of lang.conj) {
         html += '<tr>'
           + '<td style="'+tdP+'">'+(row.pronoun||row.person||'—')+'</td>'
           + '<td style="'+tdF+'">'+(row.past   ||'—')+'</td>'
           + '<td style="'+tdF+'">'+(row.present ||'—')+'</td>'
+          + '<td style="'+tdF+'">'+(row.future  ||'—')+'</td>'
           + '</tr>';
       }
     }
@@ -6409,11 +6413,11 @@ function lrRender() {
   // Story
   const storyEl = document.getElementById('lrStory');
   storyEl.textContent = pickF('story', 'storyDiacritized') || '—';
-  storyEl.style.direction  = 'rtl';
+  storyEl.style.direction  = isRTL ? 'rtl' : 'ltr';
   storyEl.style.textAlign  = isRTL ? 'right' : 'left';
-  storyEl.style.fontFamily = "'Amiri', serif";
+  storyEl.style.fontFamily = isRTL ? "'Amiri', serif" : "'Literata', Georgia, serif";
   storyEl.style.fontSize   = isRTL ? '1.15rem' : '1.05rem';
-  storyEl.style.lineHeight = '2.2';
+  storyEl.style.lineHeight = isRTL ? '2.2' : '1.9';
 
   // Mark button — single button for current lang + type
   lrRenderMarkBtn();

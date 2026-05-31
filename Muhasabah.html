@@ -6318,9 +6318,14 @@ function lrRender() {
   const showH = isAr ? (window._lrShowHarakah !== false) : false;
   const pickF = (k, dk) => showH ? (lang[dk] || lang[k] || '') : (lang[k] || lang[dk] || '');
 
-  document.getElementById('lrWordMeaning').textContent = pickF('meaning', 'meaningDiacritized') || '—';
+  const meaningEl = document.getElementById('lrWordMeaning');
+  meaningEl.textContent = pickF('meaning', 'meaningDiacritized') || '—';
+  meaningEl.style.textAlign = isRTL ? 'right' : 'left';
   const simpleMeaningEl = document.getElementById('lrSimpleMeaning');
-  if (simpleMeaningEl) simpleMeaningEl.textContent = pickF('simpleMeaning', 'simpleMeaningDiacritized');
+  if (simpleMeaningEl) {
+    simpleMeaningEl.textContent = pickF('simpleMeaning', 'simpleMeaningDiacritized');
+    simpleMeaningEl.style.textAlign = isRTL ? 'right' : 'left';
+  }
 
   const collEl = document.getElementById('lrCollocations');
   if (collEl) {
@@ -6328,6 +6333,7 @@ function lrRender() {
     collEl.style.fontFamily  = "'Amiri',serif";
     collEl.style.fontSize    = isRTL ? '17px' : '15px';
     collEl.style.direction   = 'rtl';
+    collEl.style.textAlign   = isRTL ? 'right' : 'left';
     collEl.style.lineHeight  = '2.1';
   }
 
@@ -6337,13 +6343,14 @@ function lrRender() {
     challengeEl.style.fontFamily = "'Amiri',serif";
     challengeEl.style.fontSize   = isRTL ? '1.15rem' : '1.05rem';
     challengeEl.style.direction  = 'rtl';
+    challengeEl.style.textAlign  = isRTL ? 'right' : 'left';
   }
 
   // Syn / Ant
   const synEl = document.getElementById('lrSyn');
   const antEl = document.getElementById('lrAnt');
-  synEl.textContent = lang.syn || '—'; synEl.style.direction = 'rtl'; synEl.style.fontFamily = "'Amiri',serif"; synEl.style.fontSize = isRTL ? '17px' : '15px';
-  antEl.textContent = lang.ant || '—'; antEl.style.direction = 'rtl'; antEl.style.fontFamily = "'Amiri',serif"; antEl.style.fontSize = isRTL ? '17px' : '15px';
+  synEl.textContent = lang.syn || '—'; synEl.style.direction = 'rtl'; synEl.style.textAlign = isRTL ? 'right' : 'left'; synEl.style.fontFamily = "'Amiri',serif"; synEl.style.fontSize = isRTL ? '17px' : '15px';
+  antEl.textContent = lang.ant || '—'; antEl.style.direction = 'rtl'; antEl.style.textAlign = isRTL ? 'right' : 'left'; antEl.style.fontFamily = "'Amiri',serif"; antEl.style.fontSize = isRTL ? '17px' : '15px';
 
   // Conjugation
   const conjPanel = document.getElementById('lrConjPanel');
@@ -6403,6 +6410,7 @@ function lrRender() {
   const storyEl = document.getElementById('lrStory');
   storyEl.textContent = pickF('story', 'storyDiacritized') || '—';
   storyEl.style.direction  = 'rtl';
+  storyEl.style.textAlign  = isRTL ? 'right' : 'left';
   storyEl.style.fontFamily = "'Amiri', serif";
   storyEl.style.fontSize   = isRTL ? '1.15rem' : '1.05rem';
   storyEl.style.lineHeight = '2.2';

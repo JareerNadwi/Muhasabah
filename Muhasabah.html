@@ -6226,6 +6226,9 @@ function lrSyncBtns() {
   // Dua footer
   const dua = document.getElementById('lrDua');
   if (dua) { dua.textContent = ui.dua; dua.style.direction = ui.rtl ? 'rtl' : 'ltr'; }
+  // Tashkil button — Arabic and Urdu only
+  const harakahBtn = document.getElementById('lrHarakahBtn');
+  if (harakahBtn) harakahBtn.style.display = (_lrLang === 'ar' || _lrLang === 'ur') ? '' : 'none';
 }
 
 // ── Render ────────────────────────────────────────────────────────────────
@@ -6317,7 +6320,6 @@ function lrRender() {
       + '<th style="'+thS+'">'+(isRTL?'ضمير':'Person')+'</th>'
       + '<th style="'+thS+'">'+(isRTL?'ماضي':'Past')+'</th>'
       + '<th style="'+thS+'">'+(isRTL?'مضارع':'Present')+'</th>'
-      + '<th style="'+thS+'">'+(isRTL?'مجزوم':'Jussive')+'</th>'
       + '<th style="'+thS+'">'+(isRTL?'أمر':'Cmd')+'</th>'
       + '<th style="'+thS+'">'+(isRTL?'نهي':'Neg Cmd')+'</th>'
       + '</tr>';
@@ -6326,10 +6328,9 @@ function lrRender() {
       const pick = (withH, withoutH) => showH ? (withH || withoutH || '—') : (withoutH || withH || '—');
       // For Arabic: pronoun is plain (no harakah variant), conjugated forms use diacritized fields if available
       const pronoun = row.pronoun || '—';
-      // Conjugation fields in JSON: past, present, jussive, command, nonCommand (all diacritized already)
+      // Conjugation fields in JSON: past, present, command, nonCommand (all diacritized already)
       const past    = row.past    || '—';
       const present = row.present || '—';
-      const jussive = row.jussive || '—';
       const cmd     = row.command    || '';
       const ncmd    = row.nonCommand || '';
       const cmdTd   = cmd  ? tdAr : tdDim;
@@ -6338,7 +6339,6 @@ function lrRender() {
         + '<td style="'+tdP+'">'+pronoun+'</td>'
         + '<td style="'+tdF+'">'+past+'</td>'
         + '<td style="'+tdF+'">'+present+'</td>'
-        + '<td style="'+tdF+'">'+jussive+'</td>'
         + '<td style="'+cmdTd+'">'+  (cmd  || '—') +'</td>'
         + '<td style="'+ncmdTd+'">'+( ncmd || '—') +'</td>'
         + '</tr>';
@@ -6446,7 +6446,6 @@ function lrToggleHarakah() {
       + '<th style="'+thS+'">'+(isRTL?'ضمير':'Person')+'</th>'
       + '<th style="'+thS+'">'+(isRTL?'ماضي':'Past')+'</th>'
       + '<th style="'+thS+'">'+(isRTL?'مضارع':'Present')+'</th>'
-      + '<th style="'+thS+'">'+(isRTL?'مجزوم':'Jussive')+'</th>'
       + '<th style="'+thS+'">'+(isRTL?'أمر':'Cmd')+'</th>'
       + '<th style="'+thS+'">'+(isRTL?'نهي':'Neg Cmd')+'</th>'
       + '</tr>';
@@ -6459,7 +6458,6 @@ function lrToggleHarakah() {
         + '<td style="'+tdP+'">'+(row.pronoun||'—')+'</td>'
         + '<td style="'+tdF+'">'+(row.past    ||'—')+'</td>'
         + '<td style="'+tdF+'">'+(row.present ||'—')+'</td>'
-        + '<td style="'+tdF+'">'+(row.jussive ||'—')+'</td>'
         + '<td style="'+cmdTd+'"> '+ (cmd  ||'—') +'</td>'
         + '<td style="'+ncmdTd+'">'+(ncmd ||'—') +'</td>'
         + '</tr>';

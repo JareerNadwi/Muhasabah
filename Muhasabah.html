@@ -6325,25 +6325,25 @@ function lrRender() {
   const collEl = document.getElementById('lrCollocations');
   if (collEl) {
     collEl.textContent = pickF('collocations', 'collocationsDiacritized');
-    collEl.style.fontFamily  = isRTL ? "'Amiri',serif" : "'Literata',Georgia,serif";
-    collEl.style.fontSize    = isRTL ? '17px' : '1.05rem';
-    collEl.style.direction   = isRTL ? 'rtl' : 'ltr';
-    collEl.style.lineHeight  = isRTL ? '2.1' : '1.9';
+    collEl.style.fontFamily  = "'Amiri',serif";
+    collEl.style.fontSize    = isRTL ? '17px' : '15px';
+    collEl.style.direction   = 'rtl';
+    collEl.style.lineHeight  = '2.1';
   }
 
   const challengeEl = document.getElementById('lrSpeakingChallenge');
   if (challengeEl) {
     challengeEl.textContent = pickF('speakingChallenge', 'speakingChallengeDiacritized');
-    challengeEl.style.fontFamily = isRTL ? "'Amiri',serif" : "'Literata',Georgia,serif";
-    challengeEl.style.fontSize   = isRTL ? '1.15rem' : '1.1rem';
-    challengeEl.style.direction  = isRTL ? 'rtl' : 'ltr';
+    challengeEl.style.fontFamily = "'Amiri',serif";
+    challengeEl.style.fontSize   = isRTL ? '1.15rem' : '1.05rem';
+    challengeEl.style.direction  = 'rtl';
   }
 
   // Syn / Ant
   const synEl = document.getElementById('lrSyn');
   const antEl = document.getElementById('lrAnt');
-  synEl.textContent = lang.syn || '—'; synEl.style.direction = isRTL ? 'rtl' : 'ltr'; synEl.style.fontFamily = isRTL ? "'Amiri',serif" : "'DM Mono',monospace"; synEl.style.fontSize = isRTL ? '17px' : '14px';
-  antEl.textContent = lang.ant || '—'; antEl.style.direction = isRTL ? 'rtl' : 'ltr'; antEl.style.fontFamily = isRTL ? "'Amiri',serif" : "'DM Mono',monospace"; antEl.style.fontSize = isRTL ? '17px' : '14px';
+  synEl.textContent = lang.syn || '—'; synEl.style.direction = 'rtl'; synEl.style.fontFamily = "'Amiri',serif"; synEl.style.fontSize = isRTL ? '17px' : '15px';
+  antEl.textContent = lang.ant || '—'; antEl.style.direction = 'rtl'; antEl.style.fontFamily = "'Amiri',serif"; antEl.style.fontSize = isRTL ? '17px' : '15px';
 
   // Conjugation
   const conjPanel = document.getElementById('lrConjPanel');
@@ -6392,6 +6392,8 @@ function lrRender() {
       }
     }
     conjTable.innerHTML = html;
+    conjTable.style.tableLayout = 'fixed';
+    conjTable.style.width = '100%';
     conjTable.parentElement.style.overflowX = 'auto';
   } else {
     conjPanel.style.display = 'none';
@@ -6400,10 +6402,10 @@ function lrRender() {
   // Story
   const storyEl = document.getElementById('lrStory');
   storyEl.textContent = pickF('story', 'storyDiacritized') || '—';
-  storyEl.style.direction  = isRTL ? 'rtl' : 'ltr';
-  storyEl.style.fontFamily = isRTL ? "'Amiri', serif" : "'Literata', Georgia, serif";
-  storyEl.style.fontSize   = isRTL ? '1.15rem' : '1.1rem';
-  storyEl.style.lineHeight = isRTL ? '2.2' : '1.9';
+  storyEl.style.direction  = 'rtl';
+  storyEl.style.fontFamily = "'Amiri', serif";
+  storyEl.style.fontSize   = isRTL ? '1.15rem' : '1.05rem';
+  storyEl.style.lineHeight = '2.2';
 
   // Mark button — single button for current lang + type
   lrRenderMarkBtn();

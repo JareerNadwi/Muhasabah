@@ -6352,39 +6352,44 @@ function lrRender() {
     conjPanel.style.display = '';
     const thS = "font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#7a6a40;padding:7px 8px;text-align:center;font-weight:400;font-family:'DM Mono',monospace;border-bottom:1px solid #2a2010;white-space:nowrap;";
 
-    // Pronoun cell style
-    const tdP = isAr
-      ? "font-size:13px;color:#a89060;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;text-align:right;"
-      : "font-size:12px;color:#a89060;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;text-align:left;";
-    // Data cell styles (Arabic: larger Amiri; others: DM Mono)
-    const tdAr   = "font-size:17px;color:#f0e4c0;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;";
-    const tdArDim = "font-size:15px;color:#7a6a40;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;";
-    const tdEn   = "font-size:13px;color:#c5b98a;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;text-align:center;";
-    const tdEnDim = "font-size:13px;color:#5a4a38;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;text-align:center;";
-    const tdF    = isAr ? tdAr : tdEn;
-
-    let html = '<tr>'
-      + '<th style="'+thS+'">'+(isAr?'ضمير':'Person')+'</th>'
-      + '<th style="'+thS+'">'+(isAr?'ماضي':'Past')+'</th>'
-      + '<th style="'+thS+'">'+(isAr?'مضارع':'Present')+'</th>'
-      + '<th style="'+thS+'">'+(isAr?'أمر':'Cmd')+'</th>'
-      + '<th style="'+thS+'">'+(isAr?'نهي':'Neg Cmd')+'</th>'
-      + '</tr>';
-
-    for (const row of lang.conj) {
-      const past    = row.past    || '—';
-      const present = row.present || '—';
-      const cmd     = row.command    || '';
-      const ncmd    = row.nonCommand || '';
-      const cmdTd   = isAr ? (cmd  ? tdAr   : tdArDim) : (cmd  ? tdEn   : tdEnDim);
-      const ncmdTd  = isAr ? (ncmd ? tdAr   : tdArDim) : (ncmd ? tdEn   : tdEnDim);
-      html += '<tr>'
-        + '<td style="'+tdP+'">'+(row.pronoun||'—')+'</td>'
-        + '<td style="'+tdF+'">'+past+'</td>'
-        + '<td style="'+tdF+'">'+present+'</td>'
-        + '<td style="'+cmdTd+'">'+(cmd  ||'—')+'</td>'
-        + '<td style="'+ncmdTd+'">'+(ncmd ||'—')+'</td>'
+    let html = '';
+    if (isAr) {
+      const tdP   = "font-size:13px;color:#a89060;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;text-align:center;";
+      const tdAr  = "font-size:17px;color:#f0e4c0;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;";
+      const tdDim = "font-size:15px;color:#7a6a40;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;";
+      html = '<tr>'
+        + '<th style="'+thS+'">ضمير</th>'
+        + '<th style="'+thS+'">ماضي</th>'
+        + '<th style="'+thS+'">مضارع</th>'
+        + '<th style="'+thS+'">أمر</th>'
+        + '<th style="'+thS+'">نهي</th>'
         + '</tr>';
+      for (const row of lang.conj) {
+        const cmd  = row.command    || '';
+        const ncmd = row.nonCommand || '';
+        html += '<tr>'
+          + '<td style="'+tdP+'">'+(row.pronoun||'—')+'</td>'
+          + '<td style="'+tdAr+'">'+(row.past   ||'—')+'</td>'
+          + '<td style="'+tdAr+'">'+(row.present ||'—')+'</td>'
+          + '<td style="'+(cmd ?tdAr:tdDim)+'">'+(cmd ||'—')+'</td>'
+          + '<td style="'+(ncmd?tdAr:tdDim)+'">'+(ncmd||'—')+'</td>'
+          + '</tr>';
+      }
+    } else {
+      const tdP = "font-size:10px;color:#7a6a40;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;text-align:center;";
+      const tdF = "font-size:12px;color:#c5b98a;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;text-align:center;";
+      html = '<tr>'
+        + '<th style="'+thS+'">Person</th>'
+        + '<th style="'+thS+'">Past</th>'
+        + '<th style="'+thS+'">Present</th>'
+        + '</tr>';
+      for (const row of lang.conj) {
+        html += '<tr>'
+          + '<td style="'+tdP+'">'+(row.pronoun||row.person||'—')+'</td>'
+          + '<td style="'+tdF+'">'+(row.past   ||'—')+'</td>'
+          + '<td style="'+tdF+'">'+(row.present ||'—')+'</td>'
+          + '</tr>';
+      }
     }
     conjTable.innerHTML = html;
     conjTable.parentElement.style.overflowX = 'auto';

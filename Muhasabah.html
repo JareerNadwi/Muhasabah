@@ -6286,6 +6286,7 @@ function lrRender() {
   const mainEl = document.getElementById('lrWordMain');
   mainEl.textContent = (_lrType === 'verb' ? (lang.verb || lang.word) : lang.word) || '—';
   mainEl.style.direction = isRTL ? 'rtl' : 'ltr';
+  mainEl.style.textAlign = 'center';
   mainEl.style.fontSize = isRTL ? '58px' : '52px';
 
   // Roman / phonetics — hidden for Arabic
@@ -6295,11 +6296,13 @@ function lrRender() {
     romanEl.style.display = 'none';
   } else {
     romanEl.style.display = '';
+    romanEl.style.textAlign = 'center';
     romanEl.textContent = lang.roman || '';
   }
 
   // Sub-type line (bab for verbs, gender/plural for words)
   const wordTypeEl = document.getElementById('lrWordType');
+  wordTypeEl.style.textAlign = 'center';
   if (_lrType === 'verb' && lang.bab) {
     wordTypeEl.textContent = lang.bab;
     wordTypeEl.style.fontFamily = "'Amiri', serif";
@@ -6321,12 +6324,12 @@ function lrRender() {
   const meaningEl = document.getElementById('lrWordMeaning');
   meaningEl.textContent = pickF('meaning', 'meaningDiacritized') || '—';
   meaningEl.style.direction = isRTL ? 'rtl' : 'ltr';
-  meaningEl.style.textAlign = isRTL ? 'right' : 'left';
+  meaningEl.style.textAlign = 'center';
   const simpleMeaningEl = document.getElementById('lrSimpleMeaning');
   if (simpleMeaningEl) {
     simpleMeaningEl.textContent = pickF('simpleMeaning', 'simpleMeaningDiacritized');
     simpleMeaningEl.style.direction = isRTL ? 'rtl' : 'ltr';
-    simpleMeaningEl.style.textAlign = isRTL ? 'right' : 'left';
+    simpleMeaningEl.style.textAlign = 'center';
   }
 
   const collEl = document.getElementById('lrCollocations');

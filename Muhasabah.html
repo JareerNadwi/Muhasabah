@@ -6013,20 +6013,25 @@ async function pwSend() {
         <div id="lrWordMain" style="font-family:'Amiri',serif;font-size:52px;color:#f0e4c0;line-height:1.2;margin-bottom:6px;">—</div>
         <div id="lrWordRoman" style="font-style:italic;color:#a89060;font-size:0.92rem;margin-bottom:6px;letter-spacing:.5px;font-family:'Literata',Georgia,serif;"></div>
         <div id="lrWordType" style="font-family:'DM Mono',monospace;font-size:9px;color:#5a4a28;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;"></div>
-        <div id="lrWordMeaning" style="font-family:'Literata',Georgia,serif;font-size:1.1rem;color:#c5b98a;font-style:italic;">—</div>
-        <div id="lrSimpleMeaning" style="font-family:'Literata',Georgia,serif;font-size:0.85rem;color:#7a6a40;margin-top:10px;font-style:italic;line-height:1.6;"></div>
+        <div id="lrWordMeaning" style="font-family:'Amiri',serif;font-size:1.3rem;color:#c5b98a;font-style:normal;line-height:1.9;direction:rtl;">—</div>
+        <div id="lrSimpleMeaning" style="font-family:'Amiri',serif;font-size:1.1rem;color:#7a6a40;margin-top:10px;font-style:normal;line-height:1.8;direction:rtl;"></div>
       </div>
 
       <!-- Collocations -->
       <div id="lrCollPanel" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:14px 20px;">
         <div style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:8px;font-family:'DM Mono',monospace;">Collocations</div>
-        <div id="lrCollocations" style="font-family:'DM Mono',monospace;font-size:11px;color:#c5b98a;line-height:1.8;letter-spacing:0.3px;"></div>
+        <div id="lrCollocations" style="font-family:'DM Mono',monospace;font-size:13px;color:#c5b98a;line-height:2;letter-spacing:0.3px;"></div>
       </div>
 
       <!-- Conjugation (verb only) -->
       <div id="lrConjPanel" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;">
-        <div style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:12px;font-family:'DM Mono',monospace;">Conjugation</div>
-        <table id="lrConjTable" style="width:100%;border-collapse:collapse;"></table>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;font-family:'DM Mono',monospace;">Conjugation</div>
+          <button id="lrHarakahBtn" onclick="lrToggleHarakah()" title="Toggle harakah (diacritics)" style="background:#1a1500;border:1px solid #3a2a10;color:#a89060;padding:3px 10px;border-radius:4px;cursor:pointer;font-family:'Amiri',serif;font-size:14px;letter-spacing:0;line-height:1.4;">تَشْكِيل ✦</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="lrConjTable" style="width:100%;border-collapse:collapse;min-width:360px;"></table>
+        </div>
       </div>
 
       <div style="display:flex;align-items:center;gap:14px;"><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div><span style="color:#c9a84c;font-family:'Amiri',serif;">✦</span><div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#c9a84c55,transparent);"></div></div>
@@ -6034,7 +6039,7 @@ async function pwSend() {
       <!-- Micro story -->
       <div id="lrStoryPanel" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;">
         <div style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:12px;font-family:'DM Mono',monospace;">Micro Story</div>
-        <div id="lrStory" style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c5b98a;line-height:1.9;font-style:italic;">—</div>
+        <div id="lrStory" style="font-family:'Literata',Georgia,serif;font-size:1.05rem;color:#c5b98a;line-height:1.9;font-style:italic;">—</div>
       </div>
 
       <!-- Synonym / Antonym -->
@@ -6043,11 +6048,11 @@ async function pwSend() {
         <div style="display:flex;flex-direction:column;gap:10px;">
           <div style="display:flex;align-items:baseline;gap:12px;">
             <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#6aab7a;width:48px;flex-shrink:0;">SYN</span>
-            <span id="lrSyn" style="font-family:'DM Mono',monospace;font-size:12px;color:#c5b98a;line-height:1.6;">—</span>
+            <span id="lrSyn" style="font-family:'Amiri',serif;font-size:17px;color:#c5b98a;line-height:1.6;direction:rtl;">—</span>
           </div>
           <div style="display:flex;align-items:baseline;gap:12px;">
             <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#c05050;width:48px;flex-shrink:0;">ANT</span>
-            <span id="lrAnt" style="font-family:'DM Mono',monospace;font-size:12px;color:#c5b98a;line-height:1.6;">—</span>
+            <span id="lrAnt" style="font-family:'Amiri',serif;font-size:17px;color:#c5b98a;line-height:1.6;direction:rtl;">—</span>
           </div>
         </div>
       </div>
@@ -6055,7 +6060,7 @@ async function pwSend() {
       <!-- Speaking Challenge -->
       <div id="lrChallengePanel" style="background:#141008;border:1px solid #2a2010;border-left:3px solid #6aab7a;border-radius:0 8px 8px 0;padding:14px 20px;">
         <div style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#6aab7a;margin-bottom:8px;font-family:'DM Mono',monospace;">Speaking Challenge</div>
-        <div id="lrSpeakingChallenge" style="font-family:'Literata',Georgia,serif;font-size:0.92rem;color:#c5b98a;line-height:1.8;font-style:italic;"></div>
+        <div id="lrSpeakingChallenge" style="font-family:'Literata',Georgia,serif;font-size:1.05rem;color:#c5b98a;line-height:1.9;font-style:italic;"></div>
       </div>
 
       <!-- Single mark learned button for current lang + type -->
@@ -6259,53 +6264,100 @@ function lrRender() {
   const typeLabel = _lrType === 'verb' ? 'VERB' : 'WORD';
   document.getElementById('lrWordNum').textContent = '';
   const mainEl = document.getElementById('lrWordMain');
-  mainEl.textContent = lang.word;
+  mainEl.textContent = (_lrType === 'verb' ? (lang.verb || lang.word) : lang.word) || '—';
   mainEl.style.direction = isRTL ? 'rtl' : 'ltr';
   mainEl.style.fontSize = isRTL ? '58px' : '52px';
-  document.getElementById('lrWordRoman').textContent = lang.roman;
-  document.getElementById('lrWordType').textContent = '';
-  document.getElementById('lrWordMeaning').textContent = lang.meaning;
+  document.getElementById('lrWordRoman').textContent = lang.roman || '';
+  // Show bab line for Arabic verbs (كَتَبَ - يَكْتُبُ pattern)
+  const wordTypeEl = document.getElementById('lrWordType');
+  if (_lrType === 'verb' && lang.bab) {
+    wordTypeEl.textContent = lang.bab;
+    wordTypeEl.style.fontFamily = "'Amiri', serif";
+    wordTypeEl.style.fontSize = '14px';
+    wordTypeEl.style.color = '#a89060';
+    wordTypeEl.style.letterSpacing = '0';
+  } else {
+    wordTypeEl.textContent = lang.gender ? (lang.gender + (lang.plural ? ' · ج: ' + lang.plural : '')) : '';
+    wordTypeEl.style.fontFamily = "'Amiri', serif";
+    wordTypeEl.style.fontSize = '13px';
+    wordTypeEl.style.color = '#7a6a40';
+    wordTypeEl.style.letterSpacing = '0';
+  }
+  document.getElementById('lrWordMeaning').textContent = lang.meaning || '—';
 
   const simpleMeaningEl = document.getElementById('lrSimpleMeaning');
-  if (simpleMeaningEl) simpleMeaningEl.textContent = lang.simpleMeaning || '';
+  const showH = window._lrShowHarakah !== false;
+  const pickF = (k, dk) => showH ? (lang[dk] || lang[k] || '') : (lang[k] || lang[dk] || '');
+  document.getElementById('lrWordMeaning').textContent   = pickF('meaning',        'meaningDiacritized') || '—';
+  if (simpleMeaningEl) simpleMeaningEl.textContent       = pickF('simpleMeaning',  'simpleMeaningDiacritized');
 
   const collEl = document.getElementById('lrCollocations');
-  if (collEl) collEl.textContent = lang.collocations || '';
+  if (collEl) collEl.textContent = pickF('collocations', 'collocationsDiacritized');
 
   const challengeEl = document.getElementById('lrSpeakingChallenge');
-  if (challengeEl) challengeEl.textContent = lang.speakingChallenge || '';
+  if (challengeEl) challengeEl.textContent = pickF('speakingChallenge', 'speakingChallengeDiacritized');
 
   // Syn / Ant
   const synEl = document.getElementById('lrSyn');
   const antEl = document.getElementById('lrAnt');
-  synEl.textContent = lang.syn; synEl.style.direction = isRTL ? 'rtl' : 'ltr';
-  antEl.textContent = lang.ant; antEl.style.direction = isRTL ? 'rtl' : 'ltr';
+  synEl.textContent = lang.syn || '—'; synEl.style.direction = isRTL ? 'rtl' : 'ltr'; synEl.style.fontFamily = isRTL ? "'Amiri',serif" : "'DM Mono',monospace"; synEl.style.fontSize = isRTL ? '17px' : '14px';
+  antEl.textContent = lang.ant || '—'; antEl.style.direction = isRTL ? 'rtl' : 'ltr'; antEl.style.fontFamily = isRTL ? "'Amiri',serif" : "'DM Mono',monospace"; antEl.style.fontSize = isRTL ? '17px' : '14px';
 
   // Conjugation
   const conjPanel = document.getElementById('lrConjPanel');
   const conjTable = document.getElementById('lrConjTable');
   if (_lrType === 'verb' && lang.conj) {
     conjPanel.style.display = '';
-    const thS = "font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#7a6a40;padding:5px 8px;text-align:left;font-weight:400;font-family:'DM Mono',monospace;border-bottom:1px solid #2a2010;";
-    const tdP = "font-size:10px;color:#7a6a40;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;";
-    const tdN = "font-size:12px;color:#c5b98a;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;";
-    const tdR = "font-size:14px;color:#f0e4c0;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;";
-    const tdF = isRTL ? tdR : tdN;
-    let html = '<tr><th style="'+thS+'">Person</th><th style="'+thS+'">'+(isRTL?'ماضي · Past':'Past')+'</th><th style="'+thS+'">'+(isRTL?'مضارع · Present':'Present')+'</th><th style="'+thS+'">'+(isRTL?'مستقبل · Future':'Future')+'</th></tr>';
+    const showH = window._lrShowHarakah !== false; // default true
+    const thS = "font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#7a6a40;padding:7px 8px;text-align:center;font-weight:400;font-family:'DM Mono',monospace;border-bottom:1px solid #2a2010;white-space:nowrap;";
+    const tdP = "font-size:13px;color:#a89060;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;text-align:right;";
+    const tdAr = "font-size:17px;color:#f0e4c0;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;";
+    const tdDim = "font-size:15px;color:#7a6a40;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;";
+    const tdF = isRTL ? tdAr : "font-size:14px;color:#c5b98a;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;text-align:center;";
+
+    let html = '<tr>'
+      + '<th style="'+thS+'">'+(isRTL?'ضمير':'Person')+'</th>'
+      + '<th style="'+thS+'">'+(isRTL?'ماضي':'Past')+'</th>'
+      + '<th style="'+thS+'">'+(isRTL?'مضارع':'Present')+'</th>'
+      + '<th style="'+thS+'">'+(isRTL?'مجزوم':'Jussive')+'</th>'
+      + '<th style="'+thS+'">'+(isRTL?'أمر':'Cmd')+'</th>'
+      + '<th style="'+thS+'">'+(isRTL?'نهي':'Neg Cmd')+'</th>'
+      + '</tr>';
+
     for (const row of lang.conj) {
-      html += '<tr><td style="'+tdP+'">'+row.person+'</td><td style="'+tdF+'">'+row.past+'</td><td style="'+tdF+'">'+row.present+'</td><td style="'+tdF+'">'+row.future+'</td></tr>';
+      const pick = (withH, withoutH) => showH ? (withH || withoutH || '—') : (withoutH || withH || '—');
+      // For Arabic: pronoun is plain (no harakah variant), conjugated forms use diacritized fields if available
+      const pronoun = row.pronoun || '—';
+      // Conjugation fields in JSON: past, present, jussive, command, nonCommand (all diacritized already)
+      const past    = row.past    || '—';
+      const present = row.present || '—';
+      const jussive = row.jussive || '—';
+      const cmd     = row.command    || '';
+      const ncmd    = row.nonCommand || '';
+      const cmdTd   = cmd  ? tdAr : tdDim;
+      const ncmdTd  = ncmd ? tdAr : tdDim;
+      html += '<tr>'
+        + '<td style="'+tdP+'">'+pronoun+'</td>'
+        + '<td style="'+tdF+'">'+past+'</td>'
+        + '<td style="'+tdF+'">'+present+'</td>'
+        + '<td style="'+tdF+'">'+jussive+'</td>'
+        + '<td style="'+cmdTd+'">'+  (cmd  || '—') +'</td>'
+        + '<td style="'+ncmdTd+'">'+( ncmd || '—') +'</td>'
+        + '</tr>';
     }
     conjTable.innerHTML = html;
+    // Make table horizontally scrollable on small screens
+    conjTable.parentElement.style.overflowX = 'auto';
   } else {
     conjPanel.style.display = 'none';
   }
 
   // Story
   const storyEl = document.getElementById('lrStory');
-  storyEl.textContent = lang.story;
+  storyEl.textContent = pickF('story', 'storyDiacritized') || '—';
   storyEl.style.direction = isRTL ? 'rtl' : 'ltr';
   storyEl.style.fontFamily = isRTL ? "'Amiri', serif" : "'Literata', Georgia, serif";
-  storyEl.style.fontSize = isRTL ? '1.05rem' : '0.95rem';
+  storyEl.style.fontSize = isRTL ? '1.15rem' : '1.05rem';
   storyEl.style.lineHeight = isRTL ? '2.2' : '1.9';
 
   // Mark button — single button for current lang + type
@@ -6352,6 +6404,70 @@ function lrMarkStudied() {
   lrRenderMarkBtn();
   lrUpdateGoalBadge();
   lrSaveRatioToDay();
+}
+
+// ── Harakah (diacritics) toggle ───────────────────────────────────────────
+window._lrShowHarakah = true;
+function lrToggleHarakah() {
+  window._lrShowHarakah = !window._lrShowHarakah;
+  const btn = document.getElementById('lrHarakahBtn');
+  if (btn) {
+    btn.style.borderColor = window._lrShowHarakah ? '#c9a84c' : '#3a2a10';
+    btn.style.color = window._lrShowHarakah ? '#c9a84c' : '#5a4a28';
+    btn.title = window._lrShowHarakah ? 'Harakah ON — click to hide' : 'Harakah OFF — click to show';
+  }
+  // Re-render with harakah preference applied to all diacritized fields
+  const result = lrGetTodayEntry(_lrType);
+  if (!result) return;
+  const { entry } = result;
+  const lang = entry;
+  const showH = window._lrShowHarakah;
+  // Helper: pick diacritized or plain version
+  const pick = (key, dKey) => showH ? (lang[dKey] || lang[key] || '') : (lang[key] || lang[dKey] || '');
+  // Hero meaning fields
+  document.getElementById('lrWordMeaning').textContent  = pick('meaning',        'meaningDiacritized');
+  document.getElementById('lrSimpleMeaning').textContent = pick('simpleMeaning', 'simpleMeaningDiacritized');
+  // Collocations
+  const collEl = document.getElementById('lrCollocations');
+  if (collEl) collEl.textContent = pick('collocations', 'collocationsDiacritized');
+  // Story
+  const storyEl = document.getElementById('lrStory');
+  if (storyEl) storyEl.textContent = pick('story', 'storyDiacritized');
+  // Speaking challenge
+  const chalEl = document.getElementById('lrSpeakingChallenge');
+  if (chalEl) chalEl.textContent = pick('speakingChallenge', 'speakingChallengeDiacritized');
+  // Conjugation table re-render (already uses _lrShowHarakah flag)
+  if (_lrType === 'verb' && lang.conj) {
+    const isRTL = LR_RTL.has(_lrLang);
+    const thS = "font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#7a6a40;padding:7px 8px;text-align:center;font-weight:400;font-family:'DM Mono',monospace;border-bottom:1px solid #2a2010;white-space:nowrap;";
+    const tdP = "font-size:13px;color:#a89060;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;text-align:right;";
+    const tdAr = "font-size:17px;color:#f0e4c0;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;";
+    const tdDim = "font-size:15px;color:#7a6a40;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;";
+    const tdF = isRTL ? tdAr : "font-size:14px;color:#c5b98a;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;text-align:center;";
+    let html = '<tr>'
+      + '<th style="'+thS+'">'+(isRTL?'ضمير':'Person')+'</th>'
+      + '<th style="'+thS+'">'+(isRTL?'ماضي':'Past')+'</th>'
+      + '<th style="'+thS+'">'+(isRTL?'مضارع':'Present')+'</th>'
+      + '<th style="'+thS+'">'+(isRTL?'مجزوم':'Jussive')+'</th>'
+      + '<th style="'+thS+'">'+(isRTL?'أمر':'Cmd')+'</th>'
+      + '<th style="'+thS+'">'+(isRTL?'نهي':'Neg Cmd')+'</th>'
+      + '</tr>';
+    for (const row of lang.conj) {
+      const cmd  = row.command    || '';
+      const ncmd = row.nonCommand || '';
+      const cmdTd  = cmd  ? tdAr : tdDim;
+      const ncmdTd = ncmd ? tdAr : tdDim;
+      html += '<tr>'
+        + '<td style="'+tdP+'">'+(row.pronoun||'—')+'</td>'
+        + '<td style="'+tdF+'">'+(row.past    ||'—')+'</td>'
+        + '<td style="'+tdF+'">'+(row.present ||'—')+'</td>'
+        + '<td style="'+tdF+'">'+(row.jussive ||'—')+'</td>'
+        + '<td style="'+cmdTd+'"> '+ (cmd  ||'—') +'</td>'
+        + '<td style="'+ncmdTd+'">'+(ncmd ||'—') +'</td>'
+        + '</tr>';
+    }
+    document.getElementById('lrConjTable').innerHTML = html;
+  }
 }
 
 function lrSaveRatioToDay() {

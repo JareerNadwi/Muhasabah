@@ -6610,6 +6610,14 @@ async function openLanguageReader() {
 function closeLanguageReader() {
   document.getElementById('langOverlay').classList.remove('active');
   document.body.classList.remove('overlay-open');
+  // Reset tashkil toggle — always off at next open
+  window._lrShowHarakah = false;
+  const harakahBtn = document.getElementById('lrHarakahBtn');
+  if (harakahBtn) {
+    harakahBtn.style.borderColor = '#3a2a10';
+    harakahBtn.style.color = '#5a4a28';
+    harakahBtn.title = 'Harakah OFF — click to show';
+  }
   lrUpdateGoalBadge();
 }
 

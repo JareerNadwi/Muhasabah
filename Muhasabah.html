@@ -2756,8 +2756,7 @@ async function openHadithReader(){
 
     const firstNum = _hadithData[0]?.hadithnumber || dayStart+1;
     const lastNum  = _hadithData[HADITHS_PER_DAY-1]?.hadithnumber || dayStart+HADITHS_PER_DAY;
-    document.getElementById('hadithDayInfo').textContent =
-      'Sahih Bukhari \u00B7 Day '+(di+1)+' \u00B7 Hadiths '+firstNum+'\u2013'+lastNum;
+    document.getElementById('hadithDayInfo').textContent = 'Sahih Bukhari';
 
     document.getElementById('hadithLoading').style.display = 'none';
     document.getElementById('hadithContent').style.display = 'block';
@@ -2772,15 +2771,16 @@ function renderHadith(idx){
   _hadithIdx = idx;
   const h = _hadithData[idx];
   if(!h) return;
-  document.getElementById('hadithNum').textContent     = 'Hadith ' + h.hadithnumber;
+  const ordinals = ['First','Second','Third','Fourth','Fifth'];
+  document.getElementById('hadithNum').textContent = (ordinals[idx] || (idx+1)+'th') + ' Hadith of the Day';
   document.getElementById('hadithCounter').textContent = (idx+1) + ' / ' + HADITHS_PER_DAY;
   document.getElementById('hadithText').textContent    = h.text || 'Content unavailable.';
   const refEl = document.getElementById('hadithRef');
   if(refEl){
-    if(h.book && h.book !== 0 && h.hadith_in_book && h.hadith_in_book !== 0)
+    if(h.book && h.hadith_in_book)
       refEl.textContent = 'Bukhari \u00B7 Book ' + h.book + ' \u00B7 Hadith ' + h.hadith_in_book;
     else
-      refEl.textContent = 'Sahih Bukhari \u00B7 #' + h.hadithnumber;
+      refEl.textContent = '';
   }
   document.getElementById('hadithPrevBtn').disabled    = idx === 0;
   const isLast  = idx === HADITHS_PER_DAY - 1;

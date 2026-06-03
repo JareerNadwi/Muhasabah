@@ -6365,13 +6365,13 @@ function lrRender() {
   if (collEl) {
     const collRaw = pickF('collocations', 'collocationsDiacritized', 'collocations');
     // If array (BN/HI/EN), join with bullet; if string (AR), use as-is
-    collEl.textContent = Array.isArray(collRaw) ? collRaw.join('\n') : (collRaw || '');
+    collEl.textContent = Array.isArray(collRaw) ? collRaw.join('  ·  ') : (collRaw || '');
     collEl.style.fontFamily  = isRTL ? "'Amiri',serif" : "'Literata',Georgia,serif";
     collEl.style.fontSize    = isRTL ? '17px' : '15px';
     collEl.style.direction   = isRTL ? 'rtl' : 'ltr';
     collEl.style.textAlign   = isRTL ? 'right' : 'left';
     collEl.style.lineHeight  = '2.1';
-    collEl.style.whiteSpace  = 'pre-line';
+    collEl.style.whiteSpace  = 'normal';
   }
 
   const challengeEl = document.getElementById('lrSpeakingChallenge');

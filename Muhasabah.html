@@ -6238,24 +6238,32 @@ function lrSyncBtns() {
   const harakahBtn = document.getElementById('lrHarakahBtn');
   if (harakahBtn) harakahBtn.style.display = (_lrLang === 'ar' || _lrLang === 'ur') ? '' : 'none';
 
-  // Panel section labels — Arabic gets Arabic labels, others get English
+  // Panel section labels — language-aware
   const isAr = _lrLang === 'ar';
-  const lbl = (id, en, ar, arFont) => {
+  const LR_LABELS = {
+    ar: { coll:'التلازم اللفظي', conj:'الصرف', story:'قصة قصيرة', synant:'المرادف والمضاد', syn:'مرادف', ant:'مضاد', challenge:'تحدي الكلام', font:"'Amiri',serif", ls:'0', tt:'none', fs:'1rem' },
+    en: { coll:'Collocations', conj:'Conjugation', story:'Micro Story', synant:'Synonym & Antonym', syn:'SYN', ant:'ANT', challenge:'Speaking Challenge', font:"'DM Mono',monospace", ls:'0.25em', tt:'uppercase', fs:'0.68rem' },
+    bn: { coll:'সহবাক্য', conj:'ক্রিয়া বিভক্তি', story:'ছোট গল্প', synant:'প্রতিশব্দ ও বিপরীতার্থক', syn:'প্রতিশব্দ', ant:'বিপরীত', challenge:'কথা বলার চ্যালেঞ্জ', font:"'Literata',Georgia,serif", ls:'0', tt:'none', fs:'0.75rem' },
+    ur:  { coll:'ہم آواز الفاظ', conj:'صرف', story:'مختصر کہانی', synant:'مترادف اور متضاد', syn:'مترادف', ant:'متضاد', challenge:'بولنے کا چیلنج', font:"'Amiri',serif", ls:'0', tt:'none', fs:'1rem' },
+    hi:  { coll:'सहयोगी शब्द', conj:'क्रिया रूप', story:'लघु कथा', synant:'पर्यायवाची और विलोम', syn:'पर्यायवाची', ant:'विलोम', challenge:'बोलने की चुनौती', font:"'Literata',Georgia,serif", ls:'0', tt:'none', fs:'0.75rem' },
+  };
+  const lblCfg = LR_LABELS[_lrLang] || LR_LABELS.en;
+  const lbl = (id, key) => {
     const el = document.getElementById(id);
     if (!el) return;
-    el.textContent = isAr ? ar : en;
-    el.style.fontFamily = isAr ? (arFont || "'Amiri',serif") : "'DM Mono',monospace";
-    el.style.letterSpacing = isAr ? '0' : '0.25em';
-    el.style.textTransform = isAr ? 'none' : 'uppercase';
-    el.style.fontSize = isAr ? '1rem' : '0.68rem';
+    el.textContent = lblCfg[key];
+    el.style.fontFamily = lblCfg.font;
+    el.style.letterSpacing = lblCfg.ls;
+    el.style.textTransform = lblCfg.tt;
+    el.style.fontSize = lblCfg.fs;
   };
-  lbl('lrLabelColl',     'Collocations',       'التلازم اللفظي');
-  lbl('lrLabelConj',     'Conjugation',        'الصرف');
-  lbl('lrLabelStory',    'Micro Story',        'قصة قصيرة');
-  lbl('lrLabelSynAnt',   'Synonym & Antonym',  'المرادف والمضاد');
-  lbl('lrLabelSyn',      'SYN',                'مرادف');
-  lbl('lrLabelAnt',      'ANT',                'مضاد');
-  lbl('lrLabelChallenge','Speaking Challenge',  'تحدي الكلام');
+  lbl('lrLabelColl',     'coll');
+  lbl('lrLabelConj',     'conj');
+  lbl('lrLabelStory',    'story');
+  lbl('lrLabelSynAnt',   'synant');
+  lbl('lrLabelSyn',      'syn');
+  lbl('lrLabelAnt',      'ant');
+  lbl('lrLabelChallenge','challenge');
 }
 
 // ── Render ────────────────────────────────────────────────────────────────
@@ -6317,8 +6325,16 @@ function lrRender() {
     wordTypeEl.style.fontSize = '14px';
     wordTypeEl.style.color = '#a89060';
     wordTypeEl.style.letterSpacing = '0';
+  } else if (_lrType === 'word' && lang.plural) {
+    // Arabic: show gender + Arabic plural marker; others: show plain plural
+    const pluralLabel = isAr ? (lang.gender ? lang.gender + ' · ج: ' + lang.plural : 'ج: ' + lang.plural) : lang.plural;
+    wordTypeEl.textContent = pluralLabel;
+    wordTypeEl.style.fontFamily = isAr ? "'Amiri', serif" : "'Literata',Georgia,serif";
+    wordTypeEl.style.fontSize = isAr ? '13px' : '12px';
+    wordTypeEl.style.color = '#7a6a40';
+    wordTypeEl.style.letterSpacing = '0';
   } else {
-    wordTypeEl.textContent = lang.gender ? (lang.gender + (lang.plural ? ' · ج: ' + lang.plural : '')) : '';
+    wordTypeEl.textContent = lang.gender ? lang.gender : '';
     wordTypeEl.style.fontFamily = "'Amiri', serif";
     wordTypeEl.style.fontSize = '13px';
     wordTypeEl.style.color = '#7a6a40';
@@ -6327,32 +6343,40 @@ function lrRender() {
 
   // Harakah toggle applies only to ar/ur; other languages always use plain fields
   const showH = isAr ? (window._lrShowHarakah !== false) : false;
-  const pickF = (k, dk) => showH ? (lang[dk] || lang[k] || '') : (lang[k] || lang[dk] || '');
+  // Field picker: for AR/UR supports harakah variants; others just use the plain field
+  // Handles both camelCase (EN/AR) and snake_case (BN/HI/UR) field naming
+  const pickF = (k, dk, snakeK) => {
+    if (showH) return lang[dk] || lang[k] || lang[snakeK] || '';
+    return lang[k] || lang[snakeK] || lang[dk] || '';
+  };
 
   const meaningEl = document.getElementById('lrWordMeaning');
-  meaningEl.textContent = pickF('meaning', 'meaningDiacritized') || '—';
+  meaningEl.textContent = pickF('meaning', 'meaningDiacritized', 'meaning') || '—';
   meaningEl.style.direction = isRTL ? 'rtl' : 'ltr';
   meaningEl.style.textAlign = 'center';
   const simpleMeaningEl = document.getElementById('lrSimpleMeaning');
   if (simpleMeaningEl) {
-    simpleMeaningEl.textContent = pickF('simpleMeaning', 'simpleMeaningDiacritized');
+    simpleMeaningEl.textContent = pickF('simpleMeaning', 'simpleMeaningDiacritized', 'simple_meaning') || '';
     simpleMeaningEl.style.direction = isRTL ? 'rtl' : 'ltr';
     simpleMeaningEl.style.textAlign = 'center';
   }
 
   const collEl = document.getElementById('lrCollocations');
   if (collEl) {
-    collEl.textContent = pickF('collocations', 'collocationsDiacritized');
+    const collRaw = pickF('collocations', 'collocationsDiacritized', 'collocations');
+    // If array (BN/HI/EN), join with bullet; if string (AR), use as-is
+    collEl.textContent = Array.isArray(collRaw) ? collRaw.join('\n') : (collRaw || '');
     collEl.style.fontFamily  = isRTL ? "'Amiri',serif" : "'Literata',Georgia,serif";
     collEl.style.fontSize    = isRTL ? '17px' : '15px';
     collEl.style.direction   = isRTL ? 'rtl' : 'ltr';
     collEl.style.textAlign   = isRTL ? 'right' : 'left';
     collEl.style.lineHeight  = '2.1';
+    collEl.style.whiteSpace  = 'pre-line';
   }
 
   const challengeEl = document.getElementById('lrSpeakingChallenge');
   if (challengeEl) {
-    challengeEl.textContent = pickF('speakingChallenge', 'speakingChallengeDiacritized');
+    challengeEl.textContent = pickF('speakingChallenge', 'speakingChallengeDiacritized', 'speaking_challenge') || '';
     challengeEl.style.fontFamily = isRTL ? "'Amiri',serif" : "'Literata',Georgia,serif";
     challengeEl.style.fontSize   = isRTL ? '1.15rem' : '1.05rem';
     challengeEl.style.direction  = isRTL ? 'rtl' : 'ltr';
@@ -6362,8 +6386,11 @@ function lrRender() {
   // Syn / Ant
   const synEl = document.getElementById('lrSyn');
   const antEl = document.getElementById('lrAnt');
-  synEl.textContent = lang.syn || '—'; synEl.style.direction = isRTL?'rtl':'ltr'; synEl.style.textAlign = isRTL?'right':'left'; synEl.style.fontFamily = isRTL?"'Amiri',serif":"'DM Mono',monospace"; synEl.style.fontSize = isRTL?'17px':'15px';
-  antEl.textContent = lang.ant || '—'; antEl.style.direction = isRTL?'rtl':'ltr'; antEl.style.textAlign = isRTL?'right':'left'; antEl.style.fontFamily = isRTL?"'Amiri',serif":"'DM Mono',monospace"; antEl.style.fontSize = isRTL?'17px':'15px';
+  const synVal = lang.syn || lang.synonyms;
+  const antVal = lang.ant || lang.antonyms;
+  const fmtSynAnt = (v) => Array.isArray(v) ? v.join('  ·  ') : (v || '—');
+  synEl.textContent = fmtSynAnt(synVal); synEl.style.direction = isRTL?'rtl':'ltr'; synEl.style.textAlign = isRTL?'right':'left'; synEl.style.fontFamily = isRTL?"'Amiri',serif":"'DM Mono',monospace"; synEl.style.fontSize = isRTL?'17px':'15px';
+  antEl.textContent = fmtSynAnt(antVal); antEl.style.direction = isRTL?'rtl':'ltr'; antEl.style.textAlign = isRTL?'right':'left'; antEl.style.fontFamily = isRTL?"'Amiri',serif":"'DM Mono',monospace"; antEl.style.fontSize = isRTL?'17px':'15px';
 
   // Conjugation
   const conjPanel = document.getElementById('lrConjPanel');
@@ -6395,21 +6422,55 @@ function lrRender() {
           + '<td style="'+(ncmd?tdAr:tdDim)+'">'+(ncmd||'—')+'</td>'
           + '</tr>';
       }
-    } else {
-      const tdP = "font-size:10px;color:#7a6a40;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;text-align:center;";
-      const tdF = "font-size:12px;color:#c5b98a;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:'DM Mono',monospace;text-align:center;";
-      html = '<tr>'
-        + '<th style="'+thS+'">Person</th>'
-        + '<th style="'+thS+'">Past</th>'
-        + '<th style="'+thS+'">Present</th>'
-        + '<th style="'+thS+'">Future</th>'
-        + '</tr>';
+    } else if (Array.isArray(lang.conj)) {
+      // EN/UR: array of {pronoun/person, past, present, future}
+      const isUr = _lrLang === 'ur';
+      const thFont = isUr ? "'Amiri',serif" : "'DM Mono',monospace";
+      const thDir  = isUr ? 'rtl' : 'ltr';
+      const thFSize = isUr ? '0.9rem' : '0.72rem';
+      const CONJ_HDRS = {
+        ur: ['ضمیر','ماضی','حال','مستقبل'],
+        en: ['Person','Past','Present','Future'],
+        hi: ['कर्ता','भूत','वर्तमान','भविष्य'],
+      };
+      const hdrs = CONJ_HDRS[_lrLang] || CONJ_HDRS.en;
+      const thSL = `font-size:${thFSize};letter-spacing:0.05em;color:#7a6a40;padding:7px 8px;text-align:center;font-weight:400;font-family:${thFont};border-bottom:1px solid #2a2010;white-space:nowrap;direction:${thDir};`;
+      html = '<tr>' + hdrs.map(h=>`<th style="${thSL}">${h}</th>`).join('') + '</tr>';
+      const tdP = `font-size:12px;color:#7a6a40;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:${thFont};text-align:center;direction:${thDir};`;
+      const tdF = `font-size:${isUr?'15px':'12px'};color:#c5b98a;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:${thFont};text-align:center;direction:${thDir};`;
       for (const row of lang.conj) {
         html += '<tr>'
           + '<td style="'+tdP+'">'+(row.pronoun||row.person||'—')+'</td>'
           + '<td style="'+tdF+'">'+(row.past   ||'—')+'</td>'
           + '<td style="'+tdF+'">'+(row.present ||'—')+'</td>'
           + '<td style="'+tdF+'">'+(row.future  ||'—')+'</td>'
+          + '</tr>';
+      }
+    } else if (typeof lang.conj === 'object') {
+      // BN (and possibly HI): object with keys past/present/future, each an object of pronoun→form
+      const CONJ_HDRS_BN = {
+        bn: { person:'সর্বনাম', past:'অতীত', present:'বর্তমান', future:'ভবিষ্যৎ' },
+        hi: { person:'कर्ता',  past:'भूत',   present:'वर्तमान', future:'भविष्य' },
+      };
+      const hdrs = CONJ_HDRS_BN[_lrLang] || { person:'Person', past:'Past', present:'Present', future:'Future' };
+      const cellFont = "'Literata',Georgia,serif";
+      const thSB = `font-size:0.72rem;letter-spacing:0;color:#7a6a40;padding:7px 8px;text-align:center;font-weight:400;font-family:${cellFont};border-bottom:1px solid #2a2010;white-space:nowrap;`;
+      const tdP  = `font-size:12px;color:#a89060;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:${cellFont};text-align:center;`;
+      const tdF  = `font-size:13px;color:#c5b98a;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:${cellFont};text-align:center;`;
+      html = '<tr>'
+        + `<th style="${thSB}">${hdrs.person}</th>`
+        + `<th style="${thSB}">${hdrs.past}</th>`
+        + `<th style="${thSB}">${hdrs.present}</th>`
+        + `<th style="${thSB}">${hdrs.future}</th>`
+        + '</tr>';
+      // Collect all pronoun keys from any tense
+      const pronouns = Object.keys(lang.conj.past || lang.conj.present || lang.conj.future || {});
+      for (const pronoun of pronouns) {
+        html += '<tr>'
+          + '<td style="'+tdP+'">' + pronoun + '</td>'
+          + '<td style="'+tdF+'">' + ((lang.conj.past    || {})[pronoun] || '—') + '</td>'
+          + '<td style="'+tdF+'">' + ((lang.conj.present || {})[pronoun] || '—') + '</td>'
+          + '<td style="'+tdF+'">' + ((lang.conj.future  || {})[pronoun] || '—') + '</td>'
           + '</tr>';
       }
     }
@@ -6423,7 +6484,7 @@ function lrRender() {
 
   // Story
   const storyEl = document.getElementById('lrStory');
-  storyEl.textContent = pickF('story', 'storyDiacritized') || '—';
+  storyEl.textContent = pickF('story', 'storyDiacritized', 'story') || '—';
   storyEl.style.direction  = isRTL ? 'rtl' : 'ltr';
   storyEl.style.textAlign  = isRTL ? 'right' : 'left';
   storyEl.style.fontFamily = isRTL ? "'Amiri', serif" : "'Literata', Georgia, serif";

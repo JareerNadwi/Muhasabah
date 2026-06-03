@@ -6365,7 +6365,8 @@ function lrRender() {
   if (collEl) {
     const collRaw = pickF('collocations', 'collocationsDiacritized', 'collocations');
     // If array (BN/HI/EN), join with bullet; if string (AR), use as-is
-    collEl.textContent = Array.isArray(collRaw) ? collRaw.join('  ·  ') : (collRaw || '');
+    const fmtList = (v) => Array.isArray(v) ? v.join('  ·  ') : (typeof v === 'string' ? v.split(/،|,/).map(s=>s.trim()).filter(Boolean).join('  ·  ') : (v || ''));
+    collEl.textContent = fmtList(collRaw);
     collEl.style.fontFamily  = isRTL ? "'Amiri',serif" : "'Literata',Georgia,serif";
     collEl.style.fontSize    = isRTL ? '17px' : '15px';
     collEl.style.direction   = isRTL ? 'rtl' : 'ltr';
@@ -6388,7 +6389,7 @@ function lrRender() {
   const antEl = document.getElementById('lrAnt');
   const synVal = lang.syn || lang.synonyms;
   const antVal = lang.ant || lang.antonyms;
-  const fmtSynAnt = (v) => Array.isArray(v) ? v.join('  ·  ') : (v || '—');
+  const fmtSynAnt = (v) => Array.isArray(v) ? v.join('  ·  ') : (typeof v === 'string' ? v.split(/،|,/).map(s=>s.trim()).filter(Boolean).join('  ·  ') : '—');
   synEl.textContent = fmtSynAnt(synVal); synEl.style.direction = isRTL?'rtl':'ltr'; synEl.style.textAlign = isRTL?'right':'left'; synEl.style.fontFamily = isRTL?"'Amiri',serif":"'DM Mono',monospace"; synEl.style.fontSize = isRTL?'17px':'15px';
   antEl.textContent = fmtSynAnt(antVal); antEl.style.direction = isRTL?'rtl':'ltr'; antEl.style.textAlign = isRTL?'right':'left'; antEl.style.fontFamily = isRTL?"'Amiri',serif":"'DM Mono',monospace"; antEl.style.fontSize = isRTL?'17px':'15px';
 

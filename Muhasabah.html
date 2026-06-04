@@ -6325,7 +6325,7 @@ function lrRender() {
     wordTypeEl.style.fontSize = '14px';
     wordTypeEl.style.color = '#a89060';
     wordTypeEl.style.letterSpacing = '0';
-  } else if (_lrType === 'word' && lang.plural) {
+  } else if (_lrType === 'word' && lang.plural && _lrLang !== 'bn') {
     // Arabic: show gender + Arabic plural marker; others: show plain plural
     const pluralLabel = isAr ? (lang.gender ? lang.gender + ' · ج: ' + lang.plural : 'ج: ' + lang.plural) : lang.plural;
     wordTypeEl.textContent = pluralLabel;

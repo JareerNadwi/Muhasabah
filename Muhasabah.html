@@ -6307,7 +6307,7 @@ function lrRender() {
 
   // Roman / phonetics — hidden for Arabic
   const romanEl = document.getElementById('lrWordRoman');
-  if (isAr) {
+  if (isAr || _lrLang === 'ur') {
     romanEl.textContent = '';
     romanEl.style.display = 'none';
   } else {
@@ -6319,18 +6319,27 @@ function lrRender() {
   // Sub-type line (bab for verbs, gender/plural for words)
   const wordTypeEl = document.getElementById('lrWordType');
   wordTypeEl.style.textAlign = 'center';
-  if (_lrType === 'verb' && lang.bab) {
-    wordTypeEl.textContent = lang.bab;
+  if (_lrType === 'verb' && (lang.bab || lang.verbType)) {
+    wordTypeEl.textContent = lang.bab || lang.verbType;
     wordTypeEl.style.fontFamily = "'Amiri', serif";
     wordTypeEl.style.fontSize = '14px';
     wordTypeEl.style.color = '#a89060';
     wordTypeEl.style.letterSpacing = '0';
   } else if (_lrType === 'word' && lang.plural && _lrLang !== 'bn') {
-    // Arabic: show gender + Arabic plural marker; others: show plain plural
-    const pluralLabel = isAr ? (lang.gender ? lang.gender + ' · ج: ' + lang.plural : 'ج: ' + lang.plural) : lang.plural;
+    // Arabic: show gender + Arabic plural marker; Urdu: {nominative, oblique}; others: plain plural
+    let pluralLabel;
+    if (isAr) {
+      pluralLabel = lang.gender ? lang.gender + ' · ج: ' + lang.plural : 'ج: ' + lang.plural;
+    } else if (_lrLang === 'ur' && lang.plural && typeof lang.plural === 'object') {
+      const nom = lang.plural.nominative || '';
+      const obl = lang.plural.oblique || '';
+      pluralLabel = (lang.gender || '') + (lang.gender && nom ? ' · ' : '') + (nom ? 'ج: ' + nom : '') + (obl ? ' / ' + obl : '');
+    } else {
+      pluralLabel = lang.plural;
+    }
     wordTypeEl.textContent = pluralLabel;
-    wordTypeEl.style.fontFamily = isAr ? "'Amiri', serif" : "'Literata',Georgia,serif";
-    wordTypeEl.style.fontSize = isAr ? '13px' : '12px';
+    wordTypeEl.style.fontFamily = (isAr || _lrLang === 'ur') ? "'Amiri', serif" : "'Literata',Georgia,serif";
+    wordTypeEl.style.fontSize = (isAr || _lrLang === 'ur') ? '13px' : '12px';
     wordTypeEl.style.color = '#7a6a40';
     wordTypeEl.style.letterSpacing = '0';
   } else {
@@ -6342,12 +6351,26 @@ function lrRender() {
   }
 
   // Harakah toggle applies only to ar/ur; other languages always use plain fields
-  const showH = isAr ? (window._lrShowHarakah !== false) : false;
-  // Field picker: for AR/UR supports harakah variants; others just use the plain field
-  // Handles both camelCase (EN/AR) and snake_case (BN/HI/UR) field naming
+  const showH = (_lrLang === 'ar' || _lrLang === 'ur') ? (window._lrShowHarakah !== false) : false;
+  const isUr  = _lrLang === 'ur';
+  // Field picker: handles AR flat diacritized fields, UR nested {bare/withHarakah}, and others
   const pickF = (k, dk, snakeK) => {
+    const raw = lang[k] || lang[snakeK] || lang[dk];
+    // Urdu fields are nested objects: { bare: "...", withHarakah: "..." }
+    if (isUr && raw && typeof raw === 'object' && !Array.isArray(raw)) {
+      return showH ? (raw.withHarakah || raw.bare || '') : (raw.bare || raw.withHarakah || '');
+    }
+    // Arabic uses separate flat diacritized fields (e.g. meaningDiacritized)
     if (showH) return lang[dk] || lang[k] || lang[snakeK] || '';
     return lang[k] || lang[snakeK] || lang[dk] || '';
+  };
+  // Urdu collocation/array field picker (nested {bare:[...], withHarakah:[...]})
+  const pickFArr = (k) => {
+    const raw = lang[k];
+    if (isUr && raw && typeof raw === 'object' && !Array.isArray(raw)) {
+      return showH ? (raw.withHarakah || raw.bare || []) : (raw.bare || raw.withHarakah || []);
+    }
+    return raw || [];
   };
 
   const meaningEl = document.getElementById('lrWordMeaning');
@@ -6363,7 +6386,7 @@ function lrRender() {
 
   const collEl = document.getElementById('lrCollocations');
   if (collEl) {
-    const collRaw = pickF('collocations', 'collocationsDiacritized', 'collocations');
+    const collRaw = isUr ? pickFArr('collocations') : pickF('collocations', 'collocationsDiacritized', 'collocations');
     // If array (BN/HI/EN), join with bullet; if string (AR), use as-is
     const fmtList = (v) => Array.isArray(v) ? v.join('  ·  ') : (typeof v === 'string' ? v.split(/،|,/).map(s=>s.trim()).filter(Boolean).join('  ·  ') : (v || ''));
     collEl.textContent = fmtList(collRaw);
@@ -6377,7 +6400,7 @@ function lrRender() {
 
   const challengeEl = document.getElementById('lrSpeakingChallenge');
   if (challengeEl) {
-    challengeEl.textContent = pickF('speakingChallenge', 'speakingChallengeDiacritized', 'speaking_challenge') || '';
+    challengeEl.textContent = isUr ? pickF('speakingChallenge', '', 'speakingChallenge') : pickF('speakingChallenge', 'speakingChallengeDiacritized', 'speaking_challenge') || '';
     challengeEl.style.fontFamily = isRTL ? "'Amiri',serif" : "'Literata',Georgia,serif";
     challengeEl.style.fontSize   = isRTL ? '1.15rem' : '1.05rem';
     challengeEl.style.direction  = isRTL ? 'rtl' : 'ltr';
@@ -6421,6 +6444,27 @@ function lrRender() {
           + '<td style="'+tdAr+'">'+(row.present ||'—')+'</td>'
           + '<td style="'+(cmd ?tdAr:tdDim)+'">'+(cmd ||'—')+'</td>'
           + '<td style="'+(ncmd?tdAr:tdDim)+'">'+(ncmd||'—')+'</td>'
+          + '</tr>';
+      }
+    } else if (_lrLang === 'ur' && typeof lang.conj === 'object' && !Array.isArray(lang.conj)) {
+      // Urdu: object with optional conjNote + past/present/future tense objects keyed by pronoun
+      const urFont = "'Amiri',serif";
+      const thSU = `font-size:0.9rem;letter-spacing:0;color:#7a6a40;padding:7px 8px;text-align:center;font-weight:400;font-family:${urFont};border-bottom:1px solid #2a2010;white-space:nowrap;direction:rtl;`;
+      const tdP  = `font-size:14px;color:#a89060;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:${urFont};text-align:center;direction:rtl;line-height:1.8;`;
+      const tdF  = `font-size:15px;color:#c5b98a;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:${urFont};text-align:center;direction:rtl;line-height:1.8;`;
+      const hdrs = ['ضمیر','ماضی','حال','مستقبل'];
+      html = '<tr>' + hdrs.map(h=>`<th style="${thSU}">${h}</th>`).join('') + '</tr>';
+      // conjNote displayed above table via a dedicated row spanning all columns
+      if (lang.conj.conjNote) {
+        html = `<tr><td colspan="4" style="font-size:12px;color:#7a6a40;padding:8px 10px 4px;font-family:${urFont};direction:rtl;text-align:right;line-height:1.8;border-bottom:1px solid #2a2010;">${lang.conj.conjNote}</td></tr>` + html;
+      }
+      const pronouns = Object.keys(lang.conj.past || lang.conj.present || lang.conj.future || {});
+      for (const pronoun of pronouns) {
+        html += '<tr>'
+          + '<td style="'+tdP+'">' + pronoun + '</td>'
+          + '<td style="'+tdF+'">' + ((lang.conj.past    || {})[pronoun] || '—') + '</td>'
+          + '<td style="'+tdF+'">' + ((lang.conj.present || {})[pronoun] || '—') + '</td>'
+          + '<td style="'+tdF+'">' + ((lang.conj.future  || {})[pronoun] || '—') + '</td>'
           + '</tr>';
       }
     } else if (Array.isArray(lang.conj)) {

@@ -157,8 +157,12 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 .day-cell.future{opacity:.3;cursor:not-allowed;}
 .day-cell.perfect{background:#182a1c;border-color:var(--green)!important;}
 .day-cell.perfect .day-num{color:var(--green-bright);}
-.day-cell.best-day{background:#2a1e0a;border-color:var(--gold)!important;}
-.day-cell.best-day .day-num{color:var(--gold);}
+.day-cell.best-day{background:#1a0f2a;border-color:var(--purple-bright)!important;animation:bestDayGlow 2.5s ease-in-out infinite;}
+.day-cell.best-day .day-num{color:var(--purple-bright);}
+@keyframes bestDayGlow{
+  0%,100%{box-shadow:0 0 6px rgba(154,106,191,.35),inset 0 0 8px rgba(154,106,191,.08);}
+  50%{box-shadow:0 0 14px rgba(154,106,191,.75),0 0 24px rgba(154,106,191,.3),inset 0 0 12px rgba(154,106,191,.12);}
+}
 .day-num{font-size:12px;color:var(--text-dim);line-height:1;font-weight:600;letter-spacing:.3px;}
 .day-bars{
   display:flex;flex-direction:column;gap:2px;
@@ -336,6 +340,27 @@ canvas#qrCanvas{
   background:var(--surface2);padding:5px 8px;border-radius:3px;line-height:1.6;
 }
 
+/* ── Light Mode ── */
+body.light-mode{
+  --bg:#f5f3ee;--surface:#ffffff;--surface2:#ece9e2;--border:#d4cfc5;
+  --text:#1a1a18;--text-dim:#5a5750;--text-muted:#9a9590;
+}
+body.light-mode .header{background:var(--surface);}
+body.light-mode .day-cell:hover{background:#e5e2db;}
+body.light-mode .day-cell.perfect{background:#d4edd9;}
+body.light-mode .day-cell.today{box-shadow:0 0 0 1px var(--gold);}
+body.light-mode .month-name{color:var(--text-dim);}
+body.light-mode .stat-card{background:var(--surface2);}
+
+/* ── Dark Mode Toggle ── */
+.dark-toggle{
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text-dim);padding:7px 12px;border-radius:var(--radius);
+  cursor:pointer;font-family:'DM Mono',monospace;font-size:13px;
+  letter-spacing:.5px;transition:all .2s;line-height:1;
+}
+.dark-toggle:hover{border-color:var(--gold-dim);color:var(--text);}
+
 /* ── Read Me Glow ── */
 @keyframes readMeGlow{
   0%,100%{box-shadow:0 0 6px rgba(154,106,191,.3);text-shadow:0 0 8px rgba(154,106,191,.4);}
@@ -365,6 +390,7 @@ body.overlay-open{overflow:hidden;}
   </div>
   <div class="header-right">
     <button class="back-btn" id="backBtn" onclick="showCalendar()">← Calendar</button>
+    <button class="dark-toggle" id="darkToggle" onclick="toggleDarkMode()" title="Toggle light/dark mode">🌙</button>
     <button class="export-btn" onclick="openReadMe()" style="border-color:var(--purple);color:var(--purple-bright);animation:readMeGlow 2.5s ease-in-out infinite;">&#x1F4D6; Read Me</button>
     <button class="export-btn" onclick="exportData()">&#x2191; Export</button>
     <button class="import-btn" onclick="openImportModal()">&#x2193; Import</button>
@@ -2085,7 +2111,22 @@ function openDay(dk){
   buildQuranSelector();
   loadDayData(dk);
   try { lrUpdateGoalBadge(); } catch(e) {}
+  window.scrollTo({top:0,behavior:'instant'});
 }
+
+function toggleDarkMode(){
+  const isLight=document.body.classList.toggle('light-mode');
+  document.getElementById('darkToggle').textContent=isLight?'🌕':'🌙';
+  try{localStorage.setItem('muhasabah-theme',isLight?'light':'dark');}catch(e){}
+}
+(function(){
+  try{
+    if(localStorage.getItem('muhasabah-theme')==='light'){
+      document.body.classList.add('light-mode');
+      document.getElementById('darkToggle').textContent='🌕';
+    }
+  }catch(e){}
+})();
 
 function showCalendar(){
   currentDateKey=null;

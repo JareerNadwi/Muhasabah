@@ -2261,7 +2261,11 @@ function applyReaderTheme(isLight){
 
   document.querySelectorAll('[style]').forEach(el=>{
     if(SKIP_IDS.has(el.id)) return;
-    if(el.classList.contains('lr-lang-btn')||el.classList.contains('lr-type-btn')) return;
+    if(el.classList.contains('lr-lang-btn')||el.classList.contains('lr-type-btn')){
+      // Clear any stored orig so applyReaderTheme never restores dark values on these
+      delete el.dataset.origStyle;
+      return;
+    }
     if(isLight){
       const orig=el.dataset.origStyle!==undefined ? el.dataset.origStyle : el.getAttribute('style');
       if(el.dataset.origStyle===undefined) el.dataset.origStyle=orig;
@@ -6464,9 +6468,9 @@ function lrGetUI() { return LR_UI[_lrLang] || LR_UI.en; }
 function lrSyncBtns() {
   const ui = lrGetUI();
   const isLight = document.body.classList.contains('light-mode');
-  const activeBg    = isLight ? '#fdf5dc' : '#1a1500';
-  const activeBorder= isLight ? '#9a7228' : '#c9a84c';
-  const activeColor = isLight ? '#7a5010' : '#c9a84c';
+  const activeBg    = isLight ? '#fef9ec' : '#1a1500';
+  const activeBorder= isLight ? '#c9a84c' : '#c9a84c';
+  const activeColor = isLight ? '#8a5c00' : '#c9a84c';
   const inactiveBg  = isLight ? '#ece9e2' : '#1e1a10';
   const inactiveBorder= isLight ? '#d4cfc5' : '#2a2010';
   const inactiveColor = isLight ? '#9a9590' : '#8a7840';
@@ -6474,15 +6478,17 @@ function lrSyncBtns() {
   document.querySelectorAll('.lr-lang-btn').forEach(b => {
     const active = b.dataset.lang === _lrLang;
     b.style.background = active ? activeBg : inactiveBg;
-    b.style.borderColor = active ? activeBorder : inactiveBorder;
+    b.style.border = active ? `1px solid ${activeBorder}` : `1px solid ${inactiveBorder}`;
     b.style.color = active ? activeColor : inactiveColor;
+    b.style.boxShadow = (active && isLight) ? `0 0 0 1px ${activeBorder}` : '';
   });
   // Type buttons
   document.querySelectorAll('.lr-type-btn').forEach(b => {
     const active = b.dataset.type === _lrType;
     b.style.background = active ? activeBg : inactiveBg;
-    b.style.borderColor = active ? activeBorder : inactiveBorder;
+    b.style.border = active ? `1px solid ${activeBorder}` : `1px solid ${inactiveBorder}`;
     b.style.color = active ? activeColor : inactiveColor;
+    b.style.boxShadow = (active && isLight) ? `0 0 0 1px ${activeBorder}` : '';
   });
   // Word/Verb button labels
   const wb = document.getElementById('lrWordBtn');
@@ -6685,13 +6691,22 @@ function lrRender() {
   const conjTable = document.getElementById('lrConjTable');
   if (_lrType === 'verb' && lang.conj) {
     conjPanel.style.display = '';
-    const thS = "font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#7a6a40;padding:7px 8px;text-align:center;font-weight:400;font-family:'DM Mono',monospace;border-bottom:1px solid #2a2010;white-space:nowrap;";
+    const isLight = document.body.classList.contains('light-mode');
+    const thColor   = isLight ? '#5a5750' : '#7a6a40';
+    const rowBorder = isLight ? '#d4cfc5' : '#2a2010';
+    const cellBorder= isLight ? '#e8e4dc' : '#1a1610';
+    const tdPColor  = isLight ? '#5a5750' : '#a89060';
+    const tdArColor = isLight ? '#1a1a18' : '#f0e4c0';
+    const tdFColor  = isLight ? '#1a1a18' : '#c5b98a';
+    const tdDimColor= isLight ? '#9a9590' : '#7a6a40';
+
+    const thS = `font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:${thColor};padding:7px 8px;text-align:center;font-weight:400;font-family:'DM Mono',monospace;border-bottom:1px solid ${rowBorder};white-space:nowrap;`;
 
     let html = '';
     if (isAr) {
-      const tdP   = "font-size:13px;color:#a89060;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;text-align:center;";
-      const tdAr  = "font-size:17px;color:#f0e4c0;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;";
-      const tdDim = "font-size:15px;color:#7a6a40;padding:6px 8px;border-bottom:1px solid #1a1610;font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;";
+      const tdP   = `font-size:13px;color:${tdPColor};padding:6px 8px;border-bottom:1px solid ${cellBorder};font-family:'Amiri',serif;direction:rtl;text-align:center;`;
+      const tdAr  = `font-size:17px;color:${tdArColor};padding:6px 8px;border-bottom:1px solid ${cellBorder};font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;`;
+      const tdDim = `font-size:15px;color:${tdDimColor};padding:6px 8px;border-bottom:1px solid ${cellBorder};font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;`;
       html = '<tr>'
         + '<th style="'+thS+'">ضمير</th>'
         + '<th style="'+thS+'">ماضي</th>'
@@ -6711,16 +6726,14 @@ function lrRender() {
           + '</tr>';
       }
     } else if (_lrLang === 'ur' && typeof lang.conj === 'object' && !Array.isArray(lang.conj)) {
-      // Urdu: object with optional conjNote + past/present/future tense objects keyed by pronoun
       const urFont = "'Amiri',serif";
-      const thSU = `font-size:0.9rem;letter-spacing:0;color:#7a6a40;padding:7px 8px;text-align:center;font-weight:400;font-family:${urFont};border-bottom:1px solid #2a2010;white-space:nowrap;direction:rtl;`;
-      const tdP  = `font-size:14px;color:#a89060;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:${urFont};text-align:center;direction:rtl;line-height:1.8;`;
-      const tdF  = `font-size:15px;color:#c5b98a;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:${urFont};text-align:center;direction:rtl;line-height:1.8;`;
+      const thSU = `font-size:0.9rem;letter-spacing:0;color:${thColor};padding:7px 8px;text-align:center;font-weight:400;font-family:${urFont};border-bottom:1px solid ${rowBorder};white-space:nowrap;direction:rtl;`;
+      const tdP  = `font-size:14px;color:${tdPColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${urFont};text-align:center;direction:rtl;line-height:1.8;`;
+      const tdF  = `font-size:15px;color:${tdFColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${urFont};text-align:center;direction:rtl;line-height:1.8;`;
       const hdrs = ['ضمیر','ماضی','حال','مستقبل'];
       html = '<tr>' + hdrs.map(h=>`<th style="${thSU}">${h}</th>`).join('') + '</tr>';
-      // conjNote displayed above table via a dedicated row spanning all columns
       if (lang.conj.conjNote) {
-        html = `<tr><td colspan="4" style="font-size:12px;color:#7a6a40;padding:8px 10px 4px;font-family:${urFont};direction:rtl;text-align:right;line-height:1.8;border-bottom:1px solid #2a2010;">${lang.conj.conjNote}</td></tr>` + html;
+        html = `<tr><td colspan="4" style="font-size:12px;color:${tdPColor};padding:8px 10px 4px;font-family:${urFont};direction:rtl;text-align:right;line-height:1.8;border-bottom:1px solid ${rowBorder};">${lang.conj.conjNote}</td></tr>` + html;
       }
       const pronouns = Object.keys(lang.conj.past || lang.conj.present || lang.conj.future || {});
       for (const pronoun of pronouns) {
@@ -6732,7 +6745,6 @@ function lrRender() {
           + '</tr>';
       }
     } else if (Array.isArray(lang.conj)) {
-      // EN/UR: array of {pronoun/person, past, present, future}
       const isUr = _lrLang === 'ur';
       const thFont = isUr ? "'Amiri',serif" : "'DM Mono',monospace";
       const thDir  = isUr ? 'rtl' : 'ltr';
@@ -6743,10 +6755,10 @@ function lrRender() {
         hi: ['कर्ता','भूत','वर्तमान','भविष्य'],
       };
       const hdrs = CONJ_HDRS[_lrLang] || CONJ_HDRS.en;
-      const thSL = `font-size:${thFSize};letter-spacing:0.05em;color:#7a6a40;padding:7px 8px;text-align:center;font-weight:400;font-family:${thFont};border-bottom:1px solid #2a2010;white-space:nowrap;direction:${thDir};`;
+      const thSL = `font-size:${thFSize};letter-spacing:0.05em;color:${thColor};padding:7px 8px;text-align:center;font-weight:400;font-family:${thFont};border-bottom:1px solid ${rowBorder};white-space:nowrap;direction:${thDir};`;
       html = '<tr>' + hdrs.map(h=>`<th style="${thSL}">${h}</th>`).join('') + '</tr>';
-      const tdP = `font-size:12px;color:#7a6a40;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:${thFont};text-align:center;direction:${thDir};`;
-      const tdF = `font-size:${isUr?'15px':'12px'};color:#c5b98a;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:${thFont};text-align:center;direction:${thDir};`;
+      const tdP = `font-size:12px;color:${tdPColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${thFont};text-align:center;direction:${thDir};`;
+      const tdF = `font-size:${isUr?'15px':'12px'};color:${tdFColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${thFont};text-align:center;direction:${thDir};`;
       for (const row of lang.conj) {
         html += '<tr>'
           + '<td style="'+tdP+'">'+(row.pronoun||row.person||'—')+'</td>'
@@ -6756,23 +6768,21 @@ function lrRender() {
           + '</tr>';
       }
     } else if (typeof lang.conj === 'object') {
-      // BN (and possibly HI): object with keys past/present/future, each an object of pronoun→form
       const CONJ_HDRS_BN = {
         bn: { person:'সর্বনাম', past:'অতীত', present:'বর্তমান', future:'ভবিষ্যৎ' },
         hi: { person:'कर्ता',  past:'भूत',   present:'वर्तमान', future:'भविष्य' },
       };
       const hdrs = CONJ_HDRS_BN[_lrLang] || { person:'Person', past:'Past', present:'Present', future:'Future' };
       const cellFont = "'Literata',Georgia,serif";
-      const thSB = `font-size:0.72rem;letter-spacing:0;color:#7a6a40;padding:7px 8px;text-align:center;font-weight:400;font-family:${cellFont};border-bottom:1px solid #2a2010;white-space:nowrap;`;
-      const tdP  = `font-size:12px;color:#a89060;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:${cellFont};text-align:center;`;
-      const tdF  = `font-size:13px;color:#c5b98a;padding:5px 8px;border-bottom:1px solid #1a1610;font-family:${cellFont};text-align:center;`;
+      const thSB = `font-size:0.72rem;letter-spacing:0;color:${thColor};padding:7px 8px;text-align:center;font-weight:400;font-family:${cellFont};border-bottom:1px solid ${rowBorder};white-space:nowrap;`;
+      const tdP  = `font-size:12px;color:${tdPColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${cellFont};text-align:center;`;
+      const tdF  = `font-size:13px;color:${tdFColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${cellFont};text-align:center;`;
       html = '<tr>'
         + `<th style="${thSB}">${hdrs.person}</th>`
         + `<th style="${thSB}">${hdrs.past}</th>`
         + `<th style="${thSB}">${hdrs.present}</th>`
         + `<th style="${thSB}">${hdrs.future}</th>`
         + '</tr>';
-      // Collect all pronoun keys from any tense
       const pronouns = Object.keys(lang.conj.past || lang.conj.present || lang.conj.future || {});
       for (const pronoun of pronouns) {
         html += '<tr>'
@@ -6811,26 +6821,26 @@ function lrRenderMarkBtn() {
   const done = localStorage.getItem(key) === '1';
   const ui = lrGetUI();
   const btn = document.getElementById('lrMarkBtn');
+  const isLight = document.body.classList.contains('light-mode');
   btn.dataset.done = done ? '1' : '';
   if (done) {
-    // Show "Learned" state with a subtle undo hint on hover via title
     btn.textContent = ui.learnedLabel(_lrType);
     btn.title = 'Tap again to undo';
-    btn.style.background = 'linear-gradient(135deg,#0f2010,#182818)';
-    btn.style.borderColor = '#4a7c59';
-    btn.style.color = '#6aab7a';
+    btn.style.background = isLight ? 'linear-gradient(135deg,#d8f0de,#e8f5ec)' : 'linear-gradient(135deg,#0f2010,#182818)';
+    btn.style.borderColor = isLight ? '#2d7a45' : '#4a7c59';
+    btn.style.color = isLight ? '#2d6b40' : '#6aab7a';
     btn.style.cursor = 'pointer';
-    btn.onmouseover = () => { btn.textContent = ui.undoLabel(_lrType); btn.style.background = 'linear-gradient(135deg,#2a1010,#3a1818)'; btn.style.borderColor = '#c05050'; btn.style.color = '#c07070'; };
-    btn.onmouseout  = () => { btn.textContent = ui.learnedLabel(_lrType); btn.style.background = 'linear-gradient(135deg,#0f2010,#182818)'; btn.style.borderColor = '#4a7c59'; btn.style.color = '#6aab7a'; };
+    btn.onmouseover = () => { btn.textContent = ui.undoLabel(_lrType); btn.style.background = isLight ? 'linear-gradient(135deg,#fde8e8,#fdf0f0)' : 'linear-gradient(135deg,#2a1010,#3a1818)'; btn.style.borderColor = isLight ? '#c05050' : '#c05050'; btn.style.color = isLight ? '#8b2a2a' : '#c07070'; };
+    btn.onmouseout  = () => { btn.textContent = ui.learnedLabel(_lrType); btn.style.background = isLight ? 'linear-gradient(135deg,#d8f0de,#e8f5ec)' : 'linear-gradient(135deg,#0f2010,#182818)'; btn.style.borderColor = isLight ? '#2d7a45' : '#4a7c59'; btn.style.color = isLight ? '#2d6b40' : '#6aab7a'; };
   } else {
     btn.textContent = ui.markBtn;
     btn.title = '';
-    btn.style.background = 'linear-gradient(135deg,#1a1500,#2a2000)';
-    btn.style.borderColor = '#c9a84c';
-    btn.style.color = '#c9a84c';
+    btn.style.background = isLight ? 'linear-gradient(135deg,#fdf5dc,#f5e8b0)' : 'linear-gradient(135deg,#1a1500,#2a2000)';
+    btn.style.borderColor = isLight ? '#9a7228' : '#c9a84c';
+    btn.style.color = isLight ? '#7a5010' : '#c9a84c';
     btn.style.cursor = 'pointer';
-    btn.onmouseover = () => { btn.style.background = 'linear-gradient(135deg,#2a2000,#3a3000)'; };
-    btn.onmouseout  = () => { btn.style.background = 'linear-gradient(135deg,#1a1500,#2a2000)'; };
+    btn.onmouseover = () => { btn.style.background = isLight ? 'linear-gradient(135deg,#f5e8b0,#edd898)' : 'linear-gradient(135deg,#2a2000,#3a3000)'; };
+    btn.onmouseout  = () => { btn.style.background = isLight ? 'linear-gradient(135deg,#fdf5dc,#f5e8b0)' : 'linear-gradient(135deg,#1a1500,#2a2000)'; };
   }
 }
 

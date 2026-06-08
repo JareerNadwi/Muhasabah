@@ -454,6 +454,25 @@ body.light-mode #pwApiKeyInput{background:#f0ede6!important;border-color:#d4cfc5
 body.light-mode [onclick="openGetKeyModal()"]{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#7a5010!important;}
 body.light-mode [onclick="openGetKeyModal()"]:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
 [onclick="openGetKeyModal()"]:hover{background:linear-gradient(135deg,#2a2000,#342c10)!important;}
+/* Hadith text colors */
+body.light-mode #hadithText{color:#1a1a18!important;}
+body.light-mode #hadithRef{color:#5a5750!important;}
+body.light-mode #hadithNum{color:#9a7228!important;}
+/* Transliteration boxes in Tafsir / SV readers */
+body.light-mode #tafsirTranslit,body.light-mode #svTranslit{
+  background:#f0ede6!important;border-color:#d4cfc5!important;
+  border-top-color:#9a9590!important;color:#5a5750!important;
+}
+/* Language learner syn/ant panel and challenge panel */
+body.light-mode #lrSynAntPanel{background:#f0ede6!important;border-left-color:#9a7228!important;}
+body.light-mode #lrSyn,body.light-mode #lrAnt{color:#1a1a18!important;}
+body.light-mode #lrLabelSyn,body.light-mode #lrLabelAnt{color:#9a7228!important;}
+body.light-mode #lrChallengePanel{background:#f0ede6!important;border-left-color:#2d7a45!important;border-color:#d4cfc5!important;}
+body.light-mode #lrLabelChallenge{color:#2d6b40!important;}
+body.light-mode #lrSpeakingChallenge{color:#1a1a18!important;}
+/* Post writer save and close buttons */
+body.light-mode [onclick="pwSaveKey()"]{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode [onclick="closePostWriter()"]{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 /* ── Dark Mode Toggle ── */
 .dark-toggle{
   background:var(--surface2);border:1px solid var(--border);
@@ -2236,6 +2255,7 @@ function applyReaderTheme(isLight){
     'lrNoData','lrContent','lrHero','lrCollPanel','lrConjPanel','lrStoryPanel','lrSynAntPanel','lrChallengePanel','lrMarkWrap',
     'lrTitle','lrBody','lrHarakahBtn','lrWordNum','lrWordMain','lrWordRoman','lrWordType','lrWordMeaning','lrSimpleMeaning',
     'lrLabelColl','lrCollocations','lrLabelConj','lrConjTable','lrLabelStory','lrStory','lrLabelSynAnt',
+    'lrSyn','lrAnt','lrSpeakingChallenge',
     // Post writer — JS modifies tab styles directly
     'pwTabLI','pwTabFB','pwChat','pwInputArea','pwInput','pwSendBtn','pwApiKeyInput','pwApiKeySection',
     // Zikr article
@@ -5677,8 +5697,7 @@ loadDayData = function(dk) {
             background:#1a1610;border:1px solid #3a2e18;color:#8a7840;
             padding:6px 11px;border-radius:6px;cursor:pointer;
             font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;transition:all .2s;
-          " onmouseover="this.style.borderColor='#c9a84c';this.style.color='#c9a84c'"
-             onmouseout="this.style.borderColor='#3a2e18';this.style.color='#8a7840'">Save</button>
+          ">Save</button>
           <button onclick="openGetKeyModal()" style="
             background:linear-gradient(135deg,#1a1500,#241c08);border:1px solid #c9a84c;color:#c9a84c;
             padding:6px 11px;border-radius:6px;cursor:pointer;
@@ -5689,8 +5708,7 @@ loadDayData = function(dk) {
           background:#1a1610;border:1px solid #2a2010;color:#7a6a40;
           width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:13px;
           display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;
-        " onmouseover="this.style.borderColor='#c9a84c';this.style.color='#c9a84c'"
-           onmouseout="this.style.borderColor='#2a2010';this.style.color='#7a6a40'">✕</button>
+        ">✕</button>
       </div>
     </div>
 
@@ -6683,8 +6701,9 @@ function lrRender() {
   const synVal = lang.syn || lang.synonyms;
   const antVal = lang.ant || lang.antonyms;
   const fmtSynAnt = (v) => Array.isArray(v) ? v.join('  ·  ') : (typeof v === 'string' ? v.split(/،|,/).map(s=>s.trim()).filter(Boolean).join('  ·  ') : '—');
-  synEl.textContent = fmtSynAnt(synVal); synEl.style.direction = isRTL?'rtl':'ltr'; synEl.style.textAlign = isRTL?'right':'left'; synEl.style.fontFamily = isRTL?"'Amiri',serif":"'DM Mono',monospace"; synEl.style.fontSize = isRTL?'17px':'15px';
-  antEl.textContent = fmtSynAnt(antVal); antEl.style.direction = isRTL?'rtl':'ltr'; antEl.style.textAlign = isRTL?'right':'left'; antEl.style.fontFamily = isRTL?"'Amiri',serif":"'DM Mono',monospace"; antEl.style.fontSize = isRTL?'17px':'15px';
+  const saColor = document.body.classList.contains('light-mode') ? '#1a1a18' : '#c5b98a';
+  synEl.textContent = fmtSynAnt(synVal); synEl.style.direction = isRTL?'rtl':'ltr'; synEl.style.textAlign = isRTL?'right':'left'; synEl.style.fontFamily = isRTL?"'Amiri',serif":"'DM Mono',monospace"; synEl.style.fontSize = isRTL?'17px':'15px'; synEl.style.color = saColor;
+  antEl.textContent = fmtSynAnt(antVal); antEl.style.direction = isRTL?'rtl':'ltr'; antEl.style.textAlign = isRTL?'right':'left'; antEl.style.fontFamily = isRTL?"'Amiri',serif":"'DM Mono',monospace"; antEl.style.fontSize = isRTL?'17px':'15px'; antEl.style.color = saColor;
 
   // Conjugation
   const conjPanel = document.getElementById('lrConjPanel');

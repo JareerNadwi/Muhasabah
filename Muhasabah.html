@@ -2160,8 +2160,7 @@ function applyReaderTheme(isLight){
     '#0d0b08':'#ffffff','#141008':'#f0ede6','#0f110f':'#ffffff',
     '#111311':'#ece9e2','#1a1610':'#f0ede6','#1e1a10':'#ece9e2',
     '#071407':'#e8f5ec','#0a0c0a':'#ffffff','#0d0f0e':'#ffffff',
-    '#2a2010':'#d4cfc5','#1a1500':'#f5f0e0','#1a3020':'#d8f0de',
-    '#1a2818':'#e5f5e8','#2a2418':'#d4cfc5','#221e14':'#d4cfc5',
+    '#1a1500':'#f5f0e0','#1a3020':'#d8f0de','#1a2818':'#e5f5e8',
     '#2a1515':'#f5dede','#2a1a3a':'#ede0f5'
   };
   const DARK_COLOR_MAP={
@@ -2169,32 +2168,31 @@ function applyReaderTheme(isLight){
     '#f0e4c0':'#1a1a18','#b0a07a':'#5a5750','#a89060':'#5a5750',
     '#8a7840':'#9a9590','#7a6a40':'#9a9590','#5a5030':'#9a9590',
     '#8abe98':'#2d6b40','#6abf80':'#2d6b40',
-    '#c9a84c':'#9a7228','#c8a96e':'#9a7228','#c5b98a':'#9a7228'
+    '#c9a84c':'#9a7228','#c8a96e':'#9a7228'
   };
+  const DARK_BORDER=['#2a2010','#2a1815','#2a2418','#221e14','#1e1a10','#3a6a40','#c9a84c55','#7a6a40'];
+  const LIGHT_BORDER='#d4cfc5';
+
   document.querySelectorAll('[style]').forEach(el=>{
     if(isLight){
-      if(el.dataset.origStyle!==undefined) return; // already processed
-      const orig=el.getAttribute('style');
-      let changed=false;
+      // Always work from the stored original (or current) to avoid double-processing
+      const orig=el.dataset.origStyle!==undefined ? el.dataset.origStyle : el.getAttribute('style');
+      if(el.dataset.origStyle===undefined) el.dataset.origStyle=orig;
       let s=orig;
-      // Replace background hex values
+
       for(const [dark,light] of Object.entries(DARK_BG_MAP)){
-        const re=new RegExp('background(?:-color)?:\\s*'+dark.replace('#','#'),'gi');
-        if(re.test(s)){s=s.replace(re,m=>m.replace(new RegExp(dark,'i'),light));changed=true;}
+        const escaped=dark.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+        s=s.replace(new RegExp('(background(?:-color)?:\\s*)'+escaped,'gi'),(_,p)=>p+light);
       }
-      // Replace border hex values
-      s=s.replace(/#2a2010/gi,'#d4cfc5').replace(/#2a1815/gi,'#d4cfc5').replace(/#2a2418/gi,'#d4cfc5')
-         .replace(/#221e14/gi,'#d4cfc5').replace(/#1e1a10/gi,'#d4cfc5').replace(/#3a6a40/gi,'#2d6b40');
-      if(s!==orig) changed=true;
-      // Replace foreground colors
+      for(const borderVal of DARK_BORDER){
+        const escaped=borderVal.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+        s=s.replace(new RegExp(escaped,'gi'),LIGHT_BORDER);
+      }
       for(const [dark,light] of Object.entries(DARK_COLOR_MAP)){
-        const re=new RegExp('(?<![\\w-])color:\\s*'+dark,'gi');
-        if(re.test(s)){s=s.replace(re,m=>m.replace(new RegExp(dark,'i'),light));changed=true;}
+        const escaped=dark.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+        s=s.replace(new RegExp('((?:^|;)\\s*color:\\s*)'+escaped,'gi'),(_,p)=>p+light);
       }
-      if(changed){
-        el.dataset.origStyle=orig;
-        el.setAttribute('style',s);
-      }
+      if(s!==orig) el.setAttribute('style',s);
     } else {
       if(el.dataset.origStyle!==undefined){
         el.setAttribute('style',el.dataset.origStyle);
@@ -2883,6 +2881,7 @@ async function openHadithReader(){
       _hadithBook = json.hadiths || [];
     }
     const total    = _hadithBook.length;
+    const di       = dayIdx(HADITH_START_DATE, _hadithDK);
     const dayStart = (di * HADITHS_PER_DAY) % total;
     _hadithData    = [];
     for(let i = 0; i < HADITHS_PER_DAY; i++) _hadithData.push(_hadithBook[(dayStart+i)%total]);

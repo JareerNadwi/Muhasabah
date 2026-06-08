@@ -451,6 +451,9 @@ body.light-mode #pwInput{background:#ffffff!important;border-color:#d4cfc5!impor
 body.light-mode #pwInput:focus{border-color:#9a7228!important;}
 body.light-mode #pwSendBtn{background:linear-gradient(135deg,#f5f0e0,#ede5cc)!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode #pwApiKeyInput{background:#f0ede6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
+body.light-mode [onclick="openGetKeyModal()"]{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#7a5010!important;}
+body.light-mode [onclick="openGetKeyModal()"]:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
+[onclick="openGetKeyModal()"]:hover{background:linear-gradient(135deg,#2a2000,#342c10)!important;}
 /* ── Dark Mode Toggle ── */
 .dark-toggle{
   background:var(--surface2);border:1px solid var(--border);
@@ -2258,6 +2261,7 @@ function applyReaderTheme(isLight){
 
   document.querySelectorAll('[style]').forEach(el=>{
     if(SKIP_IDS.has(el.id)) return;
+    if(el.classList.contains('lr-lang-btn')||el.classList.contains('lr-type-btn')) return;
     if(isLight){
       const orig=el.dataset.origStyle!==undefined ? el.dataset.origStyle : el.getAttribute('style');
       if(el.dataset.origStyle===undefined) el.dataset.origStyle=orig;
@@ -2297,8 +2301,7 @@ function toggleDarkMode(){
     if(localStorage.getItem('muhasabah-theme')==='light'){
       document.body.classList.add('light-mode');
       document.getElementById('darkToggle').textContent='🌕';
-      // Readers are rendered dynamically; apply after DOM settles
-      setTimeout(()=>applyReaderTheme(true),200);
+      setTimeout(()=>{applyReaderTheme(true);try{lrSyncBtns();}catch(e){}},200);
     }
   }catch(e){}
 })();
@@ -5676,8 +5679,7 @@ loadDayData = function(dk) {
             background:linear-gradient(135deg,#1a1500,#241c08);border:1px solid #c9a84c;color:#c9a84c;
             padding:6px 11px;border-radius:6px;cursor:pointer;
             font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;transition:all .2s;white-space:nowrap;
-          " onmouseover="this.style.background='linear-gradient(135deg,#2a2000,#342c10)'"
-             onmouseout="this.style.background='linear-gradient(135deg,#1a1500,#241c08)'">Get Key</button>
+          ">Get Key</button>
         </div>
         <button onclick="closePostWriter()" style="
           background:#1a1610;border:1px solid #2a2010;color:#7a6a40;

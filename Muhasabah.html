@@ -393,6 +393,48 @@ body.light-mode .progress-track,body.light-mode .bonus-track{background:var(--su
 body.light-mode .section-label{border-bottom-color:var(--border);}
 body.light-mode .counter-btn{background:var(--surface2);border-color:var(--border);}
 body.light-mode .qr-session-badge{background:var(--surface2);}
+/* JS-controlled reader panels */
+body.light-mode #hadithLoading,body.light-mode #hadithContent,body.light-mode #hadithNav,
+body.light-mode #tafsirLoading,body.light-mode #tafsirContent,body.light-mode #tafsirNav,
+body.light-mode #bookLoading,body.light-mode #bookContent,body.light-mode #bookNav,
+body.light-mode #svLoading,body.light-mode #svContent,body.light-mode #svNav,
+body.light-mode #asmaulContent,body.light-mode #asmaulSessionInfo{
+  background:#ffffff!important;color:#1a1a18!important;
+}
+body.light-mode #hadithDoneNote,body.light-mode #tafsirDoneNote,
+body.light-mode #bookDoneNote,body.light-mode #asmaulDoneNote,
+body.light-mode #zikrReaderDoneNote,body.light-mode #zikrBookDoneNote{
+  background:#e8f5ec!important;color:#2d6b40!important;border-color:#2d6b40!important;
+}
+body.light-mode #hadithPrevBtn,body.light-mode #tafsirPrevBtn,
+body.light-mode #bookPrevBtn,body.light-mode #svPrevBtn,
+body.light-mode #asmaulPrevBtn{
+  background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;
+}
+body.light-mode #hadithNextBtn,body.light-mode #tafsirNextBtn,
+body.light-mode #bookNextBtn,body.light-mode #svNextBtn,
+body.light-mode #asmaulNextBtn{
+  background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;
+}
+/* Zikr readers */
+body.light-mode #zikrReaderContent,body.light-mode #zikrReaderSessionInfo,
+body.light-mode #zikrBookContent{
+  background:#ffffff!important;color:#1a1a18!important;
+}
+body.light-mode #zikrReaderPrevBtn,body.light-mode #zikrBookPrevBtn{
+  background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;
+}
+body.light-mode #zikrReaderNextBtn,body.light-mode #zikrBookNextBtn{
+  background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;
+}
+/* Zikr article counter buttons */
+body.light-mode #zikrArticleBar{background:#ece9e2!important;}
+body.light-mode [onclick="zikrArticleTap(-1)"]{
+  background:#fff0f0!important;border-color:#e0c0c0!important;color:#8b2a2a!important;
+}
+body.light-mode [onclick="zikrArticleTap(1)"]{
+  background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;
+}
 /* ── Dark Mode Toggle ── */
 .dark-toggle{
   background:var(--surface2);border:1px solid var(--border);
@@ -2156,30 +2198,39 @@ function openDay(dk){
 }
 
 function applyReaderTheme(isLight){
+  // These elements have display: toggled by JS — skip them to avoid conflicts
+  const SKIP_IDS=new Set(['hadithLoading','hadithContent','hadithNav','hadithDoneNote',
+    'tafsirLoading','tafsirContent','tafsirNav','tafsirDoneNote',
+    'bookLoading','bookContent','bookNav','bookDoneNote',
+    'svLoading','svContent','svNav',
+    'asmaulDoneNote','asmaulSessionInfo','asmaulContent',
+    'zikrReaderContent','zikrReaderSessionInfo','zikrReaderDoneNote',
+    'zikrBookContent','zikrBookDoneNote',
+    'lrNoData','lrContent']);
+
   const DARK_BG_MAP={
     '#0d0b08':'#ffffff','#141008':'#f0ede6','#0f110f':'#ffffff',
     '#111311':'#ece9e2','#1a1610':'#f0ede6','#1e1a10':'#ece9e2',
     '#071407':'#e8f5ec','#0a0c0a':'#ffffff','#0d0f0e':'#ffffff',
     '#1a1500':'#f5f0e0','#1a3020':'#d8f0de','#1a2818':'#e5f5e8',
-    '#2a1515':'#f5dede','#2a1a3a':'#ede0f5'
+    '#2a1515':'#f5dede','#2a1a3a':'#ede0f5','#1a0a0a':'#fff5f5'
   };
+  const DARK_BORDER=['#2a2010','#2a1815','#2a2418','#221e14','#3a6a40','#c9a84c55','#7a6a40'];
   const DARK_COLOR_MAP={
     '#e8dfc8':'#1a1a18','#d4c9ae':'#1a1a18','#c5b98a':'#1a1a18',
     '#f0e4c0':'#1a1a18','#b0a07a':'#5a5750','#a89060':'#5a5750',
     '#8a7840':'#9a9590','#7a6a40':'#9a9590','#5a5030':'#9a9590',
     '#8abe98':'#2d6b40','#6abf80':'#2d6b40',
-    '#c9a84c':'#9a7228','#c8a96e':'#9a7228'
+    '#c9a84c':'#9a7228','#c8a96e':'#9a7228','#7a4040':'#8b2a2a','#3a1a1a':'#e0c0c0'
   };
-  const DARK_BORDER=['#2a2010','#2a1815','#2a2418','#221e14','#1e1a10','#3a6a40','#c9a84c55','#7a6a40'];
   const LIGHT_BORDER='#d4cfc5';
 
   document.querySelectorAll('[style]').forEach(el=>{
+    if(SKIP_IDS.has(el.id)) return;
     if(isLight){
-      // Always work from the stored original (or current) to avoid double-processing
       const orig=el.dataset.origStyle!==undefined ? el.dataset.origStyle : el.getAttribute('style');
       if(el.dataset.origStyle===undefined) el.dataset.origStyle=orig;
       let s=orig;
-
       for(const [dark,light] of Object.entries(DARK_BG_MAP)){
         const escaped=dark.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
         s=s.replace(new RegExp('(background(?:-color)?:\\s*)'+escaped,'gi'),(_,p)=>p+light);
@@ -4868,12 +4919,12 @@ function _asmaulRenderSlide(){
   });
   content.innerHTML = html;
   content.scrollTop = 0;
+  reThemeIfLight();
 }
 
 async function openAsmaulReader(){
   _asmaulDK = currentDateKey || todayKey();
   document.getElementById("asmaulReaderOverlay").classList.add("active");
-  reThemeIfLight();
   document.getElementById("asmaulDayPill").textContent = "99 Names Of Allah SWT";
 
   _asmaulCompleted = getCached(_asmaulDK).asmaul === "yes";
@@ -5216,6 +5267,7 @@ function _zikrRender(){
     "<div style=\"color:#c5b98a;font-size:0.92rem;line-height:1.75;font-family:'Amiri',serif;\">"+dua.meaning+"</div>"+
     "</div>";
   document.getElementById("zikrReaderContent").scrollTop=0;
+  reThemeIfLight();
 }
 async function openZikrReader(mode){
   _zikrMode=mode;_zikrDK=currentDateKey||todayKey();
@@ -5223,7 +5275,6 @@ async function openZikrReader(mode){
   document.getElementById("zikrReaderTitle").textContent=title;
   document.getElementById("zikrReaderDayPill").textContent="77 Duas";
   document.getElementById("zikrReaderOverlay").classList.add("active");
-  reThemeIfLight();
   _zikrDone=getCached(_zikrDK)[_zikrGoalKey()]==="yes";
   document.getElementById("zikrReaderDoneNote").style.display=_zikrDone?"block":"none";
   var dayData=getCached(_zikrDK);
@@ -5427,13 +5478,13 @@ function _zbRender() {
     '</div>';
 
   document.getElementById('zikrBookContent').scrollTop = 0;
+  reThemeIfLight();
 }
 
 /* ── Open ── */
 async function openZikrBookReader() {
   _zbDK = currentDateKey || todayKey();
   document.getElementById('zikrBookReaderOverlay').classList.add('active');
-  reThemeIfLight();
   document.getElementById('zikrBookDayPill').textContent = '123 Duas';
   document.getElementById('zikrBookContent').innerHTML =
     '<div style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:\'DM Mono\',monospace;">Loading Zikr From Book.json…</div>';

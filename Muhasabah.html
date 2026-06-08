@@ -393,68 +393,64 @@ body.light-mode .progress-track,body.light-mode .bonus-track{background:var(--su
 body.light-mode .section-label{border-bottom-color:var(--border);}
 body.light-mode .counter-btn{background:var(--surface2);border-color:var(--border);}
 body.light-mode .qr-session-badge{background:var(--surface2);}
-/* JS-controlled reader panels */
-body.light-mode #hadithLoading,body.light-mode #hadithContent,body.light-mode #hadithNav,
-body.light-mode #tafsirLoading,body.light-mode #tafsirContent,body.light-mode #tafsirNav,
-body.light-mode #bookLoading,body.light-mode #bookContent,body.light-mode #bookNav,
-body.light-mode #svLoading,body.light-mode #svContent,body.light-mode #svNav,
-body.light-mode #asmaulContent,body.light-mode #asmaulSessionInfo{
-  background:#ffffff!important;color:#1a1a18!important;
-}
+/* ── Reader elements (JS-managed display — CSS only) ── */
+/* Shared reader backgrounds */
+body.light-mode #hadithLoading,body.light-mode #hadithContent,
+body.light-mode #tafsirLoading,body.light-mode #tafsirContent,
+body.light-mode #bookLoading,body.light-mode #bookContent,
+body.light-mode #svLoading,body.light-mode #svContent,
+body.light-mode #asmaulContent,body.light-mode #asmaulSessionInfo,
+body.light-mode #zikrReaderContent,body.light-mode #zikrReaderSessionInfo,
+body.light-mode #zikrBookContent{background:#ffffff!important;color:#1a1a18!important;}
+/* Nav bars */
+body.light-mode #hadithNav,body.light-mode #tafsirNav,
+body.light-mode #bookNav,body.light-mode #svNav{background:#f0ede6!important;border-color:#d4cfc5!important;}
+/* Done notes */
 body.light-mode #hadithDoneNote,body.light-mode #tafsirDoneNote,
 body.light-mode #bookDoneNote,body.light-mode #asmaulDoneNote,
 body.light-mode #zikrReaderDoneNote,body.light-mode #zikrBookDoneNote{
   background:#e8f5ec!important;color:#2d6b40!important;border-color:#2d6b40!important;
 }
+/* Prev buttons */
 body.light-mode #hadithPrevBtn,body.light-mode #tafsirPrevBtn,
 body.light-mode #bookPrevBtn,body.light-mode #svPrevBtn,
-body.light-mode #asmaulPrevBtn{
-  background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;
-}
+body.light-mode #asmaulPrevBtn,body.light-mode #zikrReaderPrevBtn,
+body.light-mode #zikrBookPrevBtn{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+/* Next buttons */
 body.light-mode #hadithNextBtn,body.light-mode #tafsirNextBtn,
 body.light-mode #bookNextBtn,body.light-mode #svNextBtn,
-body.light-mode #asmaulNextBtn{
-  background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;
-}
-/* Zikr readers */
-body.light-mode #zikrReaderContent,body.light-mode #zikrReaderSessionInfo,
-body.light-mode #zikrBookContent{
-  background:#ffffff!important;color:#1a1a18!important;
-}
-body.light-mode #zikrReaderPrevBtn,body.light-mode #zikrBookPrevBtn{
-  background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;
-}
-body.light-mode #zikrReaderNextBtn,body.light-mode #zikrBookNextBtn{
-  background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;
-}
-/* Zikr article counter buttons */
+body.light-mode #asmaulNextBtn,body.light-mode #zikrReaderNextBtn,
+body.light-mode #zikrBookNextBtn{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
+/* Zikr article counter */
 body.light-mode #zikrArticleBar{background:#ece9e2!important;}
-body.light-mode [onclick="zikrArticleTap(-1)"]{
-  background:#fff0f0!important;border-color:#e0c0c0!important;color:#8b2a2a!important;
-}
-body.light-mode [onclick="zikrArticleTap(1)"]{
-  background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;
-}
-/* Language Learner */
+body.light-mode [onclick="zikrArticleTap(-1)"]{background:#fff0f0!important;border-color:#e0c0c0!important;color:#8b2a2a!important;}
+body.light-mode [onclick="zikrArticleTap(1)"]{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
+/* ── Language Learner ── */
 body.light-mode #langOverlay{background:rgba(240,238,232,.97);}
-body.light-mode #lrHero,body.light-mode #lrCollPanel,body.light-mode #lrConjPanel,
-body.light-mode #lrStoryPanel,body.light-mode #lrSynAntPanel,body.light-mode #lrChallengePanel{
-  background:#f0ede6!important;border-color:#d4cfc5!important;
-}
-body.light-mode #lrHero{border-top-color:#9a7228!important;}
+body.light-mode #lrHero{background:#f0ede6!important;border-color:#d4cfc5!important;border-top-color:#9a7228!important;}
+body.light-mode #lrCollPanel,body.light-mode #lrConjPanel,
+body.light-mode #lrStoryPanel,body.light-mode #lrSynAntPanel,
+body.light-mode #lrChallengePanel{background:#f0ede6!important;border-color:#d4cfc5!important;}
 body.light-mode #lrWordMain{color:#1a1a18!important;}
 body.light-mode #lrWordMeaning,body.light-mode #lrCollocations,
 body.light-mode #lrStory,body.light-mode #lrSimpleMeaning{color:#1a1a18!important;}
 body.light-mode #lrWordRoman,body.light-mode #lrWordType{color:#5a5750!important;}
 body.light-mode #lrWordNum{color:#9a9590!important;}
-/* Post Writer */
-body.light-mode #postWriterOverlay [style*="background:#0d0b08"],
-body.light-mode #postWriterOverlay [style*="background:#141008"],
-body.light-mode #postWriterOverlay [style*="background:#1a1610"],
-body.light-mode #postWriterOverlay [style*="background:#1a1500"],
-body.light-mode #postWriterOverlay [style*="background:#1a1610"]{
-  background:#f0ede6!important;
-}
+body.light-mode #lrHarakahBtn{background:#f5f0e0!important;border-color:#d4b878!important;color:#9a7228!important;}
+body.light-mode #lrBody{background:var(--bg);}
+body.light-mode .lr-lang-btn,body.light-mode .lr-type-btn{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .lr-lang-btn[style*="#1a1500"],body.light-mode .lr-lang-btn[style*="background:#1a1500"],
+body.light-mode .lr-type-btn[style*="#1a1500"]{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode #lrMarkBtn{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
+/* ── Post Writer ── */
+body.light-mode #pwTabLI{background:#f0ede6!important;color:#9a7228!important;}
+body.light-mode #pwTabFB{background:#ece9e2!important;color:#5a5750!important;}
+body.light-mode #pwChat{background:#ffffff!important;}
+body.light-mode #pwInputArea{background:#f0ede6!important;border-color:#d4cfc5!important;}
+body.light-mode #pwInput{background:#ffffff!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
+body.light-mode #pwInput:focus{border-color:#9a7228!important;}
+body.light-mode #pwSendBtn{background:linear-gradient(135deg,#f5f0e0,#ede5cc)!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode #pwApiKeyInput{background:#f0ede6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
 /* ── Dark Mode Toggle ── */
 .dark-toggle{
   background:var(--surface2);border:1px solid var(--border);
@@ -2219,14 +2215,29 @@ function openDay(dk){
 
 function applyReaderTheme(isLight){
   // These elements have display: toggled by JS — skip them to avoid conflicts
-  const SKIP_IDS=new Set(['hadithLoading','hadithContent','hadithNav','hadithDoneNote',
-    'tafsirLoading','tafsirContent','tafsirNav','tafsirDoneNote',
-    'bookLoading','bookContent','bookNav','bookDoneNote',
-    'svLoading','svContent','svNav',
-    'asmaulDoneNote','asmaulSessionInfo','asmaulContent',
-    'zikrReaderContent','zikrReaderSessionInfo','zikrReaderDoneNote',
-    'zikrBookContent','zikrBookDoneNote',
-    'lrNoData','lrContent']);
+  const SKIP_IDS=new Set([
+    // Hadith reader
+    'hadithLoading','hadithContent','hadithNav','hadithDoneNote','hadithPrevBtn','hadithNextBtn','hadithNum','hadithText','hadithRef','hadithDayInfo',
+    // Tafsir reader
+    'tafsirLoading','tafsirContent','tafsirNav','tafsirDoneNote','tafsirPrevBtn','tafsirNextBtn','tafsirTranslit',
+    // Book reader
+    'bookLoading','bookContent','bookNav','bookDoneNote','bookPrevBtn','bookNextBtn','bookDayPill',
+    // SV reader
+    'svLoading','svContent','svNav','svPrevBtn','svNextBtn','svTranslit',
+    // Asmaul reader
+    'asmaulDoneNote','asmaulSessionInfo','asmaulContent','asmaulPrevBtn','asmaulNextBtn','asmaulDayPill','asmaulProgressPill','asmaulPageDisplay',
+    // Zikr readers
+    'zikrReaderContent','zikrReaderSessionInfo','zikrReaderDoneNote','zikrReaderPrevBtn','zikrReaderNextBtn','zikrReaderProgressPill','zikrReaderPageDisplay','zikrReaderTitle','zikrReaderDayPill',
+    'zikrBookContent','zikrBookDoneNote','zikrBookPrevBtn','zikrBookNextBtn','zikrBookDayPill',
+    // Language learner — all panels have display toggled by JS
+    'lrNoData','lrContent','lrHero','lrCollPanel','lrConjPanel','lrStoryPanel','lrSynAntPanel','lrChallengePanel','lrMarkWrap',
+    'lrTitle','lrBody','lrHarakahBtn','lrWordNum','lrWordMain','lrWordRoman','lrWordType','lrWordMeaning','lrSimpleMeaning',
+    'lrLabelColl','lrCollocations','lrLabelConj','lrConjTable','lrLabelStory','lrStory','lrLabelSynAnt',
+    // Post writer — JS modifies tab styles directly
+    'pwTabLI','pwTabFB','pwChat','pwInputArea','pwInput','pwSendBtn','pwApiKeyInput','pwApiKeySection',
+    // Zikr article
+    'zikrArticleCount','zikrArticleBar','zikrArticleFill','zikrArticleMsg',
+  ]);
 
   const DARK_BG_MAP={
     '#0d0b08':'#ffffff','#141008':'#f0ede6','#0f110f':'#ffffff',
@@ -2277,6 +2288,8 @@ function toggleDarkMode(){
   const isLight=document.body.classList.toggle('light-mode');
   document.getElementById('darkToggle').textContent=isLight?'🌕':'🌙';
   applyReaderTheme(isLight);
+  try{lrSyncBtns();}catch(e){}
+  try{pwSetTab(_pwTab||'linkedin');}catch(e){}
   try{localStorage.setItem('muhasabah-theme',isLight?'light':'dark');}catch(e){}
 }
 (function(){
@@ -6025,12 +6038,18 @@ function pwSetTab(tab) {
   _pwTab = tab;
   const li = document.getElementById('pwTabLI');
   const fb = document.getElementById('pwTabFB');
+  const isLight = document.body.classList.contains('light-mode');
+  const activeBg = isLight ? '#f0ede6' : '#141008';
+  const inactiveBg = isLight ? '#ece9e2' : '#0f0d0a';
+  const activeBorder = isLight ? '#9a7228' : '#c9a84c';
+  const activeColor = isLight ? '#9a7228' : '#c9a84c';
+  const inactiveColor = isLight ? '#9a9590' : '#5a4a28';
   if (tab === 'linkedin') {
-    li.style.borderBottom = '2px solid #c9a84c'; li.style.background = '#141008'; li.style.color = '#c9a84c';
-    fb.style.borderBottom = '2px solid transparent'; fb.style.background = '#0f0d0a'; fb.style.color = '#5a4a28';
+    li.style.borderBottom = '2px solid '+activeBorder; li.style.background = activeBg; li.style.color = activeColor;
+    fb.style.borderBottom = '2px solid transparent'; fb.style.background = inactiveBg; fb.style.color = inactiveColor;
   } else {
-    fb.style.borderBottom = '2px solid #c9a84c'; fb.style.background = '#141008'; fb.style.color = '#c9a84c';
-    li.style.borderBottom = '2px solid transparent'; li.style.background = '#0f0d0a'; li.style.color = '#5a4a28';
+    fb.style.borderBottom = '2px solid '+activeBorder; fb.style.background = activeBg; fb.style.color = activeColor;
+    li.style.borderBottom = '2px solid transparent'; li.style.background = inactiveBg; li.style.color = inactiveColor;
   }
   // Load fresh chat for new tab
   pwLoadActiveDate();
@@ -6432,19 +6451,26 @@ function lrGetUI() { return LR_UI[_lrLang] || LR_UI.en; }
 
 function lrSyncBtns() {
   const ui = lrGetUI();
+  const isLight = document.body.classList.contains('light-mode');
+  const activeBg    = isLight ? '#f5f0e0' : '#1a1500';
+  const activeBorder= isLight ? '#9a7228' : '#c9a84c';
+  const activeColor = isLight ? '#9a7228' : '#c9a84c';
+  const inactiveBg  = isLight ? '#ece9e2' : '#1e1a10';
+  const inactiveBorder= isLight ? '#d4cfc5' : '#2a2010';
+  const inactiveColor = isLight ? '#5a5750' : '#8a7840';
   // Lang buttons
   document.querySelectorAll('.lr-lang-btn').forEach(b => {
     const active = b.dataset.lang === _lrLang;
-    b.style.background = active ? '#1a1500' : '#1e1a10';
-    b.style.borderColor = active ? '#c9a84c' : '#2a2010';
-    b.style.color = active ? '#c9a84c' : '#8a7840';
+    b.style.background = active ? activeBg : inactiveBg;
+    b.style.borderColor = active ? activeBorder : inactiveBorder;
+    b.style.color = active ? activeColor : inactiveColor;
   });
   // Type buttons
   document.querySelectorAll('.lr-type-btn').forEach(b => {
     const active = b.dataset.type === _lrType;
-    b.style.background = active ? '#1a1500' : '#1e1a10';
-    b.style.borderColor = active ? '#c9a84c' : '#2a2010';
-    b.style.color = active ? '#c9a84c' : '#8a7840';
+    b.style.background = active ? activeBg : inactiveBg;
+    b.style.borderColor = active ? activeBorder : inactiveBorder;
+    b.style.color = active ? activeColor : inactiveColor;
   });
   // Word/Verb button labels
   const wb = document.getElementById('lrWordBtn');

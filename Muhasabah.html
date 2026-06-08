@@ -435,6 +435,26 @@ body.light-mode [onclick="zikrArticleTap(-1)"]{
 body.light-mode [onclick="zikrArticleTap(1)"]{
   background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;
 }
+/* Language Learner */
+body.light-mode #langOverlay{background:rgba(240,238,232,.97);}
+body.light-mode #lrHero,body.light-mode #lrCollPanel,body.light-mode #lrConjPanel,
+body.light-mode #lrStoryPanel,body.light-mode #lrSynAntPanel,body.light-mode #lrChallengePanel{
+  background:#f0ede6!important;border-color:#d4cfc5!important;
+}
+body.light-mode #lrHero{border-top-color:#9a7228!important;}
+body.light-mode #lrWordMain{color:#1a1a18!important;}
+body.light-mode #lrWordMeaning,body.light-mode #lrCollocations,
+body.light-mode #lrStory,body.light-mode #lrSimpleMeaning{color:#1a1a18!important;}
+body.light-mode #lrWordRoman,body.light-mode #lrWordType{color:#5a5750!important;}
+body.light-mode #lrWordNum{color:#9a9590!important;}
+/* Post Writer */
+body.light-mode #postWriterOverlay [style*="background:#0d0b08"],
+body.light-mode #postWriterOverlay [style*="background:#141008"],
+body.light-mode #postWriterOverlay [style*="background:#1a1610"],
+body.light-mode #postWriterOverlay [style*="background:#1a1500"],
+body.light-mode #postWriterOverlay [style*="background:#1a1610"]{
+  background:#f0ede6!important;
+}
 /* ── Dark Mode Toggle ── */
 .dark-toggle{
   background:var(--surface2);border:1px solid var(--border);
@@ -3989,7 +4009,7 @@ function renderBookBadge(dk) {
 </div>
 
 <script>
-function reThemeIfLight(){if(document.body.classList.contains('light-mode'))setTimeout(()=>applyReaderTheme(true),80);}
+function reThemeIfLight(){if(document.body.classList.contains('light-mode'))applyReaderTheme(true);}
 
 function openSalahArticle(){
   document.getElementById('salahArticleOverlay').classList.add('active');
@@ -5970,6 +5990,7 @@ function pwLoadActiveDate() {
 
 function openPostWriter() {
   document.getElementById('postWriterOverlay').classList.add('active');
+  reThemeIfLight();
   // Load saved key
   _pwApiKey = localStorage.getItem('pw_gemini_key') || '';
   if (_pwApiKey) {
@@ -6743,6 +6764,7 @@ function lrRender() {
 
   // Mark button — single button for current lang + type
   lrRenderMarkBtn();
+  reThemeIfLight();
 }
 
 // ── Single mark button — with undo toggle ────────────────────────────────
@@ -6924,6 +6946,7 @@ async function openLanguageReader() {
     return;
   }
   lrRender();
+  reThemeIfLight();
   // Preload all other languages in background — no await, fire-and-forget
   lrPreloadAll();
 }

@@ -6613,26 +6613,35 @@ function lrRender() {
     wordTypeEl.style.fontSize = '14px';
     wordTypeEl.style.color = '#a89060';
     wordTypeEl.style.letterSpacing = '0';
-  } else if (_lrType === 'word' && lang.plural && _lrLang !== 'bn') {
-    // Arabic: show gender + Arabic plural marker; Urdu: {nominative, oblique}; others: plain plural
+  } else if (_lrType === 'word' && _lrLang !== 'bn') {
+    // Arabic: show gender + Arabic plural marker; Urdu/Hindi: {nominative, oblique}; others: plain plural
     let pluralLabel;
     if (isAr) {
       pluralLabel = lang.gender ? lang.gender + ' · ج: ' + lang.plural : 'ج: ' + lang.plural;
     } else if ((_lrLang === 'ur' || _lrLang === 'hi') && lang.plural && typeof lang.plural === 'object') {
       const nom = lang.plural.nominative || '';
       const obl = lang.plural.oblique || '';
-      pluralLabel = (lang.gender || '') + (lang.gender && nom ? ' · ' : '') + (nom ? 'बहु: ' + nom : '') + (obl ? ' / ' + obl : '');
+      const pluralPart = (nom ? 'बहु: ' + nom : '') + (obl ? ' / ' + obl : '');
+      pluralLabel = (lang.gender || '') + (lang.gender && pluralPart ? ' · ' : '') + pluralPart;
+    } else if (_lrLang === 'hi') {
+      // string plural (e.g. "लागू नहीं") or absent — always show gender
+      const pluralPart = (lang.plural && lang.plural !== 'लागू नहीं') ? lang.plural : 'बहु: लागू नहीं';
+      pluralLabel = (lang.gender || '') + (lang.gender ? ' · ' : '') + pluralPart;
+    } else if (_lrLang === 'ur' && lang.plural && typeof lang.plural === 'object') {
+      const nom = lang.plural.nominative || '';
+      const obl = lang.plural.oblique || '';
+      pluralLabel = (lang.gender || '') + (lang.gender && nom ? ' · ' : '') + (nom ? 'ج: ' + nom : '') + (obl ? ' / ' + obl : '');
     } else {
-      pluralLabel = lang.plural;
+      pluralLabel = lang.plural || (lang.gender || '');
     }
-    wordTypeEl.textContent = pluralLabel;
+    wordTypeEl.textContent = pluralLabel || '';
     wordTypeEl.style.fontFamily = (isAr || _lrLang === 'ur') ? "'Amiri', serif" : "'Literata',Georgia,serif";
     wordTypeEl.style.fontSize = (isAr || _lrLang === 'ur') ? '13px' : '12px';
     wordTypeEl.style.color = '#7a6a40';
     wordTypeEl.style.letterSpacing = '0';
   } else {
     wordTypeEl.textContent = lang.gender ? lang.gender : '';
-    wordTypeEl.style.fontFamily = "'Amiri', serif";
+    wordTypeEl.style.fontFamily = (_lrLang === 'bn' || _lrLang === 'hi') ? "'Literata',Georgia,serif" : "'Amiri', serif";
     wordTypeEl.style.fontSize = '13px';
     wordTypeEl.style.color = '#7a6a40';
     wordTypeEl.style.letterSpacing = '0';

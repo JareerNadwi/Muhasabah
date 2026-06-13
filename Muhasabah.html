@@ -817,7 +817,10 @@ body.overlay-open{overflow:hidden;}
 <!-- Read Me Modal -->
 <div class="modal-overlay" id="readMeModal">
   <div class="modal" style="max-width:600px;border-color:var(--purple);text-align:left;max-height:88vh;overflow-y:auto;">
-    <h3 style="color:var(--purple-bright);margin-bottom:4px;">&#x1F4D6; How To Use Muhasabah</h3>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <h3 style="color:var(--purple-bright);margin:0;">&#x1F4D6; How To Use Muhasabah</h3>
+      <button onclick="closeReadMe()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:6px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;flex-shrink:0;" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">✕ Close</button>
+    </div>
     <p style="color:var(--text-muted);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px;font-family:'DM Mono',monospace;">Daily Tracker — Complete Guide</p>
 
     <!-- WHAT IS MUHASABAH -->

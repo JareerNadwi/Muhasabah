@@ -26,146 +26,179 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 
 
 /* ══════════════════════════════════════════════════════════
-   CONTACT BOOK + CRM — CSS
+   NETWORKING HUB — Contact Book + CRM
 ══════════════════════════════════════════════════════════ */
-#contactBookOverlay{background:var(--bg);}
-.cb-wrap{max-width:720px;margin:0 auto;padding:0 0 80px;}
-.cb-topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 0 18px;border-bottom:1px solid var(--border);margin-bottom:18px;gap:10px;flex-wrap:wrap;}
-.cb-title-main{font-family:'Amiri',serif;font-size:20px;color:var(--gold);}
-.cb-subtitle{font-size:10px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
-.cb-close-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
-.cb-close-btn:hover{border-color:var(--gold-dim);color:var(--text);}
-.net-nav{display:flex;gap:0;margin-bottom:18px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-.net-nav-tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--text-dim);background:var(--surface);transition:all .15s;border:none;outline:none;}
-.net-nav-tab:first-child{border-right:1px solid var(--border);}
-.net-nav-tab.active{background:var(--surface2);color:var(--gold);border-bottom:2px solid var(--gold);}
-.net-nav-tab:hover:not(.active){color:var(--text);background:var(--surface2);}
-.cb-section{display:none;}.cb-section.on{display:block;}
-.cb-controls{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
-.cb-search{flex:1;min-width:140px;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
-.cb-search:focus{border-color:var(--gold-dim);}
-.cb-search::placeholder{color:var(--text-muted);}
-.cb-add-btn{background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);padding:8px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;white-space:nowrap;}
-.cb-add-btn:hover{background:#1a1200;border-color:var(--gold);}
-.cb-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:3500;align-items:center;justify-content:center;padding:16px;}
-.cb-modal-bg.open{display:flex;}
-.cb-modal{background:var(--surface);border:1px solid var(--border);border-radius:10px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:22px;}
-.cb-modal-title{font-family:'Amiri',serif;font-size:18px;color:var(--gold);margin-bottom:18px;}
-.cb-field{margin-bottom:13px;}
-.cb-field label{display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-dim);margin-bottom:4px;text-transform:uppercase;}
-.cb-field input,.cb-field select,.cb-field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 11px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
-.cb-field input:focus,.cb-field select:focus,.cb-field textarea:focus{border-color:var(--gold-dim);}
-.cb-field select option{background:var(--surface2);}
-.cb-field textarea{resize:vertical;min-height:56px;font-size:11px;line-height:1.5;}
-.cb-modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end;flex-wrap:wrap;}
-.cb-modal-save{background:#1a1200;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
-.cb-modal-save:hover{border-color:var(--gold);background:#221800;}
-.cb-modal-cancel{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;}
-.cb-modal-cancel:hover{color:var(--text);}
-.cb-modal-del{background:#1a0808;border:1px solid #5a2020;color:#c05050;padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;}
-.cb-modal-del:hover{border-color:var(--red);}
-.cb-empty{text-align:center;padding:48px 16px;color:var(--text-muted);font-size:13px;font-style:italic;}
-.cb-links{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
-.cb-link-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;text-decoration:none;transition:all .15s;white-space:nowrap;}
-.cb-link-btn:hover{border-color:var(--gold-dim);color:var(--text);}
-.cb-link-btn.lk:hover{border-color:#0a66c2;color:#0a66c2;}
-.cb-link-btn.fb:hover{border-color:#1877f2;color:#1877f2;}
-.cb-link-btn.wa:hover{border-color:#25d366;color:#25d366;}
-.cb-link-btn.ph:hover{border-color:#6aab7a;color:#6aab7a;}
-.cb-link-btn.em:hover{border-color:var(--gold);color:var(--gold);}
-/* Contact list */
-.cb-list{display:flex;flex-direction:column;gap:10px;}
-.cb-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;transition:border-color .2s;}
-.cb-card:hover{border-color:var(--gold-dim);}
-.cb-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
-.cb-card-name{font-family:'Instrument Serif',serif;font-size:16px;color:var(--text);}
-.cb-card-sub{font-size:11px;color:var(--text-dim);margin-top:2px;}
-.cb-card-actions{display:flex;gap:6px;flex-shrink:0;}
-.cb-sm-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:4px 10px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;transition:all .15s;white-space:nowrap;}
-.cb-sm-btn:hover{border-color:var(--gold-dim);color:var(--text);}
-.cb-sm-btn.danger:hover{border-color:var(--red);color:#c05050;background:#1a0808;}
-.cb-card-notes{font-size:11px;color:var(--text-dim);font-style:italic;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
-/* CRM */
-.crm-alert{background:#130808;border:1px solid #6a2020;border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;display:none;}
-.crm-alert.on{display:block;}
-.crm-alert-title{font-family:'DM Mono',monospace;font-size:10px;color:#e05555;letter-spacing:1px;margin-bottom:6px;}
-.crm-alert-chips{display:flex;flex-wrap:wrap;gap:6px;}
-.crm-chip{display:inline-flex;align-items:center;gap:5px;background:#1a0808;border:1px solid #6a2020;border-radius:20px;padding:3px 10px;font-size:10px;color:#e08080;cursor:pointer;font-family:'DM Mono',monospace;}
-.crm-chip:hover{border-color:#e05555;color:#e05555;}
-.crm-controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
-.crm-stage-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
-.crm-sf-pill{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);cursor:pointer;transition:all .15s;}
-.crm-sf-pill:hover,.crm-sf-pill.on{background:var(--surface2);border-color:var(--gold-dim);color:var(--text);}
-.crm-sf-pill.on{border-color:var(--gold);color:var(--gold);}
-.crm-sf-cnt{font-size:9px;background:var(--surface2);border-radius:20px;padding:1px 5px;}
-.crm-sf-pill.on .crm-sf-cnt{background:#1a1200;}
-.crm-sf-pill.ov{border-color:#5a2020;color:#e05555;}
-.crm-sf-pill.ov.on{border-color:#e05555;}
-.crm-manage-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;margin-left:auto;}
-.crm-manage-btn:hover{border-color:var(--gold-dim);color:var(--text);}
+#netHubOverlay{background:var(--bg);}
+.nh-wrap{max-width:740px;margin:0 auto;padding:0 0 80px;}
+
+/* Topbar */
+.nh-topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 0 16px;border-bottom:1px solid var(--border);margin-bottom:16px;gap:10px;flex-wrap:wrap;}
+.nh-title{font-family:'Amiri',serif;font-size:20px;color:var(--gold);}
+.nh-subtitle{font-size:10px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.nh-close{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
+.nh-close:hover{border-color:var(--gold-dim);color:var(--text);}
+
+/* Today dashboard */
+.nh-today{background:#110a0a;border:1px solid #6a2020;border-radius:8px;padding:12px 16px;margin-bottom:16px;display:none;}
+.nh-today.on{display:block;}
+.nh-today-title{font-family:'DM Mono',monospace;font-size:10px;color:#e05555;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.nh-today-dot{width:7px;height:7px;border-radius:50%;background:#e05555;animation:pulse 1.5s ease-in-out infinite;}
+.nh-today-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.nh-chip{display:inline-flex;align-items:center;gap:5px;background:#1a0808;border:1px solid #6a2020;border-radius:20px;padding:4px 12px;font-size:11px;color:#e08080;cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s;}
+.nh-chip:hover{border-color:#e05555;color:#e05555;}
+.nh-chip-company{font-size:9px;opacity:.7;}
+
+/* Nav tabs */
+.nh-nav{display:flex;margin-bottom:16px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.nh-tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--text-dim);background:var(--surface);transition:all .15s;border:none;outline:none;}
+.nh-tab:not(:last-child){border-right:1px solid var(--border);}
+.nh-tab.on{background:var(--surface2);color:var(--gold);border-bottom:2px solid var(--gold);}
+.nh-tab:hover:not(.on){color:var(--text);background:var(--surface2);}
+.nh-section{display:none;}.nh-section.on{display:block;}
+
+/* Controls */
+.nh-controls{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.nh-search{flex:1;min-width:140px;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
+.nh-search:focus{border-color:var(--gold-dim);}
+.nh-search::placeholder{color:var(--text-muted);}
+.nh-add-btn{background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);padding:8px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;white-space:nowrap;}
+.nh-add-btn:hover{background:#1a1200;border-color:var(--gold);}
+
+/* Shared modal */
+.nh-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:3500;align-items:center;justify-content:center;padding:16px;}
+.nh-modal-bg.open{display:flex;}
+.nh-modal{background:var(--surface);border:1px solid var(--border);border-radius:10px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:22px;}
+.nh-modal-title{font-family:'Amiri',serif;font-size:18px;color:var(--gold);margin-bottom:18px;}
+.nh-field{margin-bottom:12px;}
+.nh-field label{display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-dim);margin-bottom:4px;text-transform:uppercase;}
+.nh-field input,.nh-field select,.nh-field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 11px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
+.nh-field input:focus,.nh-field select:focus,.nh-field textarea:focus{border-color:var(--gold-dim);}
+.nh-field select option{background:var(--surface2);}
+.nh-field textarea{resize:vertical;min-height:60px;font-size:11px;line-height:1.5;}
+.nh-modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end;flex-wrap:wrap;}
+.nh-btn-save{background:#1a1200;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
+.nh-btn-save:hover{border-color:var(--gold);background:#221800;}
+.nh-btn-cancel{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;}
+.nh-btn-cancel:hover{color:var(--text);}
+.nh-btn-del{background:#1a0808;border:1px solid #5a2020;color:#c05050;padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;}
+.nh-btn-del:hover{border-color:var(--red);}
+
+/* Link buttons */
+.nh-links{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 8px;}
+.nh-link{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);font-family:'DM Mono',monospace;font-size:10px;text-decoration:none;transition:all .15s;white-space:nowrap;}
+.nh-link:hover{border-color:var(--gold-dim);color:var(--text);}
+.nh-link.lk:hover{border-color:#0a66c2;color:#0a66c2;}
+.nh-link.fb:hover{border-color:#1877f2;color:#1877f2;}
+.nh-link.wa:hover{border-color:#25d366;color:#25d366;}
+.nh-link.ph:hover{border-color:#6aab7a;color:#6aab7a;}
+.nh-link.em:hover{border-color:var(--gold);color:var(--gold);}
+
+/* Small action buttons */
+.nh-sm-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:4px 10px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;transition:all .15s;white-space:nowrap;}
+.nh-sm-btn:hover{border-color:var(--gold-dim);color:var(--text);}
+.nh-sm-btn.danger:hover{border-color:var(--red);color:#c05050;background:#1a0808;}
+.nh-empty{text-align:center;padding:40px 16px;color:var(--text-muted);font-size:12px;font-style:italic;}
+
+/* ── CONTACT BOOK ── */
+.nh-cb-list{display:flex;flex-direction:column;gap:10px;}
+.nh-cb-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;transition:border-color .2s;}
+.nh-cb-card:hover{border-color:var(--gold-dim);}
+.nh-cb-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px;}
+.nh-cb-name{font-family:'Instrument Serif',serif;font-size:16px;color:var(--text);}
+.nh-cb-sub{font-size:11px;color:var(--text-dim);margin-top:2px;}
+.nh-cb-actions{display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;}
+
+/* ── CRM ── */
+/* Stage filter bar */
+.nh-crm-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
+.nh-sf{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.nh-sf:hover,.nh-sf.on{background:var(--surface2);border-color:var(--gold-dim);color:var(--text);}
+.nh-sf.on{border-color:var(--gold);color:var(--gold);}
+.nh-sf-cnt{font-size:9px;background:var(--surface2);border-radius:10px;padding:1px 5px;}
+.nh-sf.on .nh-sf-cnt{background:#1a1200;}
+.nh-sf.ov-pill{border-color:#5a2020;color:#e05555;}
+.nh-sf.ov-pill.on{border-color:#e05555;background:#130808;}
+.nh-manage-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;margin-left:auto;white-space:nowrap;}
+.nh-manage-btn:hover{border-color:var(--gold-dim);color:var(--text);}
+
 /* Kanban accordion */
-.crm-kanban{display:flex;flex-direction:column;gap:8px;}
-.crm-col{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-.crm-col-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none;transition:background .15s;}
-.crm-col-header:hover{background:var(--surface2);}
-.crm-col-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;color:var(--text);display:flex;align-items:center;gap:8px;}
-.crm-col-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.crm-col-meta{display:flex;align-items:center;gap:8px;}
-.crm-col-cnt{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);background:var(--surface2);padding:2px 8px;border-radius:20px;}
-.crm-col-cnt.urg{background:#2a0808;color:#e05555;border:1px solid #5a2020;}
-.crm-col-chevron{color:var(--text-muted);font-size:10px;transition:transform .2s;}
-.crm-col.open .crm-col-chevron{transform:rotate(180deg);}
-.crm-col-body{display:none;padding:8px 12px 12px;border-top:1px solid var(--border);flex-direction:column;gap:8px;}
-.crm-col.open .crm-col-body{display:flex;}
+.nh-kanban{display:flex;flex-direction:column;gap:8px;}
+.nh-col{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:border-color .2s;}
+.nh-col-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none;transition:background .15s;}
+.nh-col-hd:hover{background:var(--surface2);}
+.nh-col-title{display:flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;color:var(--text);}
+.nh-col-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.nh-col-meta{display:flex;align-items:center;gap:8px;}
+.nh-col-cnt{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);background:var(--surface2);padding:2px 8px;border-radius:20px;}
+.nh-col-cnt.urg{background:#1a0808;color:#e05555;border:1px solid #5a2020;}
+.nh-col-chev{color:var(--text-muted);font-size:10px;transition:transform .2s;}
+.nh-col.open .nh-col-chev{transform:rotate(180deg);}
+.nh-col-body{display:none;flex-direction:column;gap:8px;padding:8px 12px 12px;border-top:1px solid var(--border);}
+.nh-col.open .nh-col-body{display:flex;}
+
 /* Deal cards */
-.crm-deal{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px 14px;transition:border-color .2s;}
-.crm-deal:hover{border-color:var(--gold-dim);}
-.crm-deal.ov{border-color:#5a2020;background:#0f0808;}
-.crm-deal.ov:hover{border-color:#e05555;}
-.crm-deal-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;}
-.crm-deal-name{font-family:'Instrument Serif',serif;font-size:15px;color:var(--text);}
-.crm-deal-company{font-size:11px;color:var(--text-dim);margin-top:1px;}
-.crm-deal-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
-.crm-ov-tag{font-family:'DM Mono',monospace;font-size:9px;color:#e05555;background:#1a0808;border:1px solid #5a2020;border-radius:20px;padding:2px 7px;white-space:nowrap;}
-.crm-fu-date{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);}
-.crm-fu-date.urg{color:#e05555;}
-.crm-deal-bottom{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.crm-deal-log-preview{font-size:10px;color:var(--text-muted);font-style:italic;flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
-.crm-deal-actions{display:flex;gap:5px;flex-shrink:0;}
-/* Activity log */
-.crm-log-panel{margin-top:8px;border-top:1px solid var(--border);padding-top:8px;display:none;}
-.crm-log-panel.open{display:block;}
-.crm-log-entry{display:flex;gap:8px;margin-bottom:5px;font-size:11px;}
-.crm-log-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;padding-top:1px;}
-.crm-log-text{color:var(--text-dim);line-height:1.4;}
-.crm-log-add{display:flex;gap:6px;margin-top:8px;}
-.crm-log-input{flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;}
-.crm-log-input:focus{border-color:var(--gold-dim);}
-.crm-log-submit{background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);padding:6px 12px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;white-space:nowrap;}
-.crm-log-submit:hover{background:#1a1200;}
+.nh-deal{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px 14px;transition:border-color .2s;}
+.nh-deal:hover{border-color:var(--gold-dim);}
+.nh-deal.ov{border-color:#5a2020;background:#0f0808;}
+.nh-deal.ov:hover{border-color:#e05555;}
+.nh-deal-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.nh-deal-name{font-family:'Instrument Serif',serif;font-size:15px;color:var(--text);}
+.nh-deal-co{font-size:11px;color:var(--text-dim);margin-top:1px;}
+.nh-deal-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
+.nh-ov-tag{font-family:'DM Mono',monospace;font-size:9px;color:#e05555;background:#1a0808;border:1px solid #5a2020;border-radius:20px;padding:2px 7px;white-space:nowrap;}
+.nh-next-date{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);}
+.nh-next-date.urg{color:#e05555;}
+.nh-next-date.soon{color:var(--gold);}
+.nh-deal-bottom{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.nh-deal-preview{font-size:10px;color:var(--text-muted);font-style:italic;flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.nh-deal-btns{display:flex;gap:5px;flex-shrink:0;}
+
+/* Notes panel (shared Contact Book + CRM) */
+.nh-notes-panel{margin-top:8px;border-top:1px solid var(--border);padding-top:10px;display:none;}
+.nh-notes-panel.open{display:block;}
+.nh-notes-log{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;max-height:220px;overflow-y:auto;}
+.nh-note-entry{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 10px;}
+.nh-note-date{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-bottom:3px;}
+.nh-note-text{font-size:11px;color:var(--text-dim);line-height:1.5;white-space:pre-wrap;}
+.nh-note-add{display:flex;flex-direction:column;gap:6px;}
+.nh-note-textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;resize:vertical;min-height:56px;line-height:1.4;}
+.nh-note-textarea:focus{border-color:var(--gold-dim);}
+.nh-note-submit{align-self:flex-end;background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);padding:6px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;}
+.nh-note-submit:hover{background:#1a1200;}
+
 /* Stage manager modal */
-.crm-sm-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
-.crm-sm-item{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;}
-.crm-sm-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.crm-sm-name{flex:1;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);}
-.crm-sm-del{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:2px 4px;}
-.crm-sm-del:hover{color:#e05555;}
-.crm-sm-add{display:flex;gap:6px;}
-.crm-sm-input{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
-.crm-sm-input:focus{border-color:var(--gold-dim);}
-.crm-sm-addbtn{background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;white-space:nowrap;}
-.crm-sm-addbtn:hover{background:#1a1200;}
-/* light mode */
-body.light-mode #contactBookOverlay{background:#f5f3ec;}
-body.light-mode .cb-modal,.cb-modal{border-color:var(--border);}
-body.light-mode .cb-modal{background:#eae7de;border-color:#c8c0a8;}
-body.light-mode .cb-card,.crm-col{border-color:var(--border);}
-body.light-mode .cb-card{background:#eae7de;border-color:#c8c0a8;}
-body.light-mode .cb-field input,body.light-mode .cb-field select,body.light-mode .cb-field textarea,body.light-mode .crm-log-input,body.light-mode .crm-sm-input{background:#dedad0;border-color:#b8b0a0;color:#1a1a18;}
-body.light-mode .cb-search{background:#eae7de;border-color:#c8c0a8;color:#1a1a18;}
-body.light-mode .cb-link-btn,body.light-mode .cb-sm-btn{background:#dedad0;border-color:#b8b0a0;}
-body.light-mode .crm-deal{background:#dedad0;border-color:#b8b0a0;}
-body.light-mode .crm-sf-pill,body.light-mode .crm-sm-item{background:#eae7de;border-color:#c8c0a8;}
+.nh-sm-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;min-height:40px;}
+.nh-sm-item{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;cursor:grab;}
+.nh-sm-item.dragging{opacity:.4;border-style:dashed;}
+.nh-sm-item.drag-over{border-color:var(--gold);}
+.nh-sm-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.nh-sm-grip{color:var(--text-muted);font-size:12px;cursor:grab;padding:0 2px;flex-shrink:0;}
+.nh-sm-name{flex:1;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);}
+.nh-sm-fixed{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);letter-spacing:.5px;}
+.nh-sm-del{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:2px 4px;}
+.nh-sm-del:hover{color:#e05555;}
+.nh-sm-add{display:flex;gap:6px;}
+.nh-sm-input{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
+.nh-sm-input:focus{border-color:var(--gold-dim);}
+.nh-sm-addbtn{background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;white-space:nowrap;}
+.nh-sm-addbtn:hover{background:#1a1200;}
+
+/* Deal drag */
+.nh-deal{cursor:grab;}
+.nh-deal.dragging{opacity:.35;border-style:dashed;cursor:grabbing;}
+.nh-col-body.drag-target{background:rgba(200,169,110,.06);border-color:var(--gold-dim);}
+.nh-col-body.drag-target .nh-add-btn{display:none;}
+
+/* Light mode */
+body.light-mode #netHubOverlay{background:#f5f3ec;}
+body.light-mode .nh-modal{background:#eae7de;border-color:#c8c0a8;}
+body.light-mode .nh-cb-card,.nh-col,.nh-deal{border-color:var(--border);}
+body.light-mode .nh-cb-card{background:#eae7de;border-color:#c8c0a8;}
+body.light-mode .nh-deal{background:#dedad0;border-color:#b8b0a0;}
+body.light-mode .nh-field input,body.light-mode .nh-field select,body.light-mode .nh-field textarea,body.light-mode .nh-note-textarea,body.light-mode .nh-sm-input,body.light-mode .nh-search{background:#dedad0;border-color:#b8b0a0;color:#1a1a18;}
+body.light-mode .nh-sm-item{background:#dedad0;border-color:#b8b0a0;}
+body.light-mode .nh-sf{background:#eae7de;border-color:#c8c0a8;}
+body.light-mode .nh-note-entry{background:#dedad0;border-color:#b8b0a0;}
 
 /* ── Contact Banner ── */
 .contact-banner{
@@ -1161,7 +1194,7 @@ body.overlay-open{overflow:hidden;}
         </div>
       </div>
       <div class="sub-label">Goal: Connect &amp; Build Rapport With 5+ People = Full 5% Core</div>
-      <button class="qr-open-btn" style="margin-top:8px;" onclick="openContactBook()">📒 Open Contact Book</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openContactBook()">📒 Open Contact Book &amp; CRM</button>
     </div>
 
   </div><!-- /growth -->
@@ -3636,7 +3669,7 @@ loadDayData = function(dk){
 /* ── Scroll lock: prevent background scroll when any overlay is open ── */
 (function(){
   function updateBodyLock(){
-    var anyActive = document.querySelector('.modal-overlay.active, .quran-reader-overlay.active, .lr-overlay.active, #contactBookOverlay.active');
+    var anyActive = document.querySelector('.modal-overlay.active, .quran-reader-overlay.active, .lr-overlay.active, #netHubOverlay.active');
     document.body.classList.toggle('overlay-open', !!anyActive);
   }
   var mo = new MutationObserver(updateBodyLock);
@@ -6873,568 +6906,661 @@ function closeLanguageReader() {
 lrUpdateGoalBadge();
 
 /* ══════════════════════════════════════════════════════════
-   CONTACT BOOK + CRM SYSTEM
-   Keys: '_cb_contacts', '_crm_deals', '_crm_stages' in IDB
+   NETWORKING HUB v3 — Contact Book + CRM
+   Storage keys (IDB global):
+     _nh_contacts  — contact book entries
+     _nh_deals     — CRM deals
+     _nh_stages    — pipeline stages
+     _nh_notes     — shared notes log {id, entityId, date, text}
 ══════════════════════════════════════════════════════════ */
 
-/* ── Storage helpers ── */
-async function netGet(key) {
-  const db = await openDB();
-  return new Promise(res => {
-    const req = db.transaction(STORE,'readonly').objectStore(STORE).get(key);
-    req.onsuccess = () => res(req.result ? req.result.data : null);
-    req.onerror = () => res(null);
+/* ── IDB helpers ── */
+async function nhGet(key){
+  const db=await openDB();
+  return new Promise(res=>{
+    const req=db.transaction(STORE,'readonly').objectStore(STORE).get(key);
+    req.onsuccess=()=>res(req.result?req.result.data:null);
+    req.onerror=()=>res(null);
   });
 }
-async function netSet(key, data) {
-  const db = await openDB();
-  return new Promise((res,rej) => {
-    const tx = db.transaction(STORE,'readwrite');
-    tx.objectStore(STORE).put({dk:key, data});
-    tx.oncomplete = () => res();
-    tx.onerror = e => rej(e.target.error);
+async function nhSet(key,data){
+  const db=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).put({dk:key,data});
+    tx.oncomplete=()=>res();
+    tx.onerror=e=>rej(e.target.error);
   });
 }
 
-/* ── State ── */
-let _cbContacts = [];
-let _crmDeals   = [];
-let _crmStages  = [];
-let _netTab     = 'contacts'; // 'contacts' | 'crm'
-let _cbEditId   = null;
-let _crmEditId  = null;
-let _crmStageFil = 'all';
-let _crmOpenCols = new Set();
+/* ── Global state ── */
+let _nhContacts=[], _nhDeals=[], _nhStages=[], _nhNotes=[];
+let _nhTab='contacts';
+let _nhCbEditId=null, _nhCrmEditId=null;
+let _nhCrmFil='all';
+let _nhOpenCols=new Set();
+let _nhDragSrc=null;
+let _nhDealDragId=null;
 
-const DEFAULT_STAGES = [
-  {id:'s1', name:'Sent Request',       color:'#6a7080'},
-  {id:'s2', name:'Accepted',           color:'#c8a96e'},
-  {id:'s3', name:'Contacted',          color:'#6aab7a'},
-  {id:'s4', name:'Responded',          color:'#9a6abf'},
-  {id:'s5', name:'Opportunity Created',color:'#5a9abf'},
-  {id:'s6', name:'Follow Up',          color:'#e05555'},
-  {id:'s7', name:'Closed',             color:'#4a7c59'},
+const NH_FIXED_STAGE={id:'stage_contacts',name:'Contacts',color:'#6a7080',fixed:true};
+const NH_DEFAULT_STAGES=[
+  NH_FIXED_STAGE,
+  {id:'s1',name:'Sent Request',color:'#c8a96e'},
+  {id:'s2',name:'Accepted',color:'#6aab7a'},
+  {id:'s3',name:'Contacted',color:'#9a6abf'},
+  {id:'s4',name:'Responded',color:'#5a9abf'},
+  {id:'s5',name:'Opportunity Created',color:'#bf9a5a'},
+  {id:'s6',name:'Follow Up',color:'#e05555'},
+  {id:'s7',name:'Closed',color:'#4a7c59'},
 ];
 
 /* ── Utils ── */
-function netDaysDiff(dateStr) {
-  if (!dateStr) return null;
-  const d = new Date(dateStr); d.setHours(0,0,0,0);
-  const n = new Date(); n.setHours(0,0,0,0);
-  return Math.round((n - d) / 86400000);
+function nhId(){return '_'+Date.now()+Math.random().toString(36).slice(2,6);}
+function nhToday(){return new Date().toISOString().slice(0,10);}
+function nhDaysDiff(ds){
+  if(!ds)return null;
+  const d=new Date(ds);d.setHours(0,0,0,0);
+  const n=new Date();n.setHours(0,0,0,0);
+  return Math.round((n-d)/86400000);
 }
-function netIsOverdue(followup) {
-  if (!followup) return false;
-  return netDaysDiff(followup) >= 0;
-}
-function netToday() { return new Date().toISOString().slice(0,10); }
-function netId() { return '_' + Date.now() + Math.random().toString(36).slice(2,7); }
-function netLinkBtns(c) {
-  let h = '';
-  if (c.linkedin)  h += `<a class="cb-link-btn lk" href="${c.linkedin}" target="_blank" rel="noopener">🔗 LinkedIn</a>`;
-  if (c.facebook)  h += `<a class="cb-link-btn fb" href="${c.facebook}" target="_blank" rel="noopener">👤 Facebook</a>`;
-  if (c.whatsapp)  h += `<a class="cb-link-btn wa" href="https://wa.me/${(c.whatsapp||'').replace(/\D/g,'')}" target="_blank" rel="noopener">💬 WhatsApp</a>`;
-  if (c.phone)     h += `<a class="cb-link-btn ph" href="tel:${c.phone}">📞 Call</a>`;
-  if (c.email)     h += `<a class="cb-link-btn em" href="mailto:${c.email}">✉ Email</a>`;
+function nhIsOverdue(d){return!!d.nextAction&&nhDaysDiff(d.nextAction)>=0;}
+function nhStageName(id){return(_nhStages.find(s=>s.id===id)||{name:'—'}).name;}
+function nhStageColor(id){return(_nhStages.find(s=>s.id===id)||{color:'#6a7080'}).color;}
+
+function nhLinkBtns(obj){
+  let h='';
+  if(obj.linkedin) h+=`<a class="nh-link lk" href="${obj.linkedin}" target="_blank" rel="noopener">🔗 LinkedIn</a>`;
+  if(obj.facebook) h+=`<a class="nh-link fb" href="${obj.facebook}" target="_blank" rel="noopener">👤 Facebook</a>`;
+  if(obj.whatsapp) h+=`<a class="nh-link wa" href="https://wa.me/${(obj.whatsapp||'').replace(/\D/g,'')}" target="_blank" rel="noopener">💬 WhatsApp</a>`;
+  if(obj.phone)    h+=`<a class="nh-link ph" href="tel:${obj.phone}">📞 Call</a>`;
+  if(obj.email)    h+=`<a class="nh-link em" href="mailto:${obj.email}">✉ Email</a>`;
   return h;
 }
 
-/* ══ OPEN / CLOSE ══ */
-async function openContactBook() {
-  _cbContacts = (await netGet('_cb_contacts')) || [];
-  _crmDeals   = (await netGet('_crm_deals'))   || [];
-  _crmStages  = (await netGet('_crm_stages'))  || JSON.parse(JSON.stringify(DEFAULT_STAGES));
-  document.getElementById('contactBookOverlay').classList.add('active');
+/* ── Open / Close ── */
+async function openContactBook(){
+  [_nhContacts,_nhDeals,_nhStages,_nhNotes]=await Promise.all([
+    nhGet('_nh_contacts').then(v=>v||[]),
+    nhGet('_nh_deals').then(v=>v||[]),
+    nhGet('_nh_stages').then(v=>{
+      if(!v||!v.length) return JSON.parse(JSON.stringify(NH_DEFAULT_STAGES));
+      // Ensure fixed stage always present
+      if(!v.find(s=>s.id==='stage_contacts')) v.unshift(JSON.parse(JSON.stringify(NH_FIXED_STAGE)));
+      return v;
+    }),
+    nhGet('_nh_notes').then(v=>v||[]),
+  ]);
+  document.getElementById('netHubOverlay').classList.add('active');
   document.body.classList.add('overlay-open');
-  netShowTab(_netTab);
+  nhShowTab(_nhTab);
+  nhRenderToday();
 }
-function closeContactBook() {
-  document.getElementById('contactBookOverlay').classList.remove('active');
+function closeContactBook(){
+  document.getElementById('netHubOverlay').classList.remove('active');
   document.body.classList.remove('overlay-open');
 }
 
-/* ══ TAB NAV ══ */
-function netShowTab(tab) {
-  _netTab = tab;
-  document.querySelectorAll('.net-nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-  document.querySelectorAll('.cb-section').forEach(s => s.classList.toggle('on', s.dataset.section === tab));
-  if (tab === 'contacts') cbRender();
-  else crmRender();
+/* ── Today dashboard ── */
+function nhRenderToday(){
+  const el=document.getElementById('nhToday');
+  const chips=document.getElementById('nhTodayChips');
+  if(!el||!chips)return;
+  const due=_nhDeals.filter(nhIsOverdue);
+  if(!due.length){el.classList.remove('on');return;}
+  el.classList.add('on');
+  chips.innerHTML=due.map(d=>`<span class="nh-chip" onclick="nhScrollDeal('${d.id}')">
+    ${d.contactName||'—'} <span class="nh-chip-company">${d.company?'· '+d.company:''}</span>
+  </span>`).join('');
 }
 
-/* ══════════════════════════════════
-   CONTACT BOOK
-══════════════════════════════════ */
-function cbRender() {
-  const q = (document.getElementById('cbSearch')?.value || '').toLowerCase();
-  let contacts = [..._cbContacts].sort((a,b)=>(a.name||'').localeCompare(b.name||''));
-  if (q) contacts = contacts.filter(c =>
-    (c.name||'').toLowerCase().includes(q) ||
-    (c.role||'').toLowerCase().includes(q) ||
-    (c.company||'').toLowerCase().includes(q)
-  );
-  const list = document.getElementById('cbList');
-  if (!list) return;
-  if (!contacts.length) { list.innerHTML = '<div class="cb-empty">No contacts yet. Add your first connection.</div>'; return; }
-  list.innerHTML = contacts.map(c => {
-    const links = netLinkBtns(c);
-    return `<div class="cb-card">
-      <div class="cb-card-top">
+function nhScrollDeal(id){
+  nhShowTab('crm');
+  setTimeout(()=>{
+    const el=document.getElementById('nhd-'+id);
+    if(el){el.scrollIntoView({behavior:'smooth'});el.style.borderColor='#e05555';setTimeout(()=>el.style.borderColor='',1500);}
+  },80);
+}
+
+/* ── Tab nav ── */
+function nhShowTab(tab){
+  _nhTab=tab;
+  document.querySelectorAll('.nh-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
+  document.querySelectorAll('.nh-section').forEach(s=>s.classList.toggle('on',s.dataset.sec===tab));
+  if(tab==='contacts') nhRenderContacts();
+  else nhRenderCrm();
+}
+
+/* ══ CONTACT BOOK ══ */
+function nhRenderContacts(){
+  const q=(document.getElementById('nhCbSearch')?.value||'').toLowerCase();
+  let list=[..._nhContacts].sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  if(q) list=list.filter(c=>(c.name+c.role+c.company).toLowerCase().includes(q));
+  const el=document.getElementById('nhCbList');
+  if(!el)return;
+  if(!list.length){el.innerHTML='<div class="nh-empty">No contacts yet. Add your first connection.</div>';return;}
+  el.innerHTML=list.map(c=>{
+    const links=nhLinkBtns(c);
+    const noteCount=_nhNotes.filter(n=>n.entityId===c.id).length;
+    return `<div class="nh-cb-card">
+      <div class="nh-cb-card-top">
         <div>
-          <div class="cb-card-name">${c.name||'—'}</div>
-          <div class="cb-card-sub">${[c.role,c.company].filter(Boolean).join(' · ')||'&nbsp;'}</div>
+          <div class="nh-cb-name">${c.name||'—'}</div>
+          <div class="nh-cb-sub">${[c.role,c.company].filter(Boolean).join(' · ')||'&nbsp;'}</div>
         </div>
-        <div class="cb-card-actions">
-          <button class="cb-sm-btn" onclick="cbOpenModal('${c.id}')">Edit</button>
-          <button class="cb-sm-btn danger" onclick="cbDelete('${c.id}')">Del</button>
+        <div class="nh-cb-actions">
+          <button class="nh-sm-btn" onclick="nhOpenNotes('${c.id}','${(c.name||'').replace(/'/g,"\\'")}')">📝 Notes${noteCount?` (${noteCount})`:''}</button>
+          <button class="nh-sm-btn" onclick="nhCbEdit('${c.id}')">Edit</button>
+          <button class="nh-sm-btn danger" onclick="nhCbDelete('${c.id}')">Del</button>
         </div>
       </div>
-      ${links ? `<div class="cb-links">${links}</div>` : ''}
-      ${c.notes ? `<div class="cb-card-notes">${c.notes}</div>` : ''}
+      ${links?`<div class="nh-links">${links}</div>`:''}
     </div>`;
   }).join('');
 }
 
-function cbOpenModal(id) {
-  _cbEditId = id || null;
-  const c = id ? _cbContacts.find(x=>x.id===id) : null;
-  document.getElementById('cbModalTitle').textContent = id ? 'Edit Contact' : 'Add Contact';
-  ['Name','Role','Company','Linkedin','Facebook','Whatsapp','Phone','Email','Notes'].forEach(f => {
-    const el = document.getElementById('cbF'+f);
-    if(el) el.value = c?.[f.toLowerCase()] || '';
+function nhCbEdit(id){
+  _nhCbEditId=id||null;
+  const c=id?_nhContacts.find(x=>x.id===id):null;
+  document.getElementById('nhCbModalTitle').textContent=id?'Edit Contact':'Add Contact';
+  ['Name','Role','Company','Linkedin','Facebook','Whatsapp','Phone','Email'].forEach(f=>{
+    const el=document.getElementById('nhCbF'+f);
+    if(el) el.value=c?.[f.toLowerCase()]||'';
   });
-  document.getElementById('cbModalBg').classList.add('open');
+  document.getElementById('nhCbModalBg').classList.add('open');
 }
-function cbCloseModal() {
-  document.getElementById('cbModalBg').classList.remove('open');
-  _cbEditId = null;
-}
-async function cbSaveContact() {
-  const name = document.getElementById('cbFName').value.trim();
-  if (!name) { alert('Name is required.'); return; }
-  const get = id => document.getElementById(id)?.value.trim() || '';
-  const contact = {
-    id: _cbEditId || netId(),
-    name, role:get('cbFRole'), company:get('cbFCompany'),
-    linkedin:get('cbFLinkedin'), facebook:get('cbFFacebook'),
-    whatsapp:get('cbFWhatsapp'), phone:get('cbFPhone'),
-    email:get('cbFEmail'), notes:get('cbFNotes'),
+function nhCbCloseModal(){document.getElementById('nhCbModalBg').classList.remove('open');_nhCbEditId=null;}
+async function nhCbSave(){
+  const g=id=>document.getElementById(id)?.value.trim()||'';
+  const name=g('nhCbFName');
+  if(!name){alert('Name is required.');return;}
+  const contact={
+    id:_nhCbEditId||nhId(),name,
+    role:g('nhCbFRole'),company:g('nhCbFCompany'),
+    linkedin:g('nhCbFLinkedin'),facebook:g('nhCbFFacebook'),
+    whatsapp:g('nhCbFWhatsapp'),phone:g('nhCbFPhone'),email:g('nhCbFEmail'),
   };
-  if (_cbEditId) { const i=_cbContacts.findIndex(x=>x.id===_cbEditId); if(i>-1) _cbContacts[i]=contact; }
-  else _cbContacts.push(contact);
-  await netSet('_cb_contacts', _cbContacts);
-  cbCloseModal(); cbRender();
+  if(_nhCbEditId){const i=_nhContacts.findIndex(x=>x.id===_nhCbEditId);if(i>-1)_nhContacts[i]=contact;}
+  else _nhContacts.push(contact);
+  // Auto-create CRM deal in Contacts stage if new
+  if(!_nhCbEditId){
+    const existsDeal=_nhDeals.some(d=>d.contactId===contact.id);
+    if(!existsDeal){
+      _nhDeals.push({
+        id:nhId(),contactId:contact.id,contactName:contact.name,
+        company:contact.company||'',stageId:'stage_contacts',
+        nextAction:'',linkedin:contact.linkedin||'',facebook:contact.facebook||'',
+        whatsapp:contact.whatsapp||'',phone:contact.phone||'',email:contact.email||'',
+        notes:'',createdAt:nhToday(),
+      });
+      await nhSet('_nh_deals',_nhDeals);
+    }
+  }
+  await nhSet('_nh_contacts',_nhContacts);
+  nhCbCloseModal();nhRenderContacts();nhRenderToday();
 }
-async function cbDelete(id) {
-  if (!confirm('Delete this contact?')) return;
-  _cbContacts = _cbContacts.filter(x=>x.id!==id);
-  await netSet('_cb_contacts', _cbContacts);
-  cbRender();
-}
-
-/* ══════════════════════════════════
-   CRM
-══════════════════════════════════ */
-function crmStageColor(stageId) {
-  return (_crmStages.find(s=>s.id===stageId)||{color:'#6a7080'}).color;
-}
-function crmStageName(stageId) {
-  return (_crmStages.find(s=>s.id===stageId)||{name:'Unknown'}).name;
-}
-
-function crmRender() {
-  crmRenderAlert();
-  crmRenderStageFil();
-  crmRenderKanban();
+async function nhCbDelete(id){
+  if(!confirm('Delete this contact? Their CRM deals will remain.'))return;
+  _nhContacts=_nhContacts.filter(x=>x.id!==id);
+  await nhSet('_nh_contacts',_nhContacts);
+  nhRenderContacts();
 }
 
-function crmRenderAlert() {
-  const overdue = _crmDeals.filter(d => netIsOverdue(d.followup));
-  const el = document.getElementById('crmAlert');
-  const chips = document.getElementById('crmAlertChips');
-  if (!el || !chips) return;
-  if (!overdue.length) { el.classList.remove('on'); return; }
-  el.classList.add('on');
-  chips.innerHTML = overdue.map(d =>
-    `<span class="crm-chip" onclick="crmScrollTo('${d.id}')">${d.contactName||d.company||'Unnamed'}</span>`
-  ).join('');
+/* ══ CRM ══ */
+function nhRenderCrm(){
+  nhRenderCrmFilters();
+  nhRenderKanban();
 }
 
-function crmRenderStageFil() {
-  const el = document.getElementById('crmStageFil');
-  if (!el) return;
-  const overdueCount = _crmDeals.filter(d=>netIsOverdue(d.followup)).length;
-  let h = `<span class="crm-sf-pill${_crmStageFil==='all'?' on':''}" onclick="crmSetFil('all')">ALL <span class="crm-sf-cnt">${_crmDeals.length}</span></span>`;
-  if (overdueCount>0) h += `<span class="crm-sf-pill ov${_crmStageFil==='ov'?' on':''}" onclick="crmSetFil('ov')">🔴 OVERDUE <span class="crm-sf-cnt">${overdueCount}</span></span>`;
-  _crmStages.forEach(s => {
-    const cnt = _crmDeals.filter(d=>d.stageId===s.id).length;
-    h += `<span class="crm-sf-pill${_crmStageFil===s.id?' on':''}" onclick="crmSetFil('${s.id}')">${s.name} <span class="crm-sf-cnt">${cnt}</span></span>`;
+function nhRenderCrmFilters(){
+  const el=document.getElementById('nhCrmFil');
+  if(!el)return;
+  const ovCnt=_nhDeals.filter(nhIsOverdue).length;
+  let h=`<span class="nh-sf${_nhCrmFil==='all'?' on':''}" onclick="nhSetFil('all')">ALL <span class="nh-sf-cnt">${_nhDeals.length}</span></span>`;
+  if(ovCnt>0) h+=`<span class="nh-sf ov-pill${_nhCrmFil==='ov'?' on':''}" onclick="nhSetFil('ov')">🔴 Overdue <span class="nh-sf-cnt">${ovCnt}</span></span>`;
+  _nhStages.forEach(s=>{
+    const cnt=_nhDeals.filter(d=>d.stageId===s.id).length;
+    h+=`<span class="nh-sf${_nhCrmFil===s.id?' on':''}" onclick="nhSetFil('${s.id}')">${s.name} <span class="nh-sf-cnt">${cnt}</span></span>`;
   });
-  h += `<span class="crm-manage-btn" onclick="crmOpenStageManager()">⚙ Stages</span>`;
-  el.innerHTML = h;
+  h+=`<span class="nh-manage-btn" onclick="nhOpenStageMgr()">⚙ Stages</span>`;
+  el.innerHTML=h;
 }
 
-function crmSetFil(val) {
-  _crmStageFil = val;
-  crmRender();
-}
+function nhSetFil(val){_nhCrmFil=val;nhRenderCrm();}
 
-function crmRenderKanban() {
-  const el = document.getElementById('crmKanban');
-  if (!el) return;
+function nhRenderKanban(){
+  const el=document.getElementById('nhKanban');
+  if(!el)return;
+  let deals=[..._nhDeals];
+  if(_nhCrmFil==='ov') deals=deals.filter(nhIsOverdue);
+  else if(_nhCrmFil!=='all') deals=deals.filter(d=>d.stageId===_nhCrmFil);
 
-  let deals = [..._crmDeals];
-  if (_crmStageFil === 'ov') deals = deals.filter(d=>netIsOverdue(d.followup));
-  else if (_crmStageFil !== 'all') deals = deals.filter(d=>d.stageId===_crmStageFil);
+  const byStage={};
+  _nhStages.forEach(s=>byStage[s.id]=[]);
+  deals.forEach(d=>{if(byStage[d.stageId])byStage[d.stageId].push(d);});
 
-  // Group by stage
-  const byStage = {};
-  _crmStages.forEach(s => byStage[s.id] = []);
-  deals.forEach(d => {
-    if (byStage[d.stageId]) byStage[d.stageId].push(d);
-    else { byStage['__other'] = byStage['__other']||[]; byStage['__other'].push(d); }
-  });
-
-  let h = '';
-  const stagesToShow = _crmStageFil==='all'||_crmStageFil==='ov'
-    ? _crmStages
-    : _crmStages.filter(s=>s.id===_crmStageFil);
-
-  stagesToShow.forEach(s => {
-    const sDeals = (byStage[s.id]||[]).sort((a,b)=>{
-      const ao=netIsOverdue(a.followup)?0:1, bo=netIsOverdue(b.followup)?0:1;
-      return ao-bo || (a.contactName||'').localeCompare(b.contactName||'');
+  const stages=_nhCrmFil==='all'||_nhCrmFil==='ov'?_nhStages:_nhStages.filter(s=>s.id===_nhCrmFil);
+  let h='';
+  stages.forEach(s=>{
+    const sDeals=(byStage[s.id]||[]).sort((a,b)=>{
+      const ao=nhIsOverdue(a)?0:1,bo=nhIsOverdue(b)?0:1;
+      return ao-bo||(a.contactName||'').localeCompare(b.contactName||'');
     });
-    if (_crmStageFil!=='all'&&_crmStageFil!=='ov'&&!sDeals.length) return;
-    const isOpen = _crmOpenCols.has(s.id);
-    const overdueInCol = sDeals.filter(d=>netIsOverdue(d.followup)).length;
-    h += `<div class="crm-col${isOpen?' open':''}" id="crmcol-${s.id}">
-      <div class="crm-col-header" onclick="crmToggleCol('${s.id}')">
-        <div class="crm-col-title">
-          <span class="crm-col-dot" style="background:${s.color}"></span>
+    const isOpen=_nhOpenCols.has(s.id);
+    const ovCnt=sDeals.filter(nhIsOverdue).length;
+    h+=`<div class="nh-col${isOpen?' open':''}" id="nhcol-${s.id}">
+      <div class="nh-col-hd" onclick="nhToggleCol('${s.id}')">
+        <div class="nh-col-title">
+          <span class="nh-col-dot" style="background:${s.color}"></span>
           ${s.name}
         </div>
-        <div class="crm-col-meta">
-          <span class="crm-col-cnt${overdueInCol?' urg':''}">${sDeals.length}${overdueInCol?` · ${overdueInCol} overdue`:''}</span>
-          <span class="crm-col-chevron">▼</span>
+        <div class="nh-col-meta">
+          <span class="nh-col-cnt${ovCnt?' urg':''}">${sDeals.length}${ovCnt?' · '+ovCnt+' overdue':''}</span>
+          <span class="nh-col-chev">▼</span>
         </div>
       </div>
-      <div class="crm-col-body">
-        ${sDeals.length ? sDeals.map(d=>crmDealHTML(d,s)).join('') : '<div class="cb-empty" style="padding:16px">No deals in this stage.</div>'}
-        <button class="cb-add-btn" style="align-self:flex-start;margin-top:4px" onclick="crmOpenModal(null,'${s.id}')">＋ Add Deal</button>
+      <div class="nh-col-body"
+        ondragover="nhColDragOver(event,'${s.id}')"
+        ondragleave="nhColDragLeave(event,'${s.id}')"
+        ondrop="nhColDrop(event,'${s.id}')">
+        ${sDeals.map(d=>nhDealHTML(d)).join('')}
+        <button class="nh-add-btn" style="align-self:flex-start;margin-top:4px" onclick="nhCrmOpenModal(null,'${s.id}')">＋ Add Deal</button>
       </div>
     </div>`;
   });
-  if (!h) h = '<div class="cb-empty">No deals yet. Add your first opportunity.</div>';
-  el.innerHTML = h;
+  if(!h) h='<div class="nh-empty">No deals yet.</div>';
+  el.innerHTML=h;
 }
 
-function crmDealHTML(d, stage) {
-  const overdue = netIsOverdue(d.followup);
-  const diff = d.followup ? netDaysDiff(d.followup) : null;
-  let fuText = '';
-  if (d.followup) {
-    if (diff===0) fuText='⚡ Today';
-    else if(diff>0) fuText=`${diff}d overdue`;
-    else fuText=d.followup;
+function nhDealHTML(d){
+  const ov=nhIsOverdue(d);
+  const diff=d.nextAction?nhDaysDiff(d.nextAction):null;
+  let dateLabel='';
+  if(d.nextAction){
+    if(diff===0) dateLabel='<span class="nh-next-date urg">⚡ Today</span>';
+    else if(diff>0) dateLabel=`<span class="nh-next-date urg">🔴 ${diff}d overdue</span>`;
+    else if(diff===-1) dateLabel='<span class="nh-next-date soon">Tomorrow</span>';
+    else if(diff<=-2&&diff>=-7) dateLabel=`<span class="nh-next-date soon">In ${-diff}d</span>`;
+    else dateLabel=`<span class="nh-next-date">${d.nextAction}</span>`;
   }
-  const links = netLinkBtns(d);
-  const lastLog = d.log?.length ? d.log[d.log.length-1] : null;
-  const logHtml = d.log?.length ? d.log.map(e=>`<div class="crm-log-entry"><span class="crm-log-date">${e.date}</span><span class="crm-log-text">${e.text}</span></div>`).join('') : '<div style="font-size:10px;color:var(--text-muted);font-style:italic">No activity yet.</div>';
-
-  return `<div class="crm-deal${overdue?' ov':''}" id="crmdeal-${d.id}">
-    <div class="crm-deal-top">
+  const links=nhLinkBtns(d);
+  const noteList=_nhNotes.filter(n=>n.entityId===d.id);
+  const lastNote=noteList.length?noteList[noteList.length-1]:null;
+  const noteCount=noteList.length;
+  return `<div class="nh-deal${ov?' ov':''}" id="nhd-${d.id}"
+    draggable="true"
+    ondragstart="nhDealDragStart(event,'${d.id}')"
+    ondragend="nhDealDragEnd('${d.id}')">
+    <div class="nh-deal-top">
       <div>
-        <div class="crm-deal-name">${d.contactName||'—'}</div>
-        <div class="crm-deal-company">${d.company||''}</div>
+        <div class="nh-deal-name">${d.contactName||'—'}</div>
+        <div class="nh-deal-co">${d.company||''}</div>
       </div>
-      <div class="crm-deal-right">
-        ${overdue?'<span class="crm-ov-tag">ACTION NEEDED</span>':''}
-        ${d.followup?`<span class="crm-fu-date${overdue?' urg':''}">${fuText}</span>`:''}
-      </div>
-    </div>
-    ${links?`<div class="cb-links">${links}</div>`:''}
-    <div class="crm-deal-bottom">
-      <div class="crm-deal-log-preview">${lastLog?lastLog.date+' — '+lastLog.text:'No activity logged'}</div>
-      <div class="crm-deal-actions">
-        <button class="cb-sm-btn" onclick="crmToggleLog('${d.id}')">📋 Log</button>
-        <button class="cb-sm-btn" onclick="crmOpenModal('${d.id}')">Edit</button>
-        <button class="cb-sm-btn danger" onclick="crmDelete('${d.id}')">Del</button>
+      <div class="nh-deal-right">
+        ${ov?'<span class="nh-ov-tag">ACTION NEEDED</span>':''}
+        ${dateLabel}
       </div>
     </div>
-    <div class="crm-log-panel" id="crmlog-${d.id}">
-      <div id="crmlog-entries-${d.id}">${logHtml}</div>
-      <div class="crm-log-add">
-        <input class="crm-log-input" id="crmlog-input-${d.id}" type="text" placeholder="Log an activity… (e.g. Sent message, Had a call)">
-        <button class="crm-log-submit" onclick="crmAddLog('${d.id}')">Log</button>
+    ${links?`<div class="nh-links">${links}</div>`:''}
+    <div class="nh-deal-bottom">
+      <div class="nh-deal-preview">${lastNote?lastNote.date+' — '+lastNote.text:'No notes yet'}</div>
+      <div class="nh-deal-btns">
+        <button class="nh-sm-btn" onclick="nhOpenNotes('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}')">📝 Notes${noteCount?' ('+noteCount+')':''}</button>
+        <button class="nh-sm-btn" onclick="nhCrmOpenModal('${d.id}')">Edit</button>
+        <button class="nh-sm-btn danger" onclick="nhCrmDelete('${d.id}')">Del</button>
       </div>
     </div>
   </div>`;
 }
 
-function crmToggleCol(stageId) {
-  if (_crmOpenCols.has(stageId)) _crmOpenCols.delete(stageId);
-  else _crmOpenCols.add(stageId);
-  const col = document.getElementById('crmcol-'+stageId);
-  if (col) col.classList.toggle('open', _crmOpenCols.has(stageId));
-}
-
-function crmToggleLog(dealId) {
-  const el = document.getElementById('crmlog-'+dealId);
-  if (el) el.classList.toggle('open');
-}
-
-function crmScrollTo(dealId) {
-  const el = document.getElementById('crmdeal-'+dealId);
-  if (el) { el.scrollIntoView({behavior:'smooth'}); }
+function nhToggleCol(id){
+  if(_nhOpenCols.has(id))_nhOpenCols.delete(id);else _nhOpenCols.add(id);
+  const col=document.getElementById('nhcol-'+id);
+  if(col)col.classList.toggle('open',_nhOpenCols.has(id));
 }
 
 /* CRM Modal */
-function crmOpenModal(id, defaultStageId) {
-  _crmEditId = id || null;
-  const d = id ? _crmDeals.find(x=>x.id===id) : null;
-  document.getElementById('crmModalTitle').textContent = id ? 'Edit Deal' : 'Add Deal';
-
-  // Populate contact picker
-  const cpick = document.getElementById('crmFContact');
-  cpick.innerHTML = '<option value="">— No linked contact —</option>' +
-    _cbContacts.map(c=>`<option value="${c.id}"${d?.contactId===c.id?' selected':''}>${c.name}${c.company?' · '+c.company:''}</option>`).join('');
-
-  // Populate stage picker
-  const spick = document.getElementById('crmFStage');
-  spick.innerHTML = _crmStages.map(s=>`<option value="${s.id}"${(d?.stageId||defaultStageId)===s.id?' selected':''}>${s.name}</option>`).join('');
-
-  document.getElementById('crmFContactName').value = d?.contactName||'';
-  document.getElementById('crmFCompany').value = d?.company||'';
-  document.getElementById('crmFFollowup').value = d?.followup||'';
-  document.getElementById('crmFNotes').value = d?.notes||'';
-
-  // Link fields — pull from linked contact if available
-  const lc = d?.contactId ? _cbContacts.find(x=>x.id===d.contactId) : null;
-  document.getElementById('crmFLinkedin').value  = d?.linkedin  || lc?.linkedin  || '';
-  document.getElementById('crmFFacebook').value  = d?.facebook  || lc?.facebook  || '';
-  document.getElementById('crmFWhatsapp').value  = d?.whatsapp  || lc?.whatsapp  || '';
-  document.getElementById('crmFPhone').value     = d?.phone     || lc?.phone     || '';
-  document.getElementById('crmFEmail').value     = d?.email     || lc?.email     || '';
-
-  document.getElementById('crmModalDelBtn').style.display = id ? 'block' : 'none';
-  document.getElementById('crmModalBg').classList.add('open');
+function nhCrmOpenModal(id,defaultStageId){
+  _nhCrmEditId=id||null;
+  const d=id?_nhDeals.find(x=>x.id===id):null;
+  document.getElementById('nhCrmModalTitle').textContent=id?'Edit Deal':'Add Deal';
+  const cpick=document.getElementById('nhCrmFContact');
+  cpick.innerHTML='<option value="">— No linked contact —</option>'+
+    _nhContacts.map(c=>`<option value="${c.id}"${d?.contactId===c.id?' selected':''}>${c.name}${c.company?' · '+c.company:''}</option>`).join('');
+  const spick=document.getElementById('nhCrmFStage');
+  spick.innerHTML=_nhStages.map(s=>`<option value="${s.id}"${(d?.stageId||defaultStageId||'stage_contacts')===s.id?' selected':''}>${s.name}</option>`).join('');
+  document.getElementById('nhCrmFContactName').value=d?.contactName||'';
+  document.getElementById('nhCrmFCompany').value=d?.company||'';
+  document.getElementById('nhCrmFNextAction').value=d?.nextAction||'';
+  document.getElementById('nhCrmFLinkedin').value=d?.linkedin||'';
+  document.getElementById('nhCrmFFacebook').value=d?.facebook||'';
+  document.getElementById('nhCrmFWhatsapp').value=d?.whatsapp||'';
+  document.getElementById('nhCrmFPhone').value=d?.phone||'';
+  document.getElementById('nhCrmFEmail').value=d?.email||'';
+  document.getElementById('nhCrmDelBtn').style.display=id?'block':'none';
+  document.getElementById('nhCrmModalBg').classList.add('open');
 }
-
-function crmCloseModal() {
-  document.getElementById('crmModalBg').classList.remove('open');
-  _crmEditId = null;
+function nhCrmCloseModal(){document.getElementById('nhCrmModalBg').classList.remove('open');_nhCrmEditId=null;}
+function nhCrmContactPick(){
+  const c=_nhContacts.find(x=>x.id===document.getElementById('nhCrmFContact').value);
+  if(!c)return;
+  document.getElementById('nhCrmFContactName').value=c.name||'';
+  document.getElementById('nhCrmFCompany').value=c.company||'';
+  document.getElementById('nhCrmFLinkedin').value=c.linkedin||'';
+  document.getElementById('nhCrmFFacebook').value=c.facebook||'';
+  document.getElementById('nhCrmFWhatsapp').value=c.whatsapp||'';
+  document.getElementById('nhCrmFPhone').value=c.phone||'';
+  document.getElementById('nhCrmFEmail').value=c.email||'';
 }
-
-// Auto-fill contact fields when contact is selected from picker
-function crmContactPick() {
-  const cid = document.getElementById('crmFContact').value;
-  const c = _cbContacts.find(x=>x.id===cid);
-  if (!c) return;
-  document.getElementById('crmFContactName').value = c.name||'';
-  document.getElementById('crmFCompany').value = c.company||'';
-  document.getElementById('crmFLinkedin').value  = c.linkedin||'';
-  document.getElementById('crmFFacebook').value  = c.facebook||'';
-  document.getElementById('crmFWhatsapp').value  = c.whatsapp||'';
-  document.getElementById('crmFPhone').value     = c.phone||'';
-  document.getElementById('crmFEmail').value     = c.email||'';
-}
-
-async function crmSaveDeal() {
-  const get = id => document.getElementById(id)?.value.trim()||'';
-  const contactName = get('crmFContactName');
-  if (!contactName) { alert('Contact name is required.'); return; }
-  const cid = get('crmFContact');
-  const deal = {
-    id: _crmEditId || netId(),
-    contactId: cid||null, contactName,
-    company: get('crmFCompany'),
-    stageId: get('crmFStage') || (_crmStages[0]?.id||'s1'),
-    followup: get('crmFFollowup'),
-    notes: get('crmFNotes'),
-    linkedin: get('crmFLinkedin'), facebook: get('crmFFacebook'),
-    whatsapp: get('crmFWhatsapp'), phone: get('crmFPhone'), email: get('crmFEmail'),
-    log: _crmEditId ? (_crmDeals.find(x=>x.id===_crmEditId)?.log||[]) : [],
-    createdAt: _crmEditId ? (_crmDeals.find(x=>x.id===_crmEditId)?.createdAt||netToday()) : netToday(),
+async function nhCrmSave(){
+  const g=id=>document.getElementById(id)?.value.trim()||'';
+  const name=g('nhCrmFContactName');
+  if(!name){alert('Contact name required.');return;}
+  const existing=_nhCrmEditId?_nhDeals.find(x=>x.id===_nhCrmEditId):null;
+  const deal={
+    id:_nhCrmEditId||nhId(),
+    contactId:g('nhCrmFContact')||null,
+    contactName:name,company:g('nhCrmFCompany'),
+    stageId:g('nhCrmFStage')||'stage_contacts',
+    nextAction:g('nhCrmFNextAction'),
+    linkedin:g('nhCrmFLinkedin'),facebook:g('nhCrmFFacebook'),
+    whatsapp:g('nhCrmFWhatsapp'),phone:g('nhCrmFPhone'),email:g('nhCrmFEmail'),
+    createdAt:existing?.createdAt||nhToday(),
   };
-  if (_crmEditId) { const i=_crmDeals.findIndex(x=>x.id===_crmEditId); if(i>-1) _crmDeals[i]=deal; }
-  else _crmDeals.push(deal);
-  await netSet('_crm_deals', _crmDeals);
-  crmCloseModal(); crmRender();
+  if(_nhCrmEditId){const i=_nhDeals.findIndex(x=>x.id===_nhCrmEditId);if(i>-1)_nhDeals[i]=deal;}
+  else _nhDeals.push(deal);
+  await nhSet('_nh_deals',_nhDeals);
+  nhCrmCloseModal();nhRenderCrm();nhRenderToday();
+}
+async function nhCrmDelete(id){
+  if(!confirm('Delete this deal?'))return;
+  _nhDeals=_nhDeals.filter(x=>x.id!==id);
+  await nhSet('_nh_deals',_nhDeals);
+  nhRenderCrm();nhRenderToday();
 }
 
-async function crmDelete(id) {
-  if (!confirm('Delete this deal?')) return;
-  _crmDeals = _crmDeals.filter(x=>x.id!==id);
-  await netSet('_crm_deals', _crmDeals);
-  crmRender();
+/* ══ SHARED NOTES ══ */
+let _nhNotesEntityId=null;
+function nhOpenNotes(entityId,entityName){
+  _nhNotesEntityId=entityId;
+  document.getElementById('nhNotesTitle').textContent='📝 Notes — '+entityName;
+  nhRenderNotesList();
+  document.getElementById('nhNotesBg').classList.add('open');
+}
+function nhCloseNotes(){document.getElementById('nhNotesBg').classList.remove('open');_nhNotesEntityId=null;}
+function nhRenderNotesList(){
+  const el=document.getElementById('nhNotesList');
+  if(!el)return;
+  const notes=_nhNotes.filter(n=>n.entityId===_nhNotesEntityId).reverse();
+  if(!notes.length){el.innerHTML='<div style="font-size:11px;color:var(--text-muted);font-style:italic;padding:8px 0">No notes yet. Start logging below.</div>';return;}
+  el.innerHTML=notes.map(n=>`<div class="nh-note-entry">
+    <div class="nh-note-date">${n.date}</div>
+    <div class="nh-note-text">${n.text}</div>
+  </div>`).join('');
+}
+async function nhAddNote(){
+  const ta=document.getElementById('nhNotesInput');
+  const text=ta?.value.trim();
+  if(!text||!_nhNotesEntityId)return;
+  _nhNotes.push({id:nhId(),entityId:_nhNotesEntityId,date:nhToday(),text});
+  await nhSet('_nh_notes',_nhNotes);
+  ta.value='';
+  nhRenderNotesList();
+  // Refresh note counts in the background
+  if(_nhTab==='contacts') nhRenderContacts();
+  else nhRenderCrm();
 }
 
-async function crmAddLog(dealId) {
-  const input = document.getElementById('crmlog-input-'+dealId);
-  const text = input?.value.trim();
-  if (!text) return;
-  const d = _crmDeals.find(x=>x.id===dealId);
-  if (!d) return;
-  if (!d.log) d.log = [];
-  d.log.push({date:netToday(), text});
-  await netSet('_crm_deals', _crmDeals);
-  input.value = '';
-  // Re-render just the entries
-  const entriesEl = document.getElementById('crmlog-entries-'+dealId);
-  if (entriesEl) entriesEl.innerHTML = d.log.map(e=>`<div class="crm-log-entry"><span class="crm-log-date">${e.date}</span><span class="crm-log-text">${e.text}</span></div>`).join('');
-  // Update preview
-  const previewEl = document.querySelector(`#crmdeal-${dealId} .crm-deal-log-preview`);
-  const last = d.log[d.log.length-1];
-  if (previewEl && last) previewEl.textContent = last.date+' — '+last.text;
+/* ══ STAGE MANAGER ══ */
+function nhOpenStageMgr(){nhRenderSmList();document.getElementById('nhSmBg').classList.add('open');}
+function nhCloseSmBg(){document.getElementById('nhSmBg').classList.remove('open');}
+
+function nhRenderSmList(){
+  const el=document.getElementById('nhSmList');
+  if(!el)return;
+  el.innerHTML=_nhStages.map((s,i)=>`<div class="nh-sm-item" draggable="true"
+      ondragstart="nhDragStart(event,'${s.id}')"
+      ondragover="nhDragOver(event,'${s.id}')"
+      ondrop="nhDrop(event,'${s.id}')"
+      ondragend="nhDragEnd()"
+      id="nhsmi-${s.id}">
+    <span class="nh-sm-grip">⠿</span>
+    <span class="nh-sm-dot" style="background:${s.color}"></span>
+    <span class="nh-sm-name">${s.name}</span>
+    ${s.fixed?'<span class="nh-sm-fixed">FIXED</span>':'<button class="nh-sm-del" onclick="nhDelStage(\''+s.id+'\')" title="Delete">✕</button>'}
+  </div>`).join('');
 }
 
-/* Stage Manager */
-function crmOpenStageManager() {
-  crmRenderStageList();
-  document.getElementById('crmStageMgrBg').classList.add('open');
+/* Drag-and-drop for stage reorder */
+function nhDragStart(e,id){
+  _nhDragSrc=id;
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move';
 }
-function crmCloseStageManager() {
-  document.getElementById('crmStageMgrBg').classList.remove('open');
+function nhDragOver(e,id){
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  document.querySelectorAll('.nh-sm-item').forEach(el=>el.classList.remove('drag-over'));
+  if(id!==_nhDragSrc){
+    const el=document.getElementById('nhsmi-'+id);
+    if(el)el.classList.add('drag-over');
+  }
 }
-function crmRenderStageList() {
-  const el = document.getElementById('crmSmList');
-  if (!el) return;
-  const COLORS = ['#6a7080','#c8a96e','#6aab7a','#9a6abf','#5a9abf','#e05555','#4a7c59','#bf9a5a','#7a5abf','#5abfbf'];
-  el.innerHTML = _crmStages.map((s,i) =>
-    `<div class="crm-sm-item">
-      <span class="crm-sm-dot" style="background:${s.color}"></span>
-      <span class="crm-sm-name">${s.name}</span>
-      <button class="crm-sm-del" onclick="crmDelStage('${s.id}')" title="Delete stage">✕</button>
-    </div>`
-  ).join('');
+async function nhDrop(e,targetId){
+  e.preventDefault();
+  if(!_nhDragSrc||_nhDragSrc===targetId)return;
+  const src=_nhStages.find(s=>s.id===_nhDragSrc);
+  const tgt=_nhStages.find(s=>s.id===targetId);
+  if(!src||!tgt)return;
+  // Cannot move fixed stage
+  if(src.fixed){alert('The Contacts stage is fixed and cannot be moved.');return;}
+  const si=_nhStages.indexOf(src);
+  const ti=_nhStages.indexOf(tgt);
+  _nhStages.splice(si,1);
+  _nhStages.splice(ti,0,src);
+  await nhSet('_nh_stages',_nhStages);
+  nhRenderSmList();
 }
-async function crmAddStage() {
-  const input = document.getElementById('crmSmInput');
-  const name = input?.value.trim();
-  if (!name) return;
-  const COLORS = ['#6a7080','#c8a96e','#6aab7a','#9a6abf','#5a9abf','#e05555','#4a7c59','#bf9a5a','#7a5abf','#5abfbf'];
-  const color = COLORS[_crmStages.length % COLORS.length];
-  _crmStages.push({id:netId(), name, color});
-  await netSet('_crm_stages', _crmStages);
-  input.value = '';
-  crmRenderStageList();
-  crmRenderStageFil();
+function nhDragEnd(){
+  _nhDragSrc=null;
+  document.querySelectorAll('.nh-sm-item').forEach(el=>{el.classList.remove('dragging','drag-over');});
 }
-async function crmDelStage(id) {
-  const hasDeal = _crmDeals.some(d=>d.stageId===id);
-  if (hasDeal && !confirm('This stage has deals. Delete anyway? Deals will become unsorted.')) return;
-  _crmStages = _crmStages.filter(s=>s.id!==id);
-  await netSet('_crm_stages', _crmStages);
-  crmRenderStageList();
-  crmRender();
+
+async function nhAddStage(){
+  const input=document.getElementById('nhSmInput');
+  const name=input?.value.trim();
+  if(!name)return;
+  const COLORS=['#c8a96e','#6aab7a','#9a6abf','#5a9abf','#bf9a5a','#e05555','#4a7c59','#bf5a9a','#7a5abf','#5abfbf'];
+  _nhStages.push({id:nhId(),name,color:COLORS[(_nhStages.length-1)%COLORS.length]});
+  await nhSet('_nh_stages',_nhStages);
+  input.value='';
+  nhRenderSmList();
+}
+async function nhDelStage(id){
+  const s=_nhStages.find(x=>x.id===id);
+  if(s?.fixed){alert('This stage is fixed and cannot be deleted.');return;}
+  const hasDeal=_nhDeals.some(d=>d.stageId===id);
+  if(hasDeal&&!confirm('This stage has deals. Delete stage? Deals will move to Contacts stage.'))return;
+  _nhDeals.forEach(d=>{if(d.stageId===id)d.stageId='stage_contacts';});
+  _nhStages=_nhStages.filter(s=>s.id!==id);
+  await Promise.all([nhSet('_nh_stages',_nhStages),nhSet('_nh_deals',_nhDeals)]);
+  nhRenderSmList();
+  nhRenderCrmFilters();
+}
+/* ── Deal drag-and-drop between stages ── */
+function nhDealDragStart(e, dealId) {
+  _nhDealDragId = dealId;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', dealId);
+  setTimeout(() => {
+    const el = document.getElementById('nhd-' + dealId);
+    if (el) el.classList.add('dragging');
+  }, 0);
+  e.stopPropagation(); // prevent column accordion toggle
+}
+function nhDealDragEnd(dealId) {
+  _nhDealDragId = null;
+  const el = document.getElementById('nhd-' + dealId);
+  if (el) el.classList.remove('dragging');
+  document.querySelectorAll('.nh-col-body').forEach(b => b.classList.remove('drag-target'));
+}
+function nhColDragOver(e, stageId) {
+  if (!_nhDealDragId) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.nh-col-body').forEach(b => b.classList.remove('drag-target'));
+  const col = document.getElementById('nhcol-' + stageId);
+  const body = col?.querySelector('.nh-col-body');
+  if (body) body.classList.add('drag-target');
+}
+function nhColDragLeave(e, stageId) {
+  const col = document.getElementById('nhcol-' + stageId);
+  const body = col?.querySelector('.nh-col-body');
+  if (body) body.classList.remove('drag-target');
+}
+async function nhColDrop(e, stageId) {
+  e.preventDefault();
+  document.querySelectorAll('.nh-col-body').forEach(b => b.classList.remove('drag-target'));
+  const dealId = _nhDealDragId || e.dataTransfer.getData('text/plain');
+  if (!dealId) return;
+  const deal = _nhDeals.find(d => d.id === dealId);
+  if (!deal || deal.stageId === stageId) return;
+  deal.stageId = stageId;
+  // Open the target column
+  _nhOpenCols.add(stageId);
+  await nhSet('_nh_deals', _nhDeals);
+  nhRenderCrm();
+  nhRenderToday();
+  // Flash the moved card
+  setTimeout(() => {
+    const el = document.getElementById('nhd-' + dealId);
+    if (el) {
+      el.style.transition = 'border-color .4s';
+      el.style.borderColor = 'var(--gold)';
+      setTimeout(() => { el.style.borderColor = ''; }, 1200);
+    }
+  }, 60);
+}
+
+async function nhSmDone(){
+  await nhSet('_nh_stages',_nhStages);
+  nhCloseSmBg();
+  nhRenderCrm();
 }
 
 </script>
 
 </body>
 
-<!-- ══ Contact Book + CRM Overlay ══ -->
-<div class="lr-overlay" id="contactBookOverlay">
-  <div class="cb-wrap">
+<!-- ══ Networking Hub Overlay ══ -->
+<div class="lr-overlay" id="netHubOverlay">
+  <div class="nh-wrap">
 
-    <!-- Topbar -->
-    <div class="cb-topbar">
+    <div class="nh-topbar">
       <div>
-        <div class="cb-title-main">🤝 Networking Hub</div>
-        <div class="cb-subtitle">Contact Book &amp; Career CRM</div>
+        <div class="nh-title">🤝 Networking Hub</div>
+        <div class="nh-subtitle">Contact Book &amp; Career CRM</div>
       </div>
-      <button class="cb-close-btn" onclick="closeContactBook()">✕ Close</button>
+      <button class="nh-close" onclick="closeContactBook()">✕ Close</button>
     </div>
 
-    <!-- Nav tabs -->
-    <div class="net-nav">
-      <button class="net-nav-tab active" data-tab="contacts" onclick="netShowTab('contacts')">📒 Contact Book</button>
-      <button class="net-nav-tab" data-tab="crm" onclick="netShowTab('crm')">📊 CRM Pipeline</button>
+    <!-- Today's action dashboard -->
+    <div class="nh-today" id="nhToday">
+      <div class="nh-today-title"><span class="nh-today-dot"></span> CONTACT TODAY</div>
+      <div class="nh-today-chips" id="nhTodayChips"></div>
     </div>
 
-    <!-- ── Contact Book Section ── -->
-    <div class="cb-section on" data-section="contacts">
-      <div class="cb-controls">
-        <input class="cb-search" id="cbSearch" type="text" placeholder="Search name, role, company…" oninput="cbRender()">
-        <button class="cb-add-btn" onclick="cbOpenModal()">＋ Add Contact</button>
-      </div>
-      <div class="cb-list" id="cbList"></div>
+    <!-- Tab nav -->
+    <div class="nh-nav">
+      <button class="nh-tab on" data-tab="contacts" onclick="nhShowTab('contacts')">📒 Contact Book</button>
+      <button class="nh-tab" data-tab="crm" onclick="nhShowTab('crm')">📊 CRM Pipeline</button>
     </div>
 
-    <!-- ── CRM Section ── -->
-    <div class="cb-section" data-section="crm">
-      <!-- Overdue alert -->
-      <div class="crm-alert" id="crmAlert">
-        <div class="crm-alert-title">🔴 FOLLOW UP NEEDED</div>
-        <div class="crm-alert-chips" id="crmAlertChips"></div>
+    <!-- Contact Book Section -->
+    <div class="nh-section on" data-sec="contacts">
+      <div class="nh-controls">
+        <input class="nh-search" id="nhCbSearch" type="text" placeholder="Search name, role, company…" oninput="nhRenderContacts()">
+        <button class="nh-add-btn" onclick="nhCbEdit(null)">＋ Add Contact</button>
       </div>
-      <!-- Stage filter + manage -->
-      <div class="crm-stage-filter" id="crmStageFil"></div>
-      <!-- Kanban -->
-      <div class="crm-kanban" id="crmKanban"></div>
+      <div class="nh-cb-list" id="nhCbList"></div>
+    </div>
+
+    <!-- CRM Section -->
+    <div class="nh-section" data-sec="crm">
+      <div class="nh-crm-filters" id="nhCrmFil"></div>
+      <div class="nh-kanban" id="nhKanban"></div>
     </div>
 
   </div>
 </div>
 
-<!-- Contact Book: Add/Edit Modal -->
-<div class="cb-modal-bg" id="cbModalBg">
-  <div class="cb-modal">
-    <div class="cb-modal-title" id="cbModalTitle">Add Contact</div>
-    <div class="cb-field"><label>Full Name *</label><input id="cbFName" type="text" placeholder="Ahmed Al-Rashidi"></div>
-    <div class="cb-field"><label>Role / Title</label><input id="cbFRole" type="text" placeholder="HR Manager"></div>
-    <div class="cb-field"><label>Company</label><input id="cbFCompany" type="text" placeholder="Saudi Aramco"></div>
-    <div class="cb-field"><label>LinkedIn URL</label><input id="cbFLinkedin" type="url" placeholder="https://linkedin.com/in/username"></div>
-    <div class="cb-field"><label>Facebook URL</label><input id="cbFFacebook" type="url" placeholder="https://facebook.com/username"></div>
-    <div class="cb-field"><label>WhatsApp (country code + number)</label><input id="cbFWhatsapp" type="tel" placeholder="966501234567"></div>
-    <div class="cb-field"><label>Phone / Mobile</label><input id="cbFPhone" type="tel" placeholder="+966501234567"></div>
-    <div class="cb-field"><label>Email</label><input id="cbFEmail" type="email" placeholder="name@company.com"></div>
-    <div class="cb-field"><label>Notes</label><textarea id="cbFNotes" placeholder="How you met, context…"></textarea></div>
-    <div class="cb-modal-actions">
-      <button class="cb-modal-cancel" onclick="cbCloseModal()">Cancel</button>
-      <button class="cb-modal-save" onclick="cbSaveContact()">Save</button>
+<!-- Contact Book Modal -->
+<div class="nh-modal-bg" id="nhCbModalBg">
+  <div class="nh-modal">
+    <div class="nh-modal-title" id="nhCbModalTitle">Add Contact</div>
+    <div class="nh-field"><label>Full Name *</label><input id="nhCbFName" type="text" placeholder="Ahmed Al-Rashidi"></div>
+    <div class="nh-field"><label>Role / Title</label><input id="nhCbFRole" type="text" placeholder="HR Manager"></div>
+    <div class="nh-field"><label>Company</label><input id="nhCbFCompany" type="text" placeholder="Saudi Aramco"></div>
+    <div class="nh-field"><label>LinkedIn URL</label><input id="nhCbFLinkedin" type="url" placeholder="https://linkedin.com/in/…"></div>
+    <div class="nh-field"><label>Facebook URL</label><input id="nhCbFFacebook" type="url" placeholder="https://facebook.com/…"></div>
+    <div class="nh-field"><label>WhatsApp (country code + number)</label><input id="nhCbFWhatsapp" type="tel" placeholder="966501234567"></div>
+    <div class="nh-field"><label>Phone</label><input id="nhCbFPhone" type="tel" placeholder="+966501234567"></div>
+    <div class="nh-field"><label>Email</label><input id="nhCbFEmail" type="email" placeholder="name@company.com"></div>
+    <div class="nh-modal-actions">
+      <button class="nh-btn-cancel" onclick="nhCbCloseModal()">Cancel</button>
+      <button class="nh-btn-save" onclick="nhCbSave()">Save Contact</button>
     </div>
   </div>
 </div>
 
-<!-- CRM: Add/Edit Deal Modal -->
-<div class="cb-modal-bg" id="crmModalBg">
-  <div class="cb-modal">
-    <div class="cb-modal-title" id="crmModalTitle">Add Deal</div>
-    <div class="cb-field">
-      <label>Link to Contact Book</label>
-      <select id="crmFContact" onchange="crmContactPick()"></select>
-    </div>
-    <div class="cb-field"><label>Contact Name *</label><input id="crmFContactName" type="text" placeholder="Full name"></div>
-    <div class="cb-field"><label>Company / Target</label><input id="crmFCompany" type="text" placeholder="Company or role target"></div>
-    <div class="cb-field"><label>Pipeline Stage</label><select id="crmFStage"></select></div>
-    <div class="cb-field"><label>Next Follow-up Date</label><input id="crmFFollowup" type="date"></div>
-    <div class="cb-field"><label>LinkedIn</label><input id="crmFLinkedin" type="url" placeholder="https://linkedin.com/in/…"></div>
-    <div class="cb-field"><label>Facebook</label><input id="crmFFacebook" type="url" placeholder="https://facebook.com/…"></div>
-    <div class="cb-field"><label>WhatsApp</label><input id="crmFWhatsapp" type="tel" placeholder="966501234567"></div>
-    <div class="cb-field"><label>Phone</label><input id="crmFPhone" type="tel" placeholder="+966…"></div>
-    <div class="cb-field"><label>Email</label><input id="crmFEmail" type="email" placeholder="name@company.com"></div>
-    <div class="cb-field"><label>Notes</label><textarea id="crmFNotes" placeholder="Deal context, what was discussed…"></textarea></div>
-    <div class="cb-modal-actions">
-      <button class="cb-modal-del" id="crmModalDelBtn" style="display:none;margin-right:auto" onclick="crmDelete(_crmEditId);crmCloseModal()">Delete</button>
-      <button class="cb-modal-cancel" onclick="crmCloseModal()">Cancel</button>
-      <button class="cb-modal-save" onclick="crmSaveDeal()">Save</button>
+<!-- CRM Deal Modal -->
+<div class="nh-modal-bg" id="nhCrmModalBg">
+  <div class="nh-modal">
+    <div class="nh-modal-title" id="nhCrmModalTitle">Add Deal</div>
+    <div class="nh-field"><label>Link to Contact Book</label><select id="nhCrmFContact" onchange="nhCrmContactPick()"></select></div>
+    <div class="nh-field"><label>Contact Name *</label><input id="nhCrmFContactName" type="text" placeholder="Full name"></div>
+    <div class="nh-field"><label>Company / Target</label><input id="nhCrmFCompany" type="text" placeholder="Company or opportunity"></div>
+    <div class="nh-field"><label>Pipeline Stage</label><select id="nhCrmFStage"></select></div>
+    <div class="nh-field"><label>Next Action Date</label><input id="nhCrmFNextAction" type="date"></div>
+    <div class="nh-field"><label>LinkedIn</label><input id="nhCrmFLinkedin" type="url" placeholder="https://linkedin.com/in/…"></div>
+    <div class="nh-field"><label>Facebook</label><input id="nhCrmFFacebook" type="url" placeholder="https://facebook.com/…"></div>
+    <div class="nh-field"><label>WhatsApp</label><input id="nhCrmFWhatsapp" type="tel" placeholder="966501234567"></div>
+    <div class="nh-field"><label>Phone</label><input id="nhCrmFPhone" type="tel" placeholder="+966…"></div>
+    <div class="nh-field"><label>Email</label><input id="nhCrmFEmail" type="email" placeholder="name@company.com"></div>
+    <div class="nh-modal-actions">
+      <button class="nh-btn-del" id="nhCrmDelBtn" style="display:none;margin-right:auto" onclick="nhCrmDelete(_nhCrmEditId);nhCrmCloseModal()">Delete</button>
+      <button class="nh-btn-cancel" onclick="nhCrmCloseModal()">Cancel</button>
+      <button class="nh-btn-save" onclick="nhCrmSave()">Save Deal</button>
     </div>
   </div>
 </div>
 
-<!-- CRM: Stage Manager Modal -->
-<div class="cb-modal-bg" id="crmStageMgrBg">
-  <div class="cb-modal">
-    <div class="cb-modal-title">⚙ Pipeline Stages</div>
-    <div class="crm-sm-list" id="crmSmList"></div>
-    <div class="crm-sm-add">
-      <input class="crm-sm-input" id="crmSmInput" type="text" placeholder="New stage name…" onkeydown="if(event.key==='Enter')crmAddStage()">
-      <button class="crm-sm-addbtn" onclick="crmAddStage()">＋ Add</button>
+<!-- Notes Modal (shared) -->
+<div class="nh-modal-bg" id="nhNotesBg">
+  <div class="nh-modal">
+    <div class="nh-modal-title" id="nhNotesTitle">📝 Notes</div>
+    <div class="nh-notes-log" id="nhNotesList"></div>
+    <div class="nh-note-add">
+      <textarea class="nh-note-textarea" id="nhNotesInput" placeholder="How you met, context, history, what was discussed…&#10;&#10;This log is shared between Contact Book and CRM."></textarea>
+      <button class="nh-note-submit" onclick="nhAddNote()">＋ Add Note</button>
     </div>
-    <div class="cb-modal-actions">
-      <button class="cb-modal-save" onclick="crmCloseStageManager();crmRender()">Done</button>
+    <div class="nh-modal-actions">
+      <button class="nh-btn-cancel" onclick="nhCloseNotes()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Stage Manager Modal -->
+<div class="nh-modal-bg" id="nhSmBg">
+  <div class="nh-modal">
+    <div class="nh-modal-title">⚙ Pipeline Stages</div>
+    <div style="font-size:10px;color:var(--text-dim);margin-bottom:10px;font-family:'DM Mono',monospace;">Drag to reorder. The Contacts stage is fixed.</div>
+    <div class="nh-sm-list" id="nhSmList"></div>
+    <div class="nh-sm-add">
+      <input class="nh-sm-input" id="nhSmInput" type="text" placeholder="New stage name…" onkeydown="if(event.key==='Enter')nhAddStage()">
+      <button class="nh-sm-addbtn" onclick="nhAddStage()">＋ Add</button>
+    </div>
+    <div class="nh-modal-actions">
+      <button class="nh-btn-save" onclick="nhSmDone()">Done</button>
     </div>
   </div>
 </div>

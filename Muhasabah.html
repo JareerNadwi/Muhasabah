@@ -164,12 +164,27 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 .nh-notes-panel.open{display:block;}
 .nh-notes-log{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;max-height:380px;overflow-y:auto;}
 .nh-note-entry{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 10px;}
+.nh-note-entry-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.nh-note-edit-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;padding:0 2px;flex-shrink:0;}
+.nh-note-edit-btn:hover{color:var(--gold);}
+.nh-note-edit-area{width:100%;background:var(--surface2);border:1px solid var(--gold-dim);color:var(--text);padding:6px 8px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;resize:vertical;min-height:48px;line-height:1.4;margin-top:4px;}
+.nh-note-save-btn{margin-top:4px;background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);padding:4px 10px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;}
+.nh-note-save-btn:hover{background:#1a1200;}
 .nh-note-date{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-bottom:3px;}
 .nh-note-text{font-size:11px;color:var(--text-dim);line-height:1.5;white-space:pre-wrap;}
 .nh-note-add{display:flex;flex-direction:column;gap:6px;}
 .nh-note-textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;resize:vertical;min-height:80px;line-height:1.4;}
 .nh-note-textarea:focus{border-color:var(--gold-dim);}
 .nh-note-submit{align-self:flex-end;background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);padding:6px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;}
+.nh-sm-btn.done{border-color:#3a6a4a;color:#6aab7a;}
+.nh-sm-btn.done:hover{background:#0a1a0f;border-color:#6aab7a;}
+.nh-markdone-next{display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;}
+.nh-markdone-next.on{display:block;}
+.nh-markdone-next label{display:block;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.nh-markdone-next input[type=date]{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 11px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;box-sizing:border-box;}
+.nh-markdone-next input[type=date]:focus{border-color:var(--gold-dim);}
+.nh-markdone-confirm{margin-top:8px;background:#1a1200;border:1px solid var(--gold-dim);color:var(--gold);padding:7px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;width:100%;}
+.nh-markdone-confirm:hover{border-color:var(--gold);}
 .nh-note-submit:hover{background:#1a1200;}
 
 /* Stage manager modal */
@@ -7014,10 +7029,19 @@ function nhRenderToday(){
 
 function nhScrollDeal(id){
   nhShowTab('crm');
+  // Find deal's stage and open it
+  const deal=_nhDeals.find(d=>d.id===id);
+  if(deal) _nhOpenCols.add(deal.stageId);
+  nhRenderCrm();
   setTimeout(()=>{
     const el=document.getElementById('nhd-'+id);
-    if(el){el.scrollIntoView({behavior:'smooth'});el.style.borderColor='#e05555';setTimeout(()=>el.style.borderColor='',1500);}
-  },80);
+    if(el){
+      el.scrollIntoView({behavior:'smooth',block:'center'});
+      el.style.transition='border-color .3s';
+      el.style.borderColor='#e05555';
+      setTimeout(()=>{el.style.borderColor='';},1800);
+    }
+  },100);
 }
 
 /* ── Tab nav ── */
@@ -7097,10 +7121,18 @@ async function nhCbSave(){
   nhCbCloseModal();nhRenderContacts();nhRenderToday();
 }
 async function nhCbDelete(id){
-  if(!confirm('Delete this contact? Their CRM deals will remain.'))return;
+  if(!confirm('Delete this contact? Their CRM deal and notes will also be deleted.'))return;
+  // Delete linked deals
+  _nhDeals=_nhDeals.filter(d=>d.contactId!==id);
+  // Delete linked notes
+  _nhNotes=_nhNotes.filter(n=>n.entityId!==id);
   _nhContacts=_nhContacts.filter(x=>x.id!==id);
-  await nhSet('_nh_contacts',_nhContacts);
-  nhRenderContacts();
+  await Promise.all([
+    nhSet('_nh_contacts',_nhContacts),
+    nhSet('_nh_deals',_nhDeals),
+    nhSet('_nh_notes',_nhNotes),
+  ]);
+  nhRenderContacts();nhRenderToday();
 }
 
 /* ══ CRM ══ */
@@ -7123,7 +7155,17 @@ function nhRenderCrmFilters(){
   el.innerHTML=h;
 }
 
-function nhSetFil(val){_nhCrmFil=val;nhRenderCrm();}
+function nhSetFil(val){
+  _nhCrmFil=val;
+  if(val==='all'||val==='ov'){
+    // All stages collapsed by default
+    _nhOpenCols=new Set();
+  } else {
+    // Single stage selected — open it
+    _nhOpenCols=new Set([val]);
+  }
+  nhRenderCrm();
+}
 
 function nhRenderKanban(){
   const el=document.getElementById('nhKanban');
@@ -7195,6 +7237,7 @@ function nhDealHTML(d){
     <div class="nh-deal-bottom">
       <div class="nh-deal-preview">${lastNote?lastNote.date+' — '+lastNote.text:'No notes yet'}</div>
       <div class="nh-deal-btns">
+        ${ov?`<button class="nh-sm-btn done" onclick="nhOpenMarkDone('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}')" >✓ Mark Done</button>`:''}
         <button class="nh-sm-btn" onclick="nhOpenNotes('${d.contactId||d.id}','${(d.contactName||'').replace(/'/g,"\\'")}')">📝 Notes</button>
         <button class="nh-sm-btn" onclick="nhCrmOpenModal('${d.id}')">Edit</button>
         <button class="nh-sm-btn danger" onclick="nhCrmDelete('${d.id}')">Del</button>
@@ -7285,10 +7328,38 @@ function nhRenderNotesList(){
   if(!el)return;
   const notes=_nhNotes.filter(n=>n.entityId===_nhNotesEntityId).reverse();
   if(!notes.length){el.innerHTML='<div style="font-size:11px;color:var(--text-muted);font-style:italic;padding:8px 0">No notes yet. Start logging below.</div>';return;}
-  el.innerHTML=notes.map(n=>`<div class="nh-note-entry">
-    <div class="nh-note-date">${n.date}</div>
-    <div class="nh-note-text">${n.text}</div>
+  el.innerHTML=notes.map(n=>`<div class="nh-note-entry" id="nhe-${n.id}">
+    <div class="nh-note-entry-top">
+      <div class="nh-note-date">${n.date}</div>
+      <button class="nh-note-edit-btn" onclick="nhEditNoteToggle('${n.id}')">✎ Edit</button>
+    </div>
+    <div class="nh-note-text" id="nhet-${n.id}">${n.text}</div>
+    <div id="nhee-${n.id}" style="display:none">
+      <textarea class="nh-note-edit-area" id="nheta-${n.id}">${n.text}</textarea>
+      <button class="nh-note-save-btn" onclick="nhSaveNoteEdit('${n.id}')">Save</button>
+    </div>
   </div>`).join('');
+}
+function nhEditNoteToggle(nid){
+  const editDiv=document.getElementById('nhee-'+nid);
+  const textDiv=document.getElementById('nhet-'+nid);
+  const ta=document.getElementById('nheta-'+nid);
+  if(!editDiv)return;
+  const isOpen=editDiv.style.display!=='none';
+  editDiv.style.display=isOpen?'none':'block';
+  textDiv.style.display=isOpen?'block':'none';
+  if(!isOpen&&ta){ta.focus();ta.selectionStart=ta.value.length;}
+}
+async function nhSaveNoteEdit(nid){
+  const ta=document.getElementById('nheta-'+nid);
+  if(!ta)return;
+  const text=ta.value.trim();
+  if(!text)return;
+  const note=_nhNotes.find(n=>n.id===nid);
+  if(!note)return;
+  note.text=text;
+  await nhSet('_nh_notes',_nhNotes);
+  nhRenderNotesList();
 }
 async function nhAddNote(){
   const ta=document.getElementById('nhNotesInput');
@@ -7301,6 +7372,46 @@ async function nhAddNote(){
   // Refresh note counts in the background
   if(_nhTab==='contacts') nhRenderContacts();
   else nhRenderCrm();
+}
+
+/* ══ MARK DONE ══ */
+let _nhMarkDoneId=null;
+function nhOpenMarkDone(dealId, name){
+  _nhMarkDoneId=dealId;
+  document.getElementById('nhMarkDoneName').textContent='✓ Mark Done — '+name;
+  document.getElementById('nhMarkDoneNote').value='';
+  document.getElementById('nhMarkDoneNextDate').value='';
+  document.getElementById('nhMarkDoneNext').classList.remove('on');
+  document.getElementById('nhMarkDoneBg').classList.add('open');
+}
+function nhCloseMarkDone(){
+  document.getElementById('nhMarkDoneBg').classList.remove('open');
+  _nhMarkDoneId=null;
+}
+async function nhMarkDoneSubmitNote(){
+  const text=document.getElementById('nhMarkDoneNote').value.trim();
+  if(!text){alert('Please write what you did.');return;}
+  const deal=_nhDeals.find(d=>d.id===_nhMarkDoneId);
+  if(!deal)return;
+  // Save note
+  const entityId=deal.contactId||deal.id;
+  _nhNotes.push({id:nhId(),entityId,date:nhToday(),text});
+  await nhSet('_nh_notes',_nhNotes);
+  // Show next action date input
+  document.getElementById('nhMarkDoneNext').classList.add('on');
+  document.getElementById('nhMarkDoneNote').disabled=true;
+  document.getElementById('nhMarkDoneNoteBtn').disabled=true;
+}
+async function nhMarkDoneConfirm(){
+  const dateVal=document.getElementById('nhMarkDoneNextDate').value;
+  if(!dateVal){alert('Please select a next action date.');return;}
+  const deal=_nhDeals.find(d=>d.id===_nhMarkDoneId);
+  if(!deal)return;
+  deal.nextAction=dateVal;
+  await nhSet('_nh_deals',_nhDeals);
+  nhCloseMarkDone();
+  nhRenderCrm();
+  nhRenderToday();
 }
 
 /* ══ STAGE MANAGER ══ */
@@ -7591,6 +7702,27 @@ async function nhSmDone(){
     </div>
     <div class="nh-modal-actions">
       <button class="nh-btn-save" onclick="nhSmDone()">Done</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Mark Done Modal -->
+<div class="nh-modal-bg" id="nhMarkDoneBg">
+  <div class="nh-modal" style="max-width:480px;">
+    <div class="nh-modal-title" id="nhMarkDoneName">✓ Mark Done</div>
+    <div class="nh-field">
+      <label>What did you do?</label>
+      <textarea class="nh-note-textarea" id="nhMarkDoneNote" style="min-height:80px;"></textarea>
+    </div>
+    <button class="nh-note-submit" id="nhMarkDoneNoteBtn" onclick="nhMarkDoneSubmitNote()" style="width:100%;margin-bottom:0;">Save &amp; Set Next Action →</button>
+    <div class="nh-markdone-next" id="nhMarkDoneNext">
+      <label>Next Action Date</label>
+      <input type="date" id="nhMarkDoneNextDate">
+      <button class="nh-markdone-confirm" onclick="nhMarkDoneConfirm()">Confirm Next Action</button>
+    </div>
+    <div class="nh-modal-actions" style="margin-top:12px;">
+      <button class="nh-btn-cancel" onclick="nhCloseMarkDone()">Cancel</button>
     </div>
   </div>
 </div>

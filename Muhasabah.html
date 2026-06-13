@@ -6545,23 +6545,26 @@ function lrRender() {
     wordTypeEl.style.color = '#a89060';
     wordTypeEl.style.letterSpacing = '0';
   } else if (_lrType === 'word' && _lrLang !== 'bn') {
-    // Arabic: show gender + Arabic plural marker; Urdu/Hindi: {nominative, oblique}; others: plain plural
+    // Arabic/Urdu: ج label; Hindi: बहु label
     let pluralLabel;
     if (isAr) {
       pluralLabel = lang.gender ? lang.gender + ' · ج: ' + lang.plural : 'ج: ' + lang.plural;
-    } else if ((_lrLang === 'ur' || _lrLang === 'hi') && lang.plural && typeof lang.plural === 'object') {
+    } else if (_lrLang === 'ur' && lang.plural && typeof lang.plural === 'object') {
+      const nom = lang.plural.nominative || '';
+      const obl = lang.plural.oblique || '';
+      const pluralPart = (nom ? 'ج: ' + nom : '') + (obl ? ' / ' + obl : '');
+      pluralLabel = (lang.gender || '') + (lang.gender && pluralPart ? ' · ' : '') + pluralPart;
+    } else if (_lrLang === 'ur') {
+      const pluralPart = lang.plural ? 'ج: ' + lang.plural : 'کوئی جمع نہیں';
+      pluralLabel = (lang.gender || '') + (lang.gender ? ' · ' : '') + pluralPart;
+    } else if (_lrLang === 'hi' && lang.plural && typeof lang.plural === 'object') {
       const nom = lang.plural.nominative || '';
       const obl = lang.plural.oblique || '';
       const pluralPart = (nom ? 'बहु: ' + nom : '') + (obl ? ' / ' + obl : '');
       pluralLabel = (lang.gender || '') + (lang.gender && pluralPart ? ' · ' : '') + pluralPart;
     } else if (_lrLang === 'hi') {
-      // string plural (e.g. "लागू नहीं") or absent — always show gender
-      const pluralPart = (lang.plural && lang.plural !== 'लागू नहीं') ? lang.plural : 'बहु: लागू नहीं';
+      const pluralPart = lang.plural ? lang.plural : 'बहु: लागू नहीं';
       pluralLabel = (lang.gender || '') + (lang.gender ? ' · ' : '') + pluralPart;
-    } else if (_lrLang === 'ur' && lang.plural && typeof lang.plural === 'object') {
-      const nom = lang.plural.nominative || '';
-      const obl = lang.plural.oblique || '';
-      pluralLabel = (lang.gender || '') + (lang.gender && nom ? ' · ' : '') + (nom ? 'ج: ' + nom : '') + (obl ? ' / ' + obl : '');
     } else {
       pluralLabel = lang.plural || (lang.gender || '');
     }

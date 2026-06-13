@@ -1,0 +1,497 @@
+[
+  {
+    "arabic": "الرَّحْمَٰنُ",
+    "latin": "Ar-Raḥmān",
+    "meaning": "The Most or Entirely Merciful — whose mercy encompasses all of creation without condition."
+  },
+  {
+    "arabic": "الرَّحِيمُ",
+    "latin": "Ar-Raḥīm",
+    "meaning": "The Especially Merciful — whose special, deep mercy is reserved for the believers."
+  },
+  {
+    "arabic": "الْمَلِكُ",
+    "latin": "Al-Malik",
+    "meaning": "The King and Owner of Dominion — sovereign ruler over all kingdoms and dominions."
+  },
+  {
+    "arabic": "الْقُدُّوسُ",
+    "latin": "Al-Quddūs",
+    "meaning": "The Absolutely Pure and Perfect — free from every deficiency, flaw, and imperfection."
+  },
+  {
+    "arabic": "السَّلَامُ",
+    "latin": "As-Salām",
+    "meaning": "The Perfection and Giver of Peace — the source of all safety, security, and peace."
+  },
+  {
+    "arabic": "الْمُؤْمِنُ",
+    "latin": "Al-Mu'min",
+    "meaning": "The Granter of Security and Faith — gives faith, security, and protection to His servants."
+  },
+  {
+    "arabic": "الْمُهَيْمِنُ",
+    "latin": "Al-Muhaymin",
+    "meaning": "The Guardian, The Witness, The Overseer — watches over and controls all affairs."
+  },
+  {
+    "arabic": "الْعَزِيزُ",
+    "latin": "Al-'Azīz",
+    "meaning": "The Almighty, The All-Powerful, The Invincible, The Honorable — unconquerable in all matters."
+  },
+  {
+    "arabic": "الْجَبَّارُ",
+    "latin": "Al-Jabbār",
+    "meaning": "The Compeller, The Restorer — compels by His will and restores the broken."
+  },
+  {
+    "arabic": "الْمُتَكَبِّرُ",
+    "latin": "Al-Mutakabbir",
+    "meaning": "The Supreme, The Majestic — possesses all greatness; pride and supremacy belong to Him alone."
+  },
+  {
+    "arabic": "الْخَالِقُ",
+    "latin": "Al-Khāliq",
+    "meaning": "The Creator, The Maker — brings all things into existence from nothing."
+  },
+  {
+    "arabic": "الْبَارِئُ",
+    "latin": "Al-Bāri'",
+    "meaning": "The Originator, The Inventor — fashions creation free from any prior model or example."
+  },
+  {
+    "arabic": "الْمُصَوِّرُ",
+    "latin": "Al-Muṣawwir",
+    "meaning": "The Fashioner, The Shaper — gives each created thing its unique and precise form."
+  },
+  {
+    "arabic": "الْغَفَّارُ",
+    "latin": "Al-Ghaffār",
+    "meaning": "The Constant Forgiver, The Great Forgiver — forgives sins repeatedly for those who repent."
+  },
+  {
+    "arabic": "الْقَهَّارُ",
+    "latin": "Al-Qahhār",
+    "meaning": "The Subduer, The Ever-Dominating — irresistibly overpowers all things in existence."
+  },
+  {
+    "arabic": "الْوَهَّابُ",
+    "latin": "Al-Wahhāb",
+    "meaning": "The Giver of Gifts, The Bestower — gives generously without condition or expectation of return."
+  },
+  {
+    "arabic": "الرَّزَّاقُ",
+    "latin": "Ar-Razzāq",
+    "meaning": "The Ever-Providing, The Constant Provider — provision flows continuously from His generosity."
+  },
+  {
+    "arabic": "الْفَتَّاحُ",
+    "latin": "Al-Fattāḥ",
+    "meaning": "The Opener, The Judge — opens gates of provision, mercy, and victory for His servants."
+  },
+  {
+    "arabic": "الْعَلِيمُ",
+    "latin": "Al-'Alīm",
+    "meaning": "The All-Knowing, The Omniscient — possesses complete and perfect knowledge of all things."
+  },
+  {
+    "arabic": "الْقَابِضُ",
+    "latin": "Al-Qābiḍ",
+    "meaning": "The Withholder, The Restrainer — withholds provision and matters by His perfect wisdom."
+  },
+  {
+    "arabic": "الْبَاسِطُ",
+    "latin": "Al-Bāsiṭ",
+    "meaning": "The Extender, The Expander — expands provision and mercy generously by His grace."
+  },
+  {
+    "arabic": "الْخَافِضُ",
+    "latin": "Al-Khāfiḍ",
+    "meaning": "The Reducer, The Abaser — lowers and humbles whom He wills by His just decree."
+  },
+  {
+    "arabic": "الرَّافِعُ",
+    "latin": "Ar-Rāfi'",
+    "meaning": "The Exalter, The Elevator — raises and elevates whom He wills in rank and honour."
+  },
+  {
+    "arabic": "الْمُعِزُّ",
+    "latin": "Al-Mu'izz",
+    "meaning": "The Honourer, The Bestower of Honor — gives dignity and honour to whom He wills."
+  },
+  {
+    "arabic": "الْمُذِلُّ",
+    "latin": "Al-Mudhill",
+    "meaning": "The Dishonourer, The Humiliator — brings low whoever He wills by His just decree."
+  },
+  {
+    "arabic": "السَّمِيعُ",
+    "latin": "As-Samī'",
+    "meaning": "The All-Hearing — hears every sound, whisper, and prayer without any limit."
+  },
+  {
+    "arabic": "الْبَصِيرُ",
+    "latin": "Al-Baṣīr",
+    "meaning": "The All-Seeing — nothing in existence is hidden from His perfect sight."
+  },
+  {
+    "arabic": "الْحَكَمُ",
+    "latin": "Al-Ḥakam",
+    "meaning": "The Judge, The Giver of Justice — the ultimate arbitrator whose judgment is perfectly just."
+  },
+  {
+    "arabic": "الْعَدْلُ",
+    "latin": "Al-'Adl",
+    "meaning": "The Utterly Just — absolute in fairness; never wrongs any soul even by an atom."
+  },
+  {
+    "arabic": "اللَّطِيفُ",
+    "latin": "Al-Laṭīf",
+    "meaning": "The Most Gentle, The Subtle One — knows the finest details and is tender with His servants."
+  },
+  {
+    "arabic": "الْخَبِيرُ",
+    "latin": "Al-Khabīr",
+    "meaning": "The All-Aware, The All-Acquainted — intimately acquainted with every hidden and apparent matter."
+  },
+  {
+    "arabic": "الْحَلِيمُ",
+    "latin": "Al-Ḥalīm",
+    "meaning": "The Most Forbearing — slow to anger; shows immense patience with His servants."
+  },
+  {
+    "arabic": "الْعَظِيمُ",
+    "latin": "Al-'Aẓīm",
+    "meaning": "The Magnificent, The Supreme — possessing all greatness, grandeur, and majesty."
+  },
+  {
+    "arabic": "الْغَفُورُ",
+    "latin": "Al-Ghafūr",
+    "meaning": "The Forgiving, The Exceedingly Forgiving — forgives abundantly and covers sins with mercy."
+  },
+  {
+    "arabic": "الشَّكُورُ",
+    "latin": "Ash-Shakūr",
+    "meaning": "The Most Appreciative — acknowledges and multiplies rewards far beyond what is deserved."
+  },
+  {
+    "arabic": "الْعَلِيُّ",
+    "latin": "Al-'Alī",
+    "meaning": "The Most High, The Exalted — supreme in status and rank above all of creation."
+  },
+  {
+    "arabic": "الْكَبِيرُ",
+    "latin": "Al-Kabīr",
+    "meaning": "The Greatest, The Most Grand — incomparably great in every dimension and attribute."
+  },
+  {
+    "arabic": "الْحَفِيظُ",
+    "latin": "Al-Ḥafīẓ",
+    "meaning": "The Preserver, The All-Heedful and All-Protecting — guards and protects all things."
+  },
+  {
+    "arabic": "الْمُقِيتُ",
+    "latin": "Al-Muqīt",
+    "meaning": "The Sustainer, The Maintainer — sustains and provides nourishment to every creature."
+  },
+  {
+    "arabic": "الْحَسِيبُ",
+    "latin": "Al-Ḥasīb",
+    "meaning": "The Reckoner — keeps perfect, complete account of every deed, large or small."
+  },
+  {
+    "arabic": "الْجَلِيلُ",
+    "latin": "Al-Jalīl",
+    "meaning": "The Majestic — full of majesty, glory, and grandeur befitting only His Divine essence."
+  },
+  {
+    "arabic": "الْكَرِيمُ",
+    "latin": "Al-Karīm",
+    "meaning": "The Most Generous, The Most Noble — generous beyond measure without expectation of return."
+  },
+  {
+    "arabic": "الرَّقِيبُ",
+    "latin": "Ar-Raqīb",
+    "meaning": "The Watchful, The All-Watchful — ever-observant over all actions, words, and intentions."
+  },
+  {
+    "arabic": "الْمُجِيبُ",
+    "latin": "Al-Mujīb",
+    "meaning": "The Responsive, The Answerer — answers the call of every sincere supplicant."
+  },
+  {
+    "arabic": "الْوَاسِعُ",
+    "latin": "Al-Wāsi'",
+    "meaning": "The All-Encompassing, The Boundless — boundless in mercy, knowledge, and generosity."
+  },
+  {
+    "arabic": "الْحَكِيمُ",
+    "latin": "Al-Ḥakīm",
+    "meaning": "The All-Wise — acts with perfect, complete wisdom in all His decrees and creation."
+  },
+  {
+    "arabic": "الْوَدُودُ",
+    "latin": "Al-Wadūd",
+    "meaning": "The Most Loving — full of deep affection and love toward His righteous servants."
+  },
+  {
+    "arabic": "الْمَجِيدُ",
+    "latin": "Al-Majīd",
+    "meaning": "The All-Glorious, The Ever-Majestic — full of glory, honour, and eternal majesty."
+  },
+  {
+    "arabic": "الْبَاعِثُ",
+    "latin": "Al-Bā'ith",
+    "meaning": "The Infuser of New Life, The Resurrector — raises the dead and sends messengers to mankind."
+  },
+  {
+    "arabic": "الشَّهِيدُ",
+    "latin": "Ash-Shahīd",
+    "meaning": "The All-Witnessing — present and bearing witness to all that occurs at all times."
+  },
+  {
+    "arabic": "الْحَقُّ",
+    "latin": "Al-Ḥaqq",
+    "meaning": "The Absolute Truth — He alone is reality; all else is contingent and dependent upon Him."
+  },
+  {
+    "arabic": "الْوَكِيلُ",
+    "latin": "Al-Wakīl",
+    "meaning": "The Trustee, The Disposer of Affairs — the best disposer of all affairs for those who rely on Him."
+  },
+  {
+    "arabic": "الْقَوِيُّ",
+    "latin": "Al-Qawiyy",
+    "meaning": "The All-Strong — possesses absolute, inexhaustible, and perfect strength."
+  },
+  {
+    "arabic": "الْمَتِينُ",
+    "latin": "Al-Matīn",
+    "meaning": "The Firm, The Steadfast — steadfast in power; never weakened or diminished in any way."
+  },
+  {
+    "arabic": "الْوَلِيُّ",
+    "latin": "Al-Waliyy",
+    "meaning": "The Protector, The Guardian — the protecting ally and guardian of the believers."
+  },
+  {
+    "arabic": "الْحَمِيدُ",
+    "latin": "Al-Ḥamīd",
+    "meaning": "The Praiseworthy, The Most Praised — inherently deserving of all praise and gratitude."
+  },
+  {
+    "arabic": "الْمُحْصِي",
+    "latin": "Al-Muḥṣī",
+    "meaning": "The All-Enumerating, The Counter — has counted and recorded every single thing in existence."
+  },
+  {
+    "arabic": "الْمُبْدِئُ",
+    "latin": "Al-Mubdi'",
+    "meaning": "The Originator, The Initiator — initiates creation from nothing without any prior model."
+  },
+  {
+    "arabic": "الْمُعِيدُ",
+    "latin": "Al-Mu'īd",
+    "meaning": "The Restorer, The Reinstater — will restore and resurrect all creation after death."
+  },
+  {
+    "arabic": "الْمُحْيِي",
+    "latin": "Al-Muḥyī",
+    "meaning": "The Giver of Life — bestows life upon whomever He wills by His power."
+  },
+  {
+    "arabic": "الْمُمِيتُ",
+    "latin": "Al-Mumīt",
+    "meaning": "The Creator of Death — decrees death for every soul by His perfect wisdom."
+  },
+  {
+    "arabic": "الْحَيُّ",
+    "latin": "Al-Ḥayy",
+    "meaning": "The Ever-Living — possesses absolute, eternal, undying life with no beginning or end."
+  },
+  {
+    "arabic": "الْقَيُّومُ",
+    "latin": "Al-Qayyūm",
+    "meaning": "The Sustainer, The Self-Subsisting — sustains all of creation by His own eternal existence."
+  },
+  {
+    "arabic": "الْوَاجِدُ",
+    "latin": "Al-Wājid",
+    "meaning": "The Finder, The Perceiver — finds and perceives all things; nothing escapes His awareness."
+  },
+  {
+    "arabic": "الْمَاجِدُ",
+    "latin": "Al-Mājid",
+    "meaning": "The Noble, The Generous — noble and generous in His essence and in His gifts to creation."
+  },
+  {
+    "arabic": "الْوَاحِدُ",
+    "latin": "Al-Wāḥid",
+    "meaning": "The One, The Indivisible — unique and alone in His essence, attributes, and actions."
+  },
+  {
+    "arabic": "الْأَحَدُ",
+    "latin": "Al-Aḥad",
+    "meaning": "The Unique, The Only One — absolutely singular with no partners, equals, or division."
+  },
+  {
+    "arabic": "الصَّمَدُ",
+    "latin": "Aṣ-Ṣamad",
+    "meaning": "The Eternal, The Absolute — the one all creation depends upon; He depends on nothing."
+  },
+  {
+    "arabic": "الْقَادِرُ",
+    "latin": "Al-Qādir",
+    "meaning": "The Omnipotent, The All-Able — able to bring any matter into existence as He wills."
+  },
+  {
+    "arabic": "الْمُقْتَدِرُ",
+    "latin": "Al-Muqtadir",
+    "meaning": "The All-Powerful, The Dominant — exercises His unlimited power with full authority."
+  },
+  {
+    "arabic": "الْمُقَدِّمُ",
+    "latin": "Al-Muqaddim",
+    "meaning": "The Expediter, The Promoter — advances and promotes whom He wills in rank and provision."
+  },
+  {
+    "arabic": "الْمُؤَخِّرُ",
+    "latin": "Al-Mu'akhkhir",
+    "meaning": "The Delayer, The Postponer — delays and postpones matters by His perfect wisdom and timing."
+  },
+  {
+    "arabic": "الْأَوَّلُ",
+    "latin": "Al-Awwal",
+    "meaning": "The First, The Foremost — existed before all creation with no beginning."
+  },
+  {
+    "arabic": "الْآخِرُ",
+    "latin": "Al-Ākhir",
+    "meaning": "The Last, The Utmost — will remain after all creation ceases with no end."
+  },
+  {
+    "arabic": "الظَّاهِرُ",
+    "latin": "Aẓ-Ẓāhir",
+    "meaning": "The Manifest, The All-Surpassing — evident through His signs and creation above all things."
+  },
+  {
+    "arabic": "الْبَاطِنُ",
+    "latin": "Al-Bāṭin",
+    "meaning": "The Hidden One, Knower of the Hidden — concealed in His essence; knows all that is hidden."
+  },
+  {
+    "arabic": "الْوَالِي",
+    "latin": "Al-Wālī",
+    "meaning": "The Sole Governor — governs and manages all affairs of creation with complete authority."
+  },
+  {
+    "arabic": "الْمُتَعَالِي",
+    "latin": "Al-Muta'ālī",
+    "meaning": "The Self-Exalted — supremely exalted above all in His attributes and essence."
+  },
+  {
+    "arabic": "الْبَرُّ",
+    "latin": "Al-Barr",
+    "meaning": "The Source of All Goodness — the origin of all good; boundlessly kind to His servants."
+  },
+  {
+    "arabic": "التَّوَّابُ",
+    "latin": "At-Tawwāb",
+    "meaning": "The Ever-Pardoning — turns toward His servants with mercy whenever they sincerely repent."
+  },
+  {
+    "arabic": "الْمُنْتَقِمُ",
+    "latin": "Al-Muntaqim",
+    "meaning": "The Avenger — exacts just vengeance upon those who persist in wrongdoing and oppression."
+  },
+  {
+    "arabic": "الْعَفُوُّ",
+    "latin": "Al-'Afūw",
+    "meaning": "The Pardoner — completely erases and wipes away sins, leaving no trace behind."
+  },
+  {
+    "arabic": "الرَّؤُوفُ",
+    "latin": "Ar-Ra'ūf",
+    "meaning": "The Most Kind — full of tenderness and profound compassion toward His servants."
+  },
+  {
+    "arabic": "مَالِكُ الْمُلْكِ",
+    "latin": "Mālik-ul-Mulk",
+    "meaning": "Master of the Dominion, Owner of the Kingdom — the true and absolute possessor of all sovereignty."
+  },
+  {
+    "arabic": "ذُو الْجَلَالِ وَالْإِكْرَامِ",
+    "latin": "Dhū al-Jalāli wal-Ikrām",
+    "meaning": "Possessor of Glory and Honour — possesses all majesty and is the sole source of honour."
+  },
+  {
+    "arabic": "الْمُقْسِطُ",
+    "latin": "Al-Muqsiṭ",
+    "meaning": "The Just One — establishes absolute justice and equity in all His decrees."
+  },
+  {
+    "arabic": "الْجَامِعُ",
+    "latin": "Al-Jāmi'",
+    "meaning": "The Gatherer, The Uniter — will gather all of mankind on the Day of Resurrection."
+  },
+  {
+    "arabic": "الْغَنِيُّ",
+    "latin": "Al-Ghaniyy",
+    "meaning": "The Self-Sufficient, The Wealthy — completely independent; needs nothing from any of creation."
+  },
+  {
+    "arabic": "الْمُغْنِي",
+    "latin": "Al-Mughnī",
+    "meaning": "The Enricher — enriches and satisfies whomever He wills from His boundless treasures."
+  },
+  {
+    "arabic": "الْمَانِعُ",
+    "latin": "Al-Māni'",
+    "meaning": "The Withholder — withholds and prevents by His wisdom; only He can remove what He withholds."
+  },
+  {
+    "arabic": "الضَّارُّ",
+    "latin": "Aḍ-Ḍārr",
+    "meaning": "The Distresser — sends trials and hardship by His perfect wisdom and decree."
+  },
+  {
+    "arabic": "النَّافِعُ",
+    "latin": "An-Nāfi'",
+    "meaning": "The Propitious, The Benefactor — brings benefit and good to whomever He wills."
+  },
+  {
+    "arabic": "النُّورُ",
+    "latin": "An-Nūr",
+    "meaning": "The Light — the source of all light, guidance, and truth in the heavens and the earth."
+  },
+  {
+    "arabic": "الْهَادِي",
+    "latin": "Al-Hādī",
+    "meaning": "The Guide — guides whomever He wills to the straight path of truth and salvation."
+  },
+  {
+    "arabic": "الْبَدِيعُ",
+    "latin": "Al-Badī'",
+    "meaning": "The Incomparable Originator — creates in ways utterly unprecedented with no equal or model."
+  },
+  {
+    "arabic": "الْبَاقِي",
+    "latin": "Al-Bāqī",
+    "meaning": "The Ever-Lasting — remains forever after all creation perishes; eternal without end."
+  },
+  {
+    "arabic": "الْوَارِثُ",
+    "latin": "Al-Wāriṯ",
+    "meaning": "The Inheritor — inherits all things after creation ceases; the true and final owner."
+  },
+  {
+    "arabic": "الرَّشِيدُ",
+    "latin": "Ar-Rashīd",
+    "meaning": "The Guide to the Right Path — directs all affairs with perfect and flawless wisdom."
+  },
+  {
+    "arabic": "الصَّبُورُ",
+    "latin": "Aṣ-Ṣabūr",
+    "meaning": "The Patient — infinitely patient with His servants and delays in repentance."
+  }
+]

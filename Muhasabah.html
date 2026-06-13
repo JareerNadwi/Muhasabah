@@ -3445,6 +3445,8 @@ async function confirmImport(){
 /* ── Read Me ── */
 function openReadMe(){
   document.getElementById('readMeModal').classList.add('active');
+  const inner = document.querySelector('#readMeModal .modal > div:nth-child(2)');
+  if(inner) inner.scrollTop = 0;
 }
 function closeReadMe(){
   document.getElementById('readMeModal').classList.remove('active');

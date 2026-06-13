@@ -7306,10 +7306,24 @@ async function nhCrmSave(){
   nhCrmCloseModal();nhRenderCrm();nhRenderToday();
 }
 async function nhCrmDelete(id){
-  if(!confirm('Delete this deal?'))return;
+  if(!confirm('Delete this deal? The linked contact and notes will also be deleted.'))return;
+  const deal=_nhDeals.find(d=>d.id===id);
+  // Delete linked contact
+  if(deal?.contactId){
+    _nhContacts=_nhContacts.filter(c=>c.id!==deal.contactId);
+    // Delete notes keyed to contact
+    _nhNotes=_nhNotes.filter(n=>n.entityId!==deal.contactId);
+  }
+  // Delete notes keyed to deal id
+  _nhNotes=_nhNotes.filter(n=>n.entityId!==id);
   _nhDeals=_nhDeals.filter(x=>x.id!==id);
-  await nhSet('_nh_deals',_nhDeals);
+  await Promise.all([
+    nhSet('_nh_deals',_nhDeals),
+    nhSet('_nh_contacts',_nhContacts),
+    nhSet('_nh_notes',_nhNotes),
+  ]);
   nhRenderCrm();nhRenderToday();
+  if(_nhTab==='contacts') nhRenderContacts();
 }
 
 /* ══ SHARED NOTES ══ */
@@ -7326,7 +7340,7 @@ function nhCloseNotes(){document.getElementById('nhNotesBg').classList.remove('o
 function nhRenderNotesList(){
   const el=document.getElementById('nhNotesList');
   if(!el)return;
-  const notes=_nhNotes.filter(n=>n.entityId===_nhNotesEntityId).reverse();
+  const notes=_nhNotes.filter(n=>n.entityId===_nhNotesEntityId);
   if(!notes.length){el.innerHTML='<div style="font-size:11px;color:var(--text-muted);font-style:italic;padding:8px 0">No notes yet. Start logging below.</div>';return;}
   el.innerHTML=notes.map(n=>`<div class="nh-note-entry" id="nhe-${n.id}">
     <div class="nh-note-entry-top">
@@ -7339,6 +7353,8 @@ function nhRenderNotesList(){
       <button class="nh-note-save-btn" onclick="nhSaveNoteEdit('${n.id}')">Save</button>
     </div>
   </div>`).join('');
+  // Scroll to bottom to show latest note
+  el.scrollTop=el.scrollHeight;
 }
 function nhEditNoteToggle(nid){
   const editDiv=document.getElementById('nhee-'+nid);
@@ -7708,12 +7724,12 @@ async function nhSmDone(){
 
 
 <!-- Mark Done Modal -->
-<div class="nh-modal-bg" id="nhMarkDoneBg">
+<div class="nh-modal-bg" id="nhMarkDoneBg" style="z-index:4000;">
   <div class="nh-modal" style="max-width:480px;">
     <div class="nh-modal-title" id="nhMarkDoneName">✓ Mark Done</div>
     <div class="nh-field">
       <label>What did you do?</label>
-      <textarea class="nh-note-textarea" id="nhMarkDoneNote" style="min-height:80px;"></textarea>
+      <textarea class="nh-note-textarea" id="nhMarkDoneNote" style="min-height:100px;pointer-events:auto;touch-action:auto;"></textarea>
     </div>
     <button class="nh-note-submit" id="nhMarkDoneNoteBtn" onclick="nhMarkDoneSubmitNote()" style="width:100%;margin-bottom:0;">Save &amp; Set Next Action →</button>
     <div class="nh-markdone-next" id="nhMarkDoneNext">

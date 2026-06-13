@@ -30,13 +30,14 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
    NETWORKING HUB — Contact Book + CRM
 ══════════════════════════════════════════════════════════ */
 #netHubOverlay{background:#0d0b08;}
+body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-wrap{max-width:740px;margin:0 auto;padding:0 0 80px;}
 
 /* Topbar */
 .nh-topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 0 16px;border-bottom:1px solid #2a2010;margin-bottom:16px;gap:10px;flex-wrap:wrap;}
 .nh-title{font-family:'Amiri',serif;font-size:20px;color:#c9a84c;}
 .nh-subtitle{font-size:10px;color:#c5b98a;letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
-.nh-close{background:#1c1814;border:1px solid #2a2010;color:#c5b98a;padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
+.nh-close{background:#1a1610;border:1px solid #2a2010;color:#c5b98a;padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
 .nh-close:hover{border-color:var(--gold-dim);color:#f0e4c0;}
 
 /* Today dashboard */
@@ -45,7 +46,7 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 .nh-today-title{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
 .nh-today-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 1.5s ease-in-out infinite;}
 .nh-today-chips{display:flex;flex-wrap:wrap;gap:6px;}
-.nh-chip{display:inline-flex;align-items:center;gap:5px;background:#1c1814;border:1px solid var(--red);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--red);cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s;}
+.nh-chip{display:inline-flex;align-items:center;gap:5px;background:#1a1610;border:1px solid var(--red);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--red);cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s;}
 .nh-chip:hover{border-color:var(--red);color:var(--red);}
 .nh-chip-company{font-size:9px;opacity:.7;}
 
@@ -53,8 +54,8 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 .nh-nav{display:flex;margin-bottom:16px;border:1px solid #2a2010;border-radius:8px;overflow:hidden;}
 .nh-tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;color:#c5b98a;background:#141008;transition:all .15s;border:none;outline:none;}
 .nh-tab:not(:last-child){border-right:1px solid #2a2010;}
-.nh-tab.on{background:#1c1814;color:var(--gold);border-bottom:2px solid var(--gold);}
-.nh-tab:hover:not(.on){color:#f0e4c0;background:#1c1814;}
+.nh-tab.on{background:#1a1610;color:var(--gold);border-bottom:2px solid var(--gold);}
+.nh-tab:hover:not(.on){color:#f0e4c0;background:#1a1610;}
 .nh-section{display:none;}.nh-section.on{display:block;}
 
 /* Controls */
@@ -62,8 +63,8 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 .nh-search{flex:1;min-width:140px;background:#141008!important;border:1px solid #2a2010!important;color:#f0e4c0!important;padding:8px 12px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
 .nh-search:focus{border-color:var(--gold-dim);}
 .nh-search::placeholder{color:#a89060;}
-.nh-add-btn{background:#1c1814;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;white-space:nowrap;}
-.nh-add-btn:hover{background:#1c1814;border-color:var(--gold);}
+.nh-add-btn{background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;white-space:nowrap;}
+.nh-add-btn:hover{background:#1a1610;border-color:var(--gold);}
 
 /* Shared modal */
 .nh-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:3500;align-items:center;justify-content:center;padding:16px;}
@@ -73,22 +74,22 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 .nh-modal-title{font-family:'Amiri',serif;font-size:18px;color:var(--gold);margin-bottom:18px;}
 .nh-field{margin-bottom:12px;}
 .nh-field label{display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:#c5b98a;margin-bottom:4px;text-transform:uppercase;}
-.nh-field input,.nh-field select,.nh-field textarea{width:100%;background:#1c1814!important;border:1px solid #2a2010!important;color:#f0e4c0!important;padding:8px 11px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;-webkit-appearance:none;appearance:none;box-sizing:border-box;}
+.nh-field input,.nh-field select,.nh-field textarea{width:100%;background:#1a1610!important;border:1px solid #2a2010!important;color:#f0e4c0!important;padding:8px 11px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;-webkit-appearance:none;appearance:none;box-sizing:border-box;}
 .nh-field input:focus,.nh-field select:focus,.nh-field textarea:focus{border-color:var(--gold-dim);}
-.nh-field select option{background:#1c1814;}
+.nh-field select option{background:#1a1610;}
 .nh-field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a7870'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
 .nh-field textarea{resize:vertical;min-height:60px;font-size:11px;line-height:1.5;}
 .nh-modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end;flex-wrap:wrap;}
-.nh-btn-save{background:#1c1814;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
+.nh-btn-save{background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
 .nh-btn-save:hover{border-color:var(--gold);background:#141008;}
-.nh-btn-cancel{background:#1c1814;border:1px solid #2a2010;color:#c5b98a;padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;}
+.nh-btn-cancel{background:#1a1610;border:1px solid #2a2010;color:#c5b98a;padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;}
 .nh-btn-cancel:hover{color:#f0e4c0;}
-.nh-btn-del{background:#1c1814;border:1px solid var(--red);color:var(--red);padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;}
+.nh-btn-del{background:#1a1610;border:1px solid var(--red);color:var(--red);padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;}
 .nh-btn-del:hover{border-color:var(--red);}
 
 /* Link buttons */
 .nh-links{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 8px;}
-.nh-link{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;border:1px solid #2a2010;background:#1c1814;color:#c5b98a;font-family:'DM Mono',monospace;font-size:10px;text-decoration:none;transition:all .15s;white-space:nowrap;}
+.nh-link{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;border:1px solid #2a2010;background:#1a1610;color:#c5b98a;font-family:'DM Mono',monospace;font-size:10px;text-decoration:none;transition:all .15s;white-space:nowrap;}
 .nh-link:hover{border-color:var(--gold-dim);color:#f0e4c0;}
 .nh-link.lk:hover{border-color:#0a66c2;color:#0a66c2;}
 .nh-link.fb:hover{border-color:#1877f2;color:#1877f2;}
@@ -97,9 +98,9 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 .nh-link.em:hover{border-color:var(--gold);color:var(--gold);}
 
 /* Small action buttons */
-.nh-sm-btn{background:#1c1814;border:1px solid #2a2010;color:#c5b98a;padding:4px 10px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;transition:all .15s;white-space:nowrap;}
+.nh-sm-btn{background:#1a1610;border:1px solid #2a2010;color:#c5b98a;padding:4px 10px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;transition:all .15s;white-space:nowrap;}
 .nh-sm-btn:hover{border-color:var(--gold-dim);color:#f0e4c0;}
-.nh-sm-btn.danger:hover{border-color:var(--red);color:var(--red);background:#1c1814;}
+.nh-sm-btn.danger:hover{border-color:var(--red);color:var(--red);background:#1a1610;}
 .nh-empty{text-align:center;padding:40px 16px;color:#a89060;font-size:12px;font-style:italic;}
 
 /* ── CONTACT BOOK ── */
@@ -115,32 +116,32 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 /* Stage filter bar */
 .nh-crm-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
 .nh-sf{display:inline-flex;align-items:center;gap:5px;background:#141008;border:1px solid #2a2010;border-radius:20px;padding:5px 12px;font-family:'DM Mono',monospace;font-size:10px;color:#c5b98a;cursor:pointer;transition:all .15s;white-space:nowrap;}
-.nh-sf:hover,.nh-sf.on{background:#1c1814;border-color:var(--gold-dim);color:#f0e4c0;}
+.nh-sf:hover,.nh-sf.on{background:#1a1610;border-color:var(--gold-dim);color:#f0e4c0;}
 .nh-sf.on{border-color:var(--gold);color:var(--gold);}
-.nh-sf-cnt{font-size:9px;background:#1c1814;border-radius:10px;padding:1px 5px;}
+.nh-sf-cnt{font-size:9px;background:#1a1610;border-radius:10px;padding:1px 5px;}
 .nh-sf.on .nh-sf-cnt{background:rgba(200,169,110,.12);}
 .nh-sf.ov-pill{border-color:var(--red);color:var(--red);}
-.nh-sf.ov-pill.on{border-color:var(--red);background:#1c1814;color:var(--red);}
-.nh-manage-btn{background:#1c1814;border:1px solid #2a2010;color:#a89060;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;margin-left:auto;white-space:nowrap;}
+.nh-sf.ov-pill.on{border-color:var(--red);background:#1a1610;color:var(--red);}
+.nh-manage-btn{background:#1a1610;border:1px solid #2a2010;color:#a89060;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;margin-left:auto;white-space:nowrap;}
 .nh-manage-btn:hover{border-color:var(--gold-dim);color:#f0e4c0;}
 
 /* Kanban accordion */
 .nh-kanban{display:flex;flex-direction:column;gap:8px;}
 .nh-col{background:#141008;border:1px solid #2a2010;border-radius:8px;overflow:hidden;transition:border-color .2s;}
 .nh-col-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none;transition:background .15s;}
-.nh-col-hd:hover{background:#1c1814;}
+.nh-col-hd:hover{background:#1a1610;}
 .nh-col-title{display:flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;color:#f0e4c0;}
 .nh-col-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .nh-col-meta{display:flex;align-items:center;gap:8px;}
-.nh-col-cnt{font-family:'DM Mono',monospace;font-size:10px;color:#c5b98a;background:#1c1814;padding:2px 8px;border-radius:20px;}
-.nh-col-cnt.urg{background:#1c1814;color:var(--red);border:1px solid var(--red);}
+.nh-col-cnt{font-family:'DM Mono',monospace;font-size:10px;color:#c5b98a;background:#1a1610;padding:2px 8px;border-radius:20px;}
+.nh-col-cnt.urg{background:#1a1610;color:var(--red);border:1px solid var(--red);}
 .nh-col-chev{color:#a89060;font-size:10px;transition:transform .2s;}
 .nh-col.open .nh-col-chev{transform:rotate(180deg);}
 .nh-col-body{display:none;flex-direction:column;gap:8px;padding:8px 12px 12px;border-top:1px solid #2a2010;}
 .nh-col.open .nh-col-body{display:flex;}
 
 /* Deal cards */
-.nh-deal{background:#1c1814;border:1px solid #2a2010;border-radius:6px;padding:12px 14px;transition:border-color .2s;cursor:grab;touch-action:none;}
+.nh-deal{background:#1a1610;border:1px solid #2a2010;border-radius:6px;padding:12px 14px;transition:border-color .2s;cursor:grab;touch-action:none;}
 .nh-deal.dragging{opacity:.3;border-style:dashed !important;cursor:grabbing;}
 .nh-col.drop-target{border-color:var(--gold) !important;}
 .nh-col.drop-target .nh-col-hd{background:rgba(200,169,110,.08);}
@@ -152,7 +153,7 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 .nh-deal-name{font-family:'Instrument Serif',serif;font-size:15px;color:#f0e4c0;}
 .nh-deal-co{font-size:11px;color:#c5b98a;margin-top:1px;}
 .nh-deal-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
-.nh-ov-tag{font-family:'DM Mono',monospace;font-size:9px;color:var(--red);background:#1c1814;border:1px solid var(--red);border-radius:20px;padding:2px 7px;white-space:nowrap;}
+.nh-ov-tag{font-family:'DM Mono',monospace;font-size:9px;color:var(--red);background:#1a1610;border:1px solid var(--red);border-radius:20px;padding:2px 7px;white-space:nowrap;}
 .nh-next-date{font-family:'DM Mono',monospace;font-size:9px;color:#a89060;}
 .nh-next-date.urg{color:#e05555;}
 .nh-next-date.soon{color:var(--gold);}
@@ -168,29 +169,29 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 .nh-note-entry-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;}
 .nh-note-edit-btn{background:none;border:none;color:#a89060;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;padding:0 2px;flex-shrink:0;}
 .nh-note-edit-btn:hover{color:var(--gold);}
-.nh-note-edit-area{width:100%;background:#1c1814;border:1px solid var(--gold-dim);color:#f0e4c0;padding:6px 8px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;resize:vertical;min-height:48px;line-height:1.4;margin-top:4px;}
-.nh-note-save-btn{margin-top:4px;background:#1c1814;border:1px solid var(--gold-dim);color:var(--gold);padding:4px 10px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;}
-.nh-note-save-btn:hover{background:#1c1814;}
+.nh-note-edit-area{width:100%;background:#1a1610;border:1px solid var(--gold-dim);color:#f0e4c0;padding:6px 8px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;resize:vertical;min-height:48px;line-height:1.4;margin-top:4px;}
+.nh-note-save-btn{margin-top:4px;background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:4px 10px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;}
+.nh-note-save-btn:hover{background:#1a1610;}
 .nh-note-date{font-family:'DM Mono',monospace;font-size:9px;color:#a89060;margin-bottom:3px;}
 .nh-note-text{font-size:11px;color:#c5b98a;line-height:1.5;white-space:pre-wrap;}
 .nh-note-add{display:flex;flex-direction:column;gap:6px;}
 .nh-note-textarea{width:100%;background:#141008;border:1px solid #2a2010;color:#f0e4c0;padding:8px 10px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;resize:vertical;min-height:80px;line-height:1.4;}
 .nh-note-textarea:focus{border-color:var(--gold-dim);}
-.nh-note-submit{align-self:flex-end;background:#1c1814;border:1px solid var(--gold-dim);color:var(--gold);padding:6px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;}
+.nh-note-submit{align-self:flex-end;background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:6px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;}
 .nh-sm-btn.done{border-color:var(--green);color:var(--green-bright);}
-.nh-sm-btn.done:hover{background:#1c1814;border-color:var(--green-bright);}
+.nh-sm-btn.done:hover{background:#1a1610;border-color:var(--green-bright);}
 .nh-markdone-next{display:none;margin-top:10px;border-top:1px solid #2a2010;padding-top:10px;}
 .nh-markdone-next.on{display:block;}
 .nh-markdone-next label{display:block;font-family:'DM Mono',monospace;font-size:10px;color:#c5b98a;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
-.nh-markdone-next input[type=date]{width:100%;background:#1c1814;border:1px solid #2a2010;color:#f0e4c0;padding:8px 11px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;box-sizing:border-box;}
+.nh-markdone-next input[type=date]{width:100%;background:#1a1610;border:1px solid #2a2010;color:#f0e4c0;padding:8px 11px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;box-sizing:border-box;}
 .nh-markdone-next input[type=date]:focus{border-color:var(--gold-dim);}
-.nh-markdone-confirm{margin-top:8px;background:#1c1814;border:1px solid var(--gold-dim);color:var(--gold);padding:7px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;width:100%;}
+.nh-markdone-confirm{margin-top:8px;background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:7px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;width:100%;}
 .nh-markdone-confirm:hover{border-color:var(--gold);}
-.nh-note-submit:hover{background:#1c1814;}
+.nh-note-submit:hover{background:#1a1610;}
 
 /* Stage manager modal */
 .nh-sm-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;min-height:40px;}
-.nh-sm-item{display:flex;align-items:center;gap:8px;background:#1c1814;border:1px solid #2a2010;border-radius:var(--radius);padding:8px 12px;cursor:grab;}
+.nh-sm-item{display:flex;align-items:center;gap:8px;background:#1a1610;border:1px solid #2a2010;border-radius:var(--radius);padding:8px 12px;cursor:grab;}
 .nh-sm-item.dragging{opacity:.4;border-style:dashed;}
 .nh-sm-item.drag-over{border-color:var(--gold);}
 .nh-sm-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
@@ -200,74 +201,77 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 .nh-sm-del{background:none;border:none;color:#a89060;cursor:pointer;font-size:14px;padding:2px 4px;}
 .nh-sm-del:hover{color:#e05555;}
 .nh-sm-add{display:flex;gap:6px;}
-.nh-sm-input{flex:1;background:#1c1814;border:1px solid #2a2010;color:#f0e4c0;padding:7px 10px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
+.nh-sm-input{flex:1;background:#1a1610;border:1px solid #2a2010;color:#f0e4c0;padding:7px 10px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
 .nh-sm-input:focus{border-color:var(--gold-dim);}
-.nh-sm-addbtn{background:#1c1814;border:1px solid var(--gold-dim);color:var(--gold);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;white-space:nowrap;}
-.nh-sm-addbtn:hover{background:#1c1814;}
-.nh-view-field{background:#1c1814;border:1px solid #2a2010;border-radius:var(--radius);padding:8px 11px;font-family:'DM Mono',monospace;font-size:12px;color:#c5b98a;min-height:36px;word-break:break-all;}
+.nh-sm-addbtn{background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;white-space:nowrap;}
+.nh-sm-addbtn:hover{background:#1a1610;}
+.nh-view-field{background:#1a1610;border:1px solid #2a2010;border-radius:var(--radius);padding:8px 11px;font-family:'DM Mono',monospace;font-size:12px;color:#c5b98a;min-height:36px;word-break:break-all;}
 .nh-view-label{display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:#a89060;margin-bottom:4px;text-transform:uppercase;}
 .nh-crm-section-head{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;color:#a89060;text-transform:uppercase;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid #2a2010;}
 .nh-stage-hint{font-size:10px;color:#a89060;font-family:'DM Mono',monospace;margin-top:3px;font-style:italic;}
 
 /* Light mode — Networking Hub */
 body.light-mode .nh-modal-bg{background:rgba(180,170,155,.75)!important;}
-body.light-mode .nh-modal{background:#141008!important;border-color:#2a2010!important;}
-body.light-mode .nh-close{background:#1c1814!important;border-color:#2a2010!important;color:#c5b98a!important;}
-body.light-mode .nh-nav{border-color:#2a2010!important;}
-body.light-mode .nh-tab{background:#141008!important;color:#c5b98a!important;}
-body.light-mode .nh-tab.on{background:#1c1814!important;color:var(--gold)!important;border-bottom-color:var(--gold)!important;}
-body.light-mode .nh-search{background:#1c1814!important;border-color:#2a2010!important;color:#f0e4c0!important;}
-body.light-mode .nh-add-btn{background:linear-gradient(135deg,#1a1500,#2a2000)!important;border-color:#c9a84c!important;color:#c9a84c!important;}
-body.light-mode .nh-add-btn:hover{background:linear-gradient(135deg,#2a2000,#3a3000)!important;}
-body.light-mode .nh-cb-card{background:#141008!important;border-color:#2a2010!important;}
-body.light-mode .nh-sm-btn{background:#1c1814!important;border-color:#2a2010!important;color:#c5b98a!important;}
-body.light-mode .nh-sm-btn:hover{border-color:var(--gold-dim)!important;color:#f0e4c0!important;}
+body.light-mode .nh-topbar{border-bottom-color:#d4cfc5!important;}
+body.light-mode .nh-title{color:#9a7228!important;}
+body.light-mode .nh-subtitle{color:#5a5750!important;}
+body.light-mode .nh-modal{background:#f0ede6!important;border-color:#d4cfc5!important;}
+body.light-mode .nh-close{background:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .nh-nav{border-color:#d4cfc5!important;}
+body.light-mode .nh-tab{background:#f0ede6!important;color:#5a5750!important;}
+body.light-mode .nh-tab.on{background:#e8e2d6!important;color:#9a7228!important;border-bottom-color:#9a7228!important;}
+body.light-mode .nh-search{background:#f0ede6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
+body.light-mode .nh-add-btn{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-add-btn:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
+body.light-mode .nh-cb-card{background:#f0ede6!important;border-color:#d4cfc5!important;}
+body.light-mode .nh-sm-btn{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .nh-sm-btn:hover{border-color:#9a7228!important;color:#1a1a18!important;}
 body.light-mode .nh-sm-btn.done{border-color:var(--green)!important;color:var(--green)!important;}
-body.light-mode .nh-sm-btn.done:hover{background:#1a3020!important;border-color:var(--green-bright)!important;}
-body.light-mode .nh-sm-btn.danger:hover{background:#2a1010!important;border-color:#c05050!important;color:#c05050!important;}
-body.light-mode .nh-link{background:#1c1814!important;border-color:#2a2010!important;color:#c5b98a!important;}
-body.light-mode .nh-today{background:#2a1010!important;border-color:#8b3a3a!important;}
-body.light-mode .nh-today-title{color:#e08080!important;}
-body.light-mode .nh-today-dot{background:#c05050!important;}
-body.light-mode .nh-chip{background:#2a1010!important;border-color:#c05050!important;color:#c05050!important;}
+body.light-mode .nh-sm-btn.done:hover{background:#d8f0de!important;border-color:var(--green)!important;}
+body.light-mode .nh-sm-btn.danger:hover{background:#f5dede!important;border-color:var(--red)!important;color:var(--red)!important;}
+body.light-mode .nh-link{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .nh-today{background:#fdf0f0!important;border-color:#c08080!important;}
+body.light-mode .nh-today-title{color:#8b2a2a!important;}
+body.light-mode .nh-today-dot{background:#8b2a2a!important;}
+body.light-mode .nh-chip{background:#f5dede!important;border-color:var(--red)!important;color:var(--red)!important;}
 body.light-mode .nh-chip:hover{border-color:var(--red)!important;color:var(--red)!important;}
-body.light-mode .nh-sf{background:#1c1814!important;border-color:#2a2010!important;color:#c5b98a!important;}
-body.light-mode .nh-sf.on{background:linear-gradient(135deg,#1a1500,#2a2000)!important;border-color:#c9a84c!important;color:#c9a84c!important;}
+body.light-mode .nh-sf{background:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .nh-sf.on{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-sf.ov-pill{border-color:var(--red)!important;color:var(--red)!important;}
-body.light-mode .nh-sf.ov-pill.on{background:#2a1010!important;border-color:#8b3a3a!important;color:#c05050!important;}
-body.light-mode .nh-manage-btn{background:#1c1814!important;border-color:#2a2010!important;color:#a89060!important;}
-body.light-mode .nh-col{background:#141008!important;border-color:#2a2010!important;}
-body.light-mode .nh-col-hd:hover{background:#1c1814!important;}
-body.light-mode .nh-col-body{border-color:#2a2010!important;}
-body.light-mode .nh-col-cnt{background:#1c1814!important;color:#c5b98a!important;}
-body.light-mode .nh-col-cnt.urg{background:#2a1010!important;color:#c05050!important;border-color:#8b3a3a!important;}
-body.light-mode .nh-deal{background:#1c1814!important;border-color:#2a2010!important;}
-body.light-mode .nh-deal:hover{border-color:var(--gold-dim)!important;}
-body.light-mode .nh-deal.ov{background:#2a1010!important;border-color:#8b3a3a!important;}
-body.light-mode .nh-ov-tag{background:#2a1010!important;border-color:#8b3a3a!important;color:#c05050!important;}
+body.light-mode .nh-sf.ov-pill.on{background:#fdf0f0!important;border-color:var(--red)!important;color:var(--red)!important;}
+body.light-mode .nh-manage-btn{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#9a9590!important;}
+body.light-mode .nh-col{background:#f0ede6!important;border-color:#d4cfc5!important;}
+body.light-mode .nh-col-hd:hover{background:#e8e2d6!important;}
+body.light-mode .nh-col-body{border-color:#d4cfc5!important;}
+body.light-mode .nh-col-cnt{background:#e8e2d6!important;color:#5a5750!important;}
+body.light-mode .nh-col-cnt.urg{background:#fdf0f0!important;color:var(--red)!important;border-color:var(--red)!important;}
+body.light-mode .nh-deal{background:#e8e2d6!important;border-color:#d4cfc5!important;}
+body.light-mode .nh-deal:hover{border-color:#9a7228!important;}
+body.light-mode .nh-deal.ov{background:#fdf0f0!important;border-color:var(--red)!important;}
+body.light-mode .nh-ov-tag{background:#fdf0f0!important;border-color:var(--red)!important;color:var(--red)!important;}
 body.light-mode .nh-next-date.urg{color:var(--red)!important;}
-body.light-mode .nh-next-date.soon{color:var(--gold)!important;}
-body.light-mode .nh-btn-save{background:linear-gradient(135deg,#1a1500,#2a2000)!important;border-color:#c9a84c!important;color:#c9a84c!important;}
-body.light-mode .nh-btn-save:hover{background:linear-gradient(135deg,#2a2000,#3a3000)!important;}
-body.light-mode .nh-btn-cancel{background:#1c1814!important;border-color:#2a2010!important;color:#c5b98a!important;}
-body.light-mode .nh-btn-del{background:#2a1010!important;border-color:#c05050!important;color:#c05050!important;}
-body.light-mode .nh-note-entry{background:#1c1814!important;border-color:#2a2010!important;}
-body.light-mode .nh-note-date{color:#a89060!important;}
-body.light-mode .nh-note-text{color:#c5b98a!important;}
-body.light-mode .nh-note-edit-btn{color:#a89060!important;}
-body.light-mode .nh-note-textarea,body.light-mode .nh-note-edit-area{background:#1c1814!important;border-color:#2a2010!important;color:#f0e4c0!important;}
-body.light-mode .nh-note-submit{background:linear-gradient(135deg,#1a1500,#2a2000)!important;border-color:#c9a84c!important;color:#c9a84c!important;}
-body.light-mode .nh-note-save-btn{background:linear-gradient(135deg,#1a1500,#2a2000)!important;border-color:#c9a84c!important;color:#c9a84c!important;}
-body.light-mode .nh-sm-item{background:#1c1814!important;border-color:#2a2010!important;}
-body.light-mode .nh-sm-name{color:#f0e4c0!important;}
-body.light-mode .nh-sm-grip{color:#a89060!important;}
-body.light-mode .nh-sm-input{background:#1c1814!important;border-color:#2a2010!important;color:#f0e4c0!important;}
-body.light-mode .nh-sm-addbtn{background:linear-gradient(135deg,#1a1500,#2a2000)!important;border-color:#c9a84c!important;color:#c9a84c!important;}
+body.light-mode .nh-next-date.soon{color:#9a7228!important;}
+body.light-mode .nh-btn-save{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-btn-save:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
+body.light-mode .nh-btn-cancel{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .nh-btn-del{background:#f5dede!important;border-color:var(--red)!important;color:var(--red)!important;}
+body.light-mode .nh-note-entry{background:#e8e2d6!important;border-color:#d4cfc5!important;}
+body.light-mode .nh-note-date{color:#9a9590!important;}
+body.light-mode .nh-note-text{color:#5a5750!important;}
+body.light-mode .nh-note-edit-btn{color:#9a9590!important;}
+body.light-mode .nh-note-textarea,body.light-mode .nh-note-edit-area{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
+body.light-mode .nh-note-submit{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-note-save-btn{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-sm-item{background:#e8e2d6!important;border-color:#d4cfc5!important;}
+body.light-mode .nh-sm-name{color:#1a1a18!important;}
+body.light-mode .nh-sm-grip{color:#9a9590!important;}
+body.light-mode .nh-sm-input{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
+body.light-mode .nh-sm-addbtn{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-sm-del:hover{color:var(--red)!important;}
-body.light-mode .nh-markdone-confirm{background:linear-gradient(135deg,#1a1500,#2a2000)!important;border-color:#c9a84c!important;color:#c9a84c!important;}
-body.light-mode .nh-markdone-next input[type=date]{background:#1c1814!important;border-color:#2a2010!important;color:#f0e4c0!important;}
-body.light-mode .nh-view-field{background:#1c1814!important;border-color:#2a2010!important;color:#c5b98a!important;}
-body.light-mode .nh-crm-section-head{color:#a89060!important;border-color:#2a2010!important;}
+body.light-mode .nh-markdone-confirm{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-markdone-next input[type=date]{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
+body.light-mode .nh-view-field{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .nh-crm-section-head{color:#9a9590!important;border-color:#d4cfc5!important;}
 
 /* ── Contact Banner ── */
 .contact-banner{
@@ -579,26 +583,26 @@ select option{background:#1c1f1c;}
 /* ── Quran Reader ── */
 .quran-reader-overlay{
   display:none;position:fixed;inset:0;z-index:2000;
-  background:#0a0c0a;flex-direction:column;
+  background:#0d0b08;flex-direction:column;
   overscroll-behavior:contain;
 }
 .quran-reader-overlay.active{display:flex;}
 .qr-topbar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:10px 20px;background:#0f110f;border-bottom:1px solid var(--border);
+  padding:10px 20px;background:#141008;border-bottom:1px solid #2a2010;
   flex-shrink:0;gap:12px;flex-wrap:wrap;
 }
 .qr-title{font-family:'Amiri',serif;font-size:16px;color:var(--gold);}
-.qr-info{font-size:11px;color:var(--text-dim);letter-spacing:.5px;}
+.qr-info{font-size:11px;color:#c5b98a;letter-spacing:.5px;}
 .qr-close{
-  background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);
+  background:#1a1610;border:1px solid #2a2010;color:#c5b98a;
   padding:6px 14px;border-radius:var(--radius);cursor:pointer;
   font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;transition:all .2s;
 }
 .qr-close:hover{border-color:#c05050;color:#c05050;}
 .qr-canvas-wrap{
   flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;
-  background:#111311;position:relative;
+  background:#1a1610;position:relative;
   overscroll-behavior:contain;
 }
 canvas#qrCanvas{
@@ -607,18 +611,18 @@ canvas#qrCanvas{
 }
 .qr-bottombar{
   display:flex;align-items:center;justify-content:center;
-  gap:16px;padding:12px 20px;background:#0f110f;border-top:1px solid var(--border);
+  gap:16px;padding:12px 20px;background:#141008;border-top:1px solid #2a2010;
   flex-shrink:0;
 }
 .qr-nav{
-  background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);
+  background:#1a1610;border:1px solid #2a2010;color:#c5b98a;
   padding:8px 20px;border-radius:var(--radius);cursor:pointer;
   font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1px;transition:all .2s;
 }
 .qr-nav:hover:not(:disabled){border-color:var(--gold-dim);color:var(--gold);}
 .qr-nav:disabled{opacity:.3;cursor:not-allowed;}
 .qr-page-display{
-  font-family:'DM Mono',monospace;font-size:13px;color:var(--text);
+  font-family:'DM Mono',monospace;font-size:13px;color:#f0e4c0;
   min-width:140px;text-align:center;letter-spacing:.5px;
 }
 .qr-session-info{
@@ -627,7 +631,7 @@ canvas#qrCanvas{
 }
 .qr-loading{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  background:#111311;color:var(--text-dim);font-size:12px;letter-spacing:1px;
+  background:#1a1610;color:#c5b98a;font-size:12px;letter-spacing:1px;
   font-family:'DM Mono',monospace;
 }
 .qr-open-btn{
@@ -642,6 +646,19 @@ canvas#qrCanvas{
   margin-top:8px;font-size:10px;color:var(--text-muted);letter-spacing:.5px;
   background:var(--surface2);padding:5px 8px;border-radius:3px;line-height:1.6;
 }
+
+/* Light mode — Quran / PDF Reader */
+body.light-mode .quran-reader-overlay{background:#ffffff!important;}
+body.light-mode .qr-topbar,body.light-mode .qr-bottombar{background:#f0ede6!important;border-color:#d4cfc5!important;}
+body.light-mode .qr-title{color:#9a7228!important;}
+body.light-mode .qr-info{color:#5a5750!important;}
+body.light-mode .qr-close{background:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .qr-close:hover{border-color:#c05050!important;color:#c05050!important;}
+body.light-mode .qr-canvas-wrap,body.light-mode .qr-loading{background:#f0ede6!important;color:#5a5750!important;}
+body.light-mode .qr-nav{background:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .qr-nav:hover:not(:disabled){border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .qr-page-display{color:#1a1a18!important;}
+body.light-mode #qrZoomLabel,body.light-mode #pdfZoomLabel{color:#5a5750!important;}
 
 /* ── Light Mode ── */
 body.light-mode{
@@ -717,7 +734,7 @@ body.light-mode #bookDoneNote,body.light-mode #asmaulDoneNote{
   background:#e8f5ec!important;color:#2d6b40!important;border-color:#2d6b40!important;
 }
 body.light-mode #zikrReaderDoneNote,body.light-mode #zikrBookDoneNote{
-  background:#1c1814!important;color:var(--green-bright)!important;border-color:#2a2010!important;
+  background:#1a1610!important;color:var(--green-bright)!important;border-color:#2a2010!important;
 }
 /* Prev buttons */
 body.light-mode #hadithPrevBtn,body.light-mode #tafsirPrevBtn,
@@ -1354,7 +1371,7 @@ body.overlay-open{overflow:hidden;}
     <button class="qr-nav" id="qrPrev" onclick="qrChangePage(-1)">← Prev</button>
     <div class="qr-page-display" id="qrPageDisplay">Page — / —</div>
     <button class="qr-nav" id="qrZoomOut" onclick="qrZoom(-1)" title="Zoom Out" disabled>－</button>
-    <span id="qrZoomLabel" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);min-width:40px;text-align:center;">100%</span>
+    <span id="qrZoomLabel" style="font-family:'DM Mono',monospace;font-size:11px;color:#c5b98a;min-width:40px;text-align:center;">100%</span>
     <button class="qr-nav" id="qrZoomIn" onclick="qrZoom(1)" title="Zoom In">＋</button>
     <button class="qr-nav" id="qrNext" onclick="qrChangePage(1)">Next →</button>
   </div>
@@ -1378,7 +1395,7 @@ body.overlay-open{overflow:hidden;}
     <button class="qr-nav" id="pdfReaderPrev" onclick="pdfReaderChangePage(-1)">← Prev</button>
     <div class="qr-page-display" id="pdfReaderPageDisplay">Page — / —</div>
     <button class="qr-nav" id="pdfZoomOut" onclick="pdfZoom(-1)" title="Zoom Out" disabled>－</button>
-    <span id="pdfZoomLabel" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);min-width:40px;text-align:center;">100%</span>
+    <span id="pdfZoomLabel" style="font-family:'DM Mono',monospace;font-size:11px;color:#c5b98a;min-width:40px;text-align:center;">100%</span>
     <button class="qr-nav" id="pdfZoomIn" onclick="pdfZoom(1)" title="Zoom In">＋</button>
     <button class="qr-nav" id="pdfReaderNext" onclick="pdfReaderChangePage(1)">Next →</button>
   </div>
@@ -1687,8 +1704,8 @@ async function closeQuranReader(){
   const totalPages   = dayData.quranSessions.reduce((s,x)=>s+x.pages,0);
   badge.innerHTML =
     `<span style="color:var(--gold);">📖 Today: ${sessionCount} Session${sessionCount !== 1 ? 's' : ''} &nbsp;·&nbsp; ≈ ${todayTotal.toFixed(2)} Juzz Total</span>`
-    + `<br><span style="font-size:9px;color:var(--text-muted);">Total: ${firstSession.start}–${lastSession.end} (${totalPages} Pages, ≈ ${todayTotal.toFixed(2)} Juzz)</span>`
-    + `<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages ${startQuranPage}–${endQuranPage} (${pagesRead} Pages, ${sessionJuzz.toFixed(2)} Juzz)</span>`;
+    + `<br><span style="font-size:9px;color:#a89060;">Total: ${firstSession.start}–${lastSession.end} (${totalPages} Pages, ≈ ${todayTotal.toFixed(2)} Juzz)</span>`
+    + `<br><span style="font-size:9px;color:#a89060;">Last: Pages ${startQuranPage}–${endQuranPage} (${pagesRead} Pages, ${sessionJuzz.toFixed(2)} Juzz)</span>`;
 
   await saveAndRefresh();
 }
@@ -2022,7 +2039,7 @@ async function closePdfReader(){
       badge.style.display = 'block';
       badge.innerHTML =
         `<span style="color:var(--gold);">📖 Opened &amp; read — Page ${pdfReaderCurPage} of ${pdfReaderLastPage}</span>`
-        + `<br><span style="font-size:9px;color:var(--text-muted);">Goal marked complete ✓</span>`;
+        + `<br><span style="font-size:9px;color:#a89060;">Goal marked complete ✓</span>`;
     }
     await saveAndRefresh();
     return;
@@ -2057,8 +2074,8 @@ async function closePdfReader(){
       const pct      = Math.round(bonusRatio * 100);
       badge.innerHTML =
         `<span style="color:var(--gold);">📖 Today: ${count} Session${count!==1?'s':''} &nbsp;·&nbsp; ${totalPagesToday} Page${totalPagesToday!==1?'s':''} Read (${pct}%)</span>`
-        + `<br><span style="font-size:9px;color:var(--text-muted);">Total: Duas ${first.start}–${last.end} (${totalPagesToday} Dua${totalPagesToday!==1?'s':''} Today)</span>`
-        + `<br><span style="font-size:9px;color:var(--text-muted);">Last: Duas ${last.start}–${last.end} (${pagesRead} Dua${pagesRead!==1?'s':''}) · Global Dua ${pdfReaderCurPage}/${pdfReaderLastPage}</span>`;
+        + `<br><span style="font-size:9px;color:#a89060;">Total: Duas ${first.start}–${last.end} (${totalPagesToday} Dua${totalPagesToday!==1?'s':''} Today)</span>`
+        + `<br><span style="font-size:9px;color:#a89060;">Last: Duas ${last.start}–${last.end} (${pagesRead} Dua${pagesRead!==1?'s':''}) · Global Dua ${pdfReaderCurPage}/${pdfReaderLastPage}</span>`;
     }
     // Auto-fill the pages counter in the UI
     const zikrBookInput = document.getElementById('zikrBookPages');
@@ -2103,8 +2120,8 @@ async function closePdfReader(){
       : `${count} Session${count!==1?'s':''} &nbsp;·&nbsp; ${totalPages} / ${pdfReaderLastPage} Page${pdfReaderLastPage!==1?'s':''} (${pct}%)`;
     badge.innerHTML =
       `<span style="color:var(--gold);">📖 Today: ${headerTxt}</span>`
-      + `<br><span style="font-size:9px;color:var(--text-muted);">Total: Pages ${first.start}–${last.end} (${totalPages} Page${totalPages!==1?'s':''} Today)</span>`
-      + `<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages ${last.start}–${last.end} (${pagesRead} Page${pagesRead!==1?'s':''}) </span>`;
+      + `<br><span style="font-size:9px;color:#a89060;">Total: Pages ${first.start}–${last.end} (${totalPages} Page${totalPages!==1?'s':''} Today)</span>`
+      + `<br><span style="font-size:9px;color:#a89060;">Last: Pages ${last.start}–${last.end} (${pagesRead} Page${pagesRead!==1?'s':''}) </span>`;
   }
 
   await saveAndRefresh();
@@ -2691,8 +2708,8 @@ function loadDayData(dk){
     const totPg   = data.quranSessions.reduce((s,x)=>s+x.pages,0);
     badge.innerHTML =
       `<span style="color:var(--gold);">📖 Today: ${count} Session${count !== 1 ? 's' : ''} &nbsp;·&nbsp; ≈ ${total.toFixed(2)} Juzz Total</span>`
-      + `<br><span style="font-size:9px;color:var(--text-muted);">Total: ${first.start}–${last.end} (${totPg} Pages, ≈ ${total.toFixed(2)} Juzz)</span>`
-      + `<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages ${last.start}–${last.end} (${last.pages} Pages, ${last.juzz.toFixed(2)} Juzz)</span>`;
+      + `<br><span style="font-size:9px;color:#a89060;">Total: ${first.start}–${last.end} (${totPg} Pages, ≈ ${total.toFixed(2)} Juzz)</span>`
+      + `<br><span style="font-size:9px;color:#a89060;">Last: Pages ${last.start}–${last.end} (${last.pages} Pages, ${last.juzz.toFixed(2)} Juzz)</span>`;
   } else {
     badge.style.display='none';
   }
@@ -2717,8 +2734,8 @@ function loadDayData(dk){
         : `${count} Session${count!==1?'s':''} &nbsp;·&nbsp; ${totalPages} Page${totalPages!==1?'s':''} (${pct}%)`;
       b.innerHTML =
         `<span style="color:var(--gold);">📖 Today: ${headerTxt}</span>`
-        + `<br><span style="font-size:9px;color:var(--text-muted);">Total: Pages ${first.start}–${last.end} (${totalPages} Page${totalPages!==1?'s':''} Today)</span>`
-        + `<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages ${last.start}–${last.end} (${last.pages} Page${last.pages!==1?'s':''}) </span>`;
+        + `<br><span style="font-size:9px;color:#a89060;">Total: Pages ${first.start}–${last.end} (${totalPages} Page${totalPages!==1?'s':''} Today)</span>`
+        + `<br><span style="font-size:9px;color:#a89060;">Last: Pages ${last.start}–${last.end} (${last.pages} Page${last.pages!==1?'s':''}) </span>`;
       b.style.color = '';
     } else {
       b.style.display = 'none';
@@ -3253,8 +3270,8 @@ function renderHadithBadge(dk){
   badge.style.display = 'block';
   badge.innerHTML =
     `<span style="color:var(--gold);">\u{1F4DA} Today: ${headerTxt}</span>`
-    +`<br><span style="font-size:9px;color:var(--text-muted);">Total: Hadiths ${first.start}\u2013${last.end} (${last.end} Hadith${last.end!==1?'s':''})</span>`
-    +`<br><span style="font-size:9px;color:var(--text-muted);">Last: Hadiths ${last.start}\u2013${last.end} (${last.end - last.start + 1} Hadith${(last.end-last.start+1)!==1?'s':''})</span>`;
+    +`<br><span style="font-size:9px;color:#a89060;">Total: Hadiths ${first.start}\u2013${last.end} (${last.end} Hadith${last.end!==1?'s':''})</span>`
+    +`<br><span style="font-size:9px;color:#a89060;">Last: Hadiths ${last.start}\u2013${last.end} (${last.end - last.start + 1} Hadith${(last.end-last.start+1)!==1?'s':''})</span>`;
 }
 
 function renderTafsirBadge(dk){
@@ -3276,8 +3293,8 @@ function renderTafsirBadge(dk){
   badge.style.display = 'block';
   badge.innerHTML =
     `<span style="color:var(--gold);">\u{1F50D} Today: ${headerTxt}</span>`
-    +`<br><span style="font-size:9px;color:var(--text-muted);">Total: Verses ${first.start}\u2013${last.end} (${last.end} Verse${last.end!==1?'s':''})</span>`
-    +`<br><span style="font-size:9px;color:var(--text-muted);">Last: Verses ${last.start}\u2013${last.end} (${last.end - last.start + 1} Verse${(last.end-last.start+1)!==1?'s':''})</span>`;
+    +`<br><span style="font-size:9px;color:#a89060;">Total: Verses ${first.start}\u2013${last.end} (${last.end} Verse${last.end!==1?'s':''})</span>`
+    +`<br><span style="font-size:9px;color:#a89060;">Last: Verses ${last.start}\u2013${last.end} (${last.end - last.start + 1} Verse${(last.end-last.start+1)!==1?'s':''})</span>`;
 }
 
 /* Scoring updates */
@@ -3727,8 +3744,8 @@ function _renderSvBadge(dk, goalKey){
   badge.style.display = 'block';
   badge.innerHTML =
     '<span style="color:var(--gold);">' + icon + ' Today: ' + headerTxt + '</span>' +
-    '<br><span style="font-size:9px;color:var(--text-muted);">Total: Verse ' + first.start + '–' + last.end + ' (' + totalVerses + ' Verse' + (totalVerses!==1?'s':'') + ' Today)</span>' +
-    '<br><span style="font-size:9px;color:var(--text-muted);">Last: Verses ' + last.start + '–' + last.end + ' (' + last.verses + ' Verse' + (last.verses!==1?'s':'') + ')</span>';
+    '<br><span style="font-size:9px;color:#a89060;">Total: Verse ' + first.start + '–' + last.end + ' (' + totalVerses + ' Verse' + (totalVerses!==1?'s':'') + ' Today)</span>' +
+    '<br><span style="font-size:9px;color:#a89060;">Last: Verses ' + last.start + '–' + last.end + ' (' + last.verses + ' Verse' + (last.verses!==1?'s':'') + ')</span>';
 }
 
 async function closeSurahVerseReader(){
@@ -4036,14 +4053,14 @@ function renderBookBadge(dk) {
     badge.style.display = 'block';
     badge.innerHTML =
       '<span style="color:var(--green-bright);">' + icon + ' Today: 1 Session · ' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ' Read (' + headerPct + '%) ✓</span>' +
-      '<br><span style="font-size:9px;color:var(--text-muted);">Total: Pages 1–' + pagesRead + ' (' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ' Today)</span>' +
-      '<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages 1–' + pagesRead + ' (' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ')</span>';
+      '<br><span style="font-size:9px;color:#a89060;">Total: Pages 1–' + pagesRead + ' (' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ' Today)</span>' +
+      '<br><span style="font-size:9px;color:#a89060;">Last: Pages 1–' + pagesRead + ' (' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ')</span>';
   } else if(pagesRead > 0){
     badge.style.display = 'block';
     badge.innerHTML =
       '<span style="color:var(--gold);">' + icon + ' Today: 1 Session · ' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ' Read (' + headerPct + '%)</span>' +
-      '<br><span style="font-size:9px;color:var(--text-muted);">Total: Pages 1–' + pagesRead + ' (' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ' Today)</span>' +
-      '<br><span style="font-size:9px;color:var(--text-muted);">Last: Pages 1–' + pagesRead + ' (' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ')</span>';
+      '<br><span style="font-size:9px;color:#a89060;">Total: Pages 1–' + pagesRead + ' (' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ' Today)</span>' +
+      '<br><span style="font-size:9px;color:#a89060;">Last: Pages 1–' + pagesRead + ' (' + pagesRead + ' Page' + (pagesRead!==1?'s':'') + ')</span>';
   } else {
     badge.style.display = 'none';
   }
@@ -4208,7 +4225,7 @@ function renderBookBadge(dk) {
       <button class="qr-close" onclick="closeSalahArticle()">✕ Close</button>
     </div>
     <!-- Body -->
-    <div style="padding:32px 28px;overflow-y:auto;color:var(--text);font-family:'Amiri',serif;">
+    <div style="padding:32px 28px;overflow-y:auto;color:#f0e4c0;font-family:'Amiri',serif;">
 
       <!-- Intro -->
       <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Salah — the ritual prayer performed five times daily — is the second pillar of Islam and the most consistent act of worship prescribed upon every Muslim. It is a direct, unmediated conversation between the servant and his Lord, renewed five times every single day without exception.</p>
@@ -4677,7 +4694,7 @@ function closeSalahArticle(){
       <!-- Counter -->
       <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:28px 24px;margin-bottom:16px;text-align:center;">
         <div id="zikrArticleCount" style="font-family:'Instrument Serif',serif;font-size:4rem;color:#c9a84c;line-height:1;margin-bottom:6px;text-shadow:0 0 24px rgba(200,169,110,0.3);">0</div>
-        <div style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--text-muted);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:24px;">/ 1500 Goal</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.72rem;color:#a89060;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:24px;">/ 1500 Goal</div>
         <div id="zikrArticleBar" style="height:6px;background:#1a1610;border-radius:3px;overflow:hidden;margin-bottom:24px;max-width:400px;margin-left:auto;margin-right:auto;">
           <div id="zikrArticleFill" style="height:100%;width:0%;background:linear-gradient(90deg,#4a7c59,#c9a84c);border-radius:3px;transition:width 0.3s ease;"></div>
         </div>
@@ -4688,7 +4705,7 @@ function closeSalahArticle(){
         <div id="zikrArticleMsg" style="font-family:'DM Mono',monospace;font-size:0.75rem;color:#5a4a28;letter-spacing:0.1em;min-height:18px;transition:color 0.3s;"></div>
       </div>
 
-      <div style="font-family:'Literata',Georgia,serif;font-size:0.78rem;color:var(--text-dim);line-height:1.8;border:1px solid var(--border);border-radius:6px;padding:16px 18px;margin-bottom:20px;">These duas are selected by the creator of this tracker. The reader is free to choose whatever they like to read as their all-time zikr.</div>
+      <div style="font-family:'Literata',Georgia,serif;font-size:0.78rem;color:#c5b98a;line-height:1.8;border:1px solid #2a2010;border-radius:6px;padding:16px 18px;margin-bottom:20px;">These duas are selected by the creator of this tracker. The reader is free to choose whatever they like to read as their all-time zikr.</div>
 
     </div>
   </div>
@@ -5033,7 +5050,7 @@ function calcBMI(){
     <!-- Nav bar -->
     <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <button id="asmaulPrevBtn" onclick="asmaulNavPrev()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
-      <div id="asmaulPageDisplay" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text);min-width:110px;text-align:center;letter-spacing:.5px;">Page — / —</div>
+      <div id="asmaulPageDisplay" style="font-family:'DM Mono',monospace;font-size:13px;color:#f0e4c0;min-width:110px;text-align:center;letter-spacing:.5px;">Page — / —</div>
       <button id="asmaulNextBtn" onclick="asmaulNavNext()" style="background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next →</button>
     </div>
   </div>
@@ -5233,8 +5250,8 @@ function renderAsmaulBadge(dk){
   badge.style.display = "block";
   badge.innerHTML =
     "<span style=\"color:var(--gold)\">🌿 Today: " + count + " Session" + (count !== 1 ? "s" : "") + " &nbsp;·&nbsp; " + totalSlides + " Page" + (totalSlides !== 1 ? "s" : "") + " Read (" + totalPct + "%" + doneText + ")</span>" +
-    "<br><span style=\"font-size:9px;color:var(--text-muted)\">Total: Page " + first.start + "–" + last.end + " (" + totalSlides + " Page" + (totalSlides !== 1 ? "s" : "") + " Today)</span>" +
-    "<br><span style=\"font-size:9px;color:var(--text-muted)\">Last: Pages " + last.start + "–" + last.end + " (" + lastSlides + " Page" + (lastSlides !== 1 ? "s" : "") + ")</span>";
+    "<br><span style=\"font-size:9px;color:#a89060\">Total: Page " + first.start + "–" + last.end + " (" + totalSlides + " Page" + (totalSlides !== 1 ? "s" : "") + " Today)</span>" +
+    "<br><span style=\"font-size:9px;color:#a89060\">Last: Pages " + last.start + "–" + last.end + " (" + lastSlides + " Page" + (lastSlides !== 1 ? "s" : "") + ")</span>";
 }
 
 document.addEventListener("keydown", function(e){
@@ -5260,20 +5277,20 @@ loadDayData = function(dk){
     <div class="zikr-reader-hd" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div>
         <div id="zikrReaderTitle" style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;"></div>
-        <div id="zikrReaderDayPill" style="font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:.4px;"></div>
+        <div id="zikrReaderDayPill" style="font-size:10px;color:#c5b98a;margin-top:2px;letter-spacing:.4px;"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
-        <span id="zikrReaderProgressPill" style="font-size:11px;color:var(--text-dim);font-family:'DM Mono',monospace;"></span>
+        <span id="zikrReaderProgressPill" style="font-size:11px;color:#c5b98a;font-family:'DM Mono',monospace;"></span>
         <button class="qr-close" onclick="closeZikrReader()">✕ Save &amp; Exit</button>
       </div>
     </div>
     <div id="zikrReaderSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#141008;"></div>
-    <div id="zikrReaderDoneNote" style="display:none;background:#1c1814;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">You have completed all 77 duas today</div>
+    <div id="zikrReaderDoneNote" style="display:none;background:#1a1610;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">You have completed all 77 duas today</div>
     <div id="zikrReaderContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#f0e4c0;min-height:0;"></div>
     <div class="zikr-reader-nav" style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
-      <button id="zikrReaderPrevBtn" onclick="zikrNavPrev()" style="background:#1c1814;border:1px solid #2a2010;color:#c5b98a;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Prev</button>
+      <button id="zikrReaderPrevBtn" onclick="zikrNavPrev()" style="background:#1a1610;border:1px solid #2a2010;color:#c5b98a;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Prev</button>
       <div id="zikrReaderPageDisplay" style="font-family:'DM Mono',monospace;font-size:13px;color:#f0e4c0;min-width:110px;text-align:center;letter-spacing:.5px;">Dua - / -</div>
-      <button id="zikrReaderNextBtn" onclick="zikrNavNext()" style="background:#1c1814;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next</button>
+      <button id="zikrReaderNextBtn" onclick="zikrNavNext()" style="background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next</button>
     </div>
   </div>
 </div>
@@ -5321,7 +5338,7 @@ function _zikrRender(){
   pb.disabled=_zikrSlide===0;pb.style.opacity=_zikrSlide===0?"0.3":"1";
   var nb=document.getElementById("zikrReaderNextBtn");
   nb.textContent=isLast?"Complete":"Next";
-  nb.style.background=isLast?"var(--green)":"var(--surface2)";
+  nb.style.background=isLast?"var(--green)":"#1a1610";
   nb.style.borderColor=isLast?"var(--green-bright)":"var(--gold-dim)";
   nb.style.color=isLast?"#fff":"var(--gold)";
   var ns=num<10?"0"+num:""+num;
@@ -5415,8 +5432,8 @@ function renderZikrBadge(dk,mode){
       badge.style.display="block";
       badge.innerHTML=
         "<span style=\"color:var(--gold)\">"+icon+" Today: 1 Session &nbsp;&#183;&nbsp; "+(idx+1)+" Dua"+(idx+1!==1?"s":"")+" Read ("+pct+")</span>"+
-        "<br><span style=\"font-size:9px;color:var(--text-muted)\">Total: Dua 1-"+(idx+1)+" ("+(idx+1)+" Dua"+(idx+1!==1?"s":"")+" Today)</span>"+
-        "<br><span style=\"font-size:9px;color:var(--text-muted)\">Last: Dua 1-"+(idx+1)+" ("+(idx+1)+" Dua"+(idx+1!==1?"s":"")+")  </span>";
+        "<br><span style=\"font-size:9px;color:#a89060\">Total: Dua 1-"+(idx+1)+" ("+(idx+1)+" Dua"+(idx+1!==1?"s":"")+" Today)</span>"+
+        "<br><span style=\"font-size:9px;color:#a89060\">Last: Dua 1-"+(idx+1)+" ("+(idx+1)+" Dua"+(idx+1!==1?"s":"")+")  </span>";
     }else{badge.style.display="none";}
     return;
   }
@@ -5427,8 +5444,8 @@ function renderZikrBadge(dk,mode){
   badge.style.display="block";
   badge.innerHTML=
     "<span style=\"color:var(--gold)\">"+icon+" Today: "+count+" Session"+(count!==1?"s":"")+" &nbsp;&#183;&nbsp; "+tot+" Dua"+(tot!==1?"s":"")+" Read ("+tp+"%"+dt+")</span>"+
-    "<br><span style=\"font-size:9px;color:var(--text-muted)\">Total: Dua "+first.start+"-"+last.end+" ("+tot+" Dua"+(tot!==1?"s":"")+" Today)</span>"+
-    "<br><span style=\"font-size:9px;color:var(--text-muted)\">Last: Duas "+last.start+"-"+last.end+" ("+last.slides+" Dua"+(last.slides!==1?"s":"")+")</span>";
+    "<br><span style=\"font-size:9px;color:#a89060\">Total: Dua "+first.start+"-"+last.end+" ("+tot+" Dua"+(tot!==1?"s":"")+" Today)</span>"+
+    "<br><span style=\"font-size:9px;color:#a89060\">Last: Duas "+last.start+"-"+last.end+" ("+last.slides+" Dua"+(last.slides!==1?"s":"")+")</span>";
 }
 document.addEventListener("keydown",function(e){
   var zO=document.getElementById("zikrReaderOverlay");
@@ -5455,20 +5472,20 @@ loadDayData=function(dk){
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div>
         <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">📖 Zikr From Book</div>
-        <div id="zikrBookDayPill" style="font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:.4px;"></div>
+        <div id="zikrBookDayPill" style="font-size:10px;color:#c5b98a;margin-top:2px;letter-spacing:.4px;"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
-        <span id="zikrBookProgressPill" style="font-size:11px;color:var(--text-dim);font-family:'DM Mono',monospace;"></span>
+        <span id="zikrBookProgressPill" style="font-size:11px;color:#c5b98a;font-family:'DM Mono',monospace;"></span>
         <button class="qr-close" onclick="closeZikrBookReader()">✕ Save & Exit</button>
       </div>
     </div>
     <div id="zikrBookSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#141008;"></div>
-    <div id="zikrBookDoneNote" style="display:none;background:#1c1814;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">✓ You have read all 123 Duas today — you may continue reviewing</div>
+    <div id="zikrBookDoneNote" style="display:none;background:#1a1610;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">✓ You have read all 123 Duas today — you may continue reviewing</div>
     <div id="zikrBookContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#f0e4c0;min-height:0;"></div>
     <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
-      <button id="zikrBookPrevBtn" onclick="zikrBookNavPrev()" style="background:#1c1814;border:1px solid #2a2010;color:#c5b98a;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
+      <button id="zikrBookPrevBtn" onclick="zikrBookNavPrev()" style="background:#1a1610;border:1px solid #2a2010;color:#c5b98a;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
       <div id="zikrBookPageDisplay" style="font-family:'DM Mono',monospace;font-size:13px;color:#f0e4c0;min-width:110px;text-align:center;letter-spacing:.5px;">Dua — / —</div>
-      <button id="zikrBookNextBtn" onclick="zikrBookNavNext()" style="background:#1c1814;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next →</button>
+      <button id="zikrBookNextBtn" onclick="zikrBookNavNext()" style="background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next →</button>
     </div>
   </div>
 </div>
@@ -5536,7 +5553,7 @@ function _zbRender() {
 
   const nb = document.getElementById('zikrBookNextBtn');
   nb.textContent = isLast ? '✓ Complete' : 'Next →';
-  nb.style.background  = isLast ? 'var(--green)'        : 'var(--surface2)';
+  nb.style.background  = isLast ? 'var(--green)'        : '#1a1610';
   nb.style.borderColor = isLast ? 'var(--green-bright)' : 'var(--gold-dim)';
   nb.style.color       = isLast ? '#fff'                : 'var(--gold)';
 
@@ -5675,8 +5692,8 @@ function _zbRenderBadge() {
   badge.style.display = 'block';
   badge.innerHTML =
     '<span style="color:var(--gold);">📖 Today: ' + count + ' Session' + (count !== 1 ? 's' : '') + ' &nbsp;·&nbsp; ' + totalDuas + ' Dua' + (totalDuas !== 1 ? 's' : '') + ' Read (' + pct + '%)</span>' +
-    '<br><span style="font-size:9px;color:var(--text-muted);">Total: Dua ' + first.start + '–' + last.end + ' (' + totalDuas + ' Dua' + (totalDuas !== 1 ? 's' : '') + ' Today)</span>' +
-    '<br><span style="font-size:9px;color:var(--text-muted);">Last: Duas ' + last.start + '–' + last.end + ' (' + last.duas + ' Dua' + (last.duas !== 1 ? 's' : '') + ') · Global Dua ' + globalPos + '/' + ZIKR_BOOK_TOTAL + '</span>';
+    '<br><span style="font-size:9px;color:#a89060;">Total: Dua ' + first.start + '–' + last.end + ' (' + totalDuas + ' Dua' + (totalDuas !== 1 ? 's' : '') + ' Today)</span>' +
+    '<br><span style="font-size:9px;color:#a89060;">Last: Duas ' + last.start + '–' + last.end + ' (' + last.duas + ' Dua' + (last.duas !== 1 ? 's' : '') + ') · Global Dua ' + globalPos + '/' + ZIKR_BOOK_TOTAL + '</span>';
 }
 
 /* ── Keyboard nav ── */
@@ -7428,7 +7445,7 @@ function nhCrmOpenModal(id,defaultStageId){
     if(whatsapp&&whatsapp!=='—') lh+=`<a class="nh-link wa" href="https://wa.me/${(whatsapp).replace(/\D/g,'')}" target="_blank" rel="noopener">💬 WhatsApp</a>`;
     if(phone&&phone!=='—') lh+=`<a class="nh-link ph" href="tel:${phone}">📞 Call</a>`;
     if(email&&email!=='—') lh+=`<a class="nh-link em" href="mailto:${email}">✉ Email</a>`;
-    linksEl.innerHTML=lh||'<span style="font-size:11px;color:var(--text-muted)">No contact links saved</span>';
+    linksEl.innerHTML=lh||'<span style="font-size:11px;color:#a89060">No contact links saved</span>';
   }
   // Populate editable pipeline fields
   const spick=document.getElementById('nhCrmFStage');
@@ -7503,7 +7520,7 @@ function nhRenderNotesList(){
   const el=document.getElementById('nhNotesList');
   if(!el)return;
   const notes=_nhNotes.filter(n=>n.entityId===_nhNotesEntityId);
-  if(!notes.length){el.innerHTML='<div style="font-size:11px;color:var(--text-muted);font-style:italic;padding:8px 0">No notes yet. Start logging below.</div>';return;}
+  if(!notes.length){el.innerHTML='<div style="font-size:11px;color:#a89060;font-style:italic;padding:8px 0">No notes yet. Start logging below.</div>';return;}
   el.innerHTML=notes.map(n=>`<div class="nh-note-entry" id="nhe-${n.id}">
     <div class="nh-note-entry-top">
       <div class="nh-note-date">${n.date}</div>
@@ -7878,7 +7895,7 @@ async function nhSmDone(){
 <div class="nh-modal-bg" id="nhSmBg">
   <div class="nh-modal">
     <div class="nh-modal-title">⚙ Pipeline Stages</div>
-    <div style="font-size:10px;color:var(--text-dim);margin-bottom:10px;font-family:'DM Mono',monospace;">Drag to reorder. The Contacts stage is fixed.</div>
+    <div style="font-size:10px;color:#c5b98a;margin-bottom:10px;font-family:'DM Mono',monospace;">Drag to reorder. The Contacts stage is fixed.</div>
     <div class="nh-sm-list" id="nhSmList"></div>
     <div class="nh-sm-add">
       <input class="nh-sm-input" id="nhSmInput" type="text" placeholder="" onkeydown="if(event.key==='Enter')nhAddStage()">

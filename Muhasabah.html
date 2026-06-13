@@ -7335,6 +7335,13 @@ function nhOpenNotes(entityId,entityName){
   if(ta) ta.value='';
   nhRenderNotesList();
   document.getElementById('nhNotesBg').classList.add('open');
+  // Scroll after modal is visible and has layout
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      const el=document.getElementById('nhNotesList');
+      if(el) el.scrollTop=el.scrollHeight;
+    });
+  });
 }
 function nhCloseNotes(){document.getElementById('nhNotesBg').classList.remove('open');_nhNotesEntityId=null;}
 function nhRenderNotesList(){
@@ -7353,8 +7360,6 @@ function nhRenderNotesList(){
       <button class="nh-note-save-btn" onclick="nhSaveNoteEdit('${n.id}')">Save</button>
     </div>
   </div>`).join('');
-  // Scroll to bottom to show latest note
-  el.scrollTop=el.scrollHeight;
 }
 function nhEditNoteToggle(nid){
   const editDiv=document.getElementById('nhee-'+nid);

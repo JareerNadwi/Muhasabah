@@ -312,7 +312,7 @@ body.light-mode .nh-crm-section-head{color:var(--text-muted)!important;border-co
 a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 @media(max-width:900px){.contact-banner{margin:0 12px;padding:8px 12px;}.contact-sep{display:none;}.contact-text{flex-direction:column;gap:4px;align-items:flex-start;}}
 @media(max-width:600px){.contact-banner{display:none;}}
-.header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:10px;}
 .header-title{font-family:'Amiri',serif;font-size:22px;color:var(--gold);}
 .header-sub{font-size:10px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
 .header-right{display:flex;gap:10px;align-items:center;}
@@ -516,7 +516,46 @@ select option{background:#1c1f1c;}
 
 /* ── Responsive ── */
 @media(max-width:900px){.months-grid{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:600px){.months-grid{grid-template-columns:1fr;}.goals-grid{grid-template-columns:1fr;}.stats-row{grid-template-columns:repeat(2,1fr);}.view{padding:16px;}.header{padding:14px 16px;}}
+@media(max-width:600px){
+  .months-grid{grid-template-columns:1fr;}
+  .goals-grid{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .view{padding:16px;}
+  .header{
+    padding:10px 14px;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:10px;
+  }
+  .header-right{
+    width:100%;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:4px;
+    gap:8px;
+    flex-wrap:nowrap;
+  }
+  .header-right::-webkit-scrollbar{height:3px;}
+  .header-right::-webkit-scrollbar-track{background:transparent;}
+  .header-right::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .back-btn,.export-btn,.import-btn,.reset-btn,.dark-toggle{
+    flex-shrink:0;
+    font-size:10px;
+    padding:6px 11px;
+    white-space:nowrap;
+  }
+  /* Quran / PDF reader topbar */
+  .qr-topbar{
+    padding:8px 12px;
+    gap:8px;
+  }
+  .qr-title{font-size:13px;}
+  .qr-close{padding:5px 10px;font-size:10px;}
+  .qr-session-info{font-size:9px;}
+  .qr-bottombar{gap:8px;padding:10px 12px;}
+  .qr-nav{padding:7px 14px;font-size:11px;}
+  .qr-page-display{min-width:unset;font-size:11px;}
+}
 
 /* ── Quran Reader ── */
 .quran-reader-overlay{
@@ -528,7 +567,7 @@ select option{background:#1c1f1c;}
 .qr-topbar{
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 20px;background:#0f110f;border-bottom:1px solid var(--border);
-  flex-shrink:0;gap:12px;
+  flex-shrink:0;gap:12px;flex-wrap:wrap;
 }
 .qr-title{font-family:'Amiri',serif;font-size:16px;color:var(--gold);}
 .qr-info{font-size:11px;color:var(--text-dim);letter-spacing:.5px;}
@@ -5647,11 +5686,11 @@ loadDayData = function(dk) {
         <div style="font-size:9px;color:#5a4a28;letter-spacing:2.5px;text-transform:uppercase;margin-top:3px;">Powered by Google Gemini</div>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-        <div id="pwApiKeySection" style="display:flex;gap:5px;align-items:center;">
+        <div id="pwApiKeySection" style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">
           <input id="pwApiKeyInput" type="password" placeholder="Paste Gemini API Key" style="
             background:#1a1610;border:1px solid #2a2010;color:#e8dfc8;
             padding:6px 10px;border-radius:6px;font-family:'DM Mono',monospace;
-            font-size:10px;width:180px;outline:none;letter-spacing:.5px;
+            font-size:10px;width:min(180px,45vw);outline:none;letter-spacing:.5px;
           " oninput="pwCheckKey()"
             onfocus="this.style.borderColor='#c9a84c'"
             onblur="this.style.borderColor='#2a2010'">

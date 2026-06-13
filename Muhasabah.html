@@ -816,398 +816,12 @@ body.overlay-open{overflow:hidden;}
 
 <!-- Read Me Modal -->
 <div class="modal-overlay" id="readMeModal">
-  <div class="modal" style="max-width:600px;border-color:var(--purple);text-align:left;max-height:88vh;overflow-y:auto;padding:0;display:flex;flex-direction:column;">
-    <div style="position:sticky;top:0;z-index:10;background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;">
-      <div>
-        <div style="color:var(--purple-bright);font-family:'Instrument Serif',serif;font-size:17px;">&#x1F4D6; How To Use Muhasabah</div>
-        <div style="color:var(--text-muted);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px;font-family:'DM Mono',monospace;">Daily Tracker — Complete Guide</div>
-      </div>
-      <button onclick="closeReadMe()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:6px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;flex-shrink:0;" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">✕ Close</button>
+  <div class="modal" style="max-width:500px;border-color:var(--purple);text-align:left;">
+    <h3 style="color:var(--purple-bright);margin-bottom:16px;">&#x1F4D6; Read Me</h3>
+    <p style="color:var(--text-dim);font-size:12px;line-height:1.8;">Contents coming soon. This section will contain guidance on how to use the tracker.</p>
+    <div class="modal-btns" style="margin-top:24px;">
+      <button class="modal-cancel" onclick="closeReadMe()">Close</button>
     </div>
-    <div style="padding:20px;overflow-y:auto;flex:1;">
-
-    <!-- WHAT IS MUHASABAH -->
-    <div style="background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--purple-bright);border-radius:0 6px 6px 0;padding:14px 16px;margin-bottom:20px;">
-      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--purple-bright);margin-bottom:8px;">What Is This?</div>
-      <p style="font-size:12px;color:var(--text-dim);line-height:1.8;">Muhasabah (محاسبة) means <em>self-accounting</em> — the Islamic practice of examining your own actions daily. This app is a structured daily tracker for 2026, scoring your ibadah and personal growth each day. Tap any date on the calendar to log that day. Your score appears as a percentage: <strong style="color:var(--gold);">Core Score</strong> (max 100%) + <strong style="color:var(--green-bright);">Bonus</strong> (unlimited). All data is stored locally on your device — nothing is sent to any server.</p>
-    </div>
-
-    <!-- CALENDAR -->
-    <div style="margin-bottom:18px;">
-      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:8px;">
-        <span>📅</span> Calendar View
-      </div>
-      <p style="font-size:12px;color:var(--text-dim);line-height:1.8;margin-bottom:6px;">The main screen shows the full 2026 calendar. Each day cell fills with colour as you score higher — from dim to gold. Tap a day cell to open it and log your activities. The stats bar at the top shows your current streak, best streak, total days logged, and your best single day.</p>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        🔥 Streak counts consecutive days where you logged <em>any</em> score above 0%.<br>
-        🏆 Best Day shows your highest single-day total score.<br>
-        ← Calendar button (top left in daily view) returns you here.
-      </div>
-    </div>
-
-    <div style="height:1px;background:var(--border);margin:16px 0;"></div>
-
-    <!-- IBADAH CORE -->
-    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;">🕌 Ibadah — Core Goals (max 100% combined)</div>
-
-    <!-- Salah -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">🕌 Salah</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">10% of Core</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> Salah is the pillar of Islam — the first deed you will be asked about on the Day of Judgement. Praying in congregation multiplies your reward 27 times.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Each of the 5 prayers contributes 2% toward your core score.<br>
-        Jamā'ah (congregation) = 100% of that prayer's 2% → <strong style="color:var(--green-bright);">2%</strong><br>
-        Munfarid (alone) = 75% → <strong style="color:var(--gold);">1.5%</strong><br>
-        Qadhā (makeup) = 25% → <strong style="color:var(--text-dim);">0.5%</strong><br>
-        Missed = 0%<br>
-        All 5 Jamā'ah = full <strong style="color:var(--green-bright);">10%</strong>
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Tap the button for each prayer (Fajr, Dhuhr, Asr, Maghrib, Isha) and cycle through Jamā'ah → Munfarid → Qadhā → Missed. The score updates instantly.</p>
-    </div>
-
-    <!-- Quran -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">📖 Quran</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">10% of Core</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> The Prophet ﷺ said that the best of you are those who learn the Quran and teach it. Reciting one Juzz daily keeps you on track to complete the full Quran throughout the year.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Goal: 1 Juzz per day = full 10% core<br>
-        Reading less is scored proportionally (1/4 Juzz = 2.5%, etc.)<br>
-        Every extra Juzz above 1 = +5% bonus (up to +45% for 10 extra Juzz)
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Select your starting Juzz from the first dropdown (optional). Then select how much you recited today from the second dropdown. Use the built-in Quran Reader PDF to read directly in the app — it tracks your pages automatically.</p>
-    </div>
-
-    <!-- Tahajjud -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">🌙 Tahajjud</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">10% of Core</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> Tahajjud is the voluntary night prayer — the closest a servant gets to Allah is in the last third of the night. It is the mark of the righteous and earns what obligatory prayer cannot.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Goal: 4 Rakat = full 10% core<br>
-        Proportional scoring (2 Rakat = 5%, etc.)<br>
-        Every extra 4 Rakat above the goal = +5% bonus
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Type the number of Rakat you prayed in the input field. Score updates as you type. Minimum is 2 Rakat, typically prayed in pairs.</p>
-    </div>
-
-    <!-- Zikr -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">📿 Zikr</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">5% of Core</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> The remembrance of Allah is the nourishment of the heart. The Prophet ﷺ said the tongue kept moist with zikr will have no account on the Day of Judgement.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Goal: 1500 Zikr = full 5% core<br>
-        Proportional scoring (750 = 2.5%, etc.)<br>
-        Every extra 1500 Zikr above the goal = +2.5% bonus
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Type your total Zikr count for the day. Count includes Subhanallah, Alhamdulillah, Allahu Akbar, La ilaha illallah, and similar remembrances. Use a tasbih counter or the count in your head — just enter the total.</p>
-    </div>
-
-    <!-- Hadith -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">📚 Hadith</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">5% of Core</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> The Hadith is the living example of the Prophet ﷺ. Learning 5 hadiths a day means you will have read over 1,800 hadiths by year's end — a complete transformation of your understanding of Sunnah.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Goal: 5 hadiths = full 5% core<br>
-        Proportional scoring (3 hadiths = 3%, etc.)<br>
-        Every extra 5 hadiths above the goal = +2.5% bonus
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Either type the number manually in the input field, or open the built-in <strong>Hadith Reader</strong> (Sahih Bukhari) — it tracks hadiths read automatically and syncs the count. The reader resumes from where you left off each day.</p>
-    </div>
-
-    <!-- Quran Meaning / Tafsir -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">🔍 Quran Meaning (Tafsir)</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">5% of Core</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> Reciting Quran feeds the tongue, but understanding it feeds the soul. Reading the meaning allows the Quran to guide your decisions and transform your character — not just your worship.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Goal: 17 verses = full 5% core<br>
-        Proportional scoring (8 verses ≈ 2.4%, etc.)<br>
-        Every extra 17 verses above the goal = +2.5% bonus
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Type the count manually, or open the <strong>Quran Meaning Reader</strong> — it shows the Arabic, transliteration, and English meaning verse by verse (choose any Surah from the dropdown). The reader tracks your progress automatically.</p>
-    </div>
-
-    <!-- Asmaul Husna -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">🌿 Asmaul Husna</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">5% of Core</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> Allah has 99 beautiful names. The Prophet ﷺ said: "Allah has 99 names — whoever memorises them all will enter Paradise." Reciting and understanding them daily builds a living relationship with Allah's attributes.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Full 5% core for opening and reading the Asmaul Husna today.<br>
-        Completing the session marks goal as done automatically.
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Tap <strong>Yes</strong> if you read it elsewhere, or open the built-in <strong>Asmaul Husna Reader</strong> — it presents all 99 names with Arabic and meaning in a slide format. Closing it after reading marks it complete automatically.</p>
-    </div>
-
-    <!-- Zikr Morning -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">☀️ Morning Zikr</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">5% of Core</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> The morning adhkar from the Sunnah are a protective shield for the day ahead. They include Ayatul Kursi, the three Quls, and specific duas — whoever reads them is under the protection of Allah until evening.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Goal: Read all 77 duas = full 5% core<br>
-        Proportional scoring if you close mid-session (% of pages read)
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Tap <strong>Yes</strong> manually, or open the <strong>Morning Zikr Reader</strong> — it shows each dua with Arabic text, harakah, and slides through all 77 duas. Progress is saved if you close mid-session.</p>
-    </div>
-
-    <!-- Zikr Evening -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">🌆 Evening Zikr</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">5% of Core</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> Just as morning adhkar protect the day, evening adhkar protect the night. These duas seal your day with gratitude, seek forgiveness for the day's shortcomings, and prepare your heart for rest.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Goal: Read all 77 duas = full 5% core<br>
-        Proportional scoring if you close mid-session (% of pages read)
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Same as Morning Zikr — tap <strong>Yes</strong> or open the <strong>Evening Zikr Reader</strong>. They are separate sessions and score independently.</p>
-    </div>
-
-    <!-- Surah Al-Waqiah -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">📜 Surah Al-Waqiah</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">5% of Core</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> The Prophet ﷺ said "Whoever recites Surah Al-Waqiah every night, poverty will never afflict him." This 29-verse Surah deals with the reality of the Hereafter and is a shield against financial hardship.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Goal: Read full Surah (29 verses) = full 5% core<br>
-        Proportional scoring based on verses read in the built-in reader
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Tap <strong>Yes</strong> if you read it on your own, or open the <strong>Surah Al-Waqiah Reader</strong> — it shows each verse with Arabic, transliteration, and meaning, tracking progress automatically.</p>
-    </div>
-
-    <!-- Surah Al-Mulk -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">📜 Surah Al-Mulk</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">5% of Core</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> The Prophet ﷺ said Al-Mulk will intercede for the one who recites it nightly, protecting them from the punishment of the grave. It is 30 verses — less than 5 minutes to recite.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Goal: Read full Surah (30 verses) = full 5% core<br>
-        Proportional scoring based on verses read in the built-in reader
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Tap <strong>Yes</strong> manually, or open the <strong>Surah Al-Mulk Reader</strong>. Verse-by-verse with Arabic, transliteration, and English. Closes automatically when all verses are read.</p>
-    </div>
-
-    <div style="height:1px;background:var(--border);margin:16px 0;"></div>
-
-    <!-- BONUS IBADAH -->
-    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--green-bright);margin-bottom:14px;">✦ Bonus Ibadah — Adds On Top Of Core Score</div>
-    <p style="font-size:11px;color:var(--text-muted);line-height:1.7;margin-bottom:14px;">Bonus goals stack on top of your 100% core score. Your total can exceed 100% — these are rewards for going above and beyond the obligatory.</p>
-
-    <!-- Sawm -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">🌙 Sawm (Fasting)</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--green-bright);">+10% Bonus</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> Fasting is a shield. The Prophet ﷺ said "Fasting is for Me, and I will reward it." A full day of fasting earns a flat +10% on top of whatever your core score is.</p>
-      <p style="font-size:11px;color:var(--text-muted);line-height:1.6;"><strong>How to use:</strong> Tap <strong>Yes</strong> if you fasted today (Ramadan, Monday/Thursday Sunnah fast, or any voluntary fast). Tap <strong>No</strong> otherwise.</p>
-    </div>
-
-    <!-- Sunnah Salah -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">🌿 Sunnah Salah</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--green-bright);">Up to +10% Bonus</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> The Prophet ﷺ said whoever prays 12 confirmed Sunnah rakats daily, Allah builds a house for them in Paradise. The full 17 Sunnah rakats complete and repair deficiencies in obligatory prayer.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Max +10% at 17 Rakat &nbsp;·&nbsp; ~+0.59% per Rakat<br>
-        17 Rakat = 2 (Fajr) + 4 (before Dhuhr) + 2 (after Dhuhr) + 2 (after Maghrib) + 2 (after Isha) + 3 (Witr)
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Type the total number of Sunnah Rakat prayed today (not counting obligatory Fard). Maximum recorded is 17.</p>
-    </div>
-
-    <!-- Nafl Salah -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">✨ Nafl Salah</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--green-bright);">Up to +10% Bonus</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> Nafl are optional prayers beyond Sunnah — prayed purely out of love for Allah. Allah said: "Whoever draws near to Me through supererogatory deeds, I will love him." This is how you earn Allah's love beyond duty.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Max +10% at 50 Rakat &nbsp;·&nbsp; +0.2% per Rakat<br>
-        Includes: Duha (2–12 rakat), Awwabeen (6 after Maghrib), Istikhara (2 rakat), etc.
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Type the total Nafl Rakat prayed today (any voluntary prayer that is not Fard, Sunnah Muakkadah, or Witr).</p>
-    </div>
-
-    <!-- Zikr From Book -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">📖 Zikr From Book</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--green-bright);">Up to +10% Bonus</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> This is a curated collection of 123 duas from a physical Islamic dua book — transcribed with full harakah. Reading structured duas from a book is a Sunnah practice that goes deeper than counting.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Max +10% at 123 duas &nbsp;·&nbsp; ~+0.08% per dua<br>
-        The built-in reader resumes globally (continues across days)
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Type the number of duas read, or open the <strong>Zikr From Book Reader</strong> — it tracks globally and picks up where you left off across sessions and days.</p>
-    </div>
-
-    <!-- Surah Al-Kahf -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">📜 Surah Al-Kahf</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--green-bright);">Up to +10% Bonus</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> The Prophet ﷺ said: "Whoever reads Surah Al-Kahf on Friday will have a light shining between two Fridays." It is 110 verses — a serious commitment that earns serious reward.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Full Surah (110 verses) = +10% bonus<br>
-        Proportional bonus based on verses read in the reader
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Tap <strong>Yes</strong> or open the <strong>Surah Al-Kahf Reader</strong> for verse-by-verse reading with Arabic, transliteration, and meaning.</p>
-    </div>
-
-    <!-- Sadaqah -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">💛 Sadaqah</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--green-bright);">Up to +10% Bonus</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> Charity extinguishes sins like water extinguishes fire, and it is a shield on the Day of Judgement. Even a smile is sadaqah — but giving wealth purifies it and grows it.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Max +10% at 50,000 units (your local currency equivalent)<br>
-        Proportional: 25,000 = +5%, 10,000 = +2%, etc.
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Enter the amount donated in local currency units (Taka, Riyal, etc.). The app does not verify what currency — just enter what you gave.</p>
-    </div>
-
-    <div style="height:1px;background:var(--border);margin:16px 0;"></div>
-
-    <!-- GROWTH & DEVELOPMENT -->
-    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--purple-bright);margin-bottom:14px;">📈 Growth &amp; Development — Core Goals</div>
-
-    <!-- Exercise -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">🏃 Exercise</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">5% of Core</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> A strong believer is better than a weak one. Your body is an amanah — taking care of it is an act of worship. 30 minutes of movement daily maintains the energy and focus needed for everything else on this list.</p>
-      <p style="font-size:11px;color:var(--text-muted);line-height:1.6;"><strong>How to use:</strong> Tap <strong>Yes</strong> if you did at least 30 minutes of exercise today (walking, gym, sports, or any physical activity). Tap <strong>No</strong> otherwise. Full 5% or 0% — no partial scoring.</p>
-    </div>
-
-    <!-- Book -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">📕 Book</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">5% of Core</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> Knowledge compounds. Reading 10 pages a day means completing 20+ books in a year. The built-in book reader has a curated 365-day reading plan — one lesson per day from carefully selected books across Islamic knowledge, personal development, and professional growth.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Goal: Read today's book lesson = full 5% core<br>
-        Proportional scoring based on lessons read in the built-in reader
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Tap <strong>Yes</strong> manually (if reading a physical book), or open the <strong>Book Reader</strong> — it opens today's curated lesson automatically. Click through the lesson slides and exit to save progress.</p>
-    </div>
-
-    <!-- Language -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">🗣 Language</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">5% of Core</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> Language is the bridge between people and ideas. Learning one new word and verb per language per day means 365 new vocabulary items by year's end — across up to 5 languages: Arabic, English, Bengali, Urdu, and Hindi.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        10 total slots: 5 languages × (1 word + 1 verb each) = full 5% core<br>
-        Each slot = 0.5%. Study all 10 = 100% score for this goal.<br>
-        You can study just one language and still earn partial credit.
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Open the <strong>Language Learner</strong> — select your language (AR / EN / BN / UR / HI), then switch between Word and Verb tabs. Each entry shows the word, meaning, conjugation table, synonyms, antonyms, a micro story, and a speaking challenge. Tap <strong>"Mark As Learned Today"</strong> after studying each type. Toggle the harakah button (◌) to show/hide diacritics for Arabic and Urdu.</p>
-    </div>
-
-    <!-- Tafakkur -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">🌿 Tafakkur</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">5% of Core</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> Tafakkur is deep contemplation — of Allah's creation, the Quran, your own soul, or the purpose of your day. One hour of tafakkur is said to be worth a year of worship. It is the antidote to a mindless, reactive life.</p>
-      <p style="font-size:11px;color:var(--text-muted);line-height:1.6;"><strong>How to use:</strong> Tap <strong>Yes</strong> if you spent intentional time today in reflection — contemplating Allah's signs in creation, pondering an ayah, journaling your thoughts, or simply sitting quietly with intention. Full 5% or 0%.</p>
-    </div>
-
-    <!-- Writing -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">✍️ Writing</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">5% of Core (2.5% each)</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> Consistent public writing builds your professional brand, develops your thinking, and creates compounding reputation. Daily posting on LinkedIn and Facebook is a career and da'wah strategy combined.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        LinkedIn Post = 2.5% core<br>
-        Facebook Post = 2.5% core<br>
-        Both done = full 5% core
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Tap <strong>Yes</strong> for LinkedIn and/or Facebook after posting. Use the built-in <strong>AI Post Writer</strong> to generate LinkedIn and Facebook posts from your ideas — it gives you 2 versions per platform. Enter your Gemini API key once (free from Google AI Studio) to activate it.</p>
-    </div>
-
-    <!-- Networking -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:13px;color:var(--text);">🤝 Networking</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);">5% of Core (2.5% each)</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-dim);line-height:1.75;margin-bottom:6px;"><strong style="color:var(--text-dim);">Why:</strong> Opportunities come through people. Connecting with 5 new people daily and building rapport with 5 existing contacts compounds your professional network rapidly. This goal forces you to stay socially active and intentional.</p>
-      <div style="background:var(--surface2);border-radius:4px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.9;">
-        Connected with 5+ people (new connections) = 2.5% core<br>
-        Built rapport with 5+ people (comments, messages, calls) = 2.5% core<br>
-        Both done = full 5% core
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.6;"><strong>How to use:</strong> Tap <strong>Yes</strong> for each when done. Use the built-in <strong>Contact Book &amp; CRM</strong> to manage all your contacts — store their LinkedIn, WhatsApp, Facebook, email, and phone. The CRM tab lets you track each person through a custom pipeline (Contacted → Applied → Interview → Offer → Closed). Contacts with overdue follow-up dates show a red alert at the top of the CRM.</p>
-    </div>
-
-    <div style="height:1px;background:var(--border);margin:16px 0;"></div>
-
-    <!-- DATA & SETTINGS -->
-    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px;">⚙ Data &amp; Settings</div>
-
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="font-size:12px;color:var(--text);margin-bottom:8px;">Export / Import</div>
-      <p style="font-size:11px;color:var(--text-muted);line-height:1.75;">All data is saved to your device only (IndexedDB). To back it up or move it to another device: tap <strong>↑ Export</strong> to download a <code style="color:var(--gold);">Muhasabah.json</code> file. To restore, tap <strong>↓ Import</strong> and drop the JSON file in — it merges with existing data (imported days overwrite matching local days, but unique local days are kept).</p>
-    </div>
-
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="font-size:12px;color:var(--text);margin-bottom:8px;">Light / Dark Mode</div>
-      <p style="font-size:11px;color:var(--text-muted);line-height:1.75;">Tap the 🌙 button in the top right to toggle between dark mode (default) and warm light mode. Your preference is saved automatically.</p>
-    </div>
-
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
-      <div style="font-size:12px;color:var(--text);margin-bottom:8px;">Reset All Data</div>
-      <p style="font-size:11px;color:var(--text-muted);line-height:1.75;">Permanently deletes all tracked data for 2026. This cannot be undone. Export first if you want a backup. The red <strong>Reset All Data</strong> button is in the top right.</p>
-    </div>
-
-    <div style="text-align:center;color:var(--text-muted);font-size:10px;font-style:italic;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);font-family:'Literata',Georgia,serif;">
-      May Allah accept our deeds and grant us consistency. آمين
-    </div>
-
-    </div><!-- /scrollable inner -->
   </div>
 </div>
 
@@ -1319,7 +933,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge" id="pct-tahajjud">0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="tahajjudRakat" min="0" placeholder="" oninput="saveAndRefresh()">
+        <input type="number" id="tahajjudRakat" min="0" placeholder="0" oninput="saveAndRefresh()">
         <span class="of-label">Rakat &nbsp;/&nbsp; 4 Goal</span>
       </div>
       <div class="sub-label">Goal: 4 Rakat = Full 10% Core &nbsp;·&nbsp; Every Extra 4 Rakat = +5% Bonus</div>
@@ -1333,7 +947,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge" id="pct-zikr">0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="zikrCount" min="0" placeholder="" oninput="saveAndRefresh()">
+        <input type="number" id="zikrCount" min="0" placeholder="0" oninput="saveAndRefresh()">
         <span class="of-label">Zikr &nbsp;/&nbsp; 1500 Goal</span>
       </div>
       <div class="sub-label">Goal: 1500 Zikr = Full 5% Core &nbsp;·&nbsp; Every Extra 1500 Zikr = +2.5% Bonus</div>
@@ -1347,7 +961,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge" id="pct-hadith">0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="hadithManual" min="0" placeholder="" oninput="saveAndRefresh()">
+        <input type="number" id="hadithManual" min="0" placeholder="0" oninput="saveAndRefresh()">
         <span class="of-label">Hadith &nbsp;/&nbsp; 5 Goal</span>
       </div>
       <div class="sub-label">Goal: 5 Hadiths = Full 5% Core &nbsp;·&nbsp; Every Extra 5 Hadiths = +2.5% Bonus</div>
@@ -1362,7 +976,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge" id="pct-tafsir">0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="tafsirManual" min="0" placeholder="" oninput="saveAndRefresh()">
+        <input type="number" id="tafsirManual" min="0" placeholder="0" oninput="saveAndRefresh()">
         <span class="of-label">Verse &nbsp;/&nbsp; 17 Goal</span>
       </div>
       <div class="sub-label">Goal: 17 Verses = Full 5% Core &nbsp;·&nbsp; Every Extra 17 Verses = +2.5% Bonus</div>
@@ -1475,7 +1089,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge bonus" id="pct-sunnahSalah">+0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="sunnahRakat" min="0" max="17" placeholder="" oninput="saveAndRefresh()">
+        <input type="number" id="sunnahRakat" min="0" max="17" placeholder="0" oninput="saveAndRefresh()">
         <span class="of-label">Rakat &nbsp;/&nbsp; 17 Max</span>
       </div>
       <div class="sub-label">Max +10% At 17 Rakat &nbsp;·&nbsp; ~+0.59% Per Rakat</div>
@@ -1489,7 +1103,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge bonus" id="pct-naflSalah">+0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="naflRakat" min="0" placeholder="" oninput="saveAndRefresh()">
+        <input type="number" id="naflRakat" min="0" placeholder="0" oninput="saveAndRefresh()">
         <span class="of-label">Rakat &nbsp;/&nbsp; 50 Max</span>
       </div>
       <div class="sub-label">Max +10% At 50 Rakat &nbsp;·&nbsp; +0.2% Per Rakat</div>
@@ -1503,7 +1117,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge bonus" id="pct-zikrBook">+0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="zikrBookPages" min="0" max="22" placeholder="" oninput="saveAndRefresh()">
+        <input type="number" id="zikrBookPages" min="0" max="22" placeholder="0" oninput="saveAndRefresh()">
         <span class="of-label">Duas &nbsp;/&nbsp; 123 Total</span>
       </div>
       <div class="sub-label">Max +10% At 123 Duas &nbsp;·&nbsp; ~+0.08% Per Dua</div>
@@ -1533,7 +1147,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge bonus" id="pct-sadaqah">+0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="sadaqahUnits" min="0" placeholder="" oninput="saveAndRefresh()">
+        <input type="number" id="sadaqahUnits" min="0" placeholder="0" oninput="saveAndRefresh()">
         <span class="of-label">Money Donated</span>
       </div>
       <div class="sub-label">Max +10% At 50,000 Units</div>
@@ -1864,6 +1478,7 @@ function nearestQuarterOption(val){
 async function openQuranReader(){
   const overlay = document.getElementById('quranReaderOverlay');
   overlay.classList.add('active');
+  reThemeIfLight();
   document.getElementById('qrLoading').style.display='flex';
   document.getElementById('qrCanvas').style.display='none';
   // Reset zoom
@@ -2194,6 +1809,7 @@ async function openPdfReader(type){
   document.getElementById('pdfReaderLoading').textContent   = 'Loading…';
   document.getElementById('pdfReaderCanvas').style.display  = 'none';
   document.getElementById('pdfReaderOverlay').classList.add('active');
+  reThemeIfLight();
   // Reset zoom
   pdfZoomLevel = 0;
   const _pzi = document.getElementById('pdfZoomIn'); if(_pzi){ _pzi.style.display=''; _pzi.disabled=false; }
@@ -3445,8 +3061,6 @@ async function confirmImport(){
 /* ── Read Me ── */
 function openReadMe(){
   document.getElementById('readMeModal').classList.add('active');
-  const inner = document.querySelector('#readMeModal .modal > div:nth-child(2)');
-  if(inner) inner.scrollTop = 0;
 }
 function closeReadMe(){
   document.getElementById('readMeModal').classList.remove('active');
@@ -5142,11 +4756,11 @@ document.addEventListener('keydown', function(e){
           <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#a89060;margin-bottom:8px;">Height</div>
           <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:8px;">
-              <input type="number" id="bmi-feet" min="0" max="8" placeholder="" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:64px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
+              <input type="number" id="bmi-feet" min="0" max="8" placeholder="0" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:64px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
               <span style="font-size:0.78rem;color:#6a5a30;letter-spacing:0.06em;">ft</span>
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
-              <input type="number" id="bmi-inches" min="0" max="11" placeholder="" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:64px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
+              <input type="number" id="bmi-inches" min="0" max="11" placeholder="0" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:64px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
               <span style="font-size:0.78rem;color:#6a5a30;letter-spacing:0.06em;">in</span>
             </div>
           </div>
@@ -5155,7 +4769,7 @@ document.addEventListener('keydown', function(e){
         <div style="margin-bottom:22px;">
           <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#a89060;margin-bottom:8px;">Weight</div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <input type="number" id="bmi-kg" min="0" max="300" placeholder="" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:80px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
+            <input type="number" id="bmi-kg" min="0" max="300" placeholder="0" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:80px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
             <span style="font-size:0.78rem;color:#6a5a30;letter-spacing:0.06em;">kg</span>
           </div>
         </div>
@@ -5658,6 +5272,7 @@ async function openZikrReader(mode){
   document.getElementById("zikrReaderTitle").textContent=title;
   document.getElementById("zikrReaderDayPill").textContent="77 Duas";
   document.getElementById("zikrReaderOverlay").classList.add("active");
+  reThemeIfLight();
   _zikrDone=getCached(_zikrDK)[_zikrGoalKey()]==="yes";
   document.getElementById("zikrReaderDoneNote").style.display=_zikrDone?"block":"none";
   var dayData=getCached(_zikrDK);
@@ -5868,6 +5483,7 @@ function _zbRender() {
 async function openZikrBookReader() {
   _zbDK = currentDateKey || todayKey();
   document.getElementById('zikrBookReaderOverlay').classList.add('active');
+  reThemeIfLight();
   document.getElementById('zikrBookDayPill').textContent = '123 Duas';
   document.getElementById('zikrBookContent').innerHTML =
     '<div style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:\'DM Mono\',monospace;">Loading Zikr From Book.json…</div>';
@@ -6009,7 +5625,7 @@ loadDayData = function(dk) {
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
         <div id="pwApiKeySection" style="display:flex;gap:5px;align-items:center;">
-          <input id="pwApiKeyInput" type="password" placeholder="" style="
+          <input id="pwApiKeyInput" type="password" placeholder="sk-ant-..." style="
             background:#1a1610;border:1px solid #2a2010;color:#e8dfc8;
             padding:6px 10px;border-radius:6px;font-family:'DM Mono',monospace;
             font-size:10px;width:180px;outline:none;letter-spacing:.5px;
@@ -6068,7 +5684,7 @@ loadDayData = function(dk) {
       display:flex;gap:8px;align-items:flex-end;flex-shrink:0;
       background:#141008;
     ">
-      <textarea id="pwInput" placeholder=""
+      <textarea id="pwInput" placeholder="Write a post about..."
         rows="4" style="
           flex:1;background:#1a1610;border:1px solid #2a2010;
           color:#e8dfc8;padding:10px 13px;border-radius:6px;
@@ -7327,6 +6943,7 @@ async function openLanguageReader() {
   overlay.classList.add('active');
   overlay.scrollTop = 0;
   document.body.classList.add('overlay-open');
+  reThemeIfLight();
   if (!LR_LOADED['en'] && !LR_ERROR['en']) {
     document.getElementById('lrNoData').style.display = 'block';
     document.getElementById('lrNoData').textContent = 'Loading…';
@@ -7455,6 +7072,7 @@ async function openContactBook(){
   ]);
   document.getElementById('netHubOverlay').classList.add('active');
   document.body.classList.add('overlay-open');
+  reThemeIfLight();
   nhShowTab(_nhTab);
   nhRenderToday();
 }

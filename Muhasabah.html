@@ -7050,7 +7050,7 @@ function nhShowTab(tab){
   document.querySelectorAll('.nh-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
   document.querySelectorAll('.nh-section').forEach(s=>s.classList.toggle('on',s.dataset.sec===tab));
   if(tab==='contacts') nhRenderContacts();
-  else nhRenderCrm();
+  else { _nhCrmFil='all'; _nhOpenCols=new Set(); nhRenderCrm(); }
 }
 
 /* ══ CONTACT BOOK ══ */

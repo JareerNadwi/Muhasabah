@@ -525,14 +525,14 @@ select option{background:#1c1f1c;}
     padding:10px 14px;
     flex-direction:column;
     align-items:flex-start;
-    gap:10px;
+    gap:8px;
   }
   .header-right{
     width:100%;
     overflow-x:auto;
     -webkit-overflow-scrolling:touch;
     padding-bottom:4px;
-    gap:8px;
+    gap:6px;
     flex-wrap:nowrap;
   }
   .header-right::-webkit-scrollbar{height:3px;}
@@ -540,21 +540,49 @@ select option{background:#1c1f1c;}
   .header-right::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
   .back-btn,.export-btn,.import-btn,.reset-btn,.dark-toggle{
     flex-shrink:0;
-    font-size:10px;
-    padding:6px 11px;
+    font-size:9px;
+    padding:5px 9px;
     white-space:nowrap;
+    letter-spacing:0.5px;
   }
   /* Quran / PDF reader topbar */
   .qr-topbar{
     padding:8px 12px;
-    gap:8px;
+    gap:6px;
   }
   .qr-title{font-size:13px;}
   .qr-close{padding:5px 10px;font-size:10px;}
   .qr-session-info{font-size:9px;}
-  .qr-bottombar{gap:8px;padding:10px 12px;}
-  .qr-nav{padding:7px 14px;font-size:11px;}
-  .qr-page-display{min-width:unset;font-size:11px;}
+  /* Quran / PDF reader bottom nav - scroll horizontally */
+  .qr-bottombar{
+    gap:6px;
+    padding:8px 10px;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    justify-content:flex-start;
+  }
+  .qr-nav{
+    padding:7px 12px;
+    font-size:10px;
+    flex-shrink:0;
+    white-space:nowrap;
+  }
+  .qr-page-display{
+    min-width:unset;
+    font-size:10px;
+    flex-shrink:0;
+    white-space:nowrap;
+  }
+  /* Post Writer input row — stack vertically on mobile */
+  #pwInputArea{
+    flex-direction:column !important;
+    padding:10px 14px !important;
+  }
+  #pwSendBtn{
+    width:100% !important;
+    padding:10px !important;
+    text-align:center !important;
+  }
 }
 
 /* ── Quran Reader ── */

@@ -68,6 +68,7 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 .nh-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:3500;align-items:center;justify-content:center;padding:16px;}
 .nh-modal-bg.open{display:flex;}
 .nh-modal{background:var(--surface);border:1px solid var(--border);border-radius:10px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:22px;}
+#nhNotesBg .nh-modal{max-width:680px;}
 .nh-modal-title{font-family:'Amiri',serif;font-size:18px;color:var(--gold);margin-bottom:18px;}
 .nh-field{margin-bottom:12px;}
 .nh-field label{display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-dim);margin-bottom:4px;text-transform:uppercase;}
@@ -161,12 +162,12 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 /* Notes panel (shared Contact Book + CRM) */
 .nh-notes-panel{margin-top:8px;border-top:1px solid var(--border);padding-top:10px;display:none;}
 .nh-notes-panel.open{display:block;}
-.nh-notes-log{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;max-height:220px;overflow-y:auto;}
+.nh-notes-log{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;max-height:380px;overflow-y:auto;}
 .nh-note-entry{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 10px;}
 .nh-note-date{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-muted);margin-bottom:3px;}
 .nh-note-text{font-size:11px;color:var(--text-dim);line-height:1.5;white-space:pre-wrap;}
 .nh-note-add{display:flex;flex-direction:column;gap:6px;}
-.nh-note-textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;resize:vertical;min-height:56px;line-height:1.4;}
+.nh-note-textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;resize:vertical;min-height:80px;line-height:1.4;}
 .nh-note-textarea:focus{border-color:var(--gold-dim);}
 .nh-note-submit{align-self:flex-end;background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);padding:6px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;}
 .nh-note-submit:hover{background:#1a1200;}
@@ -859,7 +860,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge" id="pct-tahajjud">0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="tahajjudRakat" min="0" placeholder="0" oninput="saveAndRefresh()">
+        <input type="number" id="tahajjudRakat" min="0" placeholder="" oninput="saveAndRefresh()">
         <span class="of-label">Rakat &nbsp;/&nbsp; 4 Goal</span>
       </div>
       <div class="sub-label">Goal: 4 Rakat = Full 10% Core &nbsp;·&nbsp; Every Extra 4 Rakat = +5% Bonus</div>
@@ -873,7 +874,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge" id="pct-zikr">0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="zikrCount" min="0" placeholder="0" oninput="saveAndRefresh()">
+        <input type="number" id="zikrCount" min="0" placeholder="" oninput="saveAndRefresh()">
         <span class="of-label">Zikr &nbsp;/&nbsp; 1500 Goal</span>
       </div>
       <div class="sub-label">Goal: 1500 Zikr = Full 5% Core &nbsp;·&nbsp; Every Extra 1500 Zikr = +2.5% Bonus</div>
@@ -887,7 +888,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge" id="pct-hadith">0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="hadithManual" min="0" placeholder="0" oninput="saveAndRefresh()">
+        <input type="number" id="hadithManual" min="0" placeholder="" oninput="saveAndRefresh()">
         <span class="of-label">Hadith &nbsp;/&nbsp; 5 Goal</span>
       </div>
       <div class="sub-label">Goal: 5 Hadiths = Full 5% Core &nbsp;·&nbsp; Every Extra 5 Hadiths = +2.5% Bonus</div>
@@ -902,7 +903,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge" id="pct-tafsir">0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="tafsirManual" min="0" placeholder="0" oninput="saveAndRefresh()">
+        <input type="number" id="tafsirManual" min="0" placeholder="" oninput="saveAndRefresh()">
         <span class="of-label">Verse &nbsp;/&nbsp; 17 Goal</span>
       </div>
       <div class="sub-label">Goal: 17 Verses = Full 5% Core &nbsp;·&nbsp; Every Extra 17 Verses = +2.5% Bonus</div>
@@ -1015,7 +1016,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge bonus" id="pct-sunnahSalah">+0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="sunnahRakat" min="0" max="17" placeholder="0" oninput="saveAndRefresh()">
+        <input type="number" id="sunnahRakat" min="0" max="17" placeholder="" oninput="saveAndRefresh()">
         <span class="of-label">Rakat &nbsp;/&nbsp; 17 Max</span>
       </div>
       <div class="sub-label">Max +10% At 17 Rakat &nbsp;·&nbsp; ~+0.59% Per Rakat</div>
@@ -1029,7 +1030,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge bonus" id="pct-naflSalah">+0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="naflRakat" min="0" placeholder="0" oninput="saveAndRefresh()">
+        <input type="number" id="naflRakat" min="0" placeholder="" oninput="saveAndRefresh()">
         <span class="of-label">Rakat &nbsp;/&nbsp; 50 Max</span>
       </div>
       <div class="sub-label">Max +10% At 50 Rakat &nbsp;·&nbsp; +0.2% Per Rakat</div>
@@ -1043,7 +1044,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge bonus" id="pct-zikrBook">+0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="zikrBookPages" min="0" max="22" placeholder="0" oninput="saveAndRefresh()">
+        <input type="number" id="zikrBookPages" min="0" max="22" placeholder="" oninput="saveAndRefresh()">
         <span class="of-label">Duas &nbsp;/&nbsp; 123 Total</span>
       </div>
       <div class="sub-label">Max +10% At 123 Duas &nbsp;·&nbsp; ~+0.08% Per Dua</div>
@@ -1073,7 +1074,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge bonus" id="pct-sadaqah">+0%</div>
       </div>
       <div class="num-row">
-        <input type="number" id="sadaqahUnits" min="0" placeholder="0" oninput="saveAndRefresh()">
+        <input type="number" id="sadaqahUnits" min="0" placeholder="" oninput="saveAndRefresh()">
         <span class="of-label">Money Donated</span>
       </div>
       <div class="sub-label">Max +10% At 50,000 Units</div>
@@ -4680,11 +4681,11 @@ document.addEventListener('keydown', function(e){
           <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#a89060;margin-bottom:8px;">Height</div>
           <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:8px;">
-              <input type="number" id="bmi-feet" min="0" max="8" placeholder="0" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:64px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
+              <input type="number" id="bmi-feet" min="0" max="8" placeholder="" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:64px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
               <span style="font-size:0.78rem;color:#6a5a30;letter-spacing:0.06em;">ft</span>
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
-              <input type="number" id="bmi-inches" min="0" max="11" placeholder="0" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:64px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
+              <input type="number" id="bmi-inches" min="0" max="11" placeholder="" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:64px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
               <span style="font-size:0.78rem;color:#6a5a30;letter-spacing:0.06em;">in</span>
             </div>
           </div>
@@ -4693,7 +4694,7 @@ document.addEventListener('keydown', function(e){
         <div style="margin-bottom:22px;">
           <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#a89060;margin-bottom:8px;">Weight</div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <input type="number" id="bmi-kg" min="0" max="300" placeholder="0" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:80px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
+            <input type="number" id="bmi-kg" min="0" max="300" placeholder="" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:80px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
             <span style="font-size:0.78rem;color:#6a5a30;letter-spacing:0.06em;">kg</span>
           </div>
         </div>
@@ -5547,7 +5548,7 @@ loadDayData = function(dk) {
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
         <div id="pwApiKeySection" style="display:flex;gap:5px;align-items:center;">
-          <input id="pwApiKeyInput" type="password" placeholder="Paste Gemini API Key…" style="
+          <input id="pwApiKeyInput" type="password" placeholder="" style="
             background:#1a1610;border:1px solid #2a2010;color:#e8dfc8;
             padding:6px 10px;border-radius:6px;font-family:'DM Mono',monospace;
             font-size:10px;width:180px;outline:none;letter-spacing:.5px;
@@ -5606,7 +5607,7 @@ loadDayData = function(dk) {
       display:flex;gap:8px;align-items:flex-end;flex-shrink:0;
       background:#141008;
     ">
-      <textarea id="pwInput" placeholder="Describe your post idea, topic, or paste a draft…"
+      <textarea id="pwInput" placeholder=""
         rows="4" style="
           flex:1;background:#1a1610;border:1px solid #2a2010;
           color:#e8dfc8;padding:10px 13px;border-radius:6px;
@@ -7507,7 +7508,7 @@ async function nhSmDone(){
     <!-- Contact Book Section -->
     <div class="nh-section on" data-sec="contacts">
       <div class="nh-controls">
-        <input class="nh-search" id="nhCbSearch" type="text" placeholder="Search name, role, company…" oninput="nhRenderContacts()">
+        <input class="nh-search" id="nhCbSearch" type="text" placeholder="" oninput="nhRenderContacts()">
         <button class="nh-add-btn" onclick="nhCbEdit(null)">＋ Add Contact</button>
       </div>
       <div class="nh-cb-list" id="nhCbList"></div>
@@ -7526,14 +7527,14 @@ async function nhSmDone(){
 <div class="nh-modal-bg" id="nhCbModalBg">
   <div class="nh-modal">
     <div class="nh-modal-title" id="nhCbModalTitle">Add Contact</div>
-    <div class="nh-field"><label>Full Name *</label><input id="nhCbFName" type="text" placeholder="Ahmed Al-Rashidi"></div>
-    <div class="nh-field"><label>Role / Title</label><input id="nhCbFRole" type="text" placeholder="HR Manager"></div>
-    <div class="nh-field"><label>Company</label><input id="nhCbFCompany" type="text" placeholder="Saudi Aramco"></div>
-    <div class="nh-field"><label>LinkedIn URL</label><input id="nhCbFLinkedin" type="url" placeholder="https://linkedin.com/in/…"></div>
-    <div class="nh-field"><label>Facebook URL</label><input id="nhCbFFacebook" type="url" placeholder="https://facebook.com/…"></div>
-    <div class="nh-field"><label>WhatsApp (country code + number)</label><input id="nhCbFWhatsapp" type="tel" placeholder="966501234567"></div>
-    <div class="nh-field"><label>Phone</label><input id="nhCbFPhone" type="tel" placeholder="+966501234567"></div>
-    <div class="nh-field"><label>Email</label><input id="nhCbFEmail" type="email" placeholder="name@company.com"></div>
+    <div class="nh-field"><label>Full Name *</label><input id="nhCbFName" type="text" placeholder=""></div>
+    <div class="nh-field"><label>Role / Title</label><input id="nhCbFRole" type="text" placeholder=""></div>
+    <div class="nh-field"><label>Company</label><input id="nhCbFCompany" type="text" placeholder=""></div>
+    <div class="nh-field"><label>LinkedIn URL</label><input id="nhCbFLinkedin" type="url" placeholder=""></div>
+    <div class="nh-field"><label>Facebook URL</label><input id="nhCbFFacebook" type="url" placeholder=""></div>
+    <div class="nh-field"><label>WhatsApp (Country Code + Number)</label><input id="nhCbFWhatsapp" type="tel" placeholder=""></div>
+    <div class="nh-field"><label>Mobile (Country Code + Number)</label><input id="nhCbFPhone" type="tel" placeholder=""></div>
+    <div class="nh-field"><label>Email</label><input id="nhCbFEmail" type="email" placeholder=""></div>
     <div class="nh-modal-actions">
       <button class="nh-btn-cancel" onclick="nhCbCloseModal()">Cancel</button>
       <button class="nh-btn-save" onclick="nhCbSave()">Save Contact</button>
@@ -7546,15 +7547,15 @@ async function nhSmDone(){
   <div class="nh-modal">
     <div class="nh-modal-title" id="nhCrmModalTitle">Add Deal</div>
     <div class="nh-field"><label>Link to Contact Book</label><select id="nhCrmFContact" onchange="nhCrmContactPick()"></select></div>
-    <div class="nh-field"><label>Contact Name *</label><input id="nhCrmFContactName" type="text" placeholder="Full name"></div>
-    <div class="nh-field"><label>Company / Target</label><input id="nhCrmFCompany" type="text" placeholder="Company or opportunity"></div>
+    <div class="nh-field"><label>Contact Name *</label><input id="nhCrmFContactName" type="text" placeholder=""></div>
+    <div class="nh-field"><label>Company / Target</label><input id="nhCrmFCompany" type="text" placeholder=""></div>
     <div class="nh-field"><label>Pipeline Stage</label><select id="nhCrmFStage"></select></div>
     <div class="nh-field"><label>Next Action Date</label><input id="nhCrmFNextAction" type="date"></div>
-    <div class="nh-field"><label>LinkedIn</label><input id="nhCrmFLinkedin" type="url" placeholder="https://linkedin.com/in/…"></div>
-    <div class="nh-field"><label>Facebook</label><input id="nhCrmFFacebook" type="url" placeholder="https://facebook.com/…"></div>
-    <div class="nh-field"><label>WhatsApp</label><input id="nhCrmFWhatsapp" type="tel" placeholder="966501234567"></div>
-    <div class="nh-field"><label>Phone</label><input id="nhCrmFPhone" type="tel" placeholder="+966…"></div>
-    <div class="nh-field"><label>Email</label><input id="nhCrmFEmail" type="email" placeholder="name@company.com"></div>
+    <div class="nh-field"><label>LinkedIn</label><input id="nhCrmFLinkedin" type="url" placeholder=""></div>
+    <div class="nh-field"><label>Facebook</label><input id="nhCrmFFacebook" type="url" placeholder=""></div>
+    <div class="nh-field"><label>WhatsApp (Country Code + Number)</label><input id="nhCrmFWhatsapp" type="tel" placeholder=""></div>
+    <div class="nh-field"><label>Mobile (Country Code + Number)</label><input id="nhCrmFPhone" type="tel" placeholder=""></div>
+    <div class="nh-field"><label>Email</label><input id="nhCrmFEmail" type="email" placeholder=""></div>
     <div class="nh-modal-actions">
       <button class="nh-btn-del" id="nhCrmDelBtn" style="display:none;margin-right:auto" onclick="nhCrmDelete(_nhCrmEditId);nhCrmCloseModal()">Delete</button>
       <button class="nh-btn-cancel" onclick="nhCrmCloseModal()">Cancel</button>
@@ -7569,7 +7570,7 @@ async function nhSmDone(){
     <div class="nh-modal-title" id="nhNotesTitle">📝 Notes</div>
     <div class="nh-notes-log" id="nhNotesList"></div>
     <div class="nh-note-add">
-      <textarea class="nh-note-textarea" id="nhNotesInput" placeholder="How you met, context, history, what was discussed…&#10;&#10;This log is shared between Contact Book and CRM."></textarea>
+      <textarea class="nh-note-textarea" id="nhNotesInput" placeholder=""></textarea>
       <button class="nh-note-submit" onclick="nhAddNote()">＋ Add Note</button>
     </div>
     <div class="nh-modal-actions">
@@ -7585,7 +7586,7 @@ async function nhSmDone(){
     <div style="font-size:10px;color:var(--text-dim);margin-bottom:10px;font-family:'DM Mono',monospace;">Drag to reorder. The Contacts stage is fixed.</div>
     <div class="nh-sm-list" id="nhSmList"></div>
     <div class="nh-sm-add">
-      <input class="nh-sm-input" id="nhSmInput" type="text" placeholder="New stage name…" onkeydown="if(event.key==='Enter')nhAddStage()">
+      <input class="nh-sm-input" id="nhSmInput" type="text" placeholder="" onkeydown="if(event.key==='Enter')nhAddStage()">
       <button class="nh-sm-addbtn" onclick="nhAddStage()">＋ Add</button>
     </div>
     <div class="nh-modal-actions">

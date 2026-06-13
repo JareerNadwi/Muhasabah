@@ -7323,9 +7323,17 @@ function nhCrmOpenModal(id,defaultStageId){
   // Populate read-only view fields
   const setV=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val||'—';};
   setV('nhCrmVName',name); setV('nhCrmVCompany',company);
-  setV('nhCrmVLinkedin',linkedin); setV('nhCrmVFacebook',facebook);
-  setV('nhCrmVWhatsapp',whatsapp); setV('nhCrmVPhone',phone);
-  setV('nhCrmVEmail',email);
+  // Build clickable link buttons
+  const linksEl=document.getElementById('nhCrmVLinks');
+  if(linksEl){
+    let lh='';
+    if(linkedin&&linkedin!=='—') lh+=`<a class="nh-link lk" href="${linkedin}" target="_blank" rel="noopener">🔗 LinkedIn</a>`;
+    if(facebook&&facebook!=='—') lh+=`<a class="nh-link fb" href="${facebook}" target="_blank" rel="noopener">👤 Facebook</a>`;
+    if(whatsapp&&whatsapp!=='—') lh+=`<a class="nh-link wa" href="https://wa.me/${(whatsapp).replace(/\D/g,'')}" target="_blank" rel="noopener">💬 WhatsApp</a>`;
+    if(phone&&phone!=='—') lh+=`<a class="nh-link ph" href="tel:${phone}">📞 Call</a>`;
+    if(email&&email!=='—') lh+=`<a class="nh-link em" href="mailto:${email}">✉ Email</a>`;
+    linksEl.innerHTML=lh||'<span style="font-size:11px;color:var(--text-muted)">No contact links saved</span>';
+  }
   // Populate editable pipeline fields
   const spick=document.getElementById('nhCrmFStage');
   spick.innerHTML=_nhStages.map(s=>`<option value="${s.id}"${(d?.stageId||defaultStageId||'stage_contacts')===s.id?' selected':''}>${s.name}</option>`).join('');
@@ -7734,11 +7742,7 @@ async function nhSmDone(){
     <div class="nh-crm-section-head">Contact Info (edit in Contact Book)</div>
     <div class="nh-field"><span class="nh-view-label">Name</span><div class="nh-view-field" id="nhCrmVName">—</div></div>
     <div class="nh-field"><span class="nh-view-label">Company</span><div class="nh-view-field" id="nhCrmVCompany">—</div></div>
-    <div class="nh-field"><span class="nh-view-label">LinkedIn</span><div class="nh-view-field" id="nhCrmVLinkedin">—</div></div>
-    <div class="nh-field"><span class="nh-view-label">Facebook</span><div class="nh-view-field" id="nhCrmVFacebook">—</div></div>
-    <div class="nh-field"><span class="nh-view-label">WhatsApp</span><div class="nh-view-field" id="nhCrmVWhatsapp">—</div></div>
-    <div class="nh-field"><span class="nh-view-label">Mobile</span><div class="nh-view-field" id="nhCrmVPhone">—</div></div>
-    <div class="nh-field"><span class="nh-view-label">Email</span><div class="nh-view-field" id="nhCrmVEmail">—</div></div>
+    <div class="nh-field"><span class="nh-view-label">Contact Links</span><div class="nh-links" id="nhCrmVLinks" style="margin:4px 0 0;"></div></div>
 
     <!-- Pipeline controls — editable -->
     <div class="nh-crm-section-head">Pipeline Controls</div>

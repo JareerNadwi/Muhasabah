@@ -649,8 +649,7 @@ body.light-mode #tafsirLoading,body.light-mode #tafsirContent,
 body.light-mode #bookLoading,body.light-mode #bookContent,
 body.light-mode #svLoading,body.light-mode #svContent,
 body.light-mode #asmaulContent,body.light-mode #asmaulSessionInfo,
-body.light-mode #zikrReaderContent,body.light-mode #zikrReaderSessionInfo,
-body.light-mode #zikrBookContent{background:#ffffff!important;color:#1a1a18!important;}
+/* zikrReader elements now use CSS vars directly — no overrides needed */
 /* Nav bars */
 body.light-mode #hadithNav,body.light-mode #tafsirNav,
 body.light-mode #bookNav,body.light-mode #svNav{background:#f0ede6!important;border-color:#d4cfc5!important;}
@@ -4142,14 +4141,14 @@ function renderBookBadge(dk) {
 
 <!-- SALAH ARTICLE OVERLAY -->
 <div class="modal-overlay" id="salahArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
-  <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🕌 The Pillar of Salah</div>
       <button class="qr-close" onclick="closeSalahArticle()">✕ Close</button>
     </div>
     <!-- Body -->
-    <div style="padding:32px 28px;overflow-y:auto;color:#e8dfc8;font-family:'Amiri',serif;">
+    <div style="padding:32px 28px;overflow-y:auto;color:var(--text);font-family:'Amiri',serif;">
 
       <!-- Intro -->
       <p style="line-height:1.85;font-size:1.05rem;color:#d4c9ae;margin-bottom:1.2em;">Salah — the ritual prayer performed five times daily — is the second pillar of Islam and the most consistent act of worship prescribed upon every Muslim. It is a direct, unmediated conversation between the servant and his Lord, renewed five times every single day without exception.</p>
@@ -4605,8 +4604,8 @@ function closeSalahArticle(){
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
 
     <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
-      <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">📿 Zikr</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;">
+      <div style="font-family:'Amiri',serif;font-size:17px;color:var(--gold);">📿 Zikr</div>
       <button class="qr-close" onclick="closeArticle('zikr')">✕ Close</button>
     </div>
 
@@ -4616,9 +4615,9 @@ function closeSalahArticle(){
       <div id="zikrDuasContainer"></div>
 
       <!-- Counter -->
-      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:28px 24px;margin-bottom:16px;text-align:center;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-top:2px solid #c9a84c;border-radius:8px;padding:28px 24px;margin-bottom:16px;text-align:center;">
         <div id="zikrArticleCount" style="font-family:'Instrument Serif',serif;font-size:4rem;color:#c9a84c;line-height:1;margin-bottom:6px;text-shadow:0 0 24px rgba(200,169,110,0.3);">0</div>
-        <div style="font-family:'DM Mono',monospace;font-size:0.72rem;color:#5a4a28;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:24px;">/ 1500 Goal</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--text-muted);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:24px;">/ 1500 Goal</div>
         <div id="zikrArticleBar" style="height:6px;background:#1a1610;border-radius:3px;overflow:hidden;margin-bottom:24px;max-width:400px;margin-left:auto;margin-right:auto;">
           <div id="zikrArticleFill" style="height:100%;width:0%;background:linear-gradient(90deg,#4a7c59,#c9a84c);border-radius:3px;transition:width 0.3s ease;"></div>
         </div>
@@ -4629,7 +4628,7 @@ function closeSalahArticle(){
         <div id="zikrArticleMsg" style="font-family:'DM Mono',monospace;font-size:0.75rem;color:#5a4a28;letter-spacing:0.1em;min-height:18px;transition:color 0.3s;"></div>
       </div>
 
-      <div style="font-family:'Literata',Georgia,serif;font-size:0.78rem;color:#5a4a28;line-height:1.8;border:1px solid #2a2010;border-radius:6px;padding:16px 18px;margin-bottom:20px;">These duas are selected by the creator of this tracker. The reader is free to choose whatever they like to read as their all-time zikr.</div>
+      <div style="font-family:'Literata',Georgia,serif;font-size:0.78rem;color:var(--text-dim);line-height:1.8;border:1px solid var(--border);border-radius:6px;padding:16px 18px;margin-bottom:20px;">These duas are selected by the creator of this tracker. The reader is free to choose whatever they like to read as their all-time zikr.</div>
 
     </div>
   </div>
@@ -4668,12 +4667,19 @@ async function _loadZikrDuas(){
 function _renderZikrDuas(duas){
   const container = document.getElementById('zikrDuasContainer');
   if(!container) return;
+  const lm = document.body.classList.contains('light-mode');
+  const cardBg  = lm ? 'var(--surface)'  : '#141008';
+  const cardBdr = lm ? 'var(--border)'   : '#2a2010';
+  const txtMain = lm ? 'var(--text)'     : '#f0e4c0';
+  const txtSub  = lm ? 'var(--text-dim)' : '#a89060';
+  const txtDim  = lm ? 'var(--text-dim)' : '#b0a07a';
+  const divBdr  = lm ? 'var(--border)'   : '#221e14';
   const isLast = i => i === duas.length - 1;
   container.innerHTML = duas.map((d, i) => `
-    <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:${isLast(i)?'32px':'16px'};">
-      <div style="font-family:'Amiri',serif;font-size:1.7rem;line-height:2.4;direction:rtl;text-align:right;color:#f0e4c0;display:block;margin-bottom:12px;">${d.arabic}</div>
-      <div style="font-style:italic;color:#a89060;font-size:0.92rem;line-height:1.7;margin-bottom:8px;">${d.latin}</div>
-      <div style="font-size:0.9rem;color:#b0a07a;line-height:1.7;border-top:1px solid #221e14;padding-top:10px;">${d.meaning}</div>
+    <div style="background:${cardBg};border:1px solid ${cardBdr};border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:${isLast(i)?'32px':'16px'};">
+      <div style="font-family:'Amiri',serif;font-size:1.7rem;line-height:2.4;direction:rtl;text-align:right;color:${txtMain};display:block;margin-bottom:12px;">${d.arabic}</div>
+      <div style="font-style:italic;color:${txtSub};font-size:0.92rem;line-height:1.7;margin-bottom:8px;">${d.latin}</div>
+      <div style="font-size:0.9rem;color:${txtDim};line-height:1.7;border-top:1px solid ${divBdr};padding-top:10px;">${d.meaning}</div>
     </div>`).join('');
 }
 function closeArticle(id){
@@ -5190,24 +5196,24 @@ loadDayData = function(dk){
      ZIKR MORNING / EVENING READER OVERLAY
 ══════════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="zikrReaderOverlay" style="padding:16px;">
-  <div style="display:flex;flex-direction:column;width:100%;max-width:700px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;max-height:92vh;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
+  <div class="zikr-reader-shell" style="display:flex;flex-direction:column;width:100%;max-width:700px;margin:auto;background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;max-height:92vh;">
+    <div class="zikr-reader-hd" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;">
       <div>
-        <div id="zikrReaderTitle" style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;"></div>
-        <div id="zikrReaderDayPill" style="font-size:10px;color:#8a7840;margin-top:2px;letter-spacing:.4px;"></div>
+        <div id="zikrReaderTitle" style="font-family:'Amiri',serif;font-size:17px;color:var(--gold);"></div>
+        <div id="zikrReaderDayPill" style="font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:.4px;"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
-        <span id="zikrReaderProgressPill" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
+        <span id="zikrReaderProgressPill" style="font-size:11px;color:var(--text-dim);font-family:'DM Mono',monospace;"></span>
         <button class="qr-close" onclick="closeZikrReader()">✕ Save &amp; Exit</button>
       </div>
     </div>
-    <div id="zikrReaderSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#0d0b08;"></div>
-    <div id="zikrReaderDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">You have completed all 77 duas today</div>
-    <div id="zikrReaderContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#e8dfc8;min-height:0;"></div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
-      <button id="zikrReaderPrevBtn" onclick="zikrNavPrev()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Prev</button>
+    <div id="zikrReaderSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:var(--surface);"></div>
+    <div id="zikrReaderDoneNote" style="display:none;background:var(--surface2);border-bottom:1px solid var(--border);padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">You have completed all 77 duas today</div>
+    <div id="zikrReaderContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:var(--bg);color:var(--text);min-height:0;"></div>
+    <div class="zikr-reader-nav" style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;">
+      <button id="zikrReaderPrevBtn" onclick="zikrNavPrev()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Prev</button>
       <div id="zikrReaderPageDisplay" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text);min-width:110px;text-align:center;letter-spacing:.5px;">Dua - / -</div>
-      <button id="zikrReaderNextBtn" onclick="zikrNavNext()" style="background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next</button>
+      <button id="zikrReaderNextBtn" onclick="zikrNavNext()" style="background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next</button>
     </div>
   </div>
 </div>
@@ -5255,20 +5261,25 @@ function _zikrRender(){
   pb.disabled=_zikrSlide===0;pb.style.opacity=_zikrSlide===0?"0.3":"1";
   var nb=document.getElementById("zikrReaderNextBtn");
   nb.textContent=isLast?"Complete":"Next";
-  nb.style.background=isLast?"var(--green)":"#1a1500";
-  nb.style.borderColor=isLast?"var(--green-bright)":"#c9a84c55";
-  nb.style.color=isLast?"#fff":"#c9a84c";
+  nb.style.background=isLast?"var(--green)":"var(--surface2)";
+  nb.style.borderColor=isLast?"var(--green-bright)":"var(--gold-dim)";
+  nb.style.color=isLast?"#fff":"var(--gold)";
   var ns=num<10?"0"+num:""+num;
+  var _zlm=document.body.classList.contains('light-mode');
+  var _zcard=_zlm?'#f5f0e0':'#1a1610';
+  var _ztxt=_zlm?'#1a1a18':'#f0e4c0';
+  var _zsub=_zlm?'#5a5750':'#a89060';
+  var _zdim=_zlm?'#7a7870':'#c5b98a';
+  var _zdiv=_zlm?'linear-gradient(to right,#d4cfc5,transparent)':'linear-gradient(to right,#2a2418,transparent)';
   document.getElementById("zikrReaderContent").innerHTML=
-    "<div style=\"background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;\">"+
+    "<div style=\"background:"+_zcard+";border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;\">"+
     "<div style=\"font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;font-family:'DM Mono',monospace;\">"+ns+" - Dua</div>"+
-    "<div style=\"font-family:'Amiri',serif;font-size:1.55rem;line-height:1.8;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:10px;\">"+dua.arabic+"</div>"+
-    "<div style=\"font-style:italic;color:#a89060;font-size:0.85rem;margin-bottom:8px;line-height:1.5;font-family:'Literata',Georgia,serif;\">"+dua.latin+"</div>"+
-    "<div style=\"height:1px;background:linear-gradient(to right,#2a2418,transparent);margin:10px 0;\"></div>"+
-    "<div style=\"color:#c5b98a;font-size:0.92rem;line-height:1.75;font-family:'Amiri',serif;\">"+dua.meaning+"</div>"+
+    "<div style=\"font-family:'Amiri',serif;font-size:1.55rem;line-height:1.8;direction:rtl;text-align:right;color:"+_ztxt+";margin-bottom:10px;\">"+dua.arabic+"</div>"+
+    "<div style=\"font-style:italic;color:"+_zsub+";font-size:0.85rem;margin-bottom:8px;line-height:1.5;font-family:'Literata',Georgia,serif;\">"+dua.latin+"</div>"+
+    "<div style=\"height:1px;background:"+_zdiv+";margin:10px 0;\"></div>"+
+    "<div style=\"color:"+_zdim+";font-size:0.92rem;line-height:1.75;font-family:'Amiri',serif;\">"+dua.meaning+"</div>"+
     "</div>";
   document.getElementById("zikrReaderContent").scrollTop=0;
-  reThemeIfLight();
 }
 async function openZikrReader(mode){
   _zikrMode=mode;_zikrDK=currentDateKey||todayKey();
@@ -5380,24 +5391,24 @@ loadDayData=function(dk){
      ZIKR FROM BOOK READER OVERLAY — JSON-based, mirrors Zikr Morning/Evening
 ══════════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="zikrBookReaderOverlay" style="padding:16px;">
-  <div style="display:flex;flex-direction:column;width:100%;max-width:700px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;max-height:92vh;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
+  <div style="display:flex;flex-direction:column;width:100%;max-width:700px;margin:auto;background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;max-height:92vh;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;">
       <div>
-        <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">📖 Zikr From Book</div>
-        <div id="zikrBookDayPill" style="font-size:10px;color:#8a7840;margin-top:2px;letter-spacing:.4px;"></div>
+        <div style="font-family:'Amiri',serif;font-size:17px;color:var(--gold);">📖 Zikr From Book</div>
+        <div id="zikrBookDayPill" style="font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:.4px;"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
-        <span id="zikrBookProgressPill" style="font-size:11px;color:#8a7840;font-family:'DM Mono',monospace;"></span>
+        <span id="zikrBookProgressPill" style="font-size:11px;color:var(--text-dim);font-family:'DM Mono',monospace;"></span>
         <button class="qr-close" onclick="closeZikrBookReader()">✕ Save & Exit</button>
       </div>
     </div>
-    <div id="zikrBookSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#0d0b08;"></div>
-    <div id="zikrBookDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">✓ You have read all 123 Duas today — you may continue reviewing</div>
-    <div id="zikrBookContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#e8dfc8;min-height:0;"></div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
-      <button id="zikrBookPrevBtn" onclick="zikrBookNavPrev()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
+    <div id="zikrBookSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:var(--surface);"></div>
+    <div id="zikrBookDoneNote" style="display:none;background:var(--surface2);border-bottom:1px solid var(--border);padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">✓ You have read all 123 Duas today — you may continue reviewing</div>
+    <div id="zikrBookContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:var(--bg);color:var(--text);min-height:0;"></div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;">
+      <button id="zikrBookPrevBtn" onclick="zikrBookNavPrev()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
       <div id="zikrBookPageDisplay" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text);min-width:110px;text-align:center;letter-spacing:.5px;">Dua — / —</div>
-      <button id="zikrBookNextBtn" onclick="zikrBookNavNext()" style="background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next →</button>
+      <button id="zikrBookNextBtn" onclick="zikrBookNavNext()" style="background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next →</button>
     </div>
   </div>
 </div>
@@ -5465,26 +5476,31 @@ function _zbRender() {
 
   const nb = document.getElementById('zikrBookNextBtn');
   nb.textContent = isLast ? '✓ Complete' : 'Next →';
-  nb.style.background  = isLast ? 'var(--green)'        : '#1a1500';
-  nb.style.borderColor = isLast ? 'var(--green-bright)' : '#c9a84c55';
-  nb.style.color       = isLast ? '#fff'                : '#c9a84c';
+  nb.style.background  = isLast ? 'var(--green)'        : 'var(--surface2)';
+  nb.style.borderColor = isLast ? 'var(--green-bright)' : 'var(--gold-dim)';
+  nb.style.color       = isLast ? '#fff'                : 'var(--gold)';
 
   const sourceTag = dua.source
     ? '<div style="font-size:0.72rem;color:#7a6a40;margin-top:10px;text-align:right;font-family:\'DM Mono\',monospace;">' + dua.source + '</div>'
     : '';
 
+  const _zbLm=document.body.classList.contains('light-mode');
+  const _zbCard=_zbLm?'#f5f0e0':'#1a1610';
+  const _zbTxt=_zbLm?'#1a1a18':'#f0e4c0';
+  const _zbSub=_zbLm?'#5a5750':'#a89060';
+  const _zbDim=_zbLm?'#7a7870':'#c5b98a';
+  const _zbDiv=_zbLm?'linear-gradient(to right,#d4cfc5,transparent)':'linear-gradient(to right,#2a2418,transparent)';
   document.getElementById('zikrBookContent').innerHTML =
-    '<div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;">' +
+    '<div style="background:'+_zbCard+';border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;">' +
       '<div style="font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;font-family:\'DM Mono\',monospace;">' + numStr + ' — Dua</div>' +
-      '<div style="font-family:\'Amiri\',serif;font-size:1.55rem;line-height:1.9;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:12px;">' + dua.arabic + '</div>' +
-      '<div style="font-style:italic;color:#a89060;font-size:0.85rem;margin-bottom:8px;line-height:1.55;font-family:\'Literata\',Georgia,serif;">' + (dua.transliteration || '') + '</div>' +
-      '<div style="height:1px;background:linear-gradient(to right,#2a2418,transparent);margin:10px 0;"></div>' +
-      '<div style="color:#c5b98a;font-size:0.92rem;line-height:1.75;font-family:\'Amiri\',serif;">' + (dua.translation || '') + '</div>' +
+      '<div style="font-family:\'Amiri\',serif;font-size:1.55rem;line-height:1.9;direction:rtl;text-align:right;color:'+_zbTxt+';margin-bottom:12px;">' + dua.arabic + '</div>' +
+      '<div style="font-style:italic;color:'+_zbSub+';font-size:0.85rem;margin-bottom:8px;line-height:1.55;font-family:\'Literata\',Georgia,serif;">' + (dua.transliteration || '') + '</div>' +
+      '<div style="height:1px;background:'+_zbDiv+';margin:10px 0;"></div>' +
+      '<div style="color:'+_zbDim+';font-size:0.92rem;line-height:1.75;font-family:\'Amiri\',serif;">' + (dua.translation || '') + '</div>' +
       sourceTag +
     '</div>';
 
   document.getElementById('zikrBookContent').scrollTop = 0;
-  reThemeIfLight();
 }
 
 /* ── Open ── */

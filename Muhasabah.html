@@ -24,6 +24,116 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 .lr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;overflow-y:auto;padding:16px;box-sizing:border-box;}
 .lr-overlay.active{display:block;}
 
+/* ── Contact Book Overlay ── */
+#contactBookOverlay{background:var(--bg);}
+.cb-wrap{max-width:680px;margin:0 auto;padding:0 0 80px;}
+.cb-topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 0 20px;border-bottom:1px solid var(--border);margin-bottom:20px;gap:12px;flex-wrap:wrap;}
+.cb-title{font-family:'Amiri',serif;font-size:20px;color:var(--gold);}
+.cb-subtitle{font-size:10px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.cb-close{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
+.cb-close:hover{border-color:var(--gold-dim);color:var(--text);}
+
+/* Pipeline summary bar */
+.cb-pipeline{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.cb-pipe-badge{flex:1;min-width:80px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;text-align:center;cursor:pointer;transition:border-color .2s;}
+.cb-pipe-badge:hover{border-color:var(--gold-dim);}
+.cb-pipe-badge.active-filter{border-color:var(--gold);background:var(--surface2);}
+.cb-pipe-count{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--gold);}
+.cb-pipe-count.urgent{color:#e05555;}
+.cb-pipe-label{font-size:10px;color:var(--text-dim);letter-spacing:.5px;margin-top:2px;text-transform:uppercase;}
+
+/* Today alert */
+.cb-today-alert{background:#1a0a0a;border:1px solid #5a2020;border-radius:var(--radius);padding:10px 14px;margin-bottom:16px;display:none;}
+.cb-today-alert.visible{display:block;}
+.cb-today-alert-title{font-size:11px;color:#e05555;font-family:'DM Mono',monospace;letter-spacing:1px;margin-bottom:6px;}
+.cb-today-chip{display:inline-flex;align-items:center;gap:6px;background:#2a0f0f;border:1px solid #5a2020;border-radius:20px;padding:3px 10px;margin:2px;font-size:11px;color:#e08080;cursor:pointer;}
+.cb-today-chip:hover{border-color:#e05555;color:#e05555;}
+
+/* Controls */
+.cb-controls{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.cb-search{flex:1;min-width:160px;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
+.cb-search:focus{border-color:var(--gold-dim);}
+.cb-search::placeholder{color:var(--text-muted);}
+.cb-add-btn{background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);padding:8px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;white-space:nowrap;}
+.cb-add-btn:hover{background:#1a1200;border-color:var(--gold);}
+
+/* Stage filter pills */
+.cb-filter-bar{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.cb-filter-pill{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);padding:4px 12px;border-radius:20px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.5px;transition:all .15s;}
+.cb-filter-pill:hover,.cb-filter-pill.on{background:var(--surface2);border-color:var(--gold-dim);color:var(--text);}
+.cb-filter-pill.on{border-color:var(--gold);color:var(--gold);}
+
+/* Contact cards */
+.cb-list{display:flex;flex-direction:column;gap:10px;}
+.cb-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;transition:border-color .2s;}
+.cb-card:hover{border-color:var(--gold-dim);}
+.cb-card.overdue{border-color:#5a2020;background:#0f0808;}
+.cb-card.overdue:hover{border-color:#e05555;}
+.cb-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.cb-card-left{flex:1;min-width:0;}
+.cb-card-name{font-family:'Instrument Serif',serif;font-size:16px;color:var(--text);margin-bottom:2px;}
+.cb-card-role{font-size:11px;color:var(--text-dim);margin-bottom:6px;}
+.cb-card-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
+.cb-stage-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:20px;border:1px solid;white-space:nowrap;}
+.cb-stage-badge.cold{color:#6a7080;border-color:#3a3e48;}
+.cb-stage-badge.warm{color:#c8a96e;border-color:#6a5a30;}
+.cb-stage-badge.nurturing{color:#6aab7a;border-color:#3a6a4a;}
+.cb-stage-badge.advocate{color:#9a6abf;border-color:#5a3a8a;}
+.cb-overdue-tag{font-family:'DM Mono',monospace;font-size:9px;color:#e05555;background:#1a0808;border:1px solid #5a2020;border-radius:20px;padding:2px 8px;}
+
+/* Link buttons row */
+.cb-links{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.cb-link-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;text-decoration:none;transition:all .15s;white-space:nowrap;}
+.cb-link-btn:hover{border-color:var(--gold-dim);color:var(--text);}
+.cb-link-btn.linkedin:hover{border-color:#0077b5;color:#0077b5;}
+.cb-link-btn.facebook:hover{border-color:#1877f2;color:#1877f2;}
+.cb-link-btn.whatsapp:hover{border-color:#25d366;color:#25d366;}
+.cb-link-btn.phone:hover{border-color:#6aab7a;color:#6aab7a;}
+.cb-link-btn.email:hover{border-color:var(--gold);color:var(--gold);}
+
+/* Bottom row: dates + actions */
+.cb-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.cb-dates{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);}
+.cb-dates span{color:var(--text-dim);}
+.cb-dates span.urgent{color:#e05555;}
+.cb-actions{display:flex;gap:6px;}
+.cb-act-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:4px 10px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;transition:all .15s;}
+.cb-act-btn:hover{border-color:var(--gold-dim);color:var(--text);}
+.cb-act-btn.mark{border-color:#3a6a4a;color:#6aab7a;}
+.cb-act-btn.mark:hover{background:#0a1a0f;border-color:#6aab7a;}
+.cb-act-btn.del{border-color:#3a1a1a;color:#8b3a3a;}
+.cb-act-btn.del:hover{background:#1a0a0a;border-color:var(--red);color:#c05050;}
+.cb-notes-text{font-size:11px;color:var(--text-dim);margin-top:6px;font-style:italic;border-top:1px solid var(--border);padding-top:6px;}
+.cb-empty{text-align:center;padding:48px 16px;color:var(--text-muted);font-size:13px;}
+
+/* Add/Edit modal */
+.cb-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:3000;align-items:center;justify-content:center;padding:16px;}
+.cb-modal-bg.open{display:flex;}
+.cb-modal{background:var(--surface);border:1px solid var(--border);border-radius:10px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;padding:24px;}
+.cb-modal-title{font-family:'Amiri',serif;font-size:18px;color:var(--gold);margin-bottom:20px;}
+.cb-field{margin-bottom:14px;}
+.cb-field label{display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-dim);margin-bottom:5px;text-transform:uppercase;}
+.cb-field input,.cb-field select,.cb-field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
+.cb-field input:focus,.cb-field select:focus,.cb-field textarea:focus{border-color:var(--gold-dim);}
+.cb-field select option{background:var(--surface2);}
+.cb-field textarea{resize:vertical;min-height:60px;font-size:11px;}
+.cb-modal-actions{display:flex;gap:8px;margin-top:20px;justify-content:flex-end;}
+.cb-modal-save{background:#1a1200;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
+.cb-modal-save:hover{border-color:var(--gold);background:#221800;}
+.cb-modal-cancel{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:8px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;}
+.cb-modal-cancel:hover{color:var(--text);}
+
+/* light mode overrides */
+body.light-mode #contactBookOverlay{background:#f5f3ec;}
+body.light-mode .cb-modal{background:#eae7de;border-color:#c8c0a8;}
+body.light-mode .cb-card{background:#eae7de;border-color:#c8c0a8;}
+body.light-mode .cb-card.overdue{background:#f5e8e8;border-color:#c08080;}
+body.light-mode .cb-field input,body.light-mode .cb-field select,body.light-mode .cb-field textarea{background:#dedad0;border-color:#b8b0a0;color:#1a1a18;}
+body.light-mode .cb-link-btn{background:#dedad0;border-color:#b8b0a0;color:#4a4840;}
+body.light-mode .cb-search{background:#eae7de;border-color:#c8c0a8;color:#1a1a18;}
+body.light-mode .cb-pipe-badge{background:#eae7de;border-color:#c8c0a8;}
+body.light-mode .cb-act-btn{background:#dedad0;border-color:#b8b0a0;}
+
 /* ── Contact Banner ── */
 .contact-banner{
   display:flex;align-items:center;justify-content:center;
@@ -1018,7 +1128,7 @@ body.overlay-open{overflow:hidden;}
         </div>
       </div>
       <div class="sub-label">Goal: Connect &amp; Build Rapport With 5+ People = Full 5% Core</div>
-      <button class="qr-open-btn" style="margin-top:8px;" onclick="alert('📒 Contact Book — Coming Soon')">📒 Open Contact Book</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openContactBook()">📒 Open Contact Book</button>
     </div>
 
   </div><!-- /growth -->
@@ -3493,7 +3603,7 @@ loadDayData = function(dk){
 /* ── Scroll lock: prevent background scroll when any overlay is open ── */
 (function(){
   function updateBodyLock(){
-    var anyActive = document.querySelector('.modal-overlay.active, .quran-reader-overlay.active, .lr-overlay.active');
+    var anyActive = document.querySelector('.modal-overlay.active, .quran-reader-overlay.active, .lr-overlay.active, #contactBookOverlay.active');
     document.body.classList.toggle('overlay-open', !!anyActive);
   }
   var mo = new MutationObserver(updateBodyLock);
@@ -6728,7 +6838,337 @@ function closeLanguageReader() {
 
 // Init badge on load
 lrUpdateGoalBadge();
+
+/* ══════════════════════════════════════════════════════════
+   CONTACT BOOK
+   Storage key: '_contacts' in IDB (global, not per-day)
+══════════════════════════════════════════════════════════ */
+const CB_KEY = '_contacts';
+let _cbContacts = [];
+let _cbEditId = null;
+let _cbFilter = 'all';
+
+async function cbLoad() {
+  const db = await openDB();
+  return new Promise((res) => {
+    const req = db.transaction(STORE,'readonly').objectStore(STORE).get(CB_KEY);
+    req.onsuccess = () => res(req.result ? (req.result.data || []) : []);
+    req.onerror = () => res([]);
+  });
+}
+
+async function cbSave() {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).put({ dk: CB_KEY, data: _cbContacts });
+    tx.oncomplete = () => res();
+    tx.onerror = e => rej(e.target.error);
+  });
+}
+
+function cbDaysSince(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  const now = new Date();
+  now.setHours(0,0,0,0); d.setHours(0,0,0,0);
+  return Math.round((now - d) / 86400000);
+}
+
+function cbIsOverdue(contact) {
+  if (!contact.followup) return false;
+  return cbDaysSince(contact.followup) >= 0;
+}
+
+function cbIsToday(contact) {
+  if (!contact.followup) return false;
+  return cbDaysSince(contact.followup) === 0;
+}
+
+function cbStageOrder(s) {
+  return {advocate:0, nurturing:1, warm:2, cold:3}[s] ?? 4;
+}
+
+function cbRender() {
+  const q = (document.getElementById('cbSearch')?.value || '').toLowerCase();
+  const list = document.getElementById('cbList');
+  if (!list) return;
+
+  // Sort: overdue first, then by stage, then alphabetical
+  let contacts = [..._cbContacts].sort((a,b) => {
+    const aOv = cbIsOverdue(a) ? 0 : 1;
+    const bOv = cbIsOverdue(b) ? 0 : 1;
+    if (aOv !== bOv) return aOv - bOv;
+    if (cbStageOrder(a.stage) !== cbStageOrder(b.stage)) return cbStageOrder(a.stage) - cbStageOrder(b.stage);
+    return (a.name||'').localeCompare(b.name||'');
+  });
+
+  // Filter by stage
+  if (_cbFilter !== 'all') contacts = contacts.filter(c => c.stage === _cbFilter);
+
+  // Filter by search
+  if (q) contacts = contacts.filter(c =>
+    (c.name||'').toLowerCase().includes(q) ||
+    (c.role||'').toLowerCase().includes(q) ||
+    (c.company||'').toLowerCase().includes(q)
+  );
+
+  if (contacts.length === 0) {
+    list.innerHTML = '<div class="cb-empty">No contacts found. Add your first connection.</div>';
+  } else {
+    list.innerHTML = contacts.map(c => cbCardHTML(c)).join('');
+  }
+
+  cbRenderPipeline();
+  cbRenderTodayAlert();
+}
+
+function cbCardHTML(c) {
+  const overdue = cbIsOverdue(c);
+  const stageLabelMap = {cold:'❄ Cold', warm:'🌤 Warm', nurturing:'🌱 Nurturing', advocate:'⭐ Advocate'};
+  const links = [];
+  if (c.linkedin) links.push(`<a class="cb-link-btn linkedin" href="${c.linkedin}" target="_blank" rel="noopener">🔗 LinkedIn</a>`);
+  if (c.facebook) links.push(`<a class="cb-link-btn facebook" href="${c.facebook}" target="_blank" rel="noopener">👤 Facebook</a>`);
+  if (c.whatsapp) links.push(`<a class="cb-link-btn whatsapp" href="https://wa.me/${c.whatsapp.replace(/\D/g,'')}" target="_blank" rel="noopener">💬 WhatsApp</a>`);
+  if (c.phone)    links.push(`<a class="cb-link-btn phone" href="tel:${c.phone}">📞 Call</a>`);
+  if (c.email)    links.push(`<a class="cb-link-btn email" href="mailto:${c.email}">✉ Email</a>`);
+
+  const daysSince = c.followup ? cbDaysSince(c.followup) : null;
+  let followupText = '';
+  if (c.followup) {
+    if (daysSince === 0) followupText = `<span class="urgent">⚡ Follow up TODAY</span>`;
+    else if (daysSince > 0) followupText = `<span class="urgent">🔴 ${daysSince}d overdue</span>`;
+    else followupText = `<span>Next: ${c.followup}</span>`;
+  }
+
+  const lastContactText = c.lastContacted ? `Last: ${c.lastContacted}` : 'Never contacted';
+
+  return `<div class="cb-card${overdue?' overdue':''}" id="cbcard-${c.id}">
+  <div class="cb-card-top">
+    <div class="cb-card-left">
+      <div class="cb-card-name">${c.name||'—'}</div>
+      <div class="cb-card-role">${[c.role, c.company].filter(Boolean).join(' · ') || 'No role/company set'}</div>
+    </div>
+    <div class="cb-card-right">
+      <span class="cb-stage-badge ${c.stage||'cold'}">${stageLabelMap[c.stage||'cold']}</span>
+      ${overdue ? '<span class="cb-overdue-tag">ACTION NEEDED</span>' : ''}
+    </div>
+  </div>
+  ${links.length ? `<div class="cb-links">${links.join('')}</div>` : ''}
+  ${c.notes ? `<div class="cb-notes-text">${c.notes}</div>` : ''}
+  <div class="cb-card-bottom">
+    <div class="cb-dates">${lastContactText} &nbsp;|&nbsp; ${followupText || '<span>No follow-up set</span>'}</div>
+    <div class="cb-actions">
+      <button class="cb-act-btn mark" onclick="cbMarkContacted('${c.id}')">✓ Contacted</button>
+      <button class="cb-act-btn" onclick="cbOpenModal('${c.id}')">Edit</button>
+      <button class="cb-act-btn del" onclick="cbDelete('${c.id}')">Del</button>
+    </div>
+  </div>
+</div>`;
+}
+
+function cbRenderPipeline() {
+  const el = document.getElementById('cbPipeline');
+  if (!el) return;
+  const stages = ['cold','warm','nurturing','advocate'];
+  const labels = {cold:'❄ Cold', warm:'🌤 Warm', nurturing:'🌱 Nurturing', advocate:'⭐ Advocate'};
+  const overdueCount = _cbContacts.filter(cbIsOverdue).length;
+  let html = '';
+  if (overdueCount > 0) {
+    html += `<div class="cb-pipe-badge${_cbFilter==='overdue'?' active-filter':''}" onclick="cbSetFilterDirect('overdue')">
+      <div class="cb-pipe-count urgent">${overdueCount}</div>
+      <div class="cb-pipe-label">⚠ Overdue</div>
+    </div>`;
+  }
+  stages.forEach(s => {
+    const cnt = _cbContacts.filter(c=>c.stage===s).length;
+    html += `<div class="cb-pipe-badge${_cbFilter===s?' active-filter':''}" onclick="cbSetFilterDirect('${s}')">
+      <div class="cb-pipe-count">${cnt}</div>
+      <div class="cb-pipe-label">${labels[s]}</div>
+    </div>`;
+  });
+  html += `<div class="cb-pipe-badge${_cbFilter==='all'?' active-filter':''}" onclick="cbSetFilterDirect('all')">
+    <div class="cb-pipe-count">${_cbContacts.length}</div>
+    <div class="cb-pipe-label">Total</div>
+  </div>`;
+  el.innerHTML = html;
+}
+
+function cbRenderTodayAlert() {
+  const alert = document.getElementById('cbTodayAlert');
+  const chips = document.getElementById('cbTodayChips');
+  if (!alert || !chips) return;
+  const todayContacts = _cbContacts.filter(c => cbIsToday(c) || (c.followup && cbDaysSince(c.followup) > 0));
+  if (todayContacts.length === 0) { alert.classList.remove('visible'); return; }
+  alert.classList.add('visible');
+  chips.innerHTML = todayContacts.map(c =>
+    `<span class="cb-today-chip" onclick="document.getElementById('cbcard-${c.id}')?.scrollIntoView({behavior:'smooth'})">${c.name}</span>`
+  ).join('');
+}
+
+function cbSetFilter(el, stage) {
+  document.querySelectorAll('.cb-filter-pill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  _cbFilter = stage;
+  cbRender();
+}
+
+function cbSetFilterDirect(stage) {
+  const pill = document.querySelector(`.cb-filter-pill[data-stage="${stage}"]`);
+  if (pill) { cbSetFilter(pill, stage); return; }
+  _cbFilter = stage === 'overdue' ? 'overdue' : 'all';
+  if (stage === 'overdue') {
+    // manual filter for overdue
+    const list = document.getElementById('cbList');
+    const contacts = _cbContacts.filter(cbIsOverdue);
+    list.innerHTML = contacts.length ? contacts.map(cbCardHTML).join('') : '<div class="cb-empty">No overdue contacts.</div>';
+    cbRenderPipeline();
+  } else {
+    cbRender();
+  }
+}
+
+function cbOpenModal(id) {
+  _cbEditId = id || null;
+  document.getElementById('cbModalTitle').textContent = id ? 'Edit Contact' : 'Add Contact';
+  const c = id ? _cbContacts.find(x => x.id === id) : null;
+  document.getElementById('cbFName').value = c?.name || '';
+  document.getElementById('cbFRole').value = c?.role || '';
+  document.getElementById('cbFCompany').value = c?.company || '';
+  document.getElementById('cbFStage').value = c?.stage || 'cold';
+  document.getElementById('cbFLinkedin').value = c?.linkedin || '';
+  document.getElementById('cbFFacebook').value = c?.facebook || '';
+  document.getElementById('cbFWhatsapp').value = c?.whatsapp || '';
+  document.getElementById('cbFPhone').value = c?.phone || '';
+  document.getElementById('cbFEmail').value = c?.email || '';
+  document.getElementById('cbFFollowup').value = c?.followup || '';
+  document.getElementById('cbFNotes').value = c?.notes || '';
+  document.getElementById('cbModalBg').classList.add('open');
+}
+
+function cbCloseModal() {
+  document.getElementById('cbModalBg').classList.remove('open');
+  _cbEditId = null;
+}
+
+async function cbSaveContact() {
+  const name = document.getElementById('cbFName').value.trim();
+  if (!name) { alert('Name is required.'); return; }
+  const contact = {
+    id: _cbEditId || ('cb_' + Date.now()),
+    name,
+    role: document.getElementById('cbFRole').value.trim(),
+    company: document.getElementById('cbFCompany').value.trim(),
+    stage: document.getElementById('cbFStage').value,
+    linkedin: document.getElementById('cbFLinkedin').value.trim(),
+    facebook: document.getElementById('cbFFacebook').value.trim(),
+    whatsapp: document.getElementById('cbFWhatsapp').value.trim(),
+    phone: document.getElementById('cbFPhone').value.trim(),
+    email: document.getElementById('cbFEmail').value.trim(),
+    followup: document.getElementById('cbFFollowup').value,
+    notes: document.getElementById('cbFNotes').value.trim(),
+    lastContacted: _cbEditId ? (_cbContacts.find(x=>x.id===_cbEditId)?.lastContacted || null) : null,
+    createdAt: _cbEditId ? (_cbContacts.find(x=>x.id===_cbEditId)?.createdAt || new Date().toISOString().slice(0,10)) : new Date().toISOString().slice(0,10),
+  };
+  if (_cbEditId) {
+    const idx = _cbContacts.findIndex(x => x.id === _cbEditId);
+    if (idx > -1) _cbContacts[idx] = contact;
+  } else {
+    _cbContacts.push(contact);
+  }
+  await cbSave();
+  cbCloseModal();
+  cbRender();
+}
+
+async function cbMarkContacted(id) {
+  const c = _cbContacts.find(x => x.id === id);
+  if (!c) return;
+  c.lastContacted = new Date().toISOString().slice(0,10);
+  // Push follow-up 7 days out by default
+  const next = new Date(); next.setDate(next.getDate()+7);
+  c.followup = next.toISOString().slice(0,10);
+  await cbSave();
+  cbRender();
+}
+
+async function cbDelete(id) {
+  if (!confirm('Delete this contact?')) return;
+  _cbContacts = _cbContacts.filter(x => x.id !== id);
+  await cbSave();
+  cbRender();
+}
+
+async function openContactBook() {
+  _cbContacts = await cbLoad();
+  document.getElementById('contactBookOverlay').classList.add('active');
+  document.body.classList.add('overlay-open');
+  cbRender();
+}
+
+function closeContactBook() {
+  document.getElementById('contactBookOverlay').classList.remove('active');
+  document.body.classList.remove('overlay-open');
+}
 </script>
 
 </body>
 </html>
+<!-- ══ Contact Book Overlay ══ -->
+<div class="lr-overlay" id="contactBookOverlay">
+  <div class="cb-wrap">
+    <div class="cb-topbar">
+      <div>
+        <div class="cb-title">📒 Contact Book</div>
+        <div class="cb-subtitle">Career Networking Pipeline</div>
+      </div>
+      <button class="cb-close" onclick="closeContactBook()">✕ Close</button>
+    </div>
+    <div class="cb-pipeline" id="cbPipeline"></div>
+    <div class="cb-today-alert" id="cbTodayAlert">
+      <div class="cb-today-alert-title">🔴 FOLLOW UP TODAY</div>
+      <div id="cbTodayChips"></div>
+    </div>
+    <div class="cb-controls">
+      <input class="cb-search" id="cbSearch" type="text" placeholder="Search name, role, company…" oninput="cbRender()">
+      <button class="cb-add-btn" onclick="cbOpenModal()">＋ Add Contact</button>
+    </div>
+    <div class="cb-filter-bar">
+      <span class="cb-filter-pill on" data-stage="all" onclick="cbSetFilter(this,'all')">ALL</span>
+      <span class="cb-filter-pill" data-stage="cold" onclick="cbSetFilter(this,'cold')">❄ COLD</span>
+      <span class="cb-filter-pill" data-stage="warm" onclick="cbSetFilter(this,'warm')">🌤 WARM</span>
+      <span class="cb-filter-pill" data-stage="nurturing" onclick="cbSetFilter(this,'nurturing')">🌱 NURTURING</span>
+      <span class="cb-filter-pill" data-stage="advocate" onclick="cbSetFilter(this,'advocate')">⭐ ADVOCATE</span>
+    </div>
+    <div class="cb-list" id="cbList"></div>
+  </div>
+</div>
+
+<!-- Add/Edit Contact Modal -->
+<div class="cb-modal-bg" id="cbModalBg">
+  <div class="cb-modal">
+    <div class="cb-modal-title" id="cbModalTitle">Add Contact</div>
+    <div class="cb-field"><label>Full Name *</label><input id="cbFName" type="text" placeholder="e.g. Ahmed Al-Rashidi"></div>
+    <div class="cb-field"><label>Role / Title</label><input id="cbFRole" type="text" placeholder="e.g. HR Manager"></div>
+    <div class="cb-field"><label>Company</label><input id="cbFCompany" type="text" placeholder="e.g. Saudi Aramco"></div>
+    <div class="cb-field"><label>Stage</label>
+      <select id="cbFStage">
+        <option value="cold">❄ Cold</option>
+        <option value="warm">🌤 Warm</option>
+        <option value="nurturing">🌱 Nurturing</option>
+        <option value="advocate">⭐ Advocate</option>
+      </select>
+    </div>
+    <div class="cb-field"><label>LinkedIn URL</label><input id="cbFLinkedin" type="url" placeholder="https://linkedin.com/in/username"></div>
+    <div class="cb-field"><label>Facebook URL</label><input id="cbFFacebook" type="url" placeholder="https://facebook.com/username"></div>
+    <div class="cb-field"><label>WhatsApp (with country code)</label><input id="cbFWhatsapp" type="tel" placeholder="966501234567"></div>
+    <div class="cb-field"><label>Mobile / Phone</label><input id="cbFPhone" type="tel" placeholder="+966501234567"></div>
+    <div class="cb-field"><label>Email</label><input id="cbFEmail" type="email" placeholder="name@company.com"></div>
+    <div class="cb-field"><label>Next Follow-up Date</label><input id="cbFFollowup" type="date"></div>
+    <div class="cb-field"><label>Notes</label><textarea id="cbFNotes" placeholder="Context, how you met, what was discussed…"></textarea></div>
+    <div class="cb-modal-actions">
+      <button class="cb-modal-cancel" onclick="cbCloseModal()">Cancel</button>
+      <button class="cb-modal-save" onclick="cbSaveContact()">Save Contact</button>
+    </div>
+  </div>
+</div>

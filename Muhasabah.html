@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="format-detection" content="telephone=no">
 <title>Muhasabah — Daily Tracker</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBkMGYwZSIvPgogIDwhLS0gQ3Jlc2NlbnQgbW9vbiAtLT4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxMCIgZmlsbD0iI2M4YTk2ZSIvPgogIDxjaXJjbGUgY3g9IjIwIiBjeT0iMTMiIHI9IjgiIGZpbGw9IiMwZDBmMGUiLz4KICA8IS0tIFNtYWxsIHN0YXIgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSIyMywxMCAyMy42LDExLjggMjUuNSwxMS44IDI0LDEyLjkgMjQuNiwxNC43IDIzLDEzLjYgMjEuNCwxNC43IDIyLDEyLjkgMjAuNSwxMS44IDIyLjQsMTEuOCIgZmlsbD0iI2M4YTk2ZSIvPgo8L3N2Zz4K">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -342,7 +343,7 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 .support-modal{border-color:var(--gold-dim);}
 .support-modal h3{color:var(--gold);}
 .support-bkash{background:var(--surface2);border:1px solid var(--gold-dim);border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;font-family:'DM Mono',monospace;}
-.support-bkash .num{font-size:16px;color:var(--gold);letter-spacing:1px;text-shadow:0 0 12px rgba(200,169,110,.5);}
+.support-bkash .num{font-size:16px;color:var(--gold);letter-spacing:1px;text-shadow:0 0 12px rgba(200,169,110,.5);-webkit-text-fill-color:var(--gold);}
 .support-bkash .lbl{font-size:10px;color:var(--text-muted);margin-top:4px;letter-spacing:1px;}
 .support-btns{display:flex;flex-direction:column;gap:8px;}
 .btn-donate{padding:12px;background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid var(--gold);color:var(--gold);border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1px;transition:all .2s;}
@@ -583,6 +584,30 @@ select option{background:#1c1f1c;}
     padding:10px !important;
     text-align:center !important;
   }
+  /* Header title — shrink on mobile */
+  .header-title{font-size:16px !important;}
+  .header-sub{font-size:8px !important;letter-spacing:1px !important;}
+  /* Quran/PDF bottom nav — two rows: page info top, nav controls bottom */
+  .qr-bottombar{
+    flex-wrap:wrap !important;
+    gap:6px !important;
+    padding:8px 10px !important;
+    overflow:visible !important;
+    justify-content:center !important;
+  }
+  .qr-page-display{
+    order:-1;
+    width:100%;
+    text-align:center;
+    min-width:unset !important;
+    font-size:11px !important;
+  }
+  .qr-nav{
+    padding:8px 18px !important;
+    font-size:11px !important;
+    flex-shrink:0;
+    white-space:nowrap;
+  }
 }
 
 /* ── Quran Reader ── */
@@ -820,7 +845,7 @@ body.overlay-open{overflow:hidden;}
       <div class="contact-text">
         <span class="contact-line1">🤝 Support &nbsp;<a class="contact-num" href="https://wa.me/8801829624608">WhatsApp 01829624608</a></span>
         <span class="contact-sep">·</span>
-        <span class="contact-line2">❤️ Support Development &nbsp;<span class="contact-num">bKash / Nagad 01829624608</span></span>
+        <span class="contact-line2">❤️ Support Development &nbsp;<span class="contact-num">bKash / Nagad <span>01829</span><span>624608</span></span></span>
       </div>
     </div>
   </div>
@@ -869,7 +894,7 @@ body.overlay-open{overflow:hidden;}
     <h3>❤️ Enjoying Muhasabah?</h3>
     <p>This tracker is free and always will be InShaAllah. If it's helping your daily practice, consider supporting its development.</p>
     <div class="support-bkash">
-      <div class="num">01829624608</div>
+      <div class="num"><span>01829</span><span>624608</span></div>
       <div class="lbl" style="color:var(--text-dim);">bKash &nbsp;·&nbsp; Nagad</div>
     </div>
     <div class="support-btns">

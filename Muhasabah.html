@@ -71,9 +71,10 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 .nh-modal-title{font-family:'Amiri',serif;font-size:18px;color:var(--gold);margin-bottom:18px;}
 .nh-field{margin-bottom:12px;}
 .nh-field label{display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-dim);margin-bottom:4px;text-transform:uppercase;}
-.nh-field input,.nh-field select,.nh-field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 11px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
+.nh-field input,.nh-field select,.nh-field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 11px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;-webkit-appearance:none;appearance:none;box-sizing:border-box;}
 .nh-field input:focus,.nh-field select:focus,.nh-field textarea:focus{border-color:var(--gold-dim);}
 .nh-field select option{background:var(--surface2);}
+.nh-field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a7870'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
 .nh-field textarea{resize:vertical;min-height:60px;font-size:11px;line-height:1.5;}
 .nh-modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end;flex-wrap:wrap;}
 .nh-btn-save{background:#1a1200;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
@@ -137,7 +138,11 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 .nh-col.open .nh-col-body{display:flex;}
 
 /* Deal cards */
-.nh-deal{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px 14px;transition:border-color .2s;}
+.nh-deal{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px 14px;transition:border-color .2s;cursor:grab;touch-action:none;}
+.nh-deal.dragging{opacity:.3;border-style:dashed !important;cursor:grabbing;}
+.nh-col.drop-target{border-color:var(--gold) !important;}
+.nh-col.drop-target .nh-col-hd{background:rgba(200,169,110,.08);}
+.nh-deal-ghost{position:fixed;pointer-events:none;z-index:9000;opacity:.85;border-radius:6px;background:var(--surface);border:2px solid var(--gold);padding:10px 14px;font-family:'Instrument Serif',serif;font-size:14px;color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .nh-deal:hover{border-color:var(--gold-dim);}
 .nh-deal.ov{border-color:#5a2020;background:#0f0808;}
 .nh-deal.ov:hover{border-color:#e05555;}
@@ -182,12 +187,6 @@ body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text)
 .nh-sm-input:focus{border-color:var(--gold-dim);}
 .nh-sm-addbtn{background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;white-space:nowrap;}
 .nh-sm-addbtn:hover{background:#1a1200;}
-
-/* Deal drag */
-.nh-deal{cursor:grab;}
-.nh-deal.dragging{opacity:.35;border-style:dashed;cursor:grabbing;}
-.nh-col-body.drag-target{background:rgba(200,169,110,.06);border-color:var(--gold-dim);}
-.nh-col-body.drag-target .nh-add-btn{display:none;}
 
 /* Light mode */
 body.light-mode #netHubOverlay{background:#f5f3ec;}
@@ -6940,7 +6939,6 @@ let _nhCbEditId=null, _nhCrmEditId=null;
 let _nhCrmFil='all';
 let _nhOpenCols=new Set();
 let _nhDragSrc=null;
-let _nhDealDragId=null;
 
 const NH_FIXED_STAGE={id:'stage_contacts',name:'Contacts',color:'#6a7080',fixed:true};
 const NH_DEFAULT_STAGES=[
@@ -7040,7 +7038,6 @@ function nhRenderContacts(){
   if(!list.length){el.innerHTML='<div class="nh-empty">No contacts yet. Add your first connection.</div>';return;}
   el.innerHTML=list.map(c=>{
     const links=nhLinkBtns(c);
-    const noteCount=_nhNotes.filter(n=>n.entityId===c.id).length;
     return `<div class="nh-cb-card">
       <div class="nh-cb-card-top">
         <div>
@@ -7048,7 +7045,7 @@ function nhRenderContacts(){
           <div class="nh-cb-sub">${[c.role,c.company].filter(Boolean).join(' · ')||'&nbsp;'}</div>
         </div>
         <div class="nh-cb-actions">
-          <button class="nh-sm-btn" onclick="nhOpenNotes('${c.id}','${(c.name||'').replace(/'/g,"\\'")}')">📝 Notes${noteCount?` (${noteCount})`:''}</button>
+          <button class="nh-sm-btn" onclick="nhOpenNotes('${c.id}','${(c.name||'').replace(/'/g,"\\'")}')">📝 Notes</button>
           <button class="nh-sm-btn" onclick="nhCbEdit('${c.id}')">Edit</button>
           <button class="nh-sm-btn danger" onclick="nhCbDelete('${c.id}')">Del</button>
         </div>
@@ -7081,7 +7078,7 @@ async function nhCbSave(){
   };
   if(_nhCbEditId){const i=_nhContacts.findIndex(x=>x.id===_nhCbEditId);if(i>-1)_nhContacts[i]=contact;}
   else _nhContacts.push(contact);
-  // Auto-create CRM deal in Contacts stage if new
+  // Auto-create CRM deal in Contacts stage if new contact
   if(!_nhCbEditId){
     const existsDeal=_nhDeals.some(d=>d.contactId===contact.id);
     if(!existsDeal){
@@ -7090,7 +7087,7 @@ async function nhCbSave(){
         company:contact.company||'',stageId:'stage_contacts',
         nextAction:'',linkedin:contact.linkedin||'',facebook:contact.facebook||'',
         whatsapp:contact.whatsapp||'',phone:contact.phone||'',email:contact.email||'',
-        notes:'',createdAt:nhToday(),
+        createdAt:nhToday(),
       });
       await nhSet('_nh_deals',_nhDeals);
     }
@@ -7158,12 +7155,8 @@ function nhRenderKanban(){
           <span class="nh-col-chev">▼</span>
         </div>
       </div>
-      <div class="nh-col-body"
-        ondragover="nhColDragOver(event,'${s.id}')"
-        ondragleave="nhColDragLeave(event,'${s.id}')"
-        ondrop="nhColDrop(event,'${s.id}')">
+      <div class="nh-col-body">
         ${sDeals.map(d=>nhDealHTML(d)).join('')}
-        <button class="nh-add-btn" style="align-self:flex-start;margin-top:4px" onclick="nhCrmOpenModal(null,'${s.id}')">＋ Add Deal</button>
       </div>
     </div>`;
   });
@@ -7183,13 +7176,10 @@ function nhDealHTML(d){
     else dateLabel=`<span class="nh-next-date">${d.nextAction}</span>`;
   }
   const links=nhLinkBtns(d);
-  const noteList=_nhNotes.filter(n=>n.entityId===d.id);
+  const noteList=_nhNotes.filter(n=>n.entityId===(d.contactId||d.id));
   const lastNote=noteList.length?noteList[noteList.length-1]:null;
-  const noteCount=noteList.length;
   return `<div class="nh-deal${ov?' ov':''}" id="nhd-${d.id}"
-    draggable="true"
-    ondragstart="nhDealDragStart(event,'${d.id}')"
-    ondragend="nhDealDragEnd('${d.id}')">
+    onpointerdown="nhDealPointerDown(event,'${d.id}')">
     <div class="nh-deal-top">
       <div>
         <div class="nh-deal-name">${d.contactName||'—'}</div>
@@ -7204,7 +7194,7 @@ function nhDealHTML(d){
     <div class="nh-deal-bottom">
       <div class="nh-deal-preview">${lastNote?lastNote.date+' — '+lastNote.text:'No notes yet'}</div>
       <div class="nh-deal-btns">
-        <button class="nh-sm-btn" onclick="nhOpenNotes('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}')">📝 Notes${noteCount?' ('+noteCount+')':''}</button>
+        <button class="nh-sm-btn" onclick="nhOpenNotes('${d.contactId||d.id}','${(d.contactName||'').replace(/'/g,"\\'")}')">📝 Notes</button>
         <button class="nh-sm-btn" onclick="nhCrmOpenModal('${d.id}')">Edit</button>
         <button class="nh-sm-btn danger" onclick="nhCrmDelete('${d.id}')">Del</button>
       </div>
@@ -7283,6 +7273,8 @@ let _nhNotesEntityId=null;
 function nhOpenNotes(entityId,entityName){
   _nhNotesEntityId=entityId;
   document.getElementById('nhNotesTitle').textContent='📝 Notes — '+entityName;
+  const ta=document.getElementById('nhNotesInput');
+  if(ta) ta.value='';
   nhRenderNotesList();
   document.getElementById('nhNotesBg').classList.add('open');
 }
@@ -7386,59 +7378,96 @@ async function nhDelStage(id){
   nhRenderSmList();
   nhRenderCrmFilters();
 }
-/* ── Deal drag-and-drop between stages ── */
-function nhDealDragStart(e, dealId) {
-  _nhDealDragId = dealId;
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/plain', dealId);
-  setTimeout(() => {
-    const el = document.getElementById('nhd-' + dealId);
-    if (el) el.classList.add('dragging');
-  }, 0);
-  e.stopPropagation(); // prevent column accordion toggle
-}
-function nhDealDragEnd(dealId) {
-  _nhDealDragId = null;
-  const el = document.getElementById('nhd-' + dealId);
-  if (el) el.classList.remove('dragging');
-  document.querySelectorAll('.nh-col-body').forEach(b => b.classList.remove('drag-target'));
-}
-function nhColDragOver(e, stageId) {
-  if (!_nhDealDragId) return;
+/* ── Deal drag-and-drop (mouse + touch) ── */
+let _nhDragDealId=null;
+let _nhGhostEl=null;
+let _nhDragOverStage=null;
+
+function nhDealPointerDown(e, dealId){
+  // Ignore if clicking a button/link inside the card
+  if(e.target.closest('button,a')) return;
+  _nhDragDealId=dealId;
+  // Create ghost
+  const card=document.getElementById('nhd-'+dealId);
+  const deal=_nhDeals.find(d=>d.id===dealId);
+  _nhGhostEl=document.createElement('div');
+  _nhGhostEl.className='nh-deal-ghost';
+  _nhGhostEl.textContent=deal?.contactName||'Deal';
+  document.body.appendChild(_nhGhostEl);
+  nhMoveGhost(e);
+  card.classList.add('dragging');
+  // Bind move/up on window to capture outside element
+  window.addEventListener('pointermove',nhDealPointerMove,{passive:false});
+  window.addEventListener('pointerup',nhDealPointerUp);
+  window.addEventListener('pointercancel',nhDealPointerCancel);
   e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-  document.querySelectorAll('.nh-col-body').forEach(b => b.classList.remove('drag-target'));
-  const col = document.getElementById('nhcol-' + stageId);
-  const body = col?.querySelector('.nh-col-body');
-  if (body) body.classList.add('drag-target');
 }
-function nhColDragLeave(e, stageId) {
-  const col = document.getElementById('nhcol-' + stageId);
-  const body = col?.querySelector('.nh-col-body');
-  if (body) body.classList.remove('drag-target');
+
+function nhMoveGhost(e){
+  if(!_nhGhostEl)return;
+  const cx=e.clientX??e.touches?.[0]?.clientX??0;
+  const cy=e.clientY??e.touches?.[0]?.clientY??0;
+  _nhGhostEl.style.left=(cx+12)+'px';
+  _nhGhostEl.style.top=(cy-20)+'px';
 }
-async function nhColDrop(e, stageId) {
+
+function nhGetStageFromPoint(x,y){
+  // Hit-test all columns
+  const cols=document.querySelectorAll('.nh-col[id^="nhcol-"]');
+  for(const col of cols){
+    const r=col.getBoundingClientRect();
+    if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom){
+      return col.id.replace('nhcol-','');
+    }
+  }
+  return null;
+}
+
+function nhDealPointerMove(e){
+  if(!_nhDragDealId)return;
   e.preventDefault();
-  document.querySelectorAll('.nh-col-body').forEach(b => b.classList.remove('drag-target'));
-  const dealId = _nhDealDragId || e.dataTransfer.getData('text/plain');
-  if (!dealId) return;
-  const deal = _nhDeals.find(d => d.id === dealId);
-  if (!deal || deal.stageId === stageId) return;
-  deal.stageId = stageId;
-  // Open the target column
+  nhMoveGhost(e);
+  const x=e.clientX, y=e.clientY;
+  const stageId=nhGetStageFromPoint(x,y);
+  // Update drop highlight
+  document.querySelectorAll('.nh-col').forEach(c=>c.classList.remove('drop-target'));
+  if(stageId&&stageId!==(_nhDeals.find(d=>d.id===_nhDragDealId)?.stageId)){
+    const col=document.getElementById('nhcol-'+stageId);
+    if(col) col.classList.add('drop-target');
+  }
+  _nhDragOverStage=stageId;
+}
+
+async function nhDealPointerUp(e){
+  if(!_nhDragDealId){nhDealDragCleanup();return;}
+  const dealId=_nhDragDealId;
+  const stageId=_nhDragOverStage||nhGetStageFromPoint(e.clientX,e.clientY);
+  nhDealDragCleanup();
+  if(!stageId)return;
+  const deal=_nhDeals.find(d=>d.id===dealId);
+  if(!deal||deal.stageId===stageId)return;
+  deal.stageId=stageId;
   _nhOpenCols.add(stageId);
-  await nhSet('_nh_deals', _nhDeals);
+  await nhSet('_nh_deals',_nhDeals);
   nhRenderCrm();
   nhRenderToday();
-  // Flash the moved card
-  setTimeout(() => {
-    const el = document.getElementById('nhd-' + dealId);
-    if (el) {
-      el.style.transition = 'border-color .4s';
-      el.style.borderColor = 'var(--gold)';
-      setTimeout(() => { el.style.borderColor = ''; }, 1200);
-    }
-  }, 60);
+  setTimeout(()=>{
+    const el=document.getElementById('nhd-'+dealId);
+    if(el){el.style.transition='border-color .4s';el.style.borderColor='var(--gold)';setTimeout(()=>{el.style.borderColor='';},1200);}
+  },60);
+}
+
+function nhDealPointerCancel(){nhDealDragCleanup();}
+
+function nhDealDragCleanup(){
+  _nhDragDealId=null;
+  _nhDragOverStage=null;
+  if(_nhGhostEl){_nhGhostEl.remove();_nhGhostEl=null;}
+  document.querySelectorAll('.nh-deal.dragging').forEach(el=>el.classList.remove('dragging'));
+  document.querySelectorAll('.nh-col.drop-target').forEach(el=>el.classList.remove('drop-target'));
+  window.removeEventListener('pointermove',nhDealPointerMove);
+  window.removeEventListener('pointerup',nhDealPointerUp);
+  window.removeEventListener('pointercancel',nhDealPointerCancel);
 }
 
 async function nhSmDone(){

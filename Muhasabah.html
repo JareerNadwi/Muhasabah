@@ -5281,7 +5281,6 @@ async function openZikrReader(mode){
   document.getElementById("zikrReaderTitle").textContent=title;
   document.getElementById("zikrReaderDayPill").textContent="77 Duas";
   document.getElementById("zikrReaderOverlay").classList.add("active");
-  reThemeIfLight();
   _zikrDone=getCached(_zikrDK)[_zikrGoalKey()]==="yes";
   document.getElementById("zikrReaderDoneNote").style.display=_zikrDone?"block":"none";
   var dayData=getCached(_zikrDK);
@@ -5492,7 +5491,6 @@ function _zbRender() {
 async function openZikrBookReader() {
   _zbDK = currentDateKey || todayKey();
   document.getElementById('zikrBookReaderOverlay').classList.add('active');
-  reThemeIfLight();
   document.getElementById('zikrBookDayPill').textContent = '123 Duas';
   document.getElementById('zikrBookContent').innerHTML =
     '<div style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:\'DM Mono\',monospace;">Loading Zikr From Book.json…</div>';

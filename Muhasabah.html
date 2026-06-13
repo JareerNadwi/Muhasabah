@@ -521,78 +521,36 @@ select option{background:#1c1f1c;}
   .months-grid{grid-template-columns:1fr;}
   .goals-grid{grid-template-columns:1fr;}
   .stats-row{grid-template-columns:repeat(2,1fr);}
-  .view{padding:16px;}
-  .header{
-    padding:10px 14px;
-    flex-direction:column;
-    align-items:flex-start;
-    gap:8px;
-  }
+  .view{padding:12px;}
+
+  /* ── Main header ── */
+  .header{padding:10px 14px;flex-direction:column;align-items:flex-start;gap:8px;}
+  .header-title{font-size:16px !important;}
+  .header-sub{font-size:8px !important;letter-spacing:1px !important;}
   .header-right{
-    width:100%;
-    overflow-x:auto;
-    -webkit-overflow-scrolling:touch;
-    padding-bottom:4px;
-    gap:6px;
-    flex-wrap:nowrap;
+    width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;
+    padding-bottom:4px;gap:6px;flex-wrap:nowrap;
   }
   .header-right::-webkit-scrollbar{height:3px;}
   .header-right::-webkit-scrollbar-track{background:transparent;}
   .header-right::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
   .back-btn,.export-btn,.import-btn,.reset-btn,.dark-toggle{
-    flex-shrink:0;
-    font-size:9px;
-    padding:5px 9px;
-    white-space:nowrap;
-    letter-spacing:0.5px;
+    flex-shrink:0;font-size:9px;padding:5px 9px;white-space:nowrap;letter-spacing:0.5px;
   }
-  /* Quran / PDF reader topbar */
-  .qr-topbar{
-    padding:8px 12px;
-    gap:6px;
-  }
+
+  /* ── Daily date heading ── */
+  .daily-date{font-size:20px !important;letter-spacing:-0.5px !important;}
+  .daily-header{gap:6px !important;flex-wrap:wrap !important;}
+  .daily-pct-display{font-size:13px !important;}
+  .daily-bonus-display,.daily-total-display{font-size:11px !important;}
+
+  /* ── Quran / PDF reader topbar ── */
+  .qr-topbar{padding:8px 12px;gap:6px;}
   .qr-title{font-size:13px;}
   .qr-close{padding:5px 10px;font-size:10px;}
   .qr-session-info{font-size:9px;}
-  /* Quran / PDF reader bottom nav - scroll horizontally */
-  .qr-bottombar{
-    gap:6px;
-    padding:8px 10px;
-    overflow-x:auto;
-    -webkit-overflow-scrolling:touch;
-    justify-content:flex-start;
-  }
-  .qr-nav{
-    padding:7px 12px;
-    font-size:10px;
-    flex-shrink:0;
-    white-space:nowrap;
-  }
-  .qr-page-display{
-    min-width:unset;
-    font-size:10px;
-    flex-shrink:0;
-    white-space:nowrap;
-  }
-  /* Post Writer input row — stack vertically on mobile */
-  #pwInputArea{
-    flex-direction:column !important;
-    padding:10px 14px !important;
-  }
-  #pwSendBtn{
-    width:100% !important;
-    padding:10px !important;
-    text-align:center !important;
-  }
-  /* Header title — shrink on mobile */
-  .header-title{font-size:16px !important;}
-  .header-sub{font-size:8px !important;letter-spacing:1px !important;}
-  /* Daily date header */
-  .daily-date{font-size:22px !important;letter-spacing:-0.5px !important;}
-  .daily-header{gap:8px !important;}
-  .daily-pct-display{font-size:14px !important;}
-  .daily-bonus-display,.daily-total-display{font-size:12px !important;}
-  /* Quran/PDF bottom nav — two rows: page info top, nav controls bottom */
+
+  /* ── Quran / PDF bottom nav — wrap into 2 rows ── */
   .qr-bottombar{
     flex-wrap:wrap !important;
     gap:6px !important;
@@ -601,18 +559,22 @@ select option{background:#1c1f1c;}
     justify-content:center !important;
   }
   .qr-page-display{
-    order:-1;
-    width:100%;
-    text-align:center;
+    order:-1 !important;
+    width:100% !important;
+    text-align:center !important;
     min-width:unset !important;
     font-size:11px !important;
   }
   .qr-nav{
-    padding:8px 18px !important;
+    padding:8px 16px !important;
     font-size:11px !important;
-    flex-shrink:0;
-    white-space:nowrap;
+    flex-shrink:0 !important;
+    white-space:nowrap !important;
   }
+
+  /* ── Post Writer input ── */
+  #pwInputArea{flex-direction:column !important;padding:10px 14px !important;}
+  #pwSendBtn{width:100% !important;padding:10px !important;text-align:center !important;}
 }
 
 /* ── Quran Reader ── */

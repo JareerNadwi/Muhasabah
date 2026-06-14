@@ -64,8 +64,10 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-search:focus{border-color:var(--gold-dim);}
 .nh-search::placeholder{color:#a89060;}
 .nh-search-scope{flex:0 0 auto;width:108px;background:#141008!important;border:1px solid #2a2010!important;color:#c5b98a!important;padding:8px 6px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;cursor:pointer;white-space:nowrap;}
+.nh-crm-fil-select{flex:0 1 auto;max-width:100%;min-width:0;background:#141008!important;border:1px solid #2a2010!important;color:#c5b98a!important;padding:7px 8px;border-radius:20px;font-family:'DM Mono',monospace;font-size:11px;outline:none;cursor:pointer;}
 .nh-search-scope:focus{border-color:var(--gold-dim);}
 .nh-search-scope option{background:#1a1610;color:#f0e4c0;}
+.nh-crm-fil-select option{background:#1a1610;color:#f0e4c0;}
 .nh-add-btn{flex:0 0 auto;background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;white-space:nowrap;}
 .nh-add-btn:hover{background:#1a1610;border-color:var(--gold);}
 
@@ -120,6 +122,7 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 /* Tags */
 .nh-tags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 0;}
 .nh-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;border:1px solid var(--gold-dim);background:rgba(200,169,110,.08);color:var(--gold);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.5px;white-space:nowrap;}
+.nh-stage-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;border:1px solid #6a7080;background:rgba(255,255,255,.04);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.5px;white-space:nowrap;}
 .nh-tag-input-wrap{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#1a1610;border:1px solid #2a2010;border-radius:var(--radius);padding:6px 8px;}
 .nh-tag-input-wrap:focus-within{border-color:var(--gold-dim);}
 .nh-tag-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:14px;border:1px solid var(--gold-dim);background:rgba(200,169,110,.12);color:var(--gold);font-family:'DM Mono',monospace;font-size:10px;}
@@ -244,6 +247,8 @@ body.light-mode .nh-tab{background:#f0ede6!important;color:#5a5750!important;}
 body.light-mode .nh-tab.on{background:#f5f0e0!important;color:#9a7228!important;border-bottom-color:#9a7228!important;}
 body.light-mode .nh-search{background:#f0ede6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
 body.light-mode .nh-search-scope{background-color:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .nh-crm-fil-select{background-color:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .nh-crm-fil-select option{background:#ffffff!important;color:#1a1a18!important;}
 body.light-mode .nh-search-scope option{background:#ffffff!important;color:#1a1a18!important;}
 body.light-mode .nh-add-btn{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-add-btn:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
@@ -260,6 +265,7 @@ body.light-mode .nh-sm-btn.done:hover{background:#d8f0de!important;border-color:
 body.light-mode .nh-sm-btn.danger:hover{background:#f5dede!important;border-color:var(--red)!important;color:var(--red)!important;}
 body.light-mode .nh-link{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .nh-tag{background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-stage-badge{background:#f0ede6!important;}
 body.light-mode .nh-tag-chip{background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-tag-chip-x{color:#7a756c!important;}
 body.light-mode .nh-tag-input-wrap{background:#ffffff!important;border-color:#d4cfc5!important;}
@@ -7188,6 +7194,8 @@ let _nhDragSrc=null;
 let _nhCbTags=[];
 
 const NH_FIXED_STAGE={id:'stage_contacts',name:'Contacts',color:'#6a7080',fixed:true};
+const NH_CLOSED_STAGE={id:'s7',name:'Closed',color:'#4a7c59',fixed:true};
+const NH_LOST_STAGE={id:'s8',name:'Lost',color:'#7a5a5a',fixed:true};
 const NH_DEFAULT_STAGES=[
   NH_FIXED_STAGE,
   {id:'s1',name:'Sent Request',color:'#c8a96e'},
@@ -7196,8 +7204,10 @@ const NH_DEFAULT_STAGES=[
   {id:'s4',name:'Responded',color:'#5a9abf'},
   {id:'s5',name:'Opportunity Created',color:'#bf9a5a'},
   {id:'s6',name:'Follow Up',color:'#e05555'},
-  {id:'s7',name:'Closed',color:'#4a7c59'},
+  NH_CLOSED_STAGE,
+  NH_LOST_STAGE,
 ];
+const NH_TERMINAL_STAGE_IDS=new Set([NH_CLOSED_STAGE.id,NH_LOST_STAGE.id]);
 
 /* ── Utils ── */
 function nhId(){return '_'+Date.now()+Math.random().toString(36).slice(2,6);}
@@ -7224,7 +7234,8 @@ function nhDaysDiff(ds){
   const n=new Date();n.setHours(0,0,0,0);
   return Math.round((n-d)/86400000);
 }
-function nhIsOverdue(d){return!!d.nextAction&&nhDaysDiff(d.nextAction)>=0;}
+function nhIsOverdue(d){return!!d.nextAction&&!NH_TERMINAL_STAGE_IDS.has(d.stageId)&&nhDaysDiff(d.nextAction)>=0;}
+function nhIsNoAction(d){return!d.nextAction&&!NH_TERMINAL_STAGE_IDS.has(d.stageId);}
 function nhStageName(id){return(_nhStages.find(s=>s.id===id)||{name:'—'}).name;}
 function nhStageColor(id){return(_nhStages.find(s=>s.id===id)||{color:'#6a7080'}).color;}
 
@@ -7250,13 +7261,25 @@ async function openContactBook(){
     nhGet('_nh_deals').then(v=>v||[]),
     nhGet('_nh_stages').then(v=>{
       if(!v||!v.length) return JSON.parse(JSON.stringify(NH_DEFAULT_STAGES));
-      // Ensure fixed stage always present
+      // Ensure fixed Contacts stage always present at the start
       if(!v.find(s=>s.id==='stage_contacts')) v.unshift(JSON.parse(JSON.stringify(NH_FIXED_STAGE)));
+      // Ensure Closed exists and is fixed
+      let closed=v.find(s=>s.id===NH_CLOSED_STAGE.id);
+      if(!closed){closed=JSON.parse(JSON.stringify(NH_CLOSED_STAGE));v.push(closed);}
+      else closed.fixed=true;
+      // Ensure Lost exists and is fixed
+      let lost=v.find(s=>s.id===NH_LOST_STAGE.id);
+      if(!lost){lost=JSON.parse(JSON.stringify(NH_LOST_STAGE));v.push(lost);}
+      else lost.fixed=true;
+      // Pin Closed and Lost to the bottom, in that order
+      v=v.filter(s=>s.id!==NH_CLOSED_STAGE.id&&s.id!==NH_LOST_STAGE.id);
+      v.push(closed,lost);
       return v;
     }),
     nhGet('_nh_notes').then(v=>v||[]),
     nhGet('_nh_dismissed_tags').then(v=>v||[]),
   ]);
+  await nhSet('_nh_stages',_nhStages);
   document.getElementById('netHubOverlay').classList.add('active');
   document.body.classList.add('overlay-open');
   reThemeIfLight();
@@ -7480,20 +7503,22 @@ function nhRenderCrmFilters(){
   const el=document.getElementById('nhCrmFil');
   if(!el)return;
   const ovCnt=_nhDeals.filter(nhIsOverdue).length;
-  let h=`<span class="nh-sf${_nhCrmFil==='all'?' on':''}" onclick="nhSetFil('all')">ALL <span class="nh-sf-cnt">${_nhDeals.length}</span></span>`;
-  if(ovCnt>0) h+=`<span class="nh-sf ov-pill${_nhCrmFil==='ov'?' on':''}" onclick="nhSetFil('ov')">🔴 Overdue <span class="nh-sf-cnt">${ovCnt}</span></span>`;
+  const noActionCnt=_nhDeals.filter(nhIsNoAction).length;
+  let opts=`<option value="all"${_nhCrmFil==='all'?' selected':''}>All (${_nhDeals.length})</option>`;
   _nhStages.forEach(s=>{
     const cnt=_nhDeals.filter(d=>d.stageId===s.id).length;
-    h+=`<span class="nh-sf${_nhCrmFil===s.id?' on':''}" onclick="nhSetFil('${s.id}')">${s.name} <span class="nh-sf-cnt">${cnt}</span></span>`;
+    opts+=`<option value="${s.id}"${_nhCrmFil===s.id?' selected':''}>${s.name} (${cnt})</option>`;
   });
-  h+=`<span class="nh-manage-btn" onclick="nhOpenStageMgr()">⚙ Stages</span>`;
-  el.innerHTML=h;
+  opts+=`<option value="ov"${_nhCrmFil==='ov'?' selected':''}>🔴 Overdue (${ovCnt})</option>`;
+  opts+=`<option value="noaction"${_nhCrmFil==='noaction'?' selected':''}>⚪ No Action (${noActionCnt})</option>`;
+  el.innerHTML=`<select class="nh-crm-fil-select" id="nhCrmFilSelect" onchange="nhSetFil(this.value)">${opts}</select>
+    <span class="nh-manage-btn" onclick="nhOpenStageMgr()">⚙ Stages</span>`;
 }
 
 function nhSetFil(val){
   _nhCrmFil=val;
-  if(val==='all'||val==='ov'){
-    // All stages collapsed by default
+  if(val==='all'||val==='ov'||val==='noaction'){
+    // All stages collapsed by default / flat views need no open columns
     _nhOpenCols=new Set();
   } else {
     // Single stage selected — open it
@@ -7505,15 +7530,30 @@ function nhSetFil(val){
 function nhRenderKanban(){
   const el=document.getElementById('nhKanban');
   if(!el)return;
+
+  // Flat list views — no stage columns
+  if(_nhCrmFil==='ov'||_nhCrmFil==='noaction'){
+    const pred=_nhCrmFil==='ov'?nhIsOverdue:nhIsNoAction;
+    let deals=_nhDeals.filter(pred).sort((a,b)=>{
+      if(_nhCrmFil==='ov'){
+        const da=nhDaysDiff(a.nextAction),db=nhDaysDiff(b.nextAction);
+        return db-da||(a.contactName||'').localeCompare(b.contactName||'');
+      }
+      return (a.contactName||'').localeCompare(b.contactName||'');
+    });
+    el.innerHTML=deals.length?deals.map(d=>nhDealHTML(d,true)).join(''):
+      `<div class="nh-empty">${_nhCrmFil==='ov'?'No overdue deals.':'Every active contact has a next action assigned. Nice.'}</div>`;
+    return;
+  }
+
   let deals=[..._nhDeals];
-  if(_nhCrmFil==='ov') deals=deals.filter(nhIsOverdue);
-  else if(_nhCrmFil!=='all') deals=deals.filter(d=>d.stageId===_nhCrmFil);
+  if(_nhCrmFil!=='all') deals=deals.filter(d=>d.stageId===_nhCrmFil);
 
   const byStage={};
   _nhStages.forEach(s=>byStage[s.id]=[]);
   deals.forEach(d=>{if(byStage[d.stageId])byStage[d.stageId].push(d);});
 
-  const stages=_nhCrmFil==='all'||_nhCrmFil==='ov'?_nhStages:_nhStages.filter(s=>s.id===_nhCrmFil);
+  const stages=_nhCrmFil==='all'?_nhStages:_nhStages.filter(s=>s.id===_nhCrmFil);
   let h='';
   stages.forEach(s=>{
     const sDeals=(byStage[s.id]||[]).sort((a,b)=>{
@@ -7542,7 +7582,7 @@ function nhRenderKanban(){
   el.innerHTML=h;
 }
 
-function nhDealHTML(d){
+function nhDealHTML(d,showStage){
   const ov=nhIsOverdue(d);
   const diff=d.nextAction?nhDaysDiff(d.nextAction):null;
   let dateLabel='';
@@ -7558,6 +7598,7 @@ function nhDealHTML(d){
   const tags=(contact?.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
   const noteList=_nhNotes.filter(n=>n.entityId===(d.contactId||d.id));
   const lastNote=noteList.length?noteList[noteList.length-1]:null;
+  const stageBadge=showStage?`<span class="nh-stage-badge" style="border-color:${nhStageColor(d.stageId)};color:${nhStageColor(d.stageId)}"><span class="nh-col-dot" style="background:${nhStageColor(d.stageId)}"></span>${nhStageName(d.stageId)}</span>`:'';
   return `<div class="nh-deal${ov?' ov':''}" id="nhd-${d.id}"
     onpointerdown="nhDealPointerDown(event,'${d.id}')">
     <div class="nh-deal-top">
@@ -7570,6 +7611,7 @@ function nhDealHTML(d){
         ${dateLabel}
       </div>
     </div>
+    ${stageBadge?`<div class="nh-tags">${stageBadge}</div>`:''}
     ${links?`<div class="nh-links">${links}</div>`:''}
     ${tags?`<div class="nh-tags">${tags}</div>`:''}
     <div class="nh-deal-bottom">
@@ -7825,7 +7867,9 @@ async function nhDrop(e,targetId){
   const tgt=_nhStages.find(s=>s.id===targetId);
   if(!src||!tgt)return;
   // Cannot move fixed stage
-  if(src.fixed){alert('The Contacts stage is fixed and cannot be moved.');return;}
+  if(src.fixed){alert('This stage is fixed and cannot be moved.');return;}
+  // Cannot drop onto/past a fixed stage — keeps Closed/Lost pinned to the bottom
+  if(tgt.fixed){alert('Cannot reorder past a fixed stage.');return;}
   const si=_nhStages.indexOf(src);
   const ti=_nhStages.indexOf(tgt);
   _nhStages.splice(si,1);

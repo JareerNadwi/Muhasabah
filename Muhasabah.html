@@ -237,7 +237,9 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-sm-item.drag-over{border-color:var(--gold);}
 .nh-sm-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
 .nh-sm-grip{color:#a89060;font-size:12px;cursor:grab;padding:0 2px;flex-shrink:0;}
-.nh-sm-name{flex:1;font-family:'DM Mono',monospace;font-size:12px;color:#f0e4c0;}
+.nh-sm-name{flex:1;font-family:'DM Mono',monospace;font-size:12px;color:#f0e4c0;background:transparent;border:1px solid transparent;border-radius:var(--radius);padding:3px 6px;outline:none;min-width:0;}
+.nh-sm-name:hover{border-color:#2a2010;}
+.nh-sm-name:focus{border-color:var(--gold-dim);background:#141008;}
 .nh-sm-fixed{font-family:'DM Mono',monospace;font-size:9px;color:#a89060;letter-spacing:.5px;}
 .nh-sm-del{background:none;border:none;color:#a89060;cursor:pointer;font-size:14px;padding:2px 4px;}
 .nh-sm-del:hover{color:#e05555;}
@@ -341,6 +343,8 @@ body.light-mode .nh-note-submit{background:linear-gradient(135deg,#fdf5dc,#f5e8b
 body.light-mode .nh-note-save-btn{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-sm-item{background:#e8e2d6!important;border-color:#d4cfc5!important;}
 body.light-mode .nh-sm-name{color:#1a1a18!important;}
+body.light-mode .nh-sm-name:hover{border-color:#d4cfc5!important;}
+body.light-mode .nh-sm-name:focus{border-color:#9a7228!important;background:#ffffff!important;}
 body.light-mode .nh-sm-grip{color:#9a9590!important;}
 body.light-mode .nh-sm-input{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
 body.light-mode .nh-sm-addbtn{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
@@ -7984,9 +7988,25 @@ function nhRenderSmList(){
       id="nhsmi-${s.id}">
     <span class="nh-sm-grip">⠿</span>
     <span class="nh-sm-dot" style="background:${s.color}"></span>
-    <span class="nh-sm-name">${s.name}</span>
+    <input class="nh-sm-name" id="nhsmn-${s.id}" type="text" value="${(s.name||'').replace(/"/g,'&quot;')}" draggable="false"
+      onchange="nhRenameStage('${s.id}',this.value)"
+      onkeydown="if(event.key==='Enter')this.blur()"
+      onmousedown="event.stopPropagation()">
     ${s.fixed?'<span class="nh-sm-fixed">FIXED</span>':'<button class="nh-sm-del" onclick="nhDelStage(\''+s.id+'\')" title="Delete">✕</button>'}
   </div>`).join('');
+}
+async function nhRenameStage(id,newName){
+  const s=_nhStages.find(x=>x.id===id);
+  if(!s)return;
+  const trimmed=(newName||'').trim();
+  if(!trimmed){
+    document.getElementById('nhsmn-'+id).value=s.name;
+    return;
+  }
+  if(trimmed===s.name)return;
+  s.name=trimmed;
+  await nhSet('_nh_stages',_nhStages);
+  nhRenderCrmFilters();
 }
 
 /* Drag-and-drop for stage reorder */
@@ -8040,7 +8060,8 @@ async function nhDelStage(id){
   const s=_nhStages.find(x=>x.id===id);
   if(s?.fixed){alert('This stage is fixed and cannot be deleted.');return;}
   const hasDeal=_nhDeals.some(d=>d.stageId===id);
-  if(hasDeal&&!await nhConfirm('This stage has deals. Delete stage? Deals will move to Contacts stage.','Delete Stage'))return;
+  const fallbackName=nhStageName('stage_contacts');
+  if(hasDeal&&!await nhConfirm(`This stage has deals. Delete stage? Deals will move to "${fallbackName}" stage.`,'Delete Stage'))return;
   _nhDeals.forEach(d=>{if(d.stageId===id)d.stageId='stage_contacts';});
   _nhStages=_nhStages.filter(s=>s.id!==id);
   await Promise.all([nhSet('_nh_stages',_nhStages),nhSet('_nh_deals',_nhDeals)]);
@@ -8278,7 +8299,7 @@ async function nhSmDone(){
 <div class="nh-modal-bg" id="nhSmBg">
   <div class="nh-modal">
     <div class="nh-modal-title">⚙ Pipeline Stages</div>
-    <div style="font-size:10px;color:#c5b98a;margin-bottom:10px;font-family:'DM Mono',monospace;">Drag to reorder. The Contacts stage is fixed.</div>
+    <div style="font-size:10px;color:#c5b98a;margin-bottom:10px;font-family:'DM Mono',monospace;">Drag to reorder, or tap a name to rename. Fixed stages can be renamed but not moved or deleted.</div>
     <div class="nh-sm-list" id="nhSmList"></div>
     <div class="nh-sm-add">
       <input class="nh-sm-input" id="nhSmInput" type="text" placeholder="" onkeydown="if(event.key==='Enter')nhAddStage()">

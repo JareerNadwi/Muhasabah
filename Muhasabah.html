@@ -3378,9 +3378,9 @@ function renderHadith(idx){
   const isLast  = idx === HADITHS_PER_DAY - 1;
   const btn = document.getElementById('hadithNextBtn');
   btn.textContent       = isLast ? '\u2713 Mark Done' : 'Next \u2192';
-  btn.style.background  = isLast ? 'var(--green)'        : '';
-  btn.style.borderColor = isLast ? 'var(--green-bright)' : '';
-  btn.style.color       = isLast ? '#fff'                : '';
+  btn.style.background  = isLast ? 'var(--green)'        : '#1a1500';
+  btn.style.borderColor = isLast ? 'var(--green-bright)' : '#c9a84c55';
+  btn.style.color       = isLast ? '#fff'                : '#c9a84c';
   btn.disabled = false;
 }
 
@@ -3527,9 +3527,9 @@ function renderTafsirVerse(idx){
   const isLast = idx === total - 1;
   const btn = document.getElementById('tafsirNextBtn');
   btn.textContent       = isLast ? '\u2713 Mark Done' : 'Next \u2192';
-  btn.style.background  = isLast ? 'var(--green)'        : '';
-  btn.style.borderColor = isLast ? 'var(--green-bright)' : '';
-  btn.style.color       = isLast ? '#fff'                : '';
+  btn.style.background  = isLast ? 'var(--green)'        : '#1a1500';
+  btn.style.borderColor = isLast ? 'var(--green-bright)' : '#c9a84c55';
+  btn.style.color       = isLast ? '#fff'                : '#c9a84c';
   btn.disabled = false;
 }
 
@@ -3664,9 +3664,9 @@ function renderSurahVerse(idx){
   const isLast = idx === total - 1;
   const btn = document.getElementById('svNextBtn');
   btn.textContent       = isLast ? '✓ Mark Done' : 'Next →';
-  btn.style.background  = isLast ? 'var(--green)'        : '';
-  btn.style.borderColor = isLast ? 'var(--green-bright)' : '';
-  btn.style.color       = isLast ? '#fff'                : '';
+  btn.style.background  = isLast ? 'var(--green)'        : '#1a1500';
+  btn.style.borderColor = isLast ? 'var(--green-bright)' : '#c9a84c55';
+  btn.style.color       = isLast ? '#fff'                : '#c9a84c';
   btn.disabled = false;
 }
 
@@ -3944,9 +3944,9 @@ function _renderBookSlide(book) {
     prevBtn.disabled    = true;
     prevBtn.style.opacity = '0.3';
     nextBtn.textContent = 'Lesson 1 \u2192';
-    nextBtn.style.background  = '';
-    nextBtn.style.borderColor = '';
-    nextBtn.style.color       = '';
+    nextBtn.style.background  = '#1a1500';
+    nextBtn.style.borderColor = '#c9a84c55';
+    nextBtn.style.color       = '#c9a84c';
     nextBtn.disabled    = false;
     pill.textContent    = '';
   } else {
@@ -3958,9 +3958,9 @@ function _renderBookSlide(book) {
     prevBtn.style.opacity = '1';
     const isLast = cur >= total - 1;
     nextBtn.textContent       = isLast ? '\u2713 Mark Done' : 'Lesson ' + (cur+2) + ' \u2192';
-    nextBtn.style.background  = isLast ? 'var(--green)'        : '';
-    nextBtn.style.borderColor = isLast ? 'var(--green-bright)' : '';
-    nextBtn.style.color       = isLast ? '#fff'                : '';
+    nextBtn.style.background  = isLast ? 'var(--green)'        : '#1a1500';
+    nextBtn.style.borderColor = isLast ? 'var(--green-bright)' : '#c9a84c55';
+    nextBtn.style.color       = isLast ? '#fff'                : '#c9a84c';
     nextBtn.disabled    = false;
     pill.textContent    = (cur+1) + ' / ' + total;
   }

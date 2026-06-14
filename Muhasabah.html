@@ -193,8 +193,10 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-notes-log{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;max-height:380px;overflow-y:auto;}
 .nh-note-entry{background:#141008;border:1px solid #2a2010;border-radius:6px;padding:8px 10px;}
 .nh-note-entry-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.nh-note-entry-actions{display:flex;gap:8px;flex-shrink:0;}
 .nh-note-edit-btn{background:none;border:none;color:#a89060;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;padding:0 2px;flex-shrink:0;}
 .nh-note-edit-btn:hover{color:var(--gold);}
+.nh-note-edit-btn.danger:hover{color:var(--red);}
 .nh-note-edit-area{width:100%;background:#1a1610;border:1px solid var(--gold-dim);color:#f0e4c0;padding:6px 8px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;resize:vertical;min-height:48px;line-height:1.4;margin-top:4px;}
 .nh-note-save-btn{margin-top:4px;background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:4px 10px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;}
 .nh-note-save-btn:hover{background:#1a1610;}
@@ -314,6 +316,7 @@ body.light-mode .nh-note-entry{background:#e8e2d6!important;border-color:#d4cfc5
 body.light-mode .nh-note-date{color:#9a9590!important;}
 body.light-mode .nh-note-text{color:#5a5750!important;}
 body.light-mode .nh-note-edit-btn{color:#9a9590!important;}
+body.light-mode .nh-note-edit-btn.danger:hover{color:var(--red)!important;}
 body.light-mode .nh-note-textarea,body.light-mode .nh-note-edit-area{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
 body.light-mode .nh-note-submit{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-note-save-btn{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
@@ -7751,7 +7754,10 @@ function nhRenderNotesList(){
   el.innerHTML=notes.map(n=>`<div class="nh-note-entry" id="nhe-${n.id}">
     <div class="nh-note-entry-top">
       <div class="nh-note-date">${n.date}</div>
-      <button class="nh-note-edit-btn" onclick="nhEditNoteToggle('${n.id}')">✎ Edit</button>
+      <div class="nh-note-entry-actions">
+        <button class="nh-note-edit-btn" onclick="nhEditNoteToggle('${n.id}')">✎ Edit</button>
+        <button class="nh-note-edit-btn danger" onclick="nhDeleteNote('${n.id}')">🗑 Delete</button>
+      </div>
     </div>
     <div class="nh-note-text" id="nhet-${n.id}">${n.text}</div>
     <div id="nhee-${n.id}" style="display:none">
@@ -7759,6 +7765,15 @@ function nhRenderNotesList(){
       <button class="nh-note-save-btn" onclick="nhSaveNoteEdit('${n.id}')">Save</button>
     </div>
   </div>`).join('');
+}
+async function nhDeleteNote(nid){
+  if(!await nhConfirm('Delete this note? This cannot be undone.','Delete Note'))return;
+  _nhNotes=_nhNotes.filter(n=>n.id!==nid);
+  await nhSet('_nh_notes',_nhNotes);
+  nhRenderNotesList();
+  // Refresh note previews in the background
+  if(_nhTab==='contacts') nhRenderContacts();
+  else nhRenderCrm();
 }
 function nhEditNoteToggle(nid){
   const editDiv=document.getElementById('nhee-'+nid);

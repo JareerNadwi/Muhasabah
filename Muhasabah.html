@@ -80,6 +80,8 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a7870'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
 .nh-field textarea{resize:vertical;min-height:60px;font-size:11px;line-height:1.5;}
 .nh-modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end;flex-wrap:wrap;}
+.nh-confirm-msg{font-family:'DM Mono',monospace;font-size:12px;line-height:1.6;color:#e0d4b0;}
+body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-btn-save{background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
 .nh-btn-save:hover{border-color:var(--gold);background:#141008;}
 .nh-btn-cancel{background:#1a1610;border:1px solid #2a2010;color:#c5b98a;padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;}
@@ -7168,6 +7170,22 @@ const NH_DEFAULT_STAGES=[
 /* ── Utils ── */
 function nhId(){return '_'+Date.now()+Math.random().toString(36).slice(2,6);}
 function nhToday(){return new Date().toISOString().slice(0,10);}
+
+/* ── Custom confirm dialog (replaces native confirm()) ── */
+let _nhConfirmResolver=null;
+function nhConfirm(message,title,okLabel){
+  return new Promise(resolve=>{
+    _nhConfirmResolver=resolve;
+    document.getElementById('nhConfirmTitle').textContent=title||'Confirm';
+    document.getElementById('nhConfirmMsg').textContent=message;
+    document.getElementById('nhConfirmOkBtn').textContent=okLabel||'Delete';
+    document.getElementById('nhConfirmBg').classList.add('open');
+  });
+}
+function nhConfirmResolve(val){
+  document.getElementById('nhConfirmBg').classList.remove('open');
+  if(_nhConfirmResolver){_nhConfirmResolver(val);_nhConfirmResolver=null;}
+}
 function nhDaysDiff(ds){
   if(!ds)return null;
   const d=new Date(ds);d.setHours(0,0,0,0);
@@ -7324,7 +7342,7 @@ async function nhCbSave(){
   nhCbCloseModal();nhRenderContacts();nhRenderToday();
 }
 async function nhCbDelete(id){
-  if(!confirm('Delete this contact? Their CRM deal and notes will also be deleted.'))return;
+  if(!await nhConfirm('Delete this contact? Their CRM deal and notes will also be deleted.','Delete Contact'))return;
   // Delete linked deals
   _nhDeals=_nhDeals.filter(d=>d.contactId!==id);
   // Delete linked notes
@@ -7519,7 +7537,7 @@ async function nhCrmSave(){
   nhCrmCloseModal();nhRenderCrm();nhRenderToday();
 }
 async function nhCrmDelete(id){
-  if(!confirm('Delete this deal? The linked contact and notes will also be deleted.'))return;
+  if(!await nhConfirm('Delete this deal? The linked contact and notes will also be deleted.','Delete Deal'))return;
   const deal=_nhDeals.find(d=>d.id===id);
   // Delete linked contact
   if(deal?.contactId){
@@ -7717,7 +7735,7 @@ async function nhDelStage(id){
   const s=_nhStages.find(x=>x.id===id);
   if(s?.fixed){alert('This stage is fixed and cannot be deleted.');return;}
   const hasDeal=_nhDeals.some(d=>d.stageId===id);
-  if(hasDeal&&!confirm('This stage has deals. Delete stage? Deals will move to Contacts stage.'))return;
+  if(hasDeal&&!await nhConfirm('This stage has deals. Delete stage? Deals will move to Contacts stage.','Delete Stage'))return;
   _nhDeals.forEach(d=>{if(d.stageId===id)d.stageId='stage_contacts';});
   _nhStages=_nhStages.filter(s=>s.id!==id);
   await Promise.all([nhSet('_nh_stages',_nhStages),nhSet('_nh_deals',_nhDeals)]);
@@ -7965,6 +7983,18 @@ async function nhSmDone(){
     </div>
     <div class="nh-modal-actions" style="margin-top:12px;">
       <button class="nh-btn-cancel" onclick="nhCloseMarkDone()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Dialog (shared) -->
+<div class="nh-modal-bg" id="nhConfirmBg" style="z-index:4500;">
+  <div class="nh-modal" style="max-width:420px;">
+    <div class="nh-modal-title" id="nhConfirmTitle">Confirm</div>
+    <div class="nh-confirm-msg" id="nhConfirmMsg"></div>
+    <div class="nh-modal-actions">
+      <button class="nh-btn-cancel" onclick="nhConfirmResolve(false)">Cancel</button>
+      <button class="nh-btn-del" id="nhConfirmOkBtn" onclick="nhConfirmResolve(true)">Delete</button>
     </div>
   </div>
 </div>

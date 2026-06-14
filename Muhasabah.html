@@ -165,6 +165,19 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-col-body{display:none;flex-direction:column;gap:8px;padding:8px 12px 12px;border-top:1px solid #2a2010;}
 .nh-col.open .nh-col-body{display:flex;}
 
+/* Calendar agenda view */
+.nh-cal-section-head{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#a89060;margin:14px 0 6px;}
+.nh-cal-section-head:first-child{margin-top:0;}
+.nh-cal-row{background:#141008;border:1px solid #2a2010;border-radius:8px;overflow:hidden;margin-bottom:8px;transition:border-color .2s;}
+.nh-cal-row-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none;transition:background .15s;}
+.nh-cal-row-hd:hover{background:#1a1610;}
+.nh-cal-row-date{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;color:#f0e4c0;}
+.nh-cal-row-date.urg{color:var(--red);}
+.nh-cal-row-meta{display:flex;align-items:center;gap:8px;}
+.nh-cal-row-body{display:none;flex-direction:column;gap:8px;padding:8px 12px 12px;border-top:1px solid #2a2010;}
+.nh-cal-row.open .nh-cal-row-body{display:flex;}
+.nh-cal-row.open .nh-col-chev{transform:rotate(180deg);}
+
 /* Deal cards */
 .nh-deal{background:#1a1610;border:1px solid #2a2010;border-radius:6px;padding:12px 14px;transition:border-color .2s;cursor:grab;touch-action:none;}
 .nh-deal.dragging{opacity:.3;border-style:dashed !important;cursor:grabbing;}
@@ -294,6 +307,12 @@ body.light-mode .nh-col-hd:hover{background:#e8e2d6!important;}
 body.light-mode .nh-col-body{border-color:#d4cfc5!important;}
 body.light-mode .nh-col-cnt{background:#e8e2d6!important;color:#5a5750!important;}
 body.light-mode .nh-col-cnt.urg{background:#fdf0f0!important;color:var(--red)!important;border-color:var(--red)!important;}
+body.light-mode .nh-cal-section-head{color:#9a9590!important;}
+body.light-mode .nh-cal-row{background:#f0ede6!important;border-color:#d4cfc5!important;}
+body.light-mode .nh-cal-row-hd:hover{background:#e8e2d6!important;}
+body.light-mode .nh-cal-row-body{border-color:#d4cfc5!important;}
+body.light-mode .nh-cal-row-date{color:#1a1a18!important;}
+body.light-mode .nh-cal-row-date.urg{color:var(--red)!important;}
 body.light-mode .nh-deal{background:#e8e2d6!important;border-color:#d4cfc5!important;}
 body.light-mode .nh-deal:hover{border-color:#9a7228!important;}
 body.light-mode .nh-deal.ov{background:#fdf0f0!important;border-color:var(--red)!important;}
@@ -7198,6 +7217,7 @@ let _nhCrmFil='all';
 let _nhOpenCols=new Set();
 let _nhDragSrc=null;
 let _nhCbTags=[];
+let _nhCalOpenDates=new Set();
 
 const NH_FIXED_STAGE={id:'stage_contacts',name:'Contacts',color:'#6a7080',fixed:true};
 const NH_CLOSED_STAGE={id:'s7',name:'Closed',color:'#4a7c59',fixed:true};
@@ -7242,6 +7262,14 @@ function nhDaysDiff(ds){
 }
 function nhIsOverdue(d){return!!d.nextAction&&!NH_TERMINAL_STAGE_IDS.has(d.stageId)&&nhDaysDiff(d.nextAction)>=0;}
 function nhIsNoAction(d){return!d.nextAction&&!NH_TERMINAL_STAGE_IDS.has(d.stageId);}
+function nhCalDateLabel(ds,diff){
+  const d=new Date(ds);
+  const fmt=d.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+  if(diff===0) return `${fmt} (Today)`;
+  if(diff===-1) return `${fmt} (Tomorrow)`;
+  if(diff===1) return `${fmt} (Yesterday)`;
+  return fmt;
+}
 function nhStageName(id){return(_nhStages.find(s=>s.id===id)||{name:'—'}).name;}
 function nhStageColor(id){return(_nhStages.find(s=>s.id===id)||{color:'#6a7080'}).color;}
 
@@ -7517,13 +7545,14 @@ function nhRenderCrmFilters(){
   });
   opts+=`<option value="ov"${_nhCrmFil==='ov'?' selected':''}>🔴 Overdue (${ovCnt})</option>`;
   opts+=`<option value="noaction"${_nhCrmFil==='noaction'?' selected':''}>⚪ No Action (${noActionCnt})</option>`;
+  opts+=`<option value="calendar"${_nhCrmFil==='calendar'?' selected':''}>📅 Calendar</option>`;
   el.innerHTML=`<select class="nh-crm-fil-select" id="nhCrmFilSelect" onchange="nhSetFil(this.value)">${opts}</select>
     <span class="nh-manage-btn" onclick="nhOpenStageMgr()">⚙ Stages</span>`;
 }
 
 function nhSetFil(val){
   _nhCrmFil=val;
-  if(val==='all'||val==='ov'||val==='noaction'){
+  if(val==='all'||val==='ov'||val==='noaction'||val==='calendar'){
     // All stages collapsed by default / flat views need no open columns
     _nhOpenCols=new Set();
   } else {
@@ -7549,6 +7578,49 @@ function nhRenderKanban(){
     });
     el.innerHTML=deals.length?deals.map(d=>nhDealHTML(d,true)).join(''):
       `<div class="nh-empty">${_nhCrmFil==='ov'?'No overdue deals.':'Every active contact has a next action assigned. Nice.'}</div>`;
+    return;
+  }
+
+  // Calendar view — agenda list grouped by date
+  if(_nhCrmFil==='calendar'){
+    const scheduled=_nhDeals.filter(d=>d.nextAction&&!NH_TERMINAL_STAGE_IDS.has(d.stageId));
+    const byDate={};
+    scheduled.forEach(d=>{
+      (byDate[d.nextAction]=byDate[d.nextAction]||[]).push(d);
+    });
+    const dates=Object.keys(byDate).sort();
+    const overdueDates=dates.filter(ds=>nhDaysDiff(ds)>0);
+    const todayAndFuture=dates.filter(ds=>nhDaysDiff(ds)<=0);
+
+    const renderDateRow=ds=>{
+      const deals=byDate[ds].sort((a,b)=>(a.contactName||'').localeCompare(b.contactName||''));
+      const diff=nhDaysDiff(ds);
+      const isOpen=_nhCalOpenDates.has(ds);
+      const urgent=diff>=0;
+      return `<div class="nh-cal-row${isOpen?' open':''}">
+        <div class="nh-cal-row-hd" onclick="nhToggleCalDate('${ds}')">
+          <div class="nh-cal-row-date${urgent?' urg':''}">${urgent&&diff>0?'🔴 ':''}${nhCalDateLabel(ds,diff)}</div>
+          <div class="nh-cal-row-meta">
+            <span class="nh-col-cnt${urgent?' urg':''}">${deals.length} deal${deals.length>1?'s':''}</span>
+            <span class="nh-col-chev">▼</span>
+          </div>
+        </div>
+        <div class="nh-cal-row-body">
+          ${deals.map(d=>nhDealHTML(d,true)).join('')}
+        </div>
+      </div>`;
+    };
+
+    let h='';
+    if(overdueDates.length){
+      h+=`<div class="nh-cal-section-head">🔴 Overdue</div>`;
+      h+=overdueDates.map(renderDateRow).join('');
+    }
+    if(todayAndFuture.length){
+      h+=`<div class="nh-cal-section-head">📅 Upcoming</div>`;
+      h+=todayAndFuture.map(renderDateRow).join('');
+    }
+    el.innerHTML=h||'<div class="nh-empty">No next actions scheduled.</div>';
     return;
   }
 
@@ -7641,6 +7713,10 @@ function nhToggleCol(id){
   const col=document.getElementById('nhcol-'+id);
   if(col)col.classList.toggle('open',_nhOpenCols.has(id));
 }
+function nhToggleCalDate(ds){
+  if(_nhCalOpenDates.has(ds))_nhCalOpenDates.delete(ds);else _nhCalOpenDates.add(ds);
+  nhRenderKanban();
+}
 
 /* CRM Modal */
 function nhCrmOpenModal(id,defaultStageId){
@@ -7680,6 +7756,7 @@ function nhCrmOpenModal(id,defaultStageId){
   spick.innerHTML=_nhStages.map(s=>`<option value="${s.id}"${(d?.stageId||defaultStageId||'stage_contacts')===s.id?' selected':''}>${s.name}</option>`).join('');
   document.getElementById('nhCrmFNextAction').value=d?.nextAction||'';
   document.getElementById('nhCrmFNextActionNote').value=d?.nextActionNote||'';
+  nhCrmNextActionDateChanged();
   document.getElementById('nhCrmDelBtn').style.display=id?'block':'none';
   document.getElementById('nhCrmModalBg').classList.add('open');
 }
@@ -7695,6 +7772,19 @@ function nhCrmContactPick(){
   document.getElementById('nhCrmFPhone').value=c.phone||'';
   document.getElementById('nhCrmFEmail').value=c.email||'';
 }
+function nhCrmNextActionDateChanged(){
+  const dateVal=document.getElementById('nhCrmFNextAction')?.value;
+  const noteEl=document.getElementById('nhCrmFNextActionNote');
+  if(!noteEl)return;
+  if(!dateVal){
+    noteEl.value='';
+    noteEl.disabled=true;
+    noteEl.placeholder='Set a date to add a next action';
+  }else{
+    noteEl.disabled=false;
+    noteEl.placeholder='e.g. Call to discuss proposal';
+  }
+}
 async function nhCrmSave(){
   if(!_nhCrmEditId){nhCrmCloseModal();return;}
   const g=id=>document.getElementById(id)?.value.trim()||'';
@@ -7702,8 +7792,9 @@ async function nhCrmSave(){
   if(!deal)return;
   // Only update pipeline-controlled fields
   deal.stageId=g('nhCrmFStage')||deal.stageId;
-  deal.nextAction=g('nhCrmFNextAction');
-  deal.nextActionNote=g('nhCrmFNextActionNote');
+  const nextActionVal=g('nhCrmFNextAction');
+  deal.nextAction=nextActionVal;
+  deal.nextActionNote=nextActionVal?g('nhCrmFNextActionNote'):'';
   await nhSet('_nh_deals',_nhDeals);
   nhCrmCloseModal();nhRenderCrm();nhRenderToday();
 }
@@ -8153,7 +8244,7 @@ async function nhSmDone(){
     </div>
     <div class="nh-field">
       <label>Next Action Date</label>
-      <input id="nhCrmFNextAction" type="date">
+      <input id="nhCrmFNextAction" type="date" onchange="nhCrmNextActionDateChanged()">
     </div>
     <div class="nh-field">
       <label>Next Action — What To Do</label>

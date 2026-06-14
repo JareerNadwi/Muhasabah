@@ -213,13 +213,13 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 /* Light mode — Networking Hub */
 body.light-mode .nh-modal-bg{background:rgba(180,170,155,.75)!important;}
 body.light-mode .nh-topbar{border-bottom-color:#d4cfc5!important;}
-body.light-mode .nh-title{color:#9a7228!important;}
+body.light-mode .nh-title{color:#1a1a18!important;}
 body.light-mode .nh-subtitle{color:#5a5750!important;}
 body.light-mode .nh-modal{background:#f0ede6!important;border-color:#d4cfc5!important;}
 body.light-mode .nh-close{background:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .nh-nav{border-color:#d4cfc5!important;}
 body.light-mode .nh-tab{background:#f0ede6!important;color:#5a5750!important;}
-body.light-mode .nh-tab.on{background:#e8e2d6!important;color:#9a7228!important;border-bottom-color:#9a7228!important;}
+body.light-mode .nh-tab.on{background:#f5f0e0!important;color:#9a7228!important;border-bottom-color:#9a7228!important;}
 body.light-mode .nh-search{background:#f0ede6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
 body.light-mode .nh-add-btn{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-add-btn:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
@@ -650,7 +650,7 @@ canvas#qrCanvas{
 /* Light mode — Quran / PDF Reader */
 body.light-mode .quran-reader-overlay{background:#ffffff!important;}
 body.light-mode .qr-topbar,body.light-mode .qr-bottombar{background:#f0ede6!important;border-color:#d4cfc5!important;}
-body.light-mode .qr-title{color:#9a7228!important;}
+body.light-mode .qr-title{color:#1a1a18!important;}
 body.light-mode .qr-info{color:#5a5750!important;}
 body.light-mode .qr-close{background:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .qr-close:hover{border-color:#c05050!important;color:#c05050!important;}
@@ -723,6 +723,9 @@ body.light-mode .progress-track,body.light-mode .bonus-track{background:var(--su
 body.light-mode .section-label{border-bottom-color:var(--border);}
 body.light-mode .counter-btn{background:var(--surface2);border-color:var(--border);}
 body.light-mode .qr-session-badge{background:var(--surface2);}
+/* Overlay title headings: gold is hard to read on cream/white, use dark text instead */
+body.light-mode [style*="font-family:'Amiri',serif;font-size:17px;color:#c9a84c"],
+body.light-mode [style*="font-family:'Amiri',serif;font-size:19px;color:#c9a84c"]{color:#1a1a18!important;}
 /* ── Reader elements (JS-managed display — CSS only) ── */
 /* Shared reader content-body backgrounds (white, per Zikr Reader reference) */
 body.light-mode #hadithLoading,body.light-mode #hadithContent,
@@ -760,18 +763,17 @@ body.light-mode #zikrArticleBar{background:#ece9e2!important;}
 body.light-mode [onclick="zikrArticleTap(-1)"]{background:#fff0f0!important;border-color:#e0c0c0!important;color:#8b2a2a!important;}
 body.light-mode [onclick="zikrArticleTap(1)"]{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
 /* ── Language Learner ── */
-body.light-mode #langOverlay{background:rgba(240,238,232,.97);}
-body.light-mode #lrHero{background:#f0ede6!important;border-color:#d4cfc5!important;border-top-color:#9a7228!important;}
+body.light-mode #lrHero{background:#f5f0e0!important;border-color:#d4cfc5!important;border-top-color:#9a7228!important;}
 body.light-mode #lrCollPanel,body.light-mode #lrConjPanel,
 body.light-mode #lrStoryPanel,body.light-mode #lrSynAntPanel,
-body.light-mode #lrChallengePanel{background:#f0ede6!important;border-color:#d4cfc5!important;}
+body.light-mode #lrChallengePanel{background:#f5f0e0!important;border-color:#d4cfc5!important;}
 body.light-mode #lrWordMain{color:#1a1a18!important;}
 body.light-mode #lrWordMeaning,body.light-mode #lrCollocations,
 body.light-mode #lrStory,body.light-mode #lrSimpleMeaning{color:#1a1a18!important;}
 body.light-mode #lrWordRoman,body.light-mode #lrWordType{color:#5a5750!important;}
 body.light-mode #lrWordNum{color:#9a9590!important;}
 body.light-mode #lrHarakahBtn{background:#f5f0e0!important;border-color:#d4b878!important;color:#9a7228!important;}
-body.light-mode #lrBody{background:var(--bg);}
+body.light-mode #lrBody{background:#ffffff!important;}
 body.light-mode .lr-lang-btn,body.light-mode .lr-type-btn{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .lr-lang-btn[style*="#1a1500"],body.light-mode .lr-lang-btn[style*="background:#1a1500"],
 body.light-mode .lr-type-btn[style*="#1a1500"]{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
@@ -798,10 +800,10 @@ body.light-mode #tafsirTranslit,body.light-mode #svTranslit{
   border-top-color:#9a9590!important;color:#5a5750!important;
 }
 /* Language learner syn/ant panel and challenge panel */
-body.light-mode #lrSynAntPanel{background:#f0ede6!important;border-left-color:#9a7228!important;}
+body.light-mode #lrSynAntPanel{background:#f5f0e0!important;border-left-color:#9a7228!important;}
 body.light-mode #lrSyn,body.light-mode #lrAnt{color:#1a1a18!important;}
 body.light-mode #lrLabelSyn,body.light-mode #lrLabelAnt{color:#9a7228!important;}
-body.light-mode #lrChallengePanel{background:#f0ede6!important;border-left-color:#2d7a45!important;border-color:#d4cfc5!important;}
+body.light-mode #lrChallengePanel{background:#f5f0e0!important;border-left-color:#2d7a45!important;border-color:#d4cfc5!important;}
 body.light-mode #lrLabelChallenge{color:#2d6b40!important;}
 body.light-mode #lrSpeakingChallenge{color:#1a1a18!important;}
 /* Post writer save and close buttons */

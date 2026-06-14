@@ -7448,6 +7448,19 @@ function nhRenderContacts(){
   }).join('');
 }
 
+/* ── Shared modal helper: open + reset scroll to top ── */
+function nhOpenModalTop(bgId){
+  const bg=document.getElementById(bgId);
+  if(!bg)return;
+  bg.classList.add('open');
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      const m=bg.querySelector('.nh-modal');
+      if(m)m.scrollTop=0;
+    });
+  });
+}
+
 function nhCbEdit(id){
   _nhCbEditId=id||null;
   const c=id?_nhContacts.find(x=>x.id===id):null;
@@ -7467,7 +7480,7 @@ function nhCbEdit(id){
   }else{
     stageField.style.display='none';
   }
-  document.getElementById('nhCbModalBg').classList.add('open');
+  nhOpenModalTop('nhCbModalBg');
 }
 function nhCbCloseModal(){document.getElementById('nhCbModalBg').classList.remove('open');_nhCbEditId=null;_nhCbTags=[];}
 
@@ -7808,7 +7821,7 @@ function nhCrmOpenModal(id,defaultStageId){
   nhUpdateCalTrigger('nhCrmFNextAction');
   nhCrmNextActionDateChanged();
   document.getElementById('nhCrmDelBtn').style.display=id?'block':'none';
-  document.getElementById('nhCrmModalBg').classList.add('open');
+  nhOpenModalTop('nhCrmModalBg');
 }
 function nhCrmCloseModal(){document.getElementById('nhCrmModalBg').classList.remove('open');_nhCrmEditId=null;}
 function nhCrmContactPick(){
@@ -8064,7 +8077,7 @@ function nhOpenMarkDone(dealId,name,mode){
     btn.disabled=false;
     btn.textContent=_nhMarkDoneMode==='assign'?'Save & Set Next Action →':'Save & Mark Done';
   }
-  document.getElementById('nhMarkDoneBg').classList.add('open');
+  nhOpenModalTop('nhMarkDoneBg');
 }
 function nhCloseMarkDone(){
   document.getElementById('nhMarkDoneBg').classList.remove('open');
@@ -8109,7 +8122,7 @@ async function nhMarkDoneConfirm(){
 }
 
 /* ══ STAGE MANAGER ══ */
-function nhOpenStageMgr(){nhRenderSmList();document.getElementById('nhSmBg').classList.add('open');}
+function nhOpenStageMgr(){nhRenderSmList();nhOpenModalTop('nhSmBg');}
 function nhCloseSmBg(){document.getElementById('nhSmBg').classList.remove('open');}
 
 function nhRenderSmList(){

@@ -78,6 +78,28 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-modal{background:#141008;border:1px solid #2a2010;border-radius:10px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:22px;}
 #nhNotesBg .nh-modal{max-width:680px;}
 .nh-modal-title{font-family:'Amiri',serif;font-size:18px;color:var(--gold);margin-bottom:18px;}
+
+/* Calendar date picker */
+.nh-cal-trigger{width:100%;text-align:left;background:#1a1610;border:1px solid #2a2010;color:#f0e4c0;padding:10px 12px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:13px;cursor:pointer;box-sizing:border-box;}
+.nh-cal-trigger:hover{border-color:var(--gold-dim);}
+.nh-cal-trigger.empty{color:#a89060;}
+.nh-cal-picker-modal{max-width:460px;}
+.nh-cal-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.nh-cal-picker-title{font-family:'Amiri',serif;font-size:18px;color:var(--gold);}
+.nh-cal-nav{background:#1a1610;border:1px solid #2a2010;color:#c5b98a;font-size:18px;width:38px;height:38px;border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.nh-cal-nav:hover{border-color:var(--gold-dim);color:var(--gold);}
+.nh-cal-picker-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px;}
+.nh-cal-picker-weekdays span{text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:#a89060;text-transform:uppercase;}
+.nh-cal-picker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.nh-cal-day{position:relative;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #2a2010;border-radius:8px;background:#1a1610;cursor:pointer;font-family:'DM Mono',monospace;font-size:13px;color:#f0e4c0;transition:all .15s;}
+.nh-cal-day:hover{border-color:var(--gold-dim);background:#211b10;}
+.nh-cal-day.empty{visibility:hidden;cursor:default;}
+.nh-cal-day.today{border-color:var(--gold-dim);color:var(--gold);}
+.nh-cal-day.past{color:#5a5650;}
+.nh-cal-day.selected{background:linear-gradient(135deg,#3a2e10,#2a2010);border-color:var(--gold);color:var(--gold);}
+.nh-cal-day-num{line-height:1.2;}
+.nh-cal-day-badge{position:absolute;bottom:3px;right:3px;font-size:8px;line-height:1;background:rgba(200,169,110,.18);color:var(--gold);border-radius:8px;padding:1px 4px;min-width:13px;text-align:center;}
+.nh-cal-day.past .nh-cal-day-badge{opacity:.6;}
 .nh-field{margin-bottom:12px;}
 .nh-field label{display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:#c5b98a;margin-bottom:4px;text-transform:uppercase;}
 .nh-field input,.nh-field select,.nh-field textarea{width:100%;background:#1a1610!important;border:1px solid #2a2010!important;color:#f0e4c0!important;padding:8px 11px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;-webkit-appearance:none;appearance:none;box-sizing:border-box;}
@@ -260,6 +282,19 @@ body.light-mode .nh-title{color:#1a1a18!important;}
 body.light-mode .nh-modal-title{color:#1a1a18!important;}
 body.light-mode .nh-subtitle{color:#5a5750!important;}
 body.light-mode .nh-modal{background:#f0ede6!important;border-color:#d4cfc5!important;}
+body.light-mode .nh-cal-trigger{background:#ffffff!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
+body.light-mode .nh-cal-trigger.empty{color:#9a9590!important;}
+body.light-mode .nh-cal-trigger:hover{border-color:#9a7228!important;}
+body.light-mode .nh-cal-picker-title{color:#9a7228!important;}
+body.light-mode .nh-cal-nav{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .nh-cal-nav:hover{border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-cal-picker-weekdays span{color:#9a9590!important;}
+body.light-mode .nh-cal-day{background:#ffffff!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
+body.light-mode .nh-cal-day:hover{border-color:#9a7228!important;background:#fdf5dc!important;}
+body.light-mode .nh-cal-day.today{border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-cal-day.past{color:#b0aaa0!important;}
+body.light-mode .nh-cal-day.selected{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-cal-day-badge{background:rgba(154,114,40,.15)!important;color:#9a7228!important;}
 body.light-mode .nh-close{background:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .nh-nav{border-color:#d4cfc5!important;}
 body.light-mode .nh-tab{background:#f0ede6!important;color:#5a5750!important;}
@@ -7423,6 +7458,15 @@ function nhCbEdit(id){
   });
   _nhCbTags=[...(c?.tags||[])];
   nhRenderTagInput();
+  const stageField=document.getElementById('nhCbStageField');
+  const stageSel=document.getElementById('nhCbFStage');
+  if(!id){
+    // Only show stage picker when adding a new contact
+    stageField.style.display='';
+    stageSel.innerHTML=_nhStages.map(s=>`<option value="${s.id}"${s.id==='stage_contacts'?' selected':''}>${s.name}</option>`).join('');
+  }else{
+    stageField.style.display='none';
+  }
   document.getElementById('nhCbModalBg').classList.add('open');
 }
 function nhCbCloseModal(){document.getElementById('nhCbModalBg').classList.remove('open');_nhCbEditId=null;_nhCbTags=[];}
@@ -7499,13 +7543,14 @@ async function nhCbSave(){
   };
   if(_nhCbEditId){const i=_nhContacts.findIndex(x=>x.id===_nhCbEditId);if(i>-1)_nhContacts[i]=contact;}
   else _nhContacts.push(contact);
-  // Auto-create CRM deal in Contacts stage if new contact
+  // Auto-create CRM deal in chosen stage if new contact
   if(!_nhCbEditId){
     const existsDeal=_nhDeals.some(d=>d.contactId===contact.id);
     if(!existsDeal){
+      const chosenStage=document.getElementById('nhCbFStage')?.value||'stage_contacts';
       _nhDeals.push({
         id:nhId(),contactId:contact.id,contactName:contact.name,
-        company:contact.company||'',stageId:'stage_contacts',
+        company:contact.company||'',stageId:chosenStage,
         nextAction:'',nextActionNote:'',linkedin:contact.linkedin||'',facebook:contact.facebook||'',
         whatsapp:contact.whatsapp||'',phone:contact.phone||'',email:contact.email||'',
         createdAt:nhToday(),
@@ -7760,6 +7805,7 @@ function nhCrmOpenModal(id,defaultStageId){
   spick.innerHTML=_nhStages.map(s=>`<option value="${s.id}"${(d?.stageId||defaultStageId||'stage_contacts')===s.id?' selected':''}>${s.name}</option>`).join('');
   document.getElementById('nhCrmFNextAction').value=d?.nextAction||'';
   document.getElementById('nhCrmFNextActionNote').value=d?.nextActionNote||'';
+  nhUpdateCalTrigger('nhCrmFNextAction');
   nhCrmNextActionDateChanged();
   document.getElementById('nhCrmDelBtn').style.display=id?'block':'none';
   document.getElementById('nhCrmModalBg').classList.add('open');
@@ -7788,6 +7834,94 @@ function nhCrmNextActionDateChanged(){
     noteEl.disabled=false;
     noteEl.placeholder='e.g. Call to discuss proposal';
   }
+}
+
+/* ── Calendar date picker (shared) ── */
+let _nhCalPickerTargetId=null;
+let _nhCalPickerViewDate=null;
+function nhCalDealCounts(){
+  const counts={};
+  _nhDeals.forEach(d=>{
+    if(d.nextAction&&!NH_TERMINAL_STAGE_IDS.has(d.stageId)){
+      counts[d.nextAction]=(counts[d.nextAction]||0)+1;
+    }
+  });
+  return counts;
+}
+function nhCalTriggerLabel(dateStr){
+  if(!dateStr)return 'Pick a date';
+  const d=new Date(dateStr);
+  return d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+}
+function nhUpdateCalTrigger(inputId){
+  const input=document.getElementById(inputId);
+  const btn=document.getElementById(inputId+'Btn');
+  if(!input||!btn)return;
+  const val=input.value;
+  btn.textContent=nhCalTriggerLabel(val);
+  btn.classList.toggle('empty',!val);
+}
+function nhOpenCalPicker(inputId){
+  _nhCalPickerTargetId=inputId;
+  const input=document.getElementById(inputId);
+  const current=input?.value;
+  _nhCalPickerViewDate=current?new Date(current+'T00:00:00'):new Date();
+  _nhCalPickerViewDate.setDate(1);
+  document.getElementById('nhCalPickerClearBtn').style.display=current?'':'none';
+  nhRenderCalPicker();
+  document.getElementById('nhCalPickerBg').classList.add('open');
+}
+function nhCloseCalPicker(){
+  document.getElementById('nhCalPickerBg').classList.remove('open');
+  _nhCalPickerTargetId=null;
+}
+function nhCalPickerNav(delta){
+  _nhCalPickerViewDate.setMonth(_nhCalPickerViewDate.getMonth()+delta);
+  nhRenderCalPicker();
+}
+function nhRenderCalPicker(){
+  const view=_nhCalPickerViewDate;
+  const year=view.getFullYear(), month=view.getMonth();
+  document.getElementById('nhCalPickerTitle').textContent=view.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+  const counts=nhCalDealCounts();
+  const todayStr=nhToday();
+  const selectedVal=document.getElementById(_nhCalPickerTargetId)?.value||'';
+  const firstDow=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  let h='';
+  for(let i=0;i<firstDow;i++) h+='<div class="nh-cal-day empty"></div>';
+  for(let day=1;day<=daysInMonth;day++){
+    const dateStr=`${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const isToday=dateStr===todayStr;
+    const isPast=dateStr<todayStr;
+    const isSelected=dateStr===selectedVal;
+    const cnt=counts[dateStr]||0;
+    const classes=['nh-cal-day'];
+    if(isSelected)classes.push('selected');
+    else if(isToday)classes.push('today');
+    else if(isPast)classes.push('past');
+    h+=`<div class="${classes.join(' ')}" onclick="nhCalPickerSelect('${dateStr}')">
+      <span class="nh-cal-day-num">${day}</span>
+      ${cnt?`<span class="nh-cal-day-badge">${cnt}</span>`:''}
+    </div>`;
+  }
+  document.getElementById('nhCalPickerGrid').innerHTML=h;
+}
+function nhCalPickerSelect(dateStr){
+  const input=document.getElementById(_nhCalPickerTargetId);
+  if(!input)return;
+  input.value=dateStr;
+  nhUpdateCalTrigger(_nhCalPickerTargetId);
+  if(_nhCalPickerTargetId==='nhCrmFNextAction') nhCrmNextActionDateChanged();
+  nhCloseCalPicker();
+}
+function nhCalPickerClear(){
+  const input=document.getElementById(_nhCalPickerTargetId);
+  if(!input)return;
+  input.value='';
+  nhUpdateCalTrigger(_nhCalPickerTargetId);
+  if(_nhCalPickerTargetId==='nhCrmFNextAction') nhCrmNextActionDateChanged();
+  nhCloseCalPicker();
 }
 async function nhCrmSave(){
   if(!_nhCrmEditId){nhCrmCloseModal();return;}
@@ -7914,6 +8048,7 @@ function nhOpenMarkDone(dealId,name,mode){
   document.getElementById('nhMarkDoneName').textContent=(titles[_nhMarkDoneMode]||titles.done)+name;
   document.getElementById('nhMarkDoneNextDate').value='';
   document.getElementById('nhMarkDoneNextActionNote').value='';
+  nhUpdateCalTrigger('nhMarkDoneNextDate');
   if(_nhMarkDoneMode==='assign_only'){
     // No "what did you do" step — go straight to next action inputs
     document.getElementById('nhMarkDoneNoteField').style.display='none';
@@ -8232,6 +8367,10 @@ async function nhSmDone(){
     <div class="nh-field"><label>WhatsApp (Country Code + Number)</label><input id="nhCbFWhatsapp" type="tel" placeholder=""></div>
     <div class="nh-field"><label>Mobile (Country Code + Number)</label><input id="nhCbFPhone" type="tel" placeholder=""></div>
     <div class="nh-field"><label>Email</label><input id="nhCbFEmail" type="email" placeholder=""></div>
+    <div class="nh-field" id="nhCbStageField">
+      <label>Initial Pipeline Stage</label>
+      <select id="nhCbFStage"></select>
+    </div>
     <div class="nh-field">
       <label>Tags</label>
       <div class="nh-tag-input-wrap" id="nhCbTagChips">
@@ -8265,7 +8404,8 @@ async function nhSmDone(){
     </div>
     <div class="nh-field">
       <label>Next Action Date</label>
-      <input id="nhCrmFNextAction" type="date" onchange="nhCrmNextActionDateChanged()">
+      <input id="nhCrmFNextAction" type="hidden" onchange="nhCrmNextActionDateChanged()">
+      <button type="button" class="nh-cal-trigger" id="nhCrmFNextActionBtn" onclick="nhOpenCalPicker('nhCrmFNextAction')">Pick a date</button>
     </div>
     <div class="nh-field">
       <label>Next Action — What To Do</label>
@@ -8323,13 +8463,33 @@ async function nhSmDone(){
     <button class="nh-note-submit" id="nhMarkDoneNoteBtn" onclick="nhMarkDoneSubmitNote()" style="width:100%;margin-bottom:0;">Save &amp; Set Next Action →</button>
     <div class="nh-markdone-next" id="nhMarkDoneNext">
       <label>Next Action Date</label>
-      <input type="date" id="nhMarkDoneNextDate">
+      <input type="hidden" id="nhMarkDoneNextDate">
+      <button type="button" class="nh-cal-trigger" id="nhMarkDoneNextDateBtn" onclick="nhOpenCalPicker('nhMarkDoneNextDate')">Pick a date</button>
       <label style="margin-top:8px;">Next Action — What To Do</label>
       <input type="text" id="nhMarkDoneNextActionNote" placeholder="e.g. Call to discuss proposal">
       <button class="nh-markdone-confirm" onclick="nhMarkDoneConfirm()">Confirm Next Action</button>
     </div>
     <div class="nh-modal-actions" style="margin-top:12px;">
       <button class="nh-btn-cancel" onclick="nhCloseMarkDone()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Calendar Date Picker (shared) -->
+<div class="nh-modal-bg" id="nhCalPickerBg" style="z-index:4800;">
+  <div class="nh-modal nh-cal-picker-modal">
+    <div class="nh-cal-picker-head">
+      <button type="button" class="nh-cal-nav" onclick="nhCalPickerNav(-1)">‹</button>
+      <div class="nh-cal-picker-title" id="nhCalPickerTitle">Month Year</div>
+      <button type="button" class="nh-cal-nav" onclick="nhCalPickerNav(1)">›</button>
+    </div>
+    <div class="nh-cal-picker-weekdays">
+      <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+    </div>
+    <div class="nh-cal-picker-grid" id="nhCalPickerGrid"></div>
+    <div class="nh-modal-actions">
+      <button class="nh-btn-cancel" id="nhCalPickerClearBtn" onclick="nhCalPickerClear()">Clear Date</button>
+      <button class="nh-btn-cancel" onclick="nhCloseCalPicker()">Close</button>
     </div>
   </div>
 </div>

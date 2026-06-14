@@ -64,7 +64,7 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-search:focus{border-color:var(--gold-dim);}
 .nh-search::placeholder{color:#a89060;}
 .nh-search-scope{flex:0 0 auto;width:108px;background:#141008!important;border:1px solid #2a2010!important;color:#c5b98a!important;padding:8px 6px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;cursor:pointer;white-space:nowrap;}
-.nh-crm-fil-select{flex:0 1 auto;max-width:100%;min-width:0;background:#141008!important;border:1px solid #2a2010!important;color:#c5b98a!important;padding:7px 8px;border-radius:20px;font-family:'DM Mono',monospace;font-size:11px;outline:none;cursor:pointer;}
+.nh-crm-fil-select{flex:1 1 auto;max-width:100%;min-width:0;background:#141008!important;border:1px solid #2a2010!important;color:#c5b98a!important;padding:7px 8px;border-radius:20px;font-family:'DM Mono',monospace;font-size:11px;outline:none;cursor:pointer;text-overflow:ellipsis;overflow:hidden;}
 .nh-search-scope:focus{border-color:var(--gold-dim);}
 .nh-search-scope option{background:#1a1610;color:#f0e4c0;}
 .nh-crm-fil-select option{background:#1a1610;color:#f0e4c0;}
@@ -138,7 +138,7 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 
 /* ── CRM ── */
 /* Stage filter bar */
-.nh-crm-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
+.nh-crm-filters{display:flex;gap:6px;flex-wrap:nowrap;margin-bottom:14px;align-items:center;}
 .nh-sf{display:inline-flex;align-items:center;gap:5px;background:#141008;border:1px solid #2a2010;border-radius:20px;padding:5px 12px;font-family:'DM Mono',monospace;font-size:10px;color:#c5b98a;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .nh-sf:hover,.nh-sf.on{background:#1a1610;border-color:var(--gold-dim);color:#f0e4c0;}
 .nh-sf.on{border-color:var(--gold);color:var(--gold);}
@@ -146,7 +146,7 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-sf.on .nh-sf-cnt{background:rgba(200,169,110,.12);}
 .nh-sf.ov-pill{border-color:var(--red);color:var(--red);}
 .nh-sf.ov-pill.on{border-color:var(--red);background:#1a1610;color:var(--red);}
-.nh-manage-btn{background:#1a1610;border:1px solid #2a2010;color:#a89060;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;margin-left:auto;white-space:nowrap;}
+.nh-manage-btn{flex:0 0 auto;background:#1a1610;border:1px solid #2a2010;color:#a89060;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;margin-left:auto;white-space:nowrap;}
 .nh-manage-btn:hover{border-color:var(--gold-dim);color:#f0e4c0;}
 
 /* Kanban accordion */

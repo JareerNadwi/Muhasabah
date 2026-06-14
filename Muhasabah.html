@@ -745,7 +745,8 @@ body.light-mode #zikrBookPrevBtn{background:#ece9e2!important;border-color:#d4cf
 body.light-mode #hadithNextBtn,body.light-mode #tafsirNextBtn,
 body.light-mode #bookNextBtn,body.light-mode #svNextBtn,
 body.light-mode #asmaulNextBtn,body.light-mode #zikrReaderNextBtn,
-body.light-mode #zikrBookNextBtn{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode #zikrBookNextBtn,body.light-mode #qrNext,
+body.light-mode #pdfReaderNext{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
 /* Zikr article counter */
 body.light-mode #zikrArticleBar{background:#ece9e2!important;}
 body.light-mode [onclick="zikrArticleTap(-1)"]{background:#fff0f0!important;border-color:#e0c0c0!important;color:#8b2a2a!important;}
@@ -1373,7 +1374,7 @@ body.overlay-open{overflow:hidden;}
     <button class="qr-nav" id="qrZoomOut" onclick="qrZoom(-1)" title="Zoom Out" disabled>－</button>
     <span id="qrZoomLabel" style="font-family:'DM Mono',monospace;font-size:11px;color:#c5b98a;min-width:40px;text-align:center;">100%</span>
     <button class="qr-nav" id="qrZoomIn" onclick="qrZoom(1)" title="Zoom In">＋</button>
-    <button class="qr-nav" id="qrNext" onclick="qrChangePage(1)">Next →</button>
+    <button class="qr-nav" id="qrNext" onclick="qrChangePage(1)" style="background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;">Next →</button>
   </div>
 </div>
 
@@ -1397,7 +1398,7 @@ body.overlay-open{overflow:hidden;}
     <button class="qr-nav" id="pdfZoomOut" onclick="pdfZoom(-1)" title="Zoom Out" disabled>－</button>
     <span id="pdfZoomLabel" style="font-family:'DM Mono',monospace;font-size:11px;color:#c5b98a;min-width:40px;text-align:center;">100%</span>
     <button class="qr-nav" id="pdfZoomIn" onclick="pdfZoom(1)" title="Zoom In">＋</button>
-    <button class="qr-nav" id="pdfReaderNext" onclick="pdfReaderChangePage(1)">Next →</button>
+    <button class="qr-nav" id="pdfReaderNext" onclick="pdfReaderChangePage(1)" style="background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;">Next →</button>
   </div>
 </div>
 

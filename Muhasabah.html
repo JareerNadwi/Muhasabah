@@ -672,8 +672,14 @@ body.light-mode{
 body.light-mode .header{background:var(--surface);border-bottom-color:var(--border);}
 body.light-mode .back-btn,body.light-mode .dark-toggle,body.light-mode .export-btn,body.light-mode .import-btn,body.light-mode .reset-btn{background:var(--surface2);}
 body.light-mode .reset-btn{color:var(--red);border-color:#e0c0c0;}
+body.light-mode .back-btn:hover{color:var(--text);border-color:var(--gold-dim);background:#e8e2d6;}
+body.light-mode .export-btn:hover{background:linear-gradient(135deg,#fdf5dc,#f5e8b0);border-color:var(--gold);color:#7a5010;}
+body.light-mode .import-btn:hover{background:#f0e6fa;border-color:var(--purple-bright);color:var(--purple-bright);}
+body.light-mode .reset-btn:hover{background:#fdecec;border-color:var(--red);color:#c05050;}
+body.light-mode [onclick="openReadMe()"]:hover{background:#f5edfc!important;border-color:var(--purple)!important;color:var(--purple)!important;}
 body.light-mode .contact-banner{background:linear-gradient(135deg,#f5efd8,#eef5ee,#f5efd8)!important;border-color:var(--gold-dim)!important;}
 body.light-mode .contact-banner::before{background:linear-gradient(90deg,transparent,rgba(160,120,40,.08),transparent);}
+body.light-mode a.contact-num:hover{color:#7a5010;text-shadow:0 0 20px rgba(154,114,40,.4);}
 body.light-mode .month-block{background:var(--surface);}
 body.light-mode .month-name{color:var(--text-dim);}
 body.light-mode .day-cell{background:var(--surface2);}

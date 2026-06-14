@@ -63,7 +63,7 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-search{flex:1 1 auto;min-width:0;background:#141008!important;border:1px solid #2a2010!important;color:#f0e4c0!important;padding:8px 10px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
 .nh-search:focus{border-color:var(--gold-dim);}
 .nh-search::placeholder{color:#a89060;}
-.nh-search-scope{flex:0 0 auto;width:88px;background:#141008!important;border:1px solid #2a2010!important;color:#c5b98a!important;padding:8px 16px 8px 6px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:10px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23c5b98a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;}
+.nh-search-scope{flex:0 0 auto;width:108px;background:#141008!important;border:1px solid #2a2010!important;color:#c5b98a!important;padding:8px 6px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;cursor:pointer;white-space:nowrap;}
 .nh-search-scope:focus{border-color:var(--gold-dim);}
 .nh-search-scope option{background:#1a1610;color:#f0e4c0;}
 .nh-add-btn{flex:0 0 auto;background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;white-space:nowrap;}
@@ -127,8 +127,11 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-tag-chip-x:hover{color:var(--red);}
 .nh-tag-input{flex:1;min-width:90px;background:transparent;border:none;outline:none;color:#f0e4c0;font-family:'DM Mono',monospace;font-size:11px;padding:3px 2px;}
 .nh-tag-suggestions{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
-.nh-tag-suggest{cursor:pointer;padding:3px 9px;border-radius:14px;border:1px solid #2a2010;background:#1a1610;color:#c5b98a;font-family:'DM Mono',monospace;font-size:10px;transition:all .15s;}
+.nh-tag-suggest{display:inline-flex;align-items:center;gap:6px;padding:3px 8px 3px 9px;border-radius:14px;border:1px solid #2a2010;background:#1a1610;color:#c5b98a;font-family:'DM Mono',monospace;font-size:10px;transition:all .15s;}
+.nh-tag-suggest>span:first-child{cursor:pointer;}
 .nh-tag-suggest:hover{border-color:var(--gold-dim);color:var(--gold);}
+.nh-tag-suggest-x{cursor:pointer;font-size:10px;line-height:1;color:#7a756c;}
+.nh-tag-suggest-x:hover{color:var(--red);}
 
 /* ── CRM ── */
 /* Stage filter bar */
@@ -240,7 +243,7 @@ body.light-mode .nh-nav{border-color:#d4cfc5!important;}
 body.light-mode .nh-tab{background:#f0ede6!important;color:#5a5750!important;}
 body.light-mode .nh-tab.on{background:#f5f0e0!important;color:#9a7228!important;border-bottom-color:#9a7228!important;}
 body.light-mode .nh-search{background:#f0ede6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
-body.light-mode .nh-search-scope{background-color:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a5750'/%3E%3C/svg%3E")!important;}
+body.light-mode .nh-search-scope{background-color:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .nh-search-scope option{background:#ffffff!important;color:#1a1a18!important;}
 body.light-mode .nh-add-btn{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-add-btn:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
@@ -263,6 +266,7 @@ body.light-mode .nh-tag-input-wrap{background:#ffffff!important;border-color:#d4
 body.light-mode .nh-tag-input{color:#1a1a18!important;}
 body.light-mode .nh-tag-suggest{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .nh-tag-suggest:hover{border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-tag-suggest-x{color:#9a9590!important;}
 body.light-mode .nh-today{background:#fdf0f0!important;border-color:#c08080!important;}
 body.light-mode .nh-today-title{color:#8b2a2a!important;}
 body.light-mode .nh-today-dot{background:#8b2a2a!important;}
@@ -7151,6 +7155,7 @@ lrUpdateGoalBadge();
      _nh_deals     — CRM deals
      _nh_stages    — pipeline stages
      _nh_notes     — shared notes log {id, entityId, date, text}
+     _nh_dismissed_tags — tag names hidden from "previously used" suggestions
 ══════════════════════════════════════════════════════════ */
 
 /* ── IDB helpers ── */
@@ -7174,6 +7179,7 @@ async function nhSet(key,data){
 
 /* ── Global state ── */
 let _nhContacts=[], _nhDeals=[], _nhStages=[], _nhNotes=[];
+let _nhDismissedTags=[];
 let _nhTab='contacts';
 let _nhCbEditId=null, _nhCrmEditId=null;
 let _nhCrmFil='all';
@@ -7239,7 +7245,7 @@ function nhLinkBtns(obj){
 
 /* ── Open / Close ── */
 async function openContactBook(){
-  [_nhContacts,_nhDeals,_nhStages,_nhNotes]=await Promise.all([
+  [_nhContacts,_nhDeals,_nhStages,_nhNotes,_nhDismissedTags]=await Promise.all([
     nhGet('_nh_contacts').then(v=>v||[]),
     nhGet('_nh_deals').then(v=>v||[]),
     nhGet('_nh_stages').then(v=>{
@@ -7249,6 +7255,7 @@ async function openContactBook(){
       return v;
     }),
     nhGet('_nh_notes').then(v=>v||[]),
+    nhGet('_nh_dismissed_tags').then(v=>v||[]),
   ]);
   document.getElementById('netHubOverlay').classList.add('active');
   document.body.classList.add('overlay-open');
@@ -7377,14 +7384,30 @@ function nhRenderTagInput(){
   });
   const recentWrap=document.getElementById('nhCbTagRecent');
   if(recentWrap){
-    const remaining=nhAllUsedTags().filter(t=>!_nhCbTags.some(x=>x.toLowerCase()===t.toLowerCase()));
-    recentWrap.innerHTML=remaining.map(t=>`<span class="nh-tag-suggest" onclick="nhAddTag('${t.replace(/'/g,"\\'")}')">${t}</span>`).join('');
+    const remaining=nhAllUsedTags()
+      .filter(t=>!_nhCbTags.some(x=>x.toLowerCase()===t.toLowerCase()))
+      .filter(t=>!_nhDismissedTags.some(x=>x.toLowerCase()===t.toLowerCase()));
+    recentWrap.innerHTML=remaining.map(t=>`<span class="nh-tag-suggest">
+      <span onclick="nhAddTag('${t.replace(/'/g,"\\'")}')">${t}</span>
+      <span class="nh-tag-suggest-x" onclick="nhDismissSuggestedTag('${t.replace(/'/g,"\\'")}')">✕</span>
+    </span>`).join('');
   }
+}
+async function nhDismissSuggestedTag(tag){
+  if(!_nhDismissedTags.some(t=>t.toLowerCase()===tag.toLowerCase())){
+    _nhDismissedTags.push(tag);
+    await nhSet('_nh_dismissed_tags',_nhDismissedTags);
+  }
+  nhRenderTagInput();
 }
 function nhAddTag(tag){
   tag=(tag||'').trim();
   if(!tag)return;
   if(!_nhCbTags.some(t=>t.toLowerCase()===tag.toLowerCase())) _nhCbTags.push(tag);
+  if(_nhDismissedTags.some(t=>t.toLowerCase()===tag.toLowerCase())){
+    _nhDismissedTags=_nhDismissedTags.filter(t=>t.toLowerCase()!==tag.toLowerCase());
+    nhSet('_nh_dismissed_tags',_nhDismissedTags);
+  }
   const input=document.getElementById('nhCbTagInput');
   if(input)input.value='';
   nhRenderTagInput();

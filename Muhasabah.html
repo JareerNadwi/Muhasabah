@@ -730,10 +730,11 @@ body.light-mode #tafsirLoading,body.light-mode #tafsirContent,
 body.light-mode #bookLoading,body.light-mode #bookContent,
 body.light-mode #svLoading,body.light-mode #svContent,
 body.light-mode #asmaulContent,body.light-mode #asmaulSessionInfo,
-/* zikrReader elements now use CSS vars directly — no overrides needed */
+body.light-mode #zikrReaderContent,body.light-mode #zikrBookContent,
 /* Nav bars */
 body.light-mode #hadithNav,body.light-mode #tafsirNav,
-body.light-mode #bookNav,body.light-mode #svNav{background:#f0ede6!important;border-color:#d4cfc5!important;}
+body.light-mode #bookNav,body.light-mode #svNav,
+body.light-mode #zikrReaderSessionInfo,body.light-mode #zikrBookSessionInfo{background:#f0ede6!important;border-color:#d4cfc5!important;}
 /* Done notes */
 body.light-mode #hadithDoneNote,body.light-mode #tafsirDoneNote,
 body.light-mode #bookDoneNote,body.light-mode #asmaulDoneNote{
@@ -2583,8 +2584,8 @@ function applyReaderTheme(isLight){
     // Asmaul reader
     'asmaulDoneNote','asmaulSessionInfo','asmaulContent','asmaulPrevBtn','asmaulNextBtn','asmaulDayPill','asmaulProgressPill','asmaulPageDisplay',
     // Zikr readers
-    'zikrReaderContent','zikrReaderSessionInfo','zikrReaderDoneNote','zikrReaderPrevBtn','zikrReaderNextBtn','zikrReaderProgressPill','zikrReaderPageDisplay','zikrReaderTitle','zikrReaderDayPill',
-    'zikrBookContent','zikrBookDoneNote','zikrBookPrevBtn','zikrBookNextBtn','zikrBookDayPill',
+    'zikrReaderSessionInfo','zikrReaderDoneNote','zikrReaderPrevBtn','zikrReaderNextBtn','zikrReaderProgressPill','zikrReaderPageDisplay','zikrReaderTitle','zikrReaderDayPill',
+    'zikrBookDoneNote','zikrBookPrevBtn','zikrBookNextBtn','zikrBookDayPill',
     // Language learner — all panels have display toggled by JS
     'lrNoData','lrContent','lrHero','lrCollPanel','lrConjPanel','lrStoryPanel','lrSynAntPanel','lrChallengePanel','lrMarkWrap',
     'lrTitle','lrBody','lrHarakahBtn','lrWordNum','lrWordMain','lrWordRoman','lrWordType','lrWordMeaning','lrSimpleMeaning',
@@ -2598,7 +2599,7 @@ function applyReaderTheme(isLight){
 
   const DARK_BG_MAP={
     '#0d0b08':'#ffffff','#141008':'#f0ede6','#0f110f':'#ffffff',
-    '#111311':'#ece9e2','#1a1610':'#f0ede6','#1e1a10':'#ece9e2',
+    '#111311':'#ece9e2','#1a1610':'#f5f0e0','#1e1a10':'#ece9e2',
     '#071407':'#e8f5ec','#0a0c0a':'#ffffff','#0d0f0e':'#ffffff',
     '#1a1500':'#f5f0e0','#1a3020':'#d8f0de','#1a2818':'#e5f5e8',
     '#2a1515':'#f5dede','#2a1a3a':'#ede0f5','#1a0a0a':'#fff5f5'
@@ -2652,6 +2653,9 @@ function toggleDarkMode(){
   applyReaderTheme(isLight);
   try{lrSyncBtns();}catch(e){}
   try{pwSetTab(_pwTab||'linkedin');}catch(e){}
+  try{ if(document.getElementById('zikrReaderOverlay').classList.contains('active')) _zikrRender(); }catch(e){}
+  try{ if(document.getElementById('zikrBookReaderOverlay').classList.contains('active')) _zbRender(); }catch(e){}
+  try{ if(document.getElementById('zikrArticleOverlay').classList.contains('active') && _zikrDuasCache) _renderZikrDuas(_zikrDuasCache); }catch(e){}
   try{localStorage.setItem('muhasabah-theme',isLight?'light':'dark');}catch(e){}
 }
 (function(){
@@ -4752,12 +4756,12 @@ function _renderZikrDuas(duas){
   const container = document.getElementById('zikrDuasContainer');
   if(!container) return;
   const lm = document.body.classList.contains('light-mode');
-  const cardBg  = '#141008';
-  const cardBdr = '#2a2010';
-  const txtMain = '#f0e4c0';
-  const txtSub  = '#a89060';
-  const txtDim  = '#b0a07a';
-  const divBdr  = '#221e14';
+  const cardBg  = lm ? '#f5f0e0' : '#141008';
+  const cardBdr = lm ? '#d4cfc5' : '#2a2010';
+  const txtMain = lm ? '#1a1a18' : '#f0e4c0';
+  const txtSub  = lm ? '#5a5750' : '#a89060';
+  const txtDim  = lm ? '#5a5750' : '#b0a07a';
+  const divBdr  = lm ? '#d4cfc5' : '#221e14';
   const isLast = i => i === duas.length - 1;
   container.innerHTML = duas.map((d, i) => `
     <div style="background:${cardBg};border:1px solid ${cardBdr};border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:${isLast(i)?'32px':'16px'};">
@@ -5350,11 +5354,11 @@ function _zikrRender(){
   nb.style.color=isLast?"#fff":"var(--gold)";
   var ns=num<10?"0"+num:""+num;
   var _zlm=document.body.classList.contains('light-mode');
-  var _zcard='#1a1610';
-  var _ztxt='#f0e4c0';
-  var _zsub='#a89060';
-  var _zdim='#c5b98a';
-  var _zdiv='linear-gradient(to right,#2a2418,transparent)';
+  var _zcard=_zlm?'#f5f0e0':'#1a1610';
+  var _ztxt=_zlm?'#1a1a18':'#f0e4c0';
+  var _zsub=_zlm?'#5a5750':'#a89060';
+  var _zdim=_zlm?'#1a1a18':'#c5b98a';
+  var _zdiv=_zlm?'linear-gradient(to right,#d4cfc5,transparent)':'linear-gradient(to right,#2a2418,transparent)';
   document.getElementById("zikrReaderContent").innerHTML=
     "<div style=\"background:"+_zcard+";border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;\">"+
     "<div style=\"font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;font-family:'DM Mono',monospace;\">"+ns+" - Dua</div>"+
@@ -5569,11 +5573,11 @@ function _zbRender() {
     : '';
 
   const _zbLm=document.body.classList.contains('light-mode');
-  const _zbCard='#1a1610';
-  const _zbTxt='#f0e4c0';
-  const _zbSub='#a89060';
-  const _zbDim='#c5b98a';
-  const _zbDiv='linear-gradient(to right,#2a2418,transparent)';
+  const _zbCard=_zbLm?'#f5f0e0':'#1a1610';
+  const _zbTxt=_zbLm?'#1a1a18':'#f0e4c0';
+  const _zbSub=_zbLm?'#5a5750':'#a89060';
+  const _zbDim=_zbLm?'#1a1a18':'#c5b98a';
+  const _zbDiv=_zbLm?'linear-gradient(to right,#d4cfc5,transparent)':'linear-gradient(to right,#2a2418,transparent)';
   document.getElementById('zikrBookContent').innerHTML =
     '<div style="background:'+_zbCard+';border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;">' +
       '<div style="font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;font-family:\'DM Mono\',monospace;">' + numStr + ' — Dua</div>' +

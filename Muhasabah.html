@@ -258,6 +258,13 @@ body.light-mode .nh-deal:hover{border-color:#9a7228!important;}
 body.light-mode .nh-deal.ov{background:#fdf0f0!important;border-color:var(--red)!important;}
 body.light-mode .nh-ov-tag{background:#fdf0f0!important;border-color:var(--red)!important;color:var(--red)!important;}
 body.light-mode .nh-next-date.urg{color:var(--red)!important;}
+body.light-mode .nh-cb-name{color:#1a1a18!important;}
+body.light-mode .nh-cb-sub{color:#7a756c!important;}
+body.light-mode .nh-col-title{color:#1a1a18!important;}
+body.light-mode .nh-deal-name{color:#1a1a18!important;}
+body.light-mode .nh-deal-co{color:#7a756c!important;}
+body.light-mode .nh-deal-preview{color:#7a756c!important;}
+body.light-mode .nh-empty{color:#9a9590!important;}
 body.light-mode .nh-next-date.soon{color:#9a7228!important;}
 body.light-mode .nh-btn-save{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-btn-save:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
@@ -7173,11 +7180,16 @@ function nhStageColor(id){return(_nhStages.find(s=>s.id===id)||{color:'#6a7080'}
 
 function nhLinkBtns(obj){
   let h='';
-  if(obj.linkedin) h+=`<a class="nh-link lk" href="${obj.linkedin}" target="_blank" rel="noopener">🔗 LinkedIn</a>`;
-  if(obj.facebook) h+=`<a class="nh-link fb" href="${obj.facebook}" target="_blank" rel="noopener">👤 Facebook</a>`;
-  if(obj.whatsapp) h+=`<a class="nh-link wa" href="https://wa.me/${(obj.whatsapp||'').replace(/\D/g,'')}" target="_blank" rel="noopener">💬 WhatsApp</a>`;
-  if(obj.phone)    h+=`<a class="nh-link ph" href="tel:${obj.phone}">📞 Call</a>`;
-  if(obj.email)    h+=`<a class="nh-link em" href="mailto:${obj.email}">✉ Email</a>`;
+  const linkedin=(obj.linkedin||'').trim();
+  const facebook=(obj.facebook||'').trim();
+  const waDigits=(obj.whatsapp||'').replace(/\D/g,'');
+  const phone=(obj.phone||'').trim();
+  const email=(obj.email||'').trim();
+  if(linkedin) h+=`<a class="nh-link lk" href="${linkedin}" target="_blank" rel="noopener">🔗 LinkedIn</a>`;
+  if(facebook) h+=`<a class="nh-link fb" href="${facebook}" target="_blank" rel="noopener">👤 Facebook</a>`;
+  if(waDigits) h+=`<a class="nh-link wa" href="https://wa.me/${waDigits}" target="_blank" rel="noopener">💬 WhatsApp</a>`;
+  if(phone)    h+=`<a class="nh-link ph" href="tel:${phone}">📞 Call</a>`;
+  if(email)    h+=`<a class="nh-link em" href="mailto:${email}">✉ Email</a>`;
   return h;
 }
 
@@ -7464,11 +7476,16 @@ function nhCrmOpenModal(id,defaultStageId){
   const linksEl=document.getElementById('nhCrmVLinks');
   if(linksEl){
     let lh='';
-    if(linkedin&&linkedin!=='—') lh+=`<a class="nh-link lk" href="${linkedin}" target="_blank" rel="noopener">🔗 LinkedIn</a>`;
-    if(facebook&&facebook!=='—') lh+=`<a class="nh-link fb" href="${facebook}" target="_blank" rel="noopener">👤 Facebook</a>`;
-    if(whatsapp&&whatsapp!=='—') lh+=`<a class="nh-link wa" href="https://wa.me/${(whatsapp).replace(/\D/g,'')}" target="_blank" rel="noopener">💬 WhatsApp</a>`;
-    if(phone&&phone!=='—') lh+=`<a class="nh-link ph" href="tel:${phone}">📞 Call</a>`;
-    if(email&&email!=='—') lh+=`<a class="nh-link em" href="mailto:${email}">✉ Email</a>`;
+    const li=(linkedin&&linkedin!=='—')?linkedin.trim():'';
+    const fb=(facebook&&facebook!=='—')?facebook.trim():'';
+    const wa=(whatsapp&&whatsapp!=='—')?whatsapp.replace(/\D/g,''):'';
+    const ph=(phone&&phone!=='—')?phone.trim():'';
+    const em=(email&&email!=='—')?email.trim():'';
+    if(li) lh+=`<a class="nh-link lk" href="${li}" target="_blank" rel="noopener">🔗 LinkedIn</a>`;
+    if(fb) lh+=`<a class="nh-link fb" href="${fb}" target="_blank" rel="noopener">👤 Facebook</a>`;
+    if(wa) lh+=`<a class="nh-link wa" href="https://wa.me/${wa}" target="_blank" rel="noopener">💬 WhatsApp</a>`;
+    if(ph) lh+=`<a class="nh-link ph" href="tel:${ph}">📞 Call</a>`;
+    if(em) lh+=`<a class="nh-link em" href="mailto:${em}">✉ Email</a>`;
     linksEl.innerHTML=lh||'<span style="font-size:11px;color:#a89060">No contact links saved</span>';
   }
   // Populate editable pipeline fields

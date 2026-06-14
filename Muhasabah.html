@@ -724,14 +724,15 @@ body.light-mode .section-label{border-bottom-color:var(--border);}
 body.light-mode .counter-btn{background:var(--surface2);border-color:var(--border);}
 body.light-mode .qr-session-badge{background:var(--surface2);}
 /* ── Reader elements (JS-managed display — CSS only) ── */
-/* Shared reader backgrounds */
+/* Shared reader content-body backgrounds (white, per Zikr Reader reference) */
 body.light-mode #hadithLoading,body.light-mode #hadithContent,
 body.light-mode #tafsirLoading,body.light-mode #tafsirContent,
 body.light-mode #bookLoading,body.light-mode #bookContent,
 body.light-mode #svLoading,body.light-mode #svContent,
-body.light-mode #asmaulContent,body.light-mode #asmaulSessionInfo,
-body.light-mode #zikrReaderContent,body.light-mode #zikrBookContent,
-/* Nav bars */
+body.light-mode #asmaulContent,
+body.light-mode #zikrReaderContent,body.light-mode #zikrBookContent{background:#ffffff!important;border-color:#d4cfc5!important;}
+/* Nav bars / session-info bars (cream, matches header) */
+body.light-mode #asmaulSessionInfo,
 body.light-mode #hadithNav,body.light-mode #tafsirNav,
 body.light-mode #bookNav,body.light-mode #svNav,
 body.light-mode #zikrReaderSessionInfo,body.light-mode #zikrBookSessionInfo{background:#f0ede6!important;border-color:#d4cfc5!important;}

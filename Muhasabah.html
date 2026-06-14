@@ -59,14 +59,14 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-section{display:none;}.nh-section.on{display:block;}
 
 /* Controls */
-.nh-controls{display:flex;gap:8px;margin-bottom:14px;flex-wrap:nowrap;overflow-x:auto;}
-.nh-search{flex:1 1 90px;min-width:90px;background:#141008!important;border:1px solid #2a2010!important;color:#f0e4c0!important;padding:8px 12px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
+.nh-controls{display:flex;gap:6px;margin-bottom:14px;flex-wrap:nowrap;align-items:stretch;}
+.nh-search{flex:1 1 auto;min-width:0;background:#141008!important;border:1px solid #2a2010!important;color:#f0e4c0!important;padding:8px 10px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
 .nh-search:focus{border-color:var(--gold-dim);}
 .nh-search::placeholder{color:#a89060;}
-.nh-search-scope{flex:0 0 auto;background:#141008!important;border:1px solid #2a2010!important;color:#c5b98a!important;padding:8px 8px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23c5b98a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:22px;}
+.nh-search-scope{flex:0 0 auto;width:88px;background:#141008!important;border:1px solid #2a2010!important;color:#c5b98a!important;padding:8px 16px 8px 6px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:10px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23c5b98a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;}
 .nh-search-scope:focus{border-color:var(--gold-dim);}
 .nh-search-scope option{background:#1a1610;color:#f0e4c0;}
-.nh-add-btn{flex:0 0 auto;background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;white-space:nowrap;}
+.nh-add-btn{flex:0 0 auto;background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;white-space:nowrap;}
 .nh-add-btn:hover{background:#1a1610;border-color:var(--gold);}
 
 /* Shared modal */
@@ -126,6 +126,9 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-tag-chip-x{cursor:pointer;font-size:11px;line-height:1;color:#c5b98a;}
 .nh-tag-chip-x:hover{color:var(--red);}
 .nh-tag-input{flex:1;min-width:90px;background:transparent;border:none;outline:none;color:#f0e4c0;font-family:'DM Mono',monospace;font-size:11px;padding:3px 2px;}
+.nh-tag-suggestions{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.nh-tag-suggest{cursor:pointer;padding:3px 9px;border-radius:14px;border:1px solid #2a2010;background:#1a1610;color:#c5b98a;font-family:'DM Mono',monospace;font-size:10px;transition:all .15s;}
+.nh-tag-suggest:hover{border-color:var(--gold-dim);color:var(--gold);}
 
 /* ── CRM ── */
 /* Stage filter bar */
@@ -258,6 +261,8 @@ body.light-mode .nh-tag-chip{background:#fdf5dc!important;border-color:#9a7228!i
 body.light-mode .nh-tag-chip-x{color:#7a756c!important;}
 body.light-mode .nh-tag-input-wrap{background:#ffffff!important;border-color:#d4cfc5!important;}
 body.light-mode .nh-tag-input{color:#1a1a18!important;}
+body.light-mode .nh-tag-suggest{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .nh-tag-suggest:hover{border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-today{background:#fdf0f0!important;border-color:#c08080!important;}
 body.light-mode .nh-today-title{color:#8b2a2a!important;}
 body.light-mode .nh-today-dot{background:#8b2a2a!important;}
@@ -7355,6 +7360,11 @@ function nhCbEdit(id){
 function nhCbCloseModal(){document.getElementById('nhCbModalBg').classList.remove('open');_nhCbEditId=null;_nhCbTags=[];}
 
 /* ── Tag input widget ── */
+function nhAllUsedTags(){
+  const s=new Set();
+  _nhContacts.forEach(c=>(c.tags||[]).forEach(t=>s.add(t)));
+  return [...s].sort((a,b)=>a.localeCompare(b));
+}
 function nhRenderTagInput(){
   const wrap=document.getElementById('nhCbTagChips');
   if(!wrap)return;
@@ -7365,6 +7375,11 @@ function nhRenderTagInput(){
     chip.innerHTML=`${t} <span class="nh-tag-chip-x" onclick="nhRemoveTag(${i})">✕</span>`;
     wrap.insertBefore(chip,document.getElementById('nhCbTagInput'));
   });
+  const recentWrap=document.getElementById('nhCbTagRecent');
+  if(recentWrap){
+    const remaining=nhAllUsedTags().filter(t=>!_nhCbTags.some(x=>x.toLowerCase()===t.toLowerCase()));
+    recentWrap.innerHTML=remaining.map(t=>`<span class="nh-tag-suggest" onclick="nhAddTag('${t.replace(/'/g,"\\'")}')">${t}</span>`).join('');
+  }
 }
 function nhAddTag(tag){
   tag=(tag||'').trim();
@@ -7950,7 +7965,6 @@ async function nhSmDone(){
     <!-- Contact Book Section -->
     <div class="nh-section on" data-sec="contacts">
       <div class="nh-controls">
-        <input class="nh-search" id="nhCbSearch" type="text" placeholder="" oninput="nhRenderContacts()">
         <select class="nh-search-scope" id="nhCbSearchScope" onchange="nhRenderContacts()">
           <option value="all">All Fields</option>
           <option value="name">Name</option>
@@ -7959,6 +7973,7 @@ async function nhSmDone(){
           <option value="contact">Contact Info</option>
           <option value="tags">Tags</option>
         </select>
+        <input class="nh-search" id="nhCbSearch" type="text" placeholder="" oninput="nhRenderContacts()">
         <button class="nh-add-btn" onclick="nhCbEdit(null)">＋ Add Contact</button>
       </div>
       <div class="nh-cb-list" id="nhCbList"></div>
@@ -7990,6 +8005,7 @@ async function nhSmDone(){
       <div class="nh-tag-input-wrap" id="nhCbTagChips">
         <input class="nh-tag-input" id="nhCbTagInput" type="text" placeholder="Type a tag and press Enter" onkeydown="nhTagInputKeydown(event)">
       </div>
+      <div class="nh-tag-suggestions" id="nhCbTagRecent"></div>
     </div>
     <div class="nh-modal-actions">
       <button class="nh-btn-cancel" onclick="nhCbCloseModal()">Cancel</button>

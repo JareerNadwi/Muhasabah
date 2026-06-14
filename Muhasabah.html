@@ -63,6 +63,9 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-search{flex:1;min-width:140px;background:#141008!important;border:1px solid #2a2010!important;color:#f0e4c0!important;padding:8px 12px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
 .nh-search:focus{border-color:var(--gold-dim);}
 .nh-search::placeholder{color:#a89060;}
+.nh-search-scope{background:#141008!important;border:1px solid #2a2010!important;color:#c5b98a!important;padding:8px 10px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23c5b98a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:26px;}
+.nh-search-scope:focus{border-color:var(--gold-dim);}
+.nh-search-scope option{background:#1a1610;color:#f0e4c0;}
 .nh-add-btn{background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;white-space:nowrap;}
 .nh-add-btn:hover{background:#1a1610;border-color:var(--gold);}
 
@@ -113,6 +116,19 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-cb-name{font-family:'Instrument Serif',serif;font-size:16px;color:#f0e4c0;}
 .nh-cb-sub{font-size:11px;color:#c5b98a;margin-top:2px;}
 .nh-cb-actions{display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;}
+
+/* Tags */
+.nh-tags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 0;}
+.nh-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;border:1px solid var(--gold-dim);background:rgba(200,169,110,.08);color:var(--gold);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.5px;white-space:nowrap;}
+.nh-tag-input-wrap{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#1a1610;border:1px solid #2a2010;border-radius:var(--radius);padding:6px 8px;}
+.nh-tag-input-wrap:focus-within{border-color:var(--gold-dim);}
+.nh-tag-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:14px;border:1px solid var(--gold-dim);background:rgba(200,169,110,.12);color:var(--gold);font-family:'DM Mono',monospace;font-size:10px;}
+.nh-tag-chip-x{cursor:pointer;font-size:11px;line-height:1;color:#c5b98a;}
+.nh-tag-chip-x:hover{color:var(--red);}
+.nh-tag-input{flex:1;min-width:90px;background:transparent;border:none;outline:none;color:#f0e4c0;font-family:'DM Mono',monospace;font-size:11px;padding:3px 2px;}
+.nh-tag-suggestions{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.nh-tag-suggest{cursor:pointer;padding:3px 9px;border-radius:14px;border:1px solid #2a2010;background:#1a1610;color:#c5b98a;font-family:'DM Mono',monospace;font-size:10px;transition:all .15s;}
+.nh-tag-suggest:hover{border-color:var(--gold-dim);color:var(--gold);}
 
 /* ── CRM ── */
 /* Stage filter bar */
@@ -224,6 +240,8 @@ body.light-mode .nh-nav{border-color:#d4cfc5!important;}
 body.light-mode .nh-tab{background:#f0ede6!important;color:#5a5750!important;}
 body.light-mode .nh-tab.on{background:#f5f0e0!important;color:#9a7228!important;border-bottom-color:#9a7228!important;}
 body.light-mode .nh-search{background:#f0ede6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
+body.light-mode .nh-search-scope{background-color:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a5750'/%3E%3C/svg%3E")!important;}
+body.light-mode .nh-search-scope option{background:#ffffff!important;color:#1a1a18!important;}
 body.light-mode .nh-add-btn{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-add-btn:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
 body.light-mode .nh-field input,body.light-mode .nh-field select,body.light-mode .nh-field textarea{
@@ -238,6 +256,13 @@ body.light-mode .nh-sm-btn.done{border-color:var(--green)!important;color:var(--
 body.light-mode .nh-sm-btn.done:hover{background:#d8f0de!important;border-color:var(--green)!important;}
 body.light-mode .nh-sm-btn.danger:hover{background:#f5dede!important;border-color:var(--red)!important;color:var(--red)!important;}
 body.light-mode .nh-link{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .nh-tag{background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-tag-chip{background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-tag-chip-x{color:#7a756c!important;}
+body.light-mode .nh-tag-input-wrap{background:#ffffff!important;border-color:#d4cfc5!important;}
+body.light-mode .nh-tag-input{color:#1a1a18!important;}
+body.light-mode .nh-tag-suggest{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .nh-tag-suggest:hover{border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-today{background:#fdf0f0!important;border-color:#c08080!important;}
 body.light-mode .nh-today-title{color:#8b2a2a!important;}
 body.light-mode .nh-today-dot{background:#8b2a2a!important;}
@@ -7154,6 +7179,13 @@ let _nhCbEditId=null, _nhCrmEditId=null;
 let _nhCrmFil='all';
 let _nhOpenCols=new Set();
 let _nhDragSrc=null;
+let _nhCbTags=[];
+
+const NH_TAG_SUGGESTIONS=[
+  'Decision Maker','Influencer','Gatekeeper','Individual Contributor',
+  'HR / Talent Acquisition','Operations','Key Account Management',
+  'Sales / Business Development','Finance','IT / Tech','Founder / Executive','Marketing',
+];
 
 const NH_FIXED_STAGE={id:'stage_contacts',name:'Contacts',color:'#6a7080',fixed:true};
 const NH_DEFAULT_STAGES=[
@@ -7277,13 +7309,30 @@ function nhShowTab(tab){
 /* ══ CONTACT BOOK ══ */
 function nhRenderContacts(){
   const q=(document.getElementById('nhCbSearch')?.value||'').toLowerCase();
+  const scope=document.getElementById('nhCbSearchScope')?.value||'all';
   let list=[..._nhContacts].sort((a,b)=>(a.name||'').localeCompare(b.name||''));
-  if(q) list=list.filter(c=>(c.name+c.role+c.company).toLowerCase().includes(q));
+  if(q){
+    list=list.filter(c=>{
+      const tags=(c.tags||[]).join(' ');
+      const contactInfo=[c.linkedin,c.facebook,c.whatsapp,c.phone,c.email].filter(Boolean).join(' ');
+      let hay;
+      switch(scope){
+        case 'name': hay=c.name||''; break;
+        case 'role': hay=c.role||''; break;
+        case 'company': hay=c.company||''; break;
+        case 'contact': hay=contactInfo; break;
+        case 'tags': hay=tags; break;
+        default: hay=[c.name,c.role,c.company,contactInfo,tags].filter(Boolean).join(' ');
+      }
+      return hay.toLowerCase().includes(q);
+    });
+  }
   const el=document.getElementById('nhCbList');
   if(!el)return;
   if(!list.length){el.innerHTML='<div class="nh-empty">No contacts yet. Add your first connection.</div>';return;}
   el.innerHTML=list.map(c=>{
     const links=nhLinkBtns(c);
+    const tags=(c.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
     return `<div class="nh-cb-card">
       <div class="nh-cb-card-top">
         <div>
@@ -7297,6 +7346,7 @@ function nhRenderContacts(){
         </div>
       </div>
       ${links?`<div class="nh-links">${links}</div>`:''}
+      ${tags?`<div class="nh-tags">${tags}</div>`:''}
     </div>`;
   }).join('');
 }
@@ -7309,9 +7359,56 @@ function nhCbEdit(id){
     const el=document.getElementById('nhCbF'+f);
     if(el) el.value=c?.[f.toLowerCase()]||'';
   });
+  _nhCbTags=[...(c?.tags||[])];
+  nhRenderTagInput();
   document.getElementById('nhCbModalBg').classList.add('open');
 }
-function nhCbCloseModal(){document.getElementById('nhCbModalBg').classList.remove('open');_nhCbEditId=null;}
+function nhCbCloseModal(){document.getElementById('nhCbModalBg').classList.remove('open');_nhCbEditId=null;_nhCbTags=[];}
+
+/* ── Tag input widget ── */
+function nhAllUsedTags(){
+  const s=new Set();
+  _nhContacts.forEach(c=>(c.tags||[]).forEach(t=>s.add(t)));
+  return [...s];
+}
+function nhRenderTagInput(){
+  const wrap=document.getElementById('nhCbTagChips');
+  const sugWrap=document.getElementById('nhCbTagSuggestions');
+  if(!wrap)return;
+  wrap.querySelectorAll('.nh-tag-chip').forEach(e=>e.remove());
+  _nhCbTags.forEach((t,i)=>{
+    const chip=document.createElement('span');
+    chip.className='nh-tag-chip';
+    chip.innerHTML=`${t} <span class="nh-tag-chip-x" onclick="nhRemoveTag(${i})">✕</span>`;
+    wrap.insertBefore(chip,document.getElementById('nhCbTagInput'));
+  });
+  if(sugWrap){
+    const pool=[...new Set([...NH_TAG_SUGGESTIONS,...nhAllUsedTags()])];
+    const remaining=pool.filter(t=>!_nhCbTags.includes(t));
+    sugWrap.innerHTML=remaining.map(t=>`<span class="nh-tag-suggest" onclick="nhAddTag('${t.replace(/'/g,"\\'")}')">+ ${t}</span>`).join('');
+  }
+}
+function nhAddTag(tag){
+  tag=(tag||'').trim();
+  if(!tag)return;
+  if(!_nhCbTags.some(t=>t.toLowerCase()===tag.toLowerCase())) _nhCbTags.push(tag);
+  const input=document.getElementById('nhCbTagInput');
+  if(input)input.value='';
+  nhRenderTagInput();
+}
+function nhRemoveTag(i){
+  _nhCbTags.splice(i,1);
+  nhRenderTagInput();
+}
+function nhTagInputKeydown(e){
+  if(e.key==='Enter'||e.key===','){
+    e.preventDefault();
+    nhAddTag(e.target.value);
+  } else if(e.key==='Backspace'&&!e.target.value&&_nhCbTags.length){
+    nhRemoveTag(_nhCbTags.length-1);
+  }
+}
+
 async function nhCbSave(){
   const g=id=>document.getElementById(id)?.value.trim()||'';
   const name=g('nhCbFName');
@@ -7321,6 +7418,7 @@ async function nhCbSave(){
     role:g('nhCbFRole'),company:g('nhCbFCompany'),
     linkedin:g('nhCbFLinkedin'),facebook:g('nhCbFFacebook'),
     whatsapp:g('nhCbFWhatsapp'),phone:g('nhCbFPhone'),email:g('nhCbFEmail'),
+    tags:[..._nhCbTags],
   };
   if(_nhCbEditId){const i=_nhContacts.findIndex(x=>x.id===_nhCbEditId);if(i>-1)_nhContacts[i]=contact;}
   else _nhContacts.push(contact);
@@ -7440,6 +7538,8 @@ function nhDealHTML(d){
     else dateLabel=`<span class="nh-next-date">${d.nextAction}</span>`;
   }
   const links=nhLinkBtns(d);
+  const contact=_nhContacts.find(x=>x.id===d.contactId);
+  const tags=(contact?.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
   const noteList=_nhNotes.filter(n=>n.entityId===(d.contactId||d.id));
   const lastNote=noteList.length?noteList[noteList.length-1]:null;
   return `<div class="nh-deal${ov?' ov':''}" id="nhd-${d.id}"
@@ -7455,6 +7555,7 @@ function nhDealHTML(d){
       </div>
     </div>
     ${links?`<div class="nh-links">${links}</div>`:''}
+    ${tags?`<div class="nh-tags">${tags}</div>`:''}
     <div class="nh-deal-bottom">
       <div class="nh-deal-preview">${lastNote?lastNote.date+' — '+lastNote.text:'No notes yet'}</div>
       <div class="nh-deal-btns">
@@ -7872,6 +7973,14 @@ async function nhSmDone(){
     <div class="nh-section on" data-sec="contacts">
       <div class="nh-controls">
         <input class="nh-search" id="nhCbSearch" type="text" placeholder="" oninput="nhRenderContacts()">
+        <select class="nh-search-scope" id="nhCbSearchScope" onchange="nhRenderContacts()">
+          <option value="all">All Fields</option>
+          <option value="name">Name</option>
+          <option value="role">Role / Title</option>
+          <option value="company">Company</option>
+          <option value="contact">Contact Info</option>
+          <option value="tags">Tags</option>
+        </select>
         <button class="nh-add-btn" onclick="nhCbEdit(null)">＋ Add Contact</button>
       </div>
       <div class="nh-cb-list" id="nhCbList"></div>
@@ -7898,6 +8007,13 @@ async function nhSmDone(){
     <div class="nh-field"><label>WhatsApp (Country Code + Number)</label><input id="nhCbFWhatsapp" type="tel" placeholder=""></div>
     <div class="nh-field"><label>Mobile (Country Code + Number)</label><input id="nhCbFPhone" type="tel" placeholder=""></div>
     <div class="nh-field"><label>Email</label><input id="nhCbFEmail" type="email" placeholder=""></div>
+    <div class="nh-field">
+      <label>Tags</label>
+      <div class="nh-tag-input-wrap" id="nhCbTagChips">
+        <input class="nh-tag-input" id="nhCbTagInput" type="text" placeholder="Type a tag and press Enter" onkeydown="nhTagInputKeydown(event)">
+      </div>
+      <div class="nh-tag-suggestions" id="nhCbTagSuggestions"></div>
+    </div>
     <div class="nh-modal-actions">
       <button class="nh-btn-cancel" onclick="nhCbCloseModal()">Cancel</button>
       <button class="nh-btn-save" onclick="nhCbSave()">Save Contact</button>

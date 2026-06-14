@@ -3861,7 +3861,7 @@ function _renderSvBadge(dk, goalKey){
   const sessKey  = goalKey + '_svSessions';
   const sessions = data[sessKey];
   if(!sessions || sessions.length === 0){ badge.style.display = 'none'; return; }
-  const totalMap = { surahWaqiah: 29, surahMulk: 50, surahKahf: 110 };
+  const totalMap = { surahWaqiah: 96, surahMulk: 30, surahKahf: 110 };
   const total      = totalMap[goalKey] || SURAH_LENGTHS[(goalKey === 'surahWaqiah' ? 55 : goalKey === 'surahMulk' ? 66 : 17)];
   const done       = data[goalKey] === 'yes';
   const totalVerses = sessions.reduce((s,x) => s + x.verses, 0);

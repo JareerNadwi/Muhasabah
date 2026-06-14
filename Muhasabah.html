@@ -7595,6 +7595,7 @@ function nhDealHTML(d,showStage){
   }
   const links=nhLinkBtns(d);
   const contact=_nhContacts.find(x=>x.id===d.contactId);
+  const subLine=[contact?.role,contact?.company||d.company].filter(Boolean).join(' · ');
   const tags=(contact?.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
   const noteList=_nhNotes.filter(n=>n.entityId===(d.contactId||d.id));
   const lastNote=noteList.length?noteList[noteList.length-1]:null;
@@ -7604,7 +7605,7 @@ function nhDealHTML(d,showStage){
     <div class="nh-deal-top">
       <div>
         <div class="nh-deal-name">${d.contactName||'—'}</div>
-        <div class="nh-deal-co">${d.company||''}</div>
+        <div class="nh-deal-co">${subLine}</div>
       </div>
       <div class="nh-deal-right">
         ${ov?'<span class="nh-ov-tag">ACTION NEEDED</span>':''}

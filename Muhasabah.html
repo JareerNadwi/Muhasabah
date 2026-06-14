@@ -7623,7 +7623,8 @@ function nhDealHTML(d,showStage){
       <div class="nh-deal-preview">${lastNote?lastNote.date+' — '+lastNote.text:'No notes yet'}</div>
       <div class="nh-deal-btns">
         ${ov?`<button class="nh-sm-btn done" onclick="nhOpenMarkDone('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}','done')" >✓ Mark Done</button>`:''}
-        ${(ov||nhIsNoAction(d))?`<button class="nh-sm-btn done" onclick="nhOpenMarkDone('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}','assign')" >✓ Mark Done &amp; Assign Next</button>`:''}
+        ${ov?`<button class="nh-sm-btn done" onclick="nhOpenMarkDone('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}','assign')" >✓ Mark Done &amp; Assign Next</button>`:''}
+        ${(!ov&&nhIsNoAction(d))?`<button class="nh-sm-btn done" onclick="nhOpenMarkDone('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}','assign_only')" >→ Assign Next</button>`:''}
         <button class="nh-sm-btn" onclick="nhOpenNotes('${d.contactId||d.id}','${(d.contactName||'').replace(/'/g,"\\'")}')">📝 Notes</button>
         <button class="nh-sm-btn" onclick="nhCrmOpenModal('${d.id}')">Edit</button>
         <button class="nh-sm-btn danger" onclick="nhCrmDelete('${d.id}')">Del</button>
@@ -7799,16 +7800,25 @@ let _nhMarkDoneMode='done';
 function nhOpenMarkDone(dealId,name,mode){
   _nhMarkDoneId=dealId;
   _nhMarkDoneMode=mode||'done';
-  const titlePrefix=_nhMarkDoneMode==='assign'?'✓ Mark Done & Assign Next — ':'✓ Mark Done — ';
-  document.getElementById('nhMarkDoneName').textContent=titlePrefix+name;
-  document.getElementById('nhMarkDoneNote').value='';
-  document.getElementById('nhMarkDoneNote').disabled=false;
+  const titles={done:'✓ Mark Done — ',assign:'✓ Mark Done & Assign Next — ',assign_only:'→ Assign Next Action — '};
+  document.getElementById('nhMarkDoneName').textContent=(titles[_nhMarkDoneMode]||titles.done)+name;
   document.getElementById('nhMarkDoneNextDate').value='';
   document.getElementById('nhMarkDoneNextActionNote').value='';
-  document.getElementById('nhMarkDoneNext').classList.remove('on');
-  const btn=document.getElementById('nhMarkDoneNoteBtn');
-  btn.disabled=false;
-  btn.textContent=_nhMarkDoneMode==='assign'?'Save & Set Next Action →':'Save & Mark Done';
+  if(_nhMarkDoneMode==='assign_only'){
+    // No "what did you do" step — go straight to next action inputs
+    document.getElementById('nhMarkDoneNoteField').style.display='none';
+    document.getElementById('nhMarkDoneNoteBtn').style.display='none';
+    document.getElementById('nhMarkDoneNext').classList.add('on');
+  }else{
+    document.getElementById('nhMarkDoneNoteField').style.display='';
+    document.getElementById('nhMarkDoneNote').value='';
+    document.getElementById('nhMarkDoneNote').disabled=false;
+    document.getElementById('nhMarkDoneNext').classList.remove('on');
+    const btn=document.getElementById('nhMarkDoneNoteBtn');
+    btn.style.display='';
+    btn.disabled=false;
+    btn.textContent=_nhMarkDoneMode==='assign'?'Save & Set Next Action →':'Save & Mark Done';
+  }
   document.getElementById('nhMarkDoneBg').classList.add('open');
 }
 function nhCloseMarkDone(){
@@ -8179,7 +8189,7 @@ async function nhSmDone(){
 <div class="nh-modal-bg" id="nhMarkDoneBg" style="z-index:4000;">
   <div class="nh-modal" style="max-width:480px;">
     <div class="nh-modal-title" id="nhMarkDoneName">✓ Mark Done</div>
-    <div class="nh-field">
+    <div class="nh-field" id="nhMarkDoneNoteField">
       <label>What did you do?</label>
       <textarea class="nh-note-textarea" id="nhMarkDoneNote" style="min-height:100px;pointer-events:auto;touch-action:auto;"></textarea>
     </div>

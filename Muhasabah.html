@@ -49,6 +49,7 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-chip{display:inline-flex;align-items:center;gap:5px;background:#1a1610;border:1px solid var(--red);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--red);cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s;}
 .nh-chip:hover{border-color:var(--red);color:var(--red);}
 .nh-chip-company{font-size:9px;opacity:.7;}
+.nh-chip-action{font-size:9px;opacity:.85;font-style:italic;}
 
 /* Nav tabs */
 .nh-nav{display:flex;margin-bottom:16px;border:1px solid #2a2010;border-radius:8px;overflow:hidden;}
@@ -181,6 +182,7 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-next-date{font-family:'DM Mono',monospace;font-size:9px;color:#a89060;}
 .nh-next-date.urg{color:#e05555;}
 .nh-next-date.soon{color:var(--gold);}
+.nh-next-action-note{font-family:'DM Mono',monospace;font-size:10px;color:#e0d4b0;background:rgba(200,169,110,.06);border:1px solid #2a2010;border-radius:var(--radius);padding:5px 9px;margin:6px 0 0;}
 .nh-deal-bottom{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;margin-top:8px;}
 .nh-deal-preview{font-size:10px;color:#a89060;font-style:italic;flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
 .nh-deal-btns{display:flex;gap:5px;flex-shrink:0;}
@@ -207,8 +209,8 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-markdone-next{display:none;margin-top:10px;border-top:1px solid #2a2010;padding-top:10px;}
 .nh-markdone-next.on{display:block;}
 .nh-markdone-next label{display:block;font-family:'DM Mono',monospace;font-size:10px;color:#c5b98a;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
-.nh-markdone-next input[type=date]{width:100%;background:#1a1610;border:1px solid #2a2010;color:#f0e4c0;padding:8px 11px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;box-sizing:border-box;}
-.nh-markdone-next input[type=date]:focus{border-color:var(--gold-dim);}
+.nh-markdone-next input[type=date],.nh-markdone-next input[type=text]{width:100%;background:#1a1610;border:1px solid #2a2010;color:#f0e4c0;padding:8px 11px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;box-sizing:border-box;}
+.nh-markdone-next input[type=date]:focus,.nh-markdone-next input[type=text]:focus{border-color:var(--gold-dim);}
 .nh-markdone-confirm{margin-top:8px;background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:7px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;width:100%;}
 .nh-markdone-confirm:hover{border-color:var(--gold);}
 .nh-note-submit:hover{background:#1a1610;}
@@ -303,6 +305,7 @@ body.light-mode .nh-deal-co{color:#7a756c!important;}
 body.light-mode .nh-deal-preview{color:#7a756c!important;}
 body.light-mode .nh-empty{color:#9a9590!important;}
 body.light-mode .nh-next-date.soon{color:#9a7228!important;}
+body.light-mode .nh-next-action-note{color:#5a4a28!important;background:#fdf5dc!important;border-color:#e8d8b0!important;}
 body.light-mode .nh-btn-save{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-btn-save:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
 body.light-mode .nh-btn-cancel{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
@@ -321,7 +324,7 @@ body.light-mode .nh-sm-input{background:#e8e2d6!important;border-color:#d4cfc5!i
 body.light-mode .nh-sm-addbtn{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-sm-del:hover{color:var(--red)!important;}
 body.light-mode .nh-markdone-confirm{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
-body.light-mode .nh-markdone-next input[type=date]{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
+body.light-mode .nh-markdone-next input[type=date],body.light-mode .nh-markdone-next input[type=text]{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
 body.light-mode .nh-view-field{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .nh-crm-section-head{color:#9a9590!important;border-color:#d4cfc5!important;}
 
@@ -7300,7 +7303,7 @@ function nhRenderToday(){
   if(!due.length){el.classList.remove('on');return;}
   el.classList.add('on');
   chips.innerHTML=due.map(d=>`<span class="nh-chip" onclick="nhScrollDeal('${d.id}')">
-    ${d.contactName||'—'} <span class="nh-chip-company">${d.company?'· '+d.company:''}</span>
+    ${d.contactName||'—'} <span class="nh-chip-company">${d.company?'· '+d.company:''}</span>${d.nextActionNote?` <span class="nh-chip-action">— ${d.nextActionNote}</span>`:''}
   </span>`).join('');
 }
 
@@ -7468,7 +7471,7 @@ async function nhCbSave(){
       _nhDeals.push({
         id:nhId(),contactId:contact.id,contactName:contact.name,
         company:contact.company||'',stageId:'stage_contacts',
-        nextAction:'',linkedin:contact.linkedin||'',facebook:contact.facebook||'',
+        nextAction:'',nextActionNote:'',linkedin:contact.linkedin||'',facebook:contact.facebook||'',
         whatsapp:contact.whatsapp||'',phone:contact.phone||'',email:contact.email||'',
         createdAt:nhToday(),
       });
@@ -7613,12 +7616,14 @@ function nhDealHTML(d,showStage){
       </div>
     </div>
     ${stageBadge?`<div class="nh-tags">${stageBadge}</div>`:''}
+    ${d.nextActionNote?`<div class="nh-next-action-note">📌 ${d.nextActionNote}</div>`:''}
     ${links?`<div class="nh-links">${links}</div>`:''}
     ${tags?`<div class="nh-tags">${tags}</div>`:''}
     <div class="nh-deal-bottom">
       <div class="nh-deal-preview">${lastNote?lastNote.date+' — '+lastNote.text:'No notes yet'}</div>
       <div class="nh-deal-btns">
-        ${ov?`<button class="nh-sm-btn done" onclick="nhOpenMarkDone('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}')" >✓ Mark Done</button>`:''}
+        ${ov?`<button class="nh-sm-btn done" onclick="nhOpenMarkDone('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}','done')" >✓ Mark Done</button>`:''}
+        ${(ov||nhIsNoAction(d))?`<button class="nh-sm-btn done" onclick="nhOpenMarkDone('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}','assign')" >✓ Mark Done &amp; Assign Next</button>`:''}
         <button class="nh-sm-btn" onclick="nhOpenNotes('${d.contactId||d.id}','${(d.contactName||'').replace(/'/g,"\\'")}')">📝 Notes</button>
         <button class="nh-sm-btn" onclick="nhCrmOpenModal('${d.id}')">Edit</button>
         <button class="nh-sm-btn danger" onclick="nhCrmDelete('${d.id}')">Del</button>
@@ -7670,6 +7675,7 @@ function nhCrmOpenModal(id,defaultStageId){
   const spick=document.getElementById('nhCrmFStage');
   spick.innerHTML=_nhStages.map(s=>`<option value="${s.id}"${(d?.stageId||defaultStageId||'stage_contacts')===s.id?' selected':''}>${s.name}</option>`).join('');
   document.getElementById('nhCrmFNextAction').value=d?.nextAction||'';
+  document.getElementById('nhCrmFNextActionNote').value=d?.nextActionNote||'';
   document.getElementById('nhCrmDelBtn').style.display=id?'block':'none';
   document.getElementById('nhCrmModalBg').classList.add('open');
 }
@@ -7693,6 +7699,7 @@ async function nhCrmSave(){
   // Only update pipeline-controlled fields
   deal.stageId=g('nhCrmFStage')||deal.stageId;
   deal.nextAction=g('nhCrmFNextAction');
+  deal.nextActionNote=g('nhCrmFNextActionNote');
   await nhSet('_nh_deals',_nhDeals);
   nhCrmCloseModal();nhRenderCrm();nhRenderToday();
 }
@@ -7788,12 +7795,20 @@ async function nhAddNote(){
 
 /* ══ MARK DONE ══ */
 let _nhMarkDoneId=null;
-function nhOpenMarkDone(dealId, name){
+let _nhMarkDoneMode='done';
+function nhOpenMarkDone(dealId,name,mode){
   _nhMarkDoneId=dealId;
-  document.getElementById('nhMarkDoneName').textContent='✓ Mark Done — '+name;
+  _nhMarkDoneMode=mode||'done';
+  const titlePrefix=_nhMarkDoneMode==='assign'?'✓ Mark Done & Assign Next — ':'✓ Mark Done — ';
+  document.getElementById('nhMarkDoneName').textContent=titlePrefix+name;
   document.getElementById('nhMarkDoneNote').value='';
+  document.getElementById('nhMarkDoneNote').disabled=false;
   document.getElementById('nhMarkDoneNextDate').value='';
+  document.getElementById('nhMarkDoneNextActionNote').value='';
   document.getElementById('nhMarkDoneNext').classList.remove('on');
+  const btn=document.getElementById('nhMarkDoneNoteBtn');
+  btn.disabled=false;
+  btn.textContent=_nhMarkDoneMode==='assign'?'Save & Set Next Action →':'Save & Mark Done';
   document.getElementById('nhMarkDoneBg').classList.add('open');
 }
 function nhCloseMarkDone(){
@@ -7809,17 +7824,29 @@ async function nhMarkDoneSubmitNote(){
   const entityId=deal.contactId||deal.id;
   _nhNotes.push({id:nhId(),entityId,date:nhToday(),text});
   await nhSet('_nh_notes',_nhNotes);
-  // Show next action date input
-  document.getElementById('nhMarkDoneNext').classList.add('on');
   document.getElementById('nhMarkDoneNote').disabled=true;
   document.getElementById('nhMarkDoneNoteBtn').disabled=true;
+  if(_nhMarkDoneMode==='assign'){
+    // Reveal next action date + note inputs
+    document.getElementById('nhMarkDoneNext').classList.add('on');
+  }else{
+    // Plain "Mark Done" — clear any existing next action, deal moves to No Action
+    deal.nextAction='';
+    deal.nextActionNote='';
+    await nhSet('_nh_deals',_nhDeals);
+    nhCloseMarkDone();
+    nhRenderCrm();
+    nhRenderToday();
+  }
 }
 async function nhMarkDoneConfirm(){
   const dateVal=document.getElementById('nhMarkDoneNextDate').value;
   if(!dateVal){alert('Please select a next action date.');return;}
+  const noteVal=document.getElementById('nhMarkDoneNextActionNote').value.trim();
   const deal=_nhDeals.find(d=>d.id===_nhMarkDoneId);
   if(!deal)return;
   deal.nextAction=dateVal;
+  deal.nextActionNote=noteVal;
   await nhSet('_nh_deals',_nhDeals);
   nhCloseMarkDone();
   nhRenderCrm();
@@ -8103,6 +8130,10 @@ async function nhSmDone(){
       <label>Next Action Date</label>
       <input id="nhCrmFNextAction" type="date">
     </div>
+    <div class="nh-field">
+      <label>Next Action — What To Do</label>
+      <input id="nhCrmFNextActionNote" type="text" placeholder="e.g. Call to discuss proposal">
+    </div>
 
     <div class="nh-modal-actions">
       <button class="nh-btn-del" id="nhCrmDelBtn" style="display:none;margin-right:auto" onclick="nhCrmDelete(_nhCrmEditId);nhCrmCloseModal()">Delete</button>
@@ -8156,6 +8187,8 @@ async function nhSmDone(){
     <div class="nh-markdone-next" id="nhMarkDoneNext">
       <label>Next Action Date</label>
       <input type="date" id="nhMarkDoneNextDate">
+      <label style="margin-top:8px;">Next Action — What To Do</label>
+      <input type="text" id="nhMarkDoneNextActionNote" placeholder="e.g. Call to discuss proposal">
       <button class="nh-markdone-confirm" onclick="nhMarkDoneConfirm()">Confirm Next Action</button>
     </div>
     <div class="nh-modal-actions" style="margin-top:12px;">

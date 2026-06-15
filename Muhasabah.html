@@ -128,8 +128,7 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-link:hover{border-color:var(--gold-dim);color:#f0e4c0;}
 .nh-link.lk:hover{border-color:#0a66c2;color:#0a66c2;}
 .nh-link.fb:hover{border-color:#1877f2;color:#1877f2;}
-.nh-link.wa:hover{border-color:#25d366;color:#25d366;}
-.nh-link.ph:hover{border-color:#6aab7a;color:#6aab7a;}
+.nh-link.ph:hover{border-color:#25d366;color:#25d366;}
 .nh-link.em:hover{border-color:var(--gold);color:var(--gold);}
 
 /* Small action buttons */
@@ -7300,6 +7299,29 @@ function nhConfirmResolve(val){
   document.getElementById('nhConfirmBg').classList.remove('open');
   if(_nhConfirmResolver){_nhConfirmResolver(val);_nhConfirmResolver=null;}
 }
+
+/* ── Phone picker (WhatsApp / Call) ── */
+let _nhPhonePickerNumber=null;
+function nhOpenPhonePicker(number){
+  _nhPhonePickerNumber=number;
+  document.getElementById('nhPhonePickerNumber').textContent=number;
+  document.getElementById('nhPhonePickerBg').classList.add('open');
+}
+function nhClosePhonePicker(){
+  document.getElementById('nhPhonePickerBg').classList.remove('open');
+  _nhPhonePickerNumber=null;
+}
+function nhPhonePickerGo(action){
+  const number=_nhPhonePickerNumber;
+  if(!number)return;
+  if(action==='wa'){
+    const digits=number.replace(/\D/g,'');
+    if(digits) window.open('https://wa.me/'+digits,'_blank','noopener');
+  }else if(action==='call'){
+    window.location.href='tel:'+number;
+  }
+  nhClosePhonePicker();
+}
 function nhDaysDiff(ds){
   if(!ds)return null;
   const d=new Date(ds);d.setHours(0,0,0,0);
@@ -7323,26 +7345,23 @@ function nhLinkBtns(obj){
   let h='';
   const linkedin=(obj.linkedin||'').trim();
   const facebook=(obj.facebook||'').trim();
-  const waDigits=(obj.whatsapp||'').replace(/\D/g,'');
   const phone=(obj.phone||'').trim();
   const email=(obj.email||'').trim();
   if(linkedin) h+=`<a class="nh-link lk" href="${linkedin}" target="_blank" rel="noopener">🔗 LinkedIn</a>`;
   if(facebook) h+=`<a class="nh-link fb" href="${facebook}" target="_blank" rel="noopener">👤 Facebook</a>`;
-  if(waDigits) h+=`<a class="nh-link wa" href="https://wa.me/${waDigits}" target="_blank" rel="noopener">💬 WhatsApp</a>`;
-  if(phone)    h+=`<a class="nh-link ph" href="tel:${phone}">📞 Call</a>`;
+  if(phone)    h+=`<a class="nh-link ph" href="#" onclick="event.preventDefault();nhOpenPhonePicker('${phone.replace(/'/g,"\\'")}')">📱 Phone</a>`;
   if(email)    h+=`<a class="nh-link em" href="mailto:${email}">✉ Email</a>`;
-  // Extra contact fields (up to 3), numbered per-type starting at 2
-  const extraCounts={whatsapp:1,mobile:1,email:1};
+  // Extra contact fields (up to 3 per type — Phone, Email)
+  const extraCounts={phone:1,email:1};
   (obj.extraFields||[]).forEach(f=>{
     const val=(f?.value||'').trim();
     if(!val||!f?.type)return;
-    extraCounts[f.type]=(extraCounts[f.type]||1)+1;
+    if(extraCounts[f.type]===undefined)return;
+    if(extraCounts[f.type]>=4)return; // primary(1) + up to 3 extras
+    extraCounts[f.type]+=1;
     const n=extraCounts[f.type];
-    if(f.type==='whatsapp'){
-      const digits=val.replace(/\D/g,'');
-      if(digits) h+=`<a class="nh-link wa" href="https://wa.me/${digits}" target="_blank" rel="noopener">💬 WhatsApp ${n}</a>`;
-    }else if(f.type==='mobile'){
-      h+=`<a class="nh-link ph" href="tel:${val}">📞 Mobile ${n}</a>`;
+    if(f.type==='phone'){
+      h+=`<a class="nh-link ph" href="#" onclick="event.preventDefault();nhOpenPhonePicker('${val.replace(/'/g,"\\'")}')">📱 Phone ${n}</a>`;
     }else if(f.type==='email'){
       h+=`<a class="nh-link em" href="mailto:${val}">✉ Email ${n}</a>`;
     }
@@ -7435,7 +7454,7 @@ function nhRenderContacts(){
     list=list.filter(c=>{
       const tags=(c.tags||[]).join(' ');
       const extraVals=(c.extraFields||[]).map(f=>f.value).filter(Boolean).join(' ');
-      const contactInfo=[c.linkedin,c.facebook,c.whatsapp,c.phone,c.email,extraVals].filter(Boolean).join(' ');
+      const contactInfo=[c.linkedin,c.facebook,c.phone,c.email,extraVals].filter(Boolean).join(' ');
       let hay;
       switch(scope){
         case 'name': hay=c.name||''; break;
@@ -7493,9 +7512,11 @@ function nhCbEdit(id){
   _nhCbEditId=id||null;
   const c=id?_nhContacts.find(x=>x.id===id):null;
   document.getElementById('nhCbModalTitle').textContent=id?'Edit Contact':'Add Contact';
-  ['Name','Role','Company','Country','Linkedin','Facebook','Whatsapp','Phone','Email'].forEach(f=>{
+  ['Name','Role','Company','Country','Linkedin','Facebook','Phone','Email'].forEach(f=>{
     const el=document.getElementById('nhCbF'+f);
-    if(el) el.value=c?.[f.toLowerCase()]||'';
+    if(!el)return;
+    if(f==='Phone') el.value=c?.phone||c?.whatsapp||'';
+    else el.value=c?.[f.toLowerCase()]||'';
   });
   _nhCbTags=[...(c?.tags||[])];
   nhRenderTagInput();
@@ -7514,25 +7535,28 @@ function nhCbEdit(id){
 }
 function nhCbCloseModal(){document.getElementById('nhCbModalBg').classList.remove('open');_nhCbEditId=null;_nhCbTags=[];_nhCbExtraFields=[];}
 
-/* ── Extra contact fields widget (max 3, WhatsApp/Mobile/Email) ── */
+/* ── Extra contact fields widget (up to 3 per type — Phone, Email) ── */
 function nhRenderExtraFields(){
   const wrap=document.getElementById('nhCbExtraFields');
   if(!wrap)return;
   wrap.innerHTML=_nhCbExtraFields.map((f,i)=>`<div class="nh-extra-field-row">
     <select onchange="nhExtraFieldChanged(${i},'type',this.value)">
-      <option value="whatsapp"${f.type==='whatsapp'?' selected':''}>WhatsApp</option>
-      <option value="mobile"${f.type==='mobile'?' selected':''}>Mobile</option>
+      <option value="phone"${f.type==='phone'?' selected':''}>Phone</option>
       <option value="email"${f.type==='email'?' selected':''}>Email</option>
     </select>
     <input type="text" placeholder="Value" value="${(f.value||'').replace(/"/g,'&quot;')}" onchange="nhExtraFieldChanged(${i},'value',this.value)">
     <span class="nh-extra-field-x" onclick="nhRemoveExtraField(${i})">✕</span>
   </div>`).join('');
+  const phoneCnt=_nhCbExtraFields.filter(f=>f.type==='phone').length;
+  const emailCnt=_nhCbExtraFields.filter(f=>f.type==='email').length;
   const addBtn=document.getElementById('nhCbAddExtraBtn');
-  if(addBtn) addBtn.style.display=_nhCbExtraFields.length>=3?'none':'';
+  if(addBtn) addBtn.style.display=(phoneCnt>=3&&emailCnt>=3)?'none':'';
 }
 function nhAddExtraField(){
-  if(_nhCbExtraFields.length>=3)return;
-  _nhCbExtraFields.push({type:'whatsapp',value:''});
+  const phoneCnt=_nhCbExtraFields.filter(f=>f.type==='phone').length;
+  const emailCnt=_nhCbExtraFields.filter(f=>f.type==='email').length;
+  const defaultType=phoneCnt<3?'phone':'email';
+  _nhCbExtraFields.push({type:defaultType,value:''});
   nhRenderExtraFields();
 }
 function nhRemoveExtraField(i){
@@ -7611,9 +7635,19 @@ async function nhCbSave(){
     id:_nhCbEditId||nhId(),name,
     role:g('nhCbFRole'),company:g('nhCbFCompany'),country:g('nhCbFCountry'),
     linkedin:g('nhCbFLinkedin'),facebook:g('nhCbFFacebook'),
-    whatsapp:g('nhCbFWhatsapp'),phone:g('nhCbFPhone'),email:g('nhCbFEmail'),
+    phone:g('nhCbFPhone'),email:g('nhCbFEmail'),
     tags:[..._nhCbTags],
-    extraFields:_nhCbExtraFields.filter(f=>(f.value||'').trim()).slice(0,3).map(f=>({type:f.type,value:f.value.trim()})),
+    extraFields:(()=>{
+      const valid=_nhCbExtraFields.filter(f=>(f.value||'').trim()&&(f.type==='phone'||f.type==='email'));
+      const perType={phone:0,email:0};
+      const out=[];
+      for(const f of valid){
+        if(perType[f.type]>=3)continue;
+        perType[f.type]++;
+        out.push({type:f.type,value:f.value.trim()});
+      }
+      return out;
+    })(),
   };
   if(_nhCbEditId){const i=_nhContacts.findIndex(x=>x.id===_nhCbEditId);if(i>-1)_nhContacts[i]=contact;}
   else _nhContacts.push(contact);
@@ -7626,7 +7660,7 @@ async function nhCbSave(){
         id:nhId(),contactId:contact.id,contactName:contact.name,
         company:contact.company||'',stageId:chosenStage,
         nextAction:'',nextActionNote:'',linkedin:contact.linkedin||'',facebook:contact.facebook||'',
-        whatsapp:contact.whatsapp||'',phone:contact.phone||'',email:contact.email||'',
+        phone:contact.phone||'',email:contact.email||'',
         createdAt:nhToday(),
       });
       await nhSet('_nh_deals',_nhDeals);
@@ -7851,7 +7885,6 @@ function nhCrmOpenModal(id,defaultStageId){
   const company = c?.company  || d?.company     || '—';
   const linkedin= c?.linkedin || d?.linkedin    || '—';
   const facebook= c?.facebook || d?.facebook    || '—';
-  const whatsapp= c?.whatsapp || d?.whatsapp    || '—';
   const phone   = c?.phone    || d?.phone       || '—';
   const email   = c?.email    || d?.email       || '—';
   document.getElementById('nhCrmModalTitle').textContent = name;
@@ -7861,17 +7894,14 @@ function nhCrmOpenModal(id,defaultStageId){
   // Build clickable link buttons
   const linksEl=document.getElementById('nhCrmVLinks');
   if(linksEl){
-    let lh='';
-    const li=(linkedin&&linkedin!=='—')?linkedin.trim():'';
-    const fb=(facebook&&facebook!=='—')?facebook.trim():'';
-    const wa=(whatsapp&&whatsapp!=='—')?whatsapp.replace(/\D/g,''):'';
-    const ph=(phone&&phone!=='—')?phone.trim():'';
-    const em=(email&&email!=='—')?email.trim():'';
-    if(li) lh+=`<a class="nh-link lk" href="${li}" target="_blank" rel="noopener">🔗 LinkedIn</a>`;
-    if(fb) lh+=`<a class="nh-link fb" href="${fb}" target="_blank" rel="noopener">👤 Facebook</a>`;
-    if(wa) lh+=`<a class="nh-link wa" href="https://wa.me/${wa}" target="_blank" rel="noopener">💬 WhatsApp</a>`;
-    if(ph) lh+=`<a class="nh-link ph" href="tel:${ph}">📞 Call</a>`;
-    if(em) lh+=`<a class="nh-link em" href="mailto:${em}">✉ Email</a>`;
+    const linkObj={
+      linkedin:(linkedin&&linkedin!=='—')?linkedin:'',
+      facebook:(facebook&&facebook!=='—')?facebook:'',
+      phone:(phone&&phone!=='—')?phone:'',
+      email:(email&&email!=='—')?email:'',
+      extraFields:c?.extraFields||[],
+    };
+    const lh=nhLinkBtns(linkObj);
     linksEl.innerHTML=lh||'<span style="font-size:11px;color:#a89060">No contact links saved</span>';
   }
   // Populate editable pipeline fields
@@ -7885,17 +7915,6 @@ function nhCrmOpenModal(id,defaultStageId){
   nhOpenModalTop('nhCrmModalBg');
 }
 function nhCrmCloseModal(){document.getElementById('nhCrmModalBg').classList.remove('open');_nhCrmEditId=null;}
-function nhCrmContactPick(){
-  const c=_nhContacts.find(x=>x.id===document.getElementById('nhCrmFContact').value);
-  if(!c)return;
-  document.getElementById('nhCrmFContactName').value=c.name||'';
-  document.getElementById('nhCrmFCompany').value=c.company||'';
-  document.getElementById('nhCrmFLinkedin').value=c.linkedin||'';
-  document.getElementById('nhCrmFFacebook').value=c.facebook||'';
-  document.getElementById('nhCrmFWhatsapp').value=c.whatsapp||'';
-  document.getElementById('nhCrmFPhone').value=c.phone||'';
-  document.getElementById('nhCrmFEmail').value=c.email||'';
-}
 function nhCrmNextActionDateChanged(){
   const dateVal=document.getElementById('nhCrmFNextAction')?.value;
   const noteEl=document.getElementById('nhCrmFNextActionNote');
@@ -8440,11 +8459,10 @@ async function nhSmDone(){
     <div class="nh-field"><label>Country</label><input id="nhCbFCountry" type="text" placeholder=""></div>
     <div class="nh-field"><label>LinkedIn URL</label><input id="nhCbFLinkedin" type="url" placeholder=""></div>
     <div class="nh-field"><label>Facebook URL</label><input id="nhCbFFacebook" type="url" placeholder=""></div>
-    <div class="nh-field"><label>WhatsApp (Country Code + Number)</label><input id="nhCbFWhatsapp" type="tel" placeholder=""></div>
-    <div class="nh-field"><label>Mobile (Country Code + Number)</label><input id="nhCbFPhone" type="tel" placeholder=""></div>
+    <div class="nh-field"><label>Phone (Country Code + Number)</label><input id="nhCbFPhone" type="tel" placeholder=""></div>
     <div class="nh-field"><label>Email</label><input id="nhCbFEmail" type="email" placeholder=""></div>
     <div class="nh-field">
-      <label>Extra Contact Fields <span style="font-size:9px;color:#a89060;font-style:italic;">(up to 3 — WhatsApp/Mobile/Email)</span></label>
+      <label>Extra Contact Fields <span style="font-size:9px;color:#a89060;font-style:italic;">(up to 3 Phone + up to 3 Email)</span></label>
       <div id="nhCbExtraFields"></div>
       <button type="button" class="nh-cal-trigger" id="nhCbAddExtraBtn" onclick="nhAddExtraField()" style="margin-top:6px;text-align:center;">＋ Add Contact Field</button>
     </div>
@@ -8571,6 +8589,19 @@ async function nhSmDone(){
     <div class="nh-modal-actions">
       <button class="nh-btn-cancel" id="nhCalPickerClearBtn" onclick="nhCalPickerClear()">Clear Date</button>
       <button class="nh-btn-cancel" onclick="nhCloseCalPicker()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Phone Picker (WhatsApp / Call) -->
+<div class="nh-modal-bg" id="nhPhonePickerBg" style="z-index:4600;">
+  <div class="nh-modal" style="max-width:340px;">
+    <div class="nh-modal-title">📱 Open With</div>
+    <div class="nh-confirm-msg" id="nhPhonePickerNumber" style="margin-bottom:14px;"></div>
+    <div class="nh-modal-actions" style="flex-direction:column;align-items:stretch;">
+      <button class="nh-btn-save" onclick="nhPhonePickerGo('wa')" style="margin-bottom:8px;">💬 Open WhatsApp</button>
+      <button class="nh-btn-save" onclick="nhPhonePickerGo('call')" style="margin-bottom:8px;">📞 Call</button>
+      <button class="nh-btn-cancel" onclick="nhClosePhonePicker()">Cancel</button>
     </div>
   </div>
 </div>

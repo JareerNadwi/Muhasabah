@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=Literata:ital,opsz,wght@0,7..72,300;0,7..72,400;0,7..72,500;1,7..72,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root {
   --bg:#0d0f0e; --surface:#141714; --surface2:#1c1f1c; --border:#2a2e2a;
@@ -7406,6 +7407,101 @@ function closeContactBook(){
   document.body.classList.remove('overlay-open');
 }
 
+/* ── Import Contacts from Excel ── */
+function nhImportExcel(){
+  document.getElementById('nhImportFileInput').value='';
+  document.getElementById('nhImportFileInput').click();
+}
+async function nhHandleImportFile(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async function(ev){
+    try{
+      const data=new Uint8Array(ev.target.result);
+      const wb=XLSX.read(data,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      if(!rows.length){alert('No data found in the file.');return;}
+      const fieldMap={
+        'name':['name','full name','fullname','contact name'],
+        'role':['role','title','job title','position'],
+        'company':['company','organization','org','employer'],
+        'country':['country','location','region'],
+        'linkedin':['linkedin','linkedin url','linkedin profile'],
+        'facebook':['facebook','facebook url','facebook profile'],
+        'phone':['phone','mobile','phone number','tel','telephone'],
+        'email':['email','email address','e-mail'],
+        'tags':['tags','tag','labels','category'],
+        'notes':['notes','note','remarks','comment']
+      };
+      function mapField(row,targets){
+        for(const k of Object.keys(row)){
+          if(targets.includes(k.toLowerCase().trim()))return String(row[k]||'').trim();
+        }
+        return '';
+      }
+      let added=0,skipped=0;
+      for(const row of rows){
+        const name=mapField(row,fieldMap.name);
+        if(!name){skipped++;continue;}
+        const existing=_nhContacts.find(c=>(c.name||'').toLowerCase()===name.toLowerCase());
+        if(existing){skipped++;continue;}
+        const tagsRaw=mapField(row,fieldMap.tags);
+        const tags=tagsRaw?tagsRaw.split(/[,;|]+/).map(t=>t.trim()).filter(Boolean):[];
+        const contact={
+          id:'nh_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+          name,
+          role:mapField(row,fieldMap.role),
+          company:mapField(row,fieldMap.company),
+          country:mapField(row,fieldMap.country),
+          linkedin:mapField(row,fieldMap.linkedin),
+          facebook:mapField(row,fieldMap.facebook),
+          phone:mapField(row,fieldMap.phone),
+          email:mapField(row,fieldMap.email),
+          tags,
+          notes:mapField(row,fieldMap.notes),
+          extraFields:[],
+          createdAt:new Date().toISOString()
+        };
+        _nhContacts.push(contact);
+        added++;
+      }
+      await nhSet('_nh_contacts',_nhContacts);
+      nhRenderContacts();
+      alert(`✅ Import complete.\n\nAdded: ${added} contacts\nSkipped (duplicate or no name): ${skipped}`);
+    }catch(err){
+      alert('❌ Failed to read file. Make sure it is a valid .xlsx or .csv file.\n\n'+err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ── Export Contacts to Excel ── */
+function nhExportExcel(){
+  if(!_nhContacts.length){alert('No contacts to export.');return;}
+  const rows=_nhContacts.map(c=>({
+    'Name':c.name||'',
+    'Role / Title':c.role||'',
+    'Company':c.company||'',
+    'Country':c.country||'',
+    'Phone':c.phone||'',
+    'Email':c.email||'',
+    'LinkedIn':c.linkedin||'',
+    'Facebook':c.facebook||'',
+    'Tags':(c.tags||[]).join(', '),
+    'Notes':c.notes||'',
+    'Added On':c.createdAt?new Date(c.createdAt).toLocaleDateString():''
+  }));
+  const ws=XLSX.utils.json_to_sheet(rows);
+  const colWidths=[{wch:25},{wch:22},{wch:22},{wch:16},{wch:18},{wch:28},{wch:35},{wch:35},{wch:20},{wch:40},{wch:14}];
+  ws['!cols']=colWidths;
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,'Contacts',ws);
+  const date=new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb,`Muhasabah_Contacts_${date}.xlsx`);
+}
+
 /* ── Today dashboard ── */
 function nhRenderToday(){
   const el=document.getElementById('nhToday');
@@ -8407,7 +8503,12 @@ async function nhSmDone(){
         <div class="nh-title">🤝 Networking Hub</div>
         <div class="nh-subtitle">Contact Book &amp; Career CRM</div>
       </div>
-      <button class="nh-close" onclick="closeContactBook()">✕ Close</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <button class="nh-close" onclick="nhImportExcel()" title="Import contacts from Excel (.xlsx)">⬇ Import Data</button>
+        <button class="nh-close" onclick="nhExportExcel()" title="Export all contacts to Excel (.xlsx)">⬆ Export Data</button>
+        <button class="nh-close" onclick="closeContactBook()">✕ Close</button>
+      </div>
+      <input type="file" id="nhImportFileInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="nhHandleImportFile(event)">
     </div>
 
     <!-- Today's action dashboard -->

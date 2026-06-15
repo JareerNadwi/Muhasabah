@@ -3311,9 +3311,11 @@ const BASE_URL          = 'https://jareernadwi.github.io/Muhasabah/';
 
 const SURAH_LENGTHS = [7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,
   110,98,135,112,78,118,64,77,227,93,88,69,60,34,30,73,54,45,83,182,88,75,85,54,53,
-  89,59,37,35,38,29,18,45,60,49,62,55,78,96,29,22,24,13,14,11,11,18,12,12,30,52,52,
-  44,28,28,20,56,40,31,50,40,46,42,29,19,36,25,22,17,19,26,30,20,15,21,11,8,8,19,5,
-  8,8,11,11,8,3,9,5,4,7,3,6,3,5,4,5,6];
+  89,59,37,35,31,31,18,45,60,49,62,39,40,29,67,29,53,44,55,26,24,43,6,11,50,28,52,
+  28,28,20,56,40,31,50,45,6,29,22,59,85,8,8,72,28,31,28,28,20,94,6,5,8,29,7,22,6,
+  71,65,30,54,26,20,19,18,26,25,25,26,25,32,24,20,28,36,22,26,24,27,33,7,50,11,11,
+  9,12,10,7,5,8,14,19,3,22,21,28,18,22,15,12,13,14,18,17,9,12,14,16,19,14,16,4,11,
+  14,11,6,17,5,17,11,22,16,16,10,12,5,3,4,4,7,3,6,3,5,3,5,3,3,3];
 
 const SURAH_NAMES = ['','Al-Fatihah','Al-Baqarah',"Ali 'Imran","An-Nisa","Al-Ma'idah",
   "Al-An'am","Al-A'raf",'Al-Anfal','At-Tawbah','Yunus','Hud','Yusuf',"Ar-Ra'd",
@@ -3859,7 +3861,7 @@ function _renderSvBadge(dk, goalKey){
   const sessKey  = goalKey + '_svSessions';
   const sessions = data[sessKey];
   if(!sessions || sessions.length === 0){ badge.style.display = 'none'; return; }
-  const totalMap = { surahWaqiah: 96, surahMulk: 30, surahKahf: 110 };
+  const totalMap = { surahWaqiah: 29, surahMulk: 50, surahKahf: 110 };
   const total      = totalMap[goalKey] || SURAH_LENGTHS[(goalKey === 'surahWaqiah' ? 55 : goalKey === 'surahMulk' ? 66 : 17)];
   const done       = data[goalKey] === 'yes';
   const totalVerses = sessions.reduce((s,x) => s + x.verses, 0);
@@ -7428,6 +7430,8 @@ function nhRenderContacts(){
   el.innerHTML=list.map(c=>{
     const links=nhLinkBtns(c);
     const tags=(c.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
+    const deal=_nhDeals.find(d=>d.contactId===c.id);
+    const stageBadge=deal?`<span class="nh-stage-badge" style="border-color:${nhStageColor(deal.stageId)};color:${nhStageColor(deal.stageId)}"><span class="nh-col-dot" style="background:${nhStageColor(deal.stageId)}"></span>${nhStageName(deal.stageId)}</span>`:'';
     return `<div class="nh-cb-card">
       <div class="nh-cb-card-top">
         <div>
@@ -7440,6 +7444,7 @@ function nhRenderContacts(){
           <button class="nh-sm-btn danger" onclick="nhCbDelete('${c.id}')">Del</button>
         </div>
       </div>
+      ${stageBadge?`<div class="nh-tags">${stageBadge}</div>`:''}
       ${links?`<div class="nh-links">${links}</div>`:''}
       ${tags?`<div class="nh-tags">${tags}</div>`:''}
     </div>`;

@@ -104,6 +104,11 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-field label{display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:#c5b98a;margin-bottom:4px;text-transform:uppercase;}
 .nh-field input,.nh-field select,.nh-field textarea{width:100%;background:#1a1610!important;border:1px solid #2a2010!important;color:#f0e4c0!important;padding:8px 11px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;-webkit-appearance:none;appearance:none;box-sizing:border-box;}
 .nh-field input:focus,.nh-field select:focus,.nh-field textarea:focus{border-color:var(--gold-dim);}
+.nh-extra-field-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
+.nh-extra-field-row select{flex:0 0 110px;width:auto;}
+.nh-extra-field-row input{flex:1;min-width:0;}
+.nh-extra-field-x{cursor:pointer;font-size:13px;color:#a89060;flex-shrink:0;padding:0 2px;}
+.nh-extra-field-x:hover{color:var(--red);}
 .nh-field select option{background:#1a1610;}
 .nh-field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a7870'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
 .nh-field textarea{resize:vertical;min-height:60px;font-size:11px;line-height:1.5;}
@@ -322,6 +327,7 @@ body.light-mode .nh-tag{background:#fdf5dc!important;border-color:#9a7228!import
 body.light-mode .nh-stage-badge{background:#f0ede6!important;}
 body.light-mode .nh-tag-chip{background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-tag-chip-x{color:#7a756c!important;}
+body.light-mode .nh-extra-field-x{color:#9a9590!important;}
 body.light-mode .nh-tag-input-wrap{background:#ffffff!important;border-color:#d4cfc5!important;}
 body.light-mode .nh-tag-input{color:#1a1a18!important;}
 body.light-mode .nh-tag-suggest{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
@@ -7256,6 +7262,7 @@ let _nhCrmFil='all';
 let _nhOpenCols=new Set();
 let _nhDragSrc=null;
 let _nhCbTags=[];
+let _nhCbExtraFields=[];
 let _nhCalOpenDates=new Set();
 
 const NH_FIXED_STAGE={id:'stage_contacts',name:'Contacts',color:'#6a7080',fixed:true};
@@ -7324,6 +7331,22 @@ function nhLinkBtns(obj){
   if(waDigits) h+=`<a class="nh-link wa" href="https://wa.me/${waDigits}" target="_blank" rel="noopener">💬 WhatsApp</a>`;
   if(phone)    h+=`<a class="nh-link ph" href="tel:${phone}">📞 Call</a>`;
   if(email)    h+=`<a class="nh-link em" href="mailto:${email}">✉ Email</a>`;
+  // Extra contact fields (up to 3), numbered per-type starting at 2
+  const extraCounts={whatsapp:1,mobile:1,email:1};
+  (obj.extraFields||[]).forEach(f=>{
+    const val=(f?.value||'').trim();
+    if(!val||!f?.type)return;
+    extraCounts[f.type]=(extraCounts[f.type]||1)+1;
+    const n=extraCounts[f.type];
+    if(f.type==='whatsapp'){
+      const digits=val.replace(/\D/g,'');
+      if(digits) h+=`<a class="nh-link wa" href="https://wa.me/${digits}" target="_blank" rel="noopener">💬 WhatsApp ${n}</a>`;
+    }else if(f.type==='mobile'){
+      h+=`<a class="nh-link ph" href="tel:${val}">📞 Mobile ${n}</a>`;
+    }else if(f.type==='email'){
+      h+=`<a class="nh-link em" href="mailto:${val}">✉ Email ${n}</a>`;
+    }
+  });
   return h;
 }
 
@@ -7411,15 +7434,17 @@ function nhRenderContacts(){
   if(q){
     list=list.filter(c=>{
       const tags=(c.tags||[]).join(' ');
-      const contactInfo=[c.linkedin,c.facebook,c.whatsapp,c.phone,c.email].filter(Boolean).join(' ');
+      const extraVals=(c.extraFields||[]).map(f=>f.value).filter(Boolean).join(' ');
+      const contactInfo=[c.linkedin,c.facebook,c.whatsapp,c.phone,c.email,extraVals].filter(Boolean).join(' ');
       let hay;
       switch(scope){
         case 'name': hay=c.name||''; break;
         case 'role': hay=c.role||''; break;
         case 'company': hay=c.company||''; break;
+        case 'country': hay=c.country||''; break;
         case 'contact': hay=contactInfo; break;
         case 'tags': hay=tags; break;
-        default: hay=[c.name,c.role,c.company,contactInfo,tags].filter(Boolean).join(' ');
+        default: hay=[c.name,c.role,c.company,c.country,contactInfo,tags].filter(Boolean).join(' ');
       }
       return hay.toLowerCase().includes(q);
     });
@@ -7436,7 +7461,7 @@ function nhRenderContacts(){
       <div class="nh-cb-card-top">
         <div>
           <div class="nh-cb-name">${c.name||'—'}</div>
-          <div class="nh-cb-sub">${[c.role,c.company].filter(Boolean).join(' · ')||'&nbsp;'}</div>
+          <div class="nh-cb-sub">${[c.role,c.company,c.country].filter(Boolean).join(' · ')||'&nbsp;'}</div>
         </div>
         <div class="nh-cb-actions">
           <button class="nh-sm-btn" onclick="nhOpenNotes('${c.id}','${(c.name||'').replace(/'/g,"\\'")}')">📝 Notes</button>
@@ -7468,12 +7493,14 @@ function nhCbEdit(id){
   _nhCbEditId=id||null;
   const c=id?_nhContacts.find(x=>x.id===id):null;
   document.getElementById('nhCbModalTitle').textContent=id?'Edit Contact':'Add Contact';
-  ['Name','Role','Company','Linkedin','Facebook','Whatsapp','Phone','Email'].forEach(f=>{
+  ['Name','Role','Company','Country','Linkedin','Facebook','Whatsapp','Phone','Email'].forEach(f=>{
     const el=document.getElementById('nhCbF'+f);
     if(el) el.value=c?.[f.toLowerCase()]||'';
   });
   _nhCbTags=[...(c?.tags||[])];
   nhRenderTagInput();
+  _nhCbExtraFields=(c?.extraFields||[]).map(f=>({type:f.type,value:f.value}));
+  nhRenderExtraFields();
   const stageField=document.getElementById('nhCbStageField');
   const stageSel=document.getElementById('nhCbFStage');
   if(!id){
@@ -7485,7 +7512,37 @@ function nhCbEdit(id){
   }
   nhOpenModalTop('nhCbModalBg');
 }
-function nhCbCloseModal(){document.getElementById('nhCbModalBg').classList.remove('open');_nhCbEditId=null;_nhCbTags=[];}
+function nhCbCloseModal(){document.getElementById('nhCbModalBg').classList.remove('open');_nhCbEditId=null;_nhCbTags=[];_nhCbExtraFields=[];}
+
+/* ── Extra contact fields widget (max 3, WhatsApp/Mobile/Email) ── */
+function nhRenderExtraFields(){
+  const wrap=document.getElementById('nhCbExtraFields');
+  if(!wrap)return;
+  wrap.innerHTML=_nhCbExtraFields.map((f,i)=>`<div class="nh-extra-field-row">
+    <select onchange="nhExtraFieldChanged(${i},'type',this.value)">
+      <option value="whatsapp"${f.type==='whatsapp'?' selected':''}>WhatsApp</option>
+      <option value="mobile"${f.type==='mobile'?' selected':''}>Mobile</option>
+      <option value="email"${f.type==='email'?' selected':''}>Email</option>
+    </select>
+    <input type="text" placeholder="Value" value="${(f.value||'').replace(/"/g,'&quot;')}" onchange="nhExtraFieldChanged(${i},'value',this.value)">
+    <span class="nh-extra-field-x" onclick="nhRemoveExtraField(${i})">✕</span>
+  </div>`).join('');
+  const addBtn=document.getElementById('nhCbAddExtraBtn');
+  if(addBtn) addBtn.style.display=_nhCbExtraFields.length>=3?'none':'';
+}
+function nhAddExtraField(){
+  if(_nhCbExtraFields.length>=3)return;
+  _nhCbExtraFields.push({type:'whatsapp',value:''});
+  nhRenderExtraFields();
+}
+function nhRemoveExtraField(i){
+  _nhCbExtraFields.splice(i,1);
+  nhRenderExtraFields();
+}
+function nhExtraFieldChanged(i,key,val){
+  if(!_nhCbExtraFields[i])return;
+  _nhCbExtraFields[i][key]=val;
+}
 
 /* ── Tag input widget ── */
 function nhAllUsedTags(){
@@ -7552,10 +7609,11 @@ async function nhCbSave(){
   if(!name){alert('Name is required.');return;}
   const contact={
     id:_nhCbEditId||nhId(),name,
-    role:g('nhCbFRole'),company:g('nhCbFCompany'),
+    role:g('nhCbFRole'),company:g('nhCbFCompany'),country:g('nhCbFCountry'),
     linkedin:g('nhCbFLinkedin'),facebook:g('nhCbFFacebook'),
     whatsapp:g('nhCbFWhatsapp'),phone:g('nhCbFPhone'),email:g('nhCbFEmail'),
     tags:[..._nhCbTags],
+    extraFields:_nhCbExtraFields.filter(f=>(f.value||'').trim()).slice(0,3).map(f=>({type:f.type,value:f.value.trim()})),
   };
   if(_nhCbEditId){const i=_nhContacts.findIndex(x=>x.id===_nhCbEditId);if(i>-1)_nhContacts[i]=contact;}
   else _nhContacts.push(contact);
@@ -7738,7 +7796,7 @@ function nhDealHTML(d,showStage){
   }
   const links=nhLinkBtns(d);
   const contact=_nhContacts.find(x=>x.id===d.contactId);
-  const subLine=[contact?.role,contact?.company||d.company].filter(Boolean).join(' · ');
+  const subLine=[contact?.role,contact?.company||d.company,contact?.country].filter(Boolean).join(' · ');
   const tags=(contact?.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
   const noteList=_nhNotes.filter(n=>n.entityId===(d.contactId||d.id));
   const lastNote=noteList.length?noteList[noteList.length-1]:null;
@@ -8353,6 +8411,7 @@ async function nhSmDone(){
           <option value="name">Name</option>
           <option value="role">Role / Title</option>
           <option value="company">Company</option>
+          <option value="country">Country</option>
           <option value="contact">Contact Info</option>
           <option value="tags">Tags</option>
         </select>
@@ -8378,11 +8437,17 @@ async function nhSmDone(){
     <div class="nh-field"><label>Full Name *</label><input id="nhCbFName" type="text" placeholder=""></div>
     <div class="nh-field"><label>Role / Title</label><input id="nhCbFRole" type="text" placeholder=""></div>
     <div class="nh-field"><label>Company</label><input id="nhCbFCompany" type="text" placeholder=""></div>
+    <div class="nh-field"><label>Country</label><input id="nhCbFCountry" type="text" placeholder=""></div>
     <div class="nh-field"><label>LinkedIn URL</label><input id="nhCbFLinkedin" type="url" placeholder=""></div>
     <div class="nh-field"><label>Facebook URL</label><input id="nhCbFFacebook" type="url" placeholder=""></div>
     <div class="nh-field"><label>WhatsApp (Country Code + Number)</label><input id="nhCbFWhatsapp" type="tel" placeholder=""></div>
     <div class="nh-field"><label>Mobile (Country Code + Number)</label><input id="nhCbFPhone" type="tel" placeholder=""></div>
     <div class="nh-field"><label>Email</label><input id="nhCbFEmail" type="email" placeholder=""></div>
+    <div class="nh-field">
+      <label>Extra Contact Fields <span style="font-size:9px;color:#a89060;font-style:italic;">(up to 3 — WhatsApp/Mobile/Email)</span></label>
+      <div id="nhCbExtraFields"></div>
+      <button type="button" class="nh-cal-trigger" id="nhCbAddExtraBtn" onclick="nhAddExtraField()" style="margin-top:6px;text-align:center;">＋ Add Contact Field</button>
+    </div>
     <div class="nh-field" id="nhCbStageField">
       <label>Initial Pipeline Stage</label>
       <select id="nhCbFStage"></select>

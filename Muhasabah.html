@@ -7727,6 +7727,8 @@ async function nhCbSave(){
   const g=id=>document.getElementById(id)?.value.trim()||'';
   const name=g('nhCbFName');
   if(!name){alert('Name is required.');return;}
+  const duplicate=_nhContacts.find(c=>c.id!==(_nhCbEditId||'')&&(c.name||'').toLowerCase()===name.toLowerCase());
+  if(duplicate){alert(`⚠️ A contact named "${duplicate.name}" already exists.\n\nPlease use a different name or edit the existing contact.`);return;}
   const contact={
     id:_nhCbEditId||nhId(),name,
     role:g('nhCbFRole'),company:g('nhCbFCompany'),country:g('nhCbFCountry'),

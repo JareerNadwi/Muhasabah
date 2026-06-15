@@ -7480,34 +7480,44 @@ async function nhHandleImportFile(e){
 /* ── Export Contacts to Excel ── */
 function nhExportExcel(){
   if(!_nhContacts.length){alert('No contacts to export.');return;}
-  const rows=_nhContacts.map(c=>({
-    'Name':c.name||'',
-    'Role / Title':c.role||'',
-    'Company':c.company||'',
-    'Country':c.country||'',
-    'Phone':c.phone||'',
-    'Email':c.email||'',
-    'LinkedIn':c.linkedin||'',
-    'Facebook':c.facebook||'',
-    'Tags':(c.tags||[]).join(', '),
-    'Notes':c.notes||'',
-    'Added On':c.createdAt?new Date(c.createdAt).toLocaleDateString():''
-  }));
-  const ws=XLSX.utils.json_to_sheet(rows);
-  const colWidths=[{wch:25},{wch:22},{wch:22},{wch:16},{wch:18},{wch:28},{wch:35},{wch:35},{wch:20},{wch:40},{wch:14}];
-  ws['!cols']=colWidths;
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,'Contacts',ws);
   const date=new Date().toISOString().slice(0,10);
-  const wbout=XLSX.write(wb,{bookType:'xlsx',type:'array'});
-  const blob=new Blob([wbout],{type:'application/octet-stream'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download=`Muhasabah_Contacts_${date}.xlsx`;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+  const fields=['Name','Role / Title','Company','Country','Phone','Email','LinkedIn','Facebook','Tags','Notes','Added On'];
+  const rows=_nhContacts.map(c=>([
+    c.name||'',c.role||'',c.company||'',c.country||'',
+    c.phone||'',c.email||'',c.linkedin||'',c.facebook||'',
+    (c.tags||[]).join(', '),c.notes||'',
+    c.createdAt?new Date(c.createdAt).toLocaleDateString():''
+  ]));
+  try{
+    if(typeof XLSX==='undefined') throw new Error('XLSX library not loaded');
+    const wsData=[fields,...rows];
+    const ws=XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols']=[{wch:25},{wch:22},{wch:22},{wch:16},{wch:18},{wch:28},{wch:35},{wch:35},{wch:20},{wch:40},{wch:14}];
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,'Contacts',ws);
+    const wbout=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+    const blob=new Blob([wbout],{type:'application/octet-stream'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=`Muhasabah_Contacts_${date}.xlsx`;
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+  }catch(err){
+    // Fallback: export as CSV
+    try{
+      const escape=v=>'"'+String(v).replace(/"/g,'""')+'"';
+      const csv=[fields.map(escape).join(','),...rows.map(r=>r.map(escape).join(','))].join('\r\n');
+      const blob=new Blob([csv],{type:'text/csv'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;a.download=`Muhasabah_Contacts_${date}.csv`;
+      document.body.appendChild(a);a.click();
+      setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+      alert('Note: Exported as CSV instead of Excel (XLSX library failed to load). You can open this in Excel.');
+    }catch(err2){
+      alert('Export failed: '+err2.message);
+    }
+  }
 }
 
 /* ── Today dashboard ── */

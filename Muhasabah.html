@@ -7446,10 +7446,8 @@ async function nhHandleImportFile(e){
           if(targets.includes(k.toLowerCase().trim())){
             const raw=row[k];
             if(raw===null||raw===undefined||raw==='')return '';
-            // If Excel parsed it as a number, restore the + prefix
             let val=String(raw).trim();
             if(!val||val==='0')return '';
-            // If it looks like a numeric phone (no + and no letters), add +
             if(/^\d[\d\s\-()]+$/.test(val)) val='+'+val;
             return val;
           }
@@ -7480,7 +7478,6 @@ async function nhHandleImportFile(e){
           createdAt:new Date().toISOString()
         };
         _nhContacts.push(contact);
-        // Auto-create CRM deal in Leads stage for every imported contact
         const existsDeal=_nhDeals.some(d=>d.contactId===contact.id);
         if(!existsDeal){
           _nhDeals.push({
@@ -7506,35 +7503,51 @@ async function nhHandleImportFile(e){
 
 /* ── Export Contacts to Excel ── */
 function nhExportExcel(){
-  if(!_nhContacts.length){alert('No contacts to export.');return;}
-  const rows=_nhContacts.map(c=>({
-    'Name':c.name||'',
-    'Role / Title':c.role||'',
-    'Company':c.company||'',
-    'Country':c.country||'',
-    'Phone':c.phone||'',
-    'Email':c.email||'',
-    'LinkedIn':c.linkedin||'',
-    'Facebook':c.facebook||'',
-    'Tags':(c.tags||[]).join(', '),
-    'Notes':c.notes||'',
-    'Added On':c.createdAt?new Date(c.createdAt).toLocaleDateString():''
-  }));
-  const ws=XLSX.utils.json_to_sheet(rows);
-  const colWidths=[{wch:25},{wch:22},{wch:22},{wch:16},{wch:18},{wch:28},{wch:35},{wch:35},{wch:20},{wch:40},{wch:14}];
-  ws['!cols']=colWidths;
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,'Contacts',ws);
-  const date=new Date().toISOString().slice(0,10);
-  const wbout=XLSX.write(wb,{bookType:'xlsx',type:'array'});
-  const blob=new Blob([wbout],{type:'application/octet-stream'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download=`Muhasabah_Contacts_${date}.xlsx`;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+  try{
+    if(!_nhContacts.length){alert('No contacts to export.');return;}
+    if(typeof XLSX==='undefined'){alert('❌ Export library not loaded. Please check your internet connection and reload the page.');return;}
+    const rows=_nhContacts.map(c=>({
+      'Name':c.name||'',
+      'Role / Title':c.role||'',
+      'Company':c.company||'',
+      'Country':c.country||'',
+      'Phone':c.phone||'',
+      'Email':c.email||'',
+      'LinkedIn':c.linkedin||'',
+      'Facebook':c.facebook||'',
+      'Tags':(c.tags||[]).join(', '),
+      'Notes':c.notes||'',
+      'Added On':c.createdAt?new Date(c.createdAt).toLocaleDateString():''
+    }));
+    const ws=XLSX.utils.json_to_sheet(rows);
+    // Force Phone column as text so + sign is preserved
+    const phoneColIdx=4; // 0-based: Name,Role,Company,Country,Phone
+    const range=XLSX.utils.decode_range(ws['!ref']||'A1');
+    for(let R=range.s.r+1;R<=range.e.r;R++){
+      const cellAddr=XLSX.utils.encode_cell({r:R,c:phoneColIdx});
+      if(ws[cellAddr]&&ws[cellAddr].v){
+        ws[cellAddr].t='s';
+        ws[cellAddr].v=String(ws[cellAddr].v);
+        delete ws[cellAddr].z;
+      }
+    }
+    const colWidths=[{wch:25},{wch:22},{wch:22},{wch:16},{wch:18},{wch:28},{wch:35},{wch:35},{wch:20},{wch:40},{wch:14}];
+    ws['!cols']=colWidths;
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,'Contacts',ws);
+    const date=new Date().toISOString().slice(0,10);
+    const wbout=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+    const blob=new Blob([wbout],{type:'application/octet-stream'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=`Muhasabah_Contacts_${date}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+  }catch(err){
+    alert('❌ Export failed: '+err.message);
+  }
 }
 
 /* ── Today dashboard ── */

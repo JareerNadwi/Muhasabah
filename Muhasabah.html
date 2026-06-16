@@ -7864,12 +7864,10 @@ function nhRenderKanban(){
       const company=(d.company||c?.company||'').toLowerCase();
       const country=(c?.country||'').toLowerCase();
       const tags=(c?.tags||[]).join(' ').toLowerCase();
-      const contact_info=(c?.phone||'').toLowerCase()+(c?.email||'').toLowerCase()+(c?.linkedin||'').toLowerCase();
       if(_crmScope==='name') return name.includes(_crmQ);
       if(_crmScope==='role') return role.includes(_crmQ);
       if(_crmScope==='company') return company.includes(_crmQ);
       if(_crmScope==='country') return country.includes(_crmQ);
-      if(_crmScope==='contact') return contact_info.includes(_crmQ);
       if(_crmScope==='tags') return tags.includes(_crmQ);
       return name.includes(_crmQ)||role.includes(_crmQ)||company.includes(_crmQ)||country.includes(_crmQ)||tags.includes(_crmQ);
     }).sort((a,b)=>(a.contactName||'').localeCompare(b.contactName||''));
@@ -8313,6 +8311,9 @@ function nhOpenMarkDone(dealId,name,mode){
     btn.disabled=false;
     btn.textContent=_nhMarkDoneMode==='assign'?'Save & Set Next Action →':'Save & Mark Done';
   }
+  const _mdDeal=_nhMarkDoneId?_nhDeals.find(d=>d.id===_nhMarkDoneId):null;
+  const _mdStageEl=document.getElementById('nhMarkDoneStage');
+  if(_mdStageEl) _mdStageEl.innerHTML=_nhStages.map(s=>`<option value="${s.id}"${_mdDeal&&_mdDeal.stageId===s.id?' selected':''}>${s.name}</option>`).join('');
   nhOpenModalTop('nhMarkDoneBg');
 }
 function nhCloseMarkDone(){
@@ -8337,6 +8338,8 @@ async function nhMarkDoneSubmitNote(){
     // Plain "Mark Done" — clear any existing next action, deal moves to No Action
     deal.nextAction='';
     deal.nextActionNote='';
+    const _mdS=document.getElementById('nhMarkDoneStage')?.value;
+    if(_mdS) deal.stageId=_mdS;
     await nhSet('_nh_deals',_nhDeals);
     nhCloseMarkDone();
     nhRenderCrm();
@@ -8351,6 +8354,8 @@ async function nhMarkDoneConfirm(){
   if(!deal)return;
   deal.nextAction=dateVal;
   deal.nextActionNote=noteVal;
+  const _mdSC=document.getElementById('nhMarkDoneStage')?.value;
+  if(_mdSC) deal.stageId=_mdSC;
   await nhSet('_nh_deals',_nhDeals);
   nhCloseMarkDone();
   nhRenderCrm();
@@ -8610,7 +8615,6 @@ async function nhSmDone(){
           <option value="role">Role / Title</option>
           <option value="company">Company</option>
           <option value="country">Country</option>
-          <option value="contact">Contact Info</option>
           <option value="tags">Tags</option>
         </select>
         <input class="nh-search" id="nhCrmSearch" type="text" placeholder="" oninput="nhRenderCrm()">
@@ -8729,6 +8733,11 @@ async function nhSmDone(){
 <div class="nh-modal-bg" id="nhMarkDoneBg" style="z-index:4000;">
   <div class="nh-modal" style="max-width:480px;">
     <div class="nh-modal-title" id="nhMarkDoneName">✓ Mark Done</div>
+    <div class="nh-crm-section-head">Pipeline Controls</div>
+    <div class="nh-field">
+      <label>Stage <span style="font-size:9px;color:var(--gold);font-style:italic;">← tap to change</span></label>
+      <select id="nhMarkDoneStage"></select>
+    </div>
     <div class="nh-field" id="nhMarkDoneNoteField">
       <label>What did you do?</label>
       <textarea class="nh-note-textarea" id="nhMarkDoneNote" style="min-height:100px;pointer-events:auto;touch-action:auto;"></textarea>

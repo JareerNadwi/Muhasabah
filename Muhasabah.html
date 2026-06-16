@@ -7851,8 +7851,29 @@ function nhSetFil(val){
 
 function nhRenderKanban(){
   const _crmQ=(document.getElementById('nhCrmSearch')?.value||'').toLowerCase().trim();
+  const _crmScope=document.getElementById('nhCrmSearchScope')?.value||'all';
   const el=document.getElementById('nhKanban');
   if(!el)return;
+
+  // Search active — flat list, no stages
+  if(_crmQ){
+    const sResults=[..._nhDeals].filter(d=>{
+      const c=_nhContacts.find(x=>x.id===d.contactId);
+      const name=(d.contactName||'').toLowerCase();
+      const role=(c?.role||'').toLowerCase();
+      const company=(d.company||c?.company||'').toLowerCase();
+      const country=(c?.country||'').toLowerCase();
+      const tags=(c?.tags||[]).join(' ').toLowerCase();
+      if(_crmScope==='name') return name.includes(_crmQ);
+      if(_crmScope==='role') return role.includes(_crmQ);
+      if(_crmScope==='company') return company.includes(_crmQ);
+      if(_crmScope==='country') return country.includes(_crmQ);
+      if(_crmScope==='tags') return tags.includes(_crmQ);
+      return name.includes(_crmQ)||role.includes(_crmQ)||company.includes(_crmQ)||country.includes(_crmQ)||tags.includes(_crmQ);
+    }).sort((a,b)=>(a.contactName||'').localeCompare(b.contactName||''));
+    el.innerHTML=sResults.length?sResults.map(d=>nhDealHTML(d,true)).join(''):'<div class="nh-empty">No results found.</div>';
+    return;
+  }
 
   // Flat list views — no stage columns
   if(_nhCrmFil==='ov'||_nhCrmFil==='noaction'){
@@ -7914,14 +7935,7 @@ function nhRenderKanban(){
 
   let deals=[..._nhDeals];
   if(_nhCrmFil!=='all') deals=deals.filter(d=>d.stageId===_nhCrmFil);
-  if(_crmQ){deals=deals.filter(d=>{
-    const c=_nhContacts.find(x=>x.id===d.contactId);
-    return (d.contactName||'').toLowerCase().includes(_crmQ)||
-      (d.company||'').toLowerCase().includes(_crmQ)||
-      (c?.role||'').toLowerCase().includes(_crmQ)||
-      (c?.country||'').toLowerCase().includes(_crmQ)||
-      (c?.tags||[]).join(' ').toLowerCase().includes(_crmQ);
-  });}
+
 
   const byStage={};
   _nhStages.forEach(s=>byStage[s.id]=[]);
@@ -8587,8 +8601,16 @@ async function nhSmDone(){
 
     <!-- CRM Section -->
     <div class="nh-section" data-sec="crm">
-      <div class="nh-controls" style="margin-bottom:10px;">
-        <input class="nh-search" id="nhCrmSearch" type="text" placeholder="Search pipeline..." oninput="nhRenderCrm()">
+      <div class="nh-controls">
+        <select class="nh-search-scope" id="nhCrmSearchScope" onchange="nhRenderCrm()">
+          <option value="all">All Fields</option>
+          <option value="name">Name</option>
+          <option value="role">Role / Title</option>
+          <option value="company">Company</option>
+          <option value="country">Country</option>
+          <option value="tags">Tags</option>
+        </select>
+        <input class="nh-search" id="nhCrmSearch" type="text" placeholder="" oninput="nhRenderCrm()">
       </div>
       <div class="nh-crm-filters" id="nhCrmFil"></div>
       <div class="nh-kanban" id="nhKanban"></div>

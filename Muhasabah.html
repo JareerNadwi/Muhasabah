@@ -770,7 +770,8 @@ canvas#qrCanvas{
 .qr-nav:disabled{opacity:.3;cursor:not-allowed;}
 /* Shared Prev/Next nav buttons for all readers (book, hadith, tafsir, sv, asmaul, zikr) */
 .rdr-nav-btn{background:#1e1a10;border:1px solid #2a2010;color:#8a7840;}
-.rdr-nav-btn:hover:not(:disabled){border-color:var(--gold-dim);color:var(--gold);background:#211b10;}
+.rdr-nav-btn:hover:not(:disabled):not(.rdr-nav-done){border-color:var(--gold-dim)!important;color:var(--gold)!important;background:#211b10!important;}
+.rdr-nav-btn.rdr-nav-done:hover{border-color:var(--green-bright)!important;background:#1a3020!important;}
 .rdr-nav-btn:disabled{opacity:.35;cursor:not-allowed;}
 .qr-page-display{
   font-family:'DM Mono',monospace;font-size:13px;color:#f0e4c0;
@@ -925,10 +926,11 @@ body.light-mode #hadithPrevBtn:hover,body.light-mode #tafsirPrevBtn:hover,
 body.light-mode #bookPrevBtn:hover,body.light-mode #svPrevBtn:hover,
 body.light-mode #asmaulPrevBtn:hover,body.light-mode #zikrReaderPrevBtn:hover,
 body.light-mode #zikrBookPrevBtn:hover,
-body.light-mode #hadithNextBtn:hover,body.light-mode #tafsirNextBtn:hover,
-body.light-mode #bookNextBtn:hover,body.light-mode #svNextBtn:hover,
-body.light-mode #asmaulNextBtn:hover,body.light-mode #zikrReaderNextBtn:hover,
-body.light-mode #zikrBookNextBtn:hover{background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode #hadithNextBtn:hover:not(.rdr-nav-done),body.light-mode #tafsirNextBtn:hover:not(.rdr-nav-done),
+body.light-mode #bookNextBtn:hover:not(.rdr-nav-done),body.light-mode #svNextBtn:hover:not(.rdr-nav-done),
+body.light-mode #asmaulNextBtn:hover:not(.rdr-nav-done),body.light-mode #zikrReaderNextBtn:hover:not(.rdr-nav-done),
+body.light-mode #zikrBookNextBtn:hover:not(.rdr-nav-done){background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .rdr-nav-done:hover{background:#d8f0de!important;border-color:var(--green)!important;color:var(--green)!important;}
 /* Zikr article counter */
 body.light-mode #zikrArticleBar{background:#ece9e2!important;}
 body.light-mode [onclick="zikrArticleTap(-1)"]{background:#fff0f0!important;border-color:#e0c0c0!important;color:#8b2a2a!important;}
@@ -3581,9 +3583,10 @@ function renderHadith(idx){
   const isLast  = idx === HADITHS_PER_DAY - 1;
   const btn = document.getElementById('hadithNextBtn');
   btn.textContent       = isLast ? '\u2713 Mark Done' : 'Next \u2192';
-  btn.style.background  = isLast ? 'var(--green)'        : '#1a1500';
-  btn.style.borderColor = isLast ? 'var(--green-bright)' : '#c9a84c55';
-  btn.style.color       = isLast ? '#fff'                : '#c9a84c';
+  btn.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
+  btn.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
+  btn.style.color       = isLast ? '#fff'                : '#8a7840';
+  btn.classList.toggle('rdr-nav-done', isLast);
   btn.disabled = false;
 }
 
@@ -3730,9 +3733,10 @@ function renderTafsirVerse(idx){
   const isLast = idx === total - 1;
   const btn = document.getElementById('tafsirNextBtn');
   btn.textContent       = isLast ? '\u2713 Mark Done' : 'Next \u2192';
-  btn.style.background  = isLast ? 'var(--green)'        : '#1a1500';
-  btn.style.borderColor = isLast ? 'var(--green-bright)' : '#c9a84c55';
-  btn.style.color       = isLast ? '#fff'                : '#c9a84c';
+  btn.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
+  btn.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
+  btn.style.color       = isLast ? '#fff'                : '#8a7840';
+  btn.classList.toggle('rdr-nav-done', isLast);
   btn.disabled = false;
 }
 
@@ -3867,9 +3871,10 @@ function renderSurahVerse(idx){
   const isLast = idx === total - 1;
   const btn = document.getElementById('svNextBtn');
   btn.textContent       = isLast ? '✓ Mark Done' : 'Next →';
-  btn.style.background  = isLast ? 'var(--green)'        : '#1a1500';
-  btn.style.borderColor = isLast ? 'var(--green-bright)' : '#c9a84c55';
-  btn.style.color       = isLast ? '#fff'                : '#c9a84c';
+  btn.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
+  btn.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
+  btn.style.color       = isLast ? '#fff'                : '#8a7840';
+  btn.classList.toggle('rdr-nav-done', isLast);
   btn.disabled = false;
 }
 
@@ -4147,9 +4152,9 @@ function _renderBookSlide(book) {
     prevBtn.disabled    = true;
     prevBtn.style.opacity = '0.3';
     nextBtn.textContent = 'Lesson 1 \u2192';
-    nextBtn.style.background  = '#1a1500';
-    nextBtn.style.borderColor = '#c9a84c55';
-    nextBtn.style.color       = '#c9a84c';
+    nextBtn.style.background  = '#1e1a10';
+    nextBtn.style.borderColor = '#2a2010';
+    nextBtn.style.color       = '#8a7840';
     nextBtn.disabled    = false;
     pill.textContent    = '';
   } else {
@@ -4161,9 +4166,10 @@ function _renderBookSlide(book) {
     prevBtn.style.opacity = '1';
     const isLast = cur >= total - 1;
     nextBtn.textContent       = isLast ? '\u2713 Mark Done' : 'Lesson ' + (cur+2) + ' \u2192';
-    nextBtn.style.background  = isLast ? 'var(--green)'        : '#1a1500';
-    nextBtn.style.borderColor = isLast ? 'var(--green-bright)' : '#c9a84c55';
-    nextBtn.style.color       = isLast ? '#fff'                : '#c9a84c';
+    nextBtn.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
+    nextBtn.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
+    nextBtn.style.color       = isLast ? '#fff'                : '#8a7840';
+    nextBtn.classList.toggle('rdr-nav-done', isLast);
     nextBtn.disabled    = false;
     pill.textContent    = (cur+1) + ' / ' + total;
   }
@@ -5327,9 +5333,10 @@ function _asmaulRenderSlide(){
   prevBtn.disabled      = _asmaulSlide === 0;
   prevBtn.style.opacity = _asmaulSlide === 0 ? "0.3" : "1";
   nextBtn.textContent       = isLast ? "✓ Complete" : "Next →";
-  nextBtn.style.background  = isLast ? "var(--green)"        : "#1a1500";
-  nextBtn.style.borderColor = isLast ? "var(--green-bright)" : "#c9a84c55";
-  nextBtn.style.color       = isLast ? "#fff"                : "#c9a84c";
+  nextBtn.style.background  = isLast ? "var(--green)"        : "#1e1a10";
+  nextBtn.style.borderColor = isLast ? "var(--green-bright)" : "#2a2010";
+  nextBtn.style.color       = isLast ? "#fff"                : "#8a7840";
+  nextBtn.classList.toggle('rdr-nav-done', isLast);
 
   let html = "";
   slide.forEach(function(name, i){
@@ -5552,9 +5559,10 @@ function _zikrRender(){
   pb.disabled=_zikrSlide===0;pb.style.opacity=_zikrSlide===0?"0.3":"1";
   var nb=document.getElementById("zikrReaderNextBtn");
   nb.textContent=isLast?"Complete":"Next";
-  nb.style.background=isLast?"var(--green)":"#1a1610";
-  nb.style.borderColor=isLast?"var(--green-bright)":"var(--gold-dim)";
-  nb.style.color=isLast?"#fff":"var(--gold)";
+  nb.style.background=isLast?"var(--green)":"#1e1a10";
+  nb.style.borderColor=isLast?"var(--green-bright)":"#2a2010";
+  nb.style.color=isLast?"#fff":"#8a7840";
+  nb.classList.toggle('rdr-nav-done', isLast);
   var ns=num<10?"0"+num:""+num;
   var _zlm=document.body.classList.contains('light-mode');
   var _zcard=_zlm?'#f5f0e0':'#1a1610';
@@ -5767,9 +5775,10 @@ function _zbRender() {
 
   const nb = document.getElementById('zikrBookNextBtn');
   nb.textContent = isLast ? '✓ Complete' : 'Next →';
-  nb.style.background  = isLast ? 'var(--green)'        : '#1a1610';
-  nb.style.borderColor = isLast ? 'var(--green-bright)' : 'var(--gold-dim)';
-  nb.style.color       = isLast ? '#fff'                : 'var(--gold)';
+  nb.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
+  nb.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
+  nb.style.color       = isLast ? '#fff'                : '#8a7840';
+  nb.classList.toggle('rdr-nav-done', isLast);
 
   const sourceTag = dua.source
     ? '<div style="font-size:0.72rem;color:#7a6a40;margin-top:10px;text-align:right;font-family:\'DM Mono\',monospace;">' + dua.source + '</div>'
@@ -7468,6 +7477,7 @@ async function openContactBook(){
     nhGet('_nh_dismissed_tags').then(v=>v||[]),
   ]);
   await nhSet('_nh_stages',_nhStages);
+  _nhTab = await nhGet('_nh_active_tab') || 'contacts';
   document.getElementById('netHubOverlay').classList.add('active');
   document.body.classList.add('overlay-open');
   reThemeIfLight();
@@ -7637,6 +7647,7 @@ function nhScrollDeal(id){
 /* ── Tab nav ── */
 function nhShowTab(tab){
   _nhTab=tab;
+  nhSet('_nh_active_tab', tab);
   document.querySelectorAll('.nh-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
   document.querySelectorAll('.nh-section').forEach(s=>s.classList.toggle('on',s.dataset.sec===tab));
   if(tab==='contacts') nhRenderContacts();

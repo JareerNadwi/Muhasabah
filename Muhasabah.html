@@ -7505,34 +7505,28 @@ async function nhHandleImportFile(e){
 function nhExportExcel(){
   try{
     if(!_nhContacts.length){alert('No contacts to export.');return;}
-    if(typeof XLSX==='undefined'){alert('❌ Export library not loaded. Please check your internet connection and reload the page.');return;}
+    if(typeof XLSX==='undefined'){alert('Export library not loaded. Please check your internet connection and reload.');return;}
+    const s=v=>typeof v==='string'?v:(v==null?'':String(v));
     const rows=_nhContacts.map(c=>({
-      'Name':c.name||'',
-      'Role / Title':c.role||'',
-      'Company':c.company||'',
-      'Country':c.country||'',
-      'Phone':c.phone||'',
-      'Email':c.email||'',
-      'LinkedIn':c.linkedin||'',
-      'Facebook':c.facebook||'',
-      'Tags':(c.tags||[]).join(', '),
-      'Notes':c.notes||'',
+      'Name':s(c.name),
+      'Role / Title':s(c.role),
+      'Company':s(c.company),
+      'Country':s(c.country),
+      'Phone':s(c.phone),
+      'Email':s(c.email),
+      'LinkedIn':s(c.linkedin),
+      'Facebook':s(c.facebook),
+      'Tags':Array.isArray(c.tags)?c.tags.join(', '):s(c.tags),
+      'Notes':s(c.notes),
       'Added On':c.createdAt?new Date(c.createdAt).toLocaleDateString():''
     }));
     const ws=XLSX.utils.json_to_sheet(rows);
-    // Force Phone column as text so + sign is preserved
-    const phoneColIdx=4; // 0-based: Name,Role,Company,Country,Phone
     const range=XLSX.utils.decode_range(ws['!ref']||'A1');
     for(let R=range.s.r+1;R<=range.e.r;R++){
-      const cellAddr=XLSX.utils.encode_cell({r:R,c:phoneColIdx});
-      if(ws[cellAddr]&&ws[cellAddr].v){
-        ws[cellAddr].t='s';
-        ws[cellAddr].v=String(ws[cellAddr].v);
-        delete ws[cellAddr].z;
-      }
+      const ca=XLSX.utils.encode_cell({r:R,c:4});
+      if(ws[ca]&&ws[ca].v){ws[ca].t='s';ws[ca].v=String(ws[ca].v);delete ws[ca].z;}
     }
-    const colWidths=[{wch:25},{wch:22},{wch:22},{wch:16},{wch:18},{wch:28},{wch:35},{wch:35},{wch:20},{wch:40},{wch:14}];
-    ws['!cols']=colWidths;
+    ws['!cols']=[{wch:25},{wch:22},{wch:22},{wch:16},{wch:18},{wch:28},{wch:35},{wch:35},{wch:20},{wch:40},{wch:14}];
     const wb=XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb,'Contacts',ws);
     const date=new Date().toISOString().slice(0,10);
@@ -7540,13 +7534,11 @@ function nhExportExcel(){
     const blob=new Blob([wbout],{type:'application/octet-stream'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
-    a.href=url;
-    a.download=`Muhasabah_Contacts_${date}.xlsx`;
-    document.body.appendChild(a);
-    a.click();
+    a.href=url;a.download=`Muhasabah_Contacts_${date}.xlsx`;
+    document.body.appendChild(a);a.click();
     setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
   }catch(err){
-    alert('❌ Export failed: '+err.message);
+    alert('Export failed: '+err.message);
   }
 }
 

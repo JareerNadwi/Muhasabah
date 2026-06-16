@@ -68,6 +68,8 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-search-scope{flex:0 0 auto;width:108px;background:#141008!important;border:1px solid #2a2010!important;color:#c5b98a!important;padding:8px 6px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;cursor:pointer;white-space:nowrap;}
 .nh-crm-fil-select{flex:1 1 auto;max-width:100%;min-width:0;background:#141008!important;border:1px solid #2a2010!important;color:#c5b98a!important;padding:7px 8px;border-radius:20px;font-family:'DM Mono',monospace;font-size:11px;outline:none;cursor:pointer;text-overflow:ellipsis;overflow:hidden;}
 .nh-search-scope:focus{border-color:var(--gold-dim);}
+.nh-search-scope:hover{border-color:var(--gold-dim)!important;}
+body.light-mode .nh-search-scope:hover{border-color:#9a7228!important;}
 .nh-search-scope option{background:#1a1610;color:#f0e4c0;}
 .nh-crm-fil-select option{background:#1a1610;color:#f0e4c0;}
 .nh-add-btn{flex:0 0 auto;background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;white-space:nowrap;}
@@ -113,8 +115,8 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-field select option{background:#1a1610;}
 .nh-field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a7870'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
 /* Stage selector (CRM Pipeline + Contact Book initial stage) — had no hover feedback at all */
-#nhCrmFStage:hover,#nhCbFStage:hover{border-color:var(--gold-dim);cursor:pointer;}
-body.light-mode #nhCrmFStage:hover,body.light-mode #nhCbFStage:hover{border-color:#9a7228!important;}
+#nhCrmFStage:hover,#nhCbFStage:hover{border-color:var(--gold-dim)!important;background:#211b10!important;cursor:pointer;}
+body.light-mode #nhCrmFStage:hover,body.light-mode #nhCbFStage:hover{border-color:#9a7228!important;background:#fdf5dc!important;}
 .nh-field textarea{resize:vertical;min-height:60px;font-size:11px;line-height:1.5;}
 .nh-modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end;flex-wrap:wrap;}
 .nh-confirm-msg{font-family:'DM Mono',monospace;font-size:12px;line-height:1.6;color:#e0d4b0;}
@@ -124,7 +126,7 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-btn-cancel{background:#1a1610;border:1px solid #2a2010;color:#c5b98a;padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;}
 .nh-btn-cancel:hover{color:#f0e4c0;}
 .nh-btn-del{background:#1a1610;border:1px solid var(--red);color:var(--red);padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;}
-.nh-btn-del:hover{border-color:var(--red);}
+.nh-btn-del:hover{border-color:var(--red);background:#2a1515;}
 
 /* Link buttons */
 .nh-links{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 8px;}
@@ -242,7 +244,7 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-note-edit-btn.danger:hover{color:var(--red);}
 .nh-note-edit-area{width:100%;background:#1a1610;border:1px solid var(--gold-dim);color:#f0e4c0;padding:6px 8px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:11px;outline:none;resize:vertical;min-height:48px;line-height:1.4;margin-top:4px;}
 .nh-note-save-btn{margin-top:4px;background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:4px 10px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;}
-.nh-note-save-btn:hover{background:#1a1610;}
+.nh-note-save-btn:hover{border-color:var(--gold);}
 .nh-note-date{font-family:'DM Mono',monospace;font-size:9px;color:#a89060;margin-bottom:3px;}
 .nh-note-text{font-size:11px;color:#c5b98a;line-height:1.5;white-space:pre-wrap;}
 .nh-note-add{display:flex;flex-direction:column;gap:6px;}
@@ -258,7 +260,7 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-markdone-next input[type=date]:focus,.nh-markdone-next input[type=text]:focus{border-color:var(--gold-dim);}
 .nh-markdone-confirm{margin-top:8px;background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:7px 16px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;width:100%;}
 .nh-markdone-confirm:hover{border-color:var(--gold);}
-.nh-note-submit:hover{background:#1a1610;}
+.nh-note-submit:hover{border-color:var(--gold);}
 
 /* Stage manager modal */
 .nh-sm-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;min-height:40px;}
@@ -277,7 +279,7 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-sm-input{flex:1;background:#1a1610;border:1px solid #2a2010;color:#f0e4c0;padding:7px 10px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
 .nh-sm-input:focus{border-color:var(--gold-dim);}
 .nh-sm-addbtn{background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;white-space:nowrap;}
-.nh-sm-addbtn:hover{background:#1a1610;}
+.nh-sm-addbtn:hover{border-color:var(--gold);}
 .nh-view-field{background:#1a1610;border:1px solid #2a2010;border-radius:var(--radius);padding:8px 11px;font-family:'DM Mono',monospace;font-size:12px;color:#c5b98a;min-height:36px;word-break:break-all;}
 .nh-view-label{display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:#a89060;margin-bottom:4px;text-transform:uppercase;}
 .nh-crm-section-head{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;color:#a89060;text-transform:uppercase;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid #2a2010;}
@@ -304,8 +306,11 @@ body.light-mode .nh-cal-day.past{color:#b0aaa0!important;}
 body.light-mode .nh-cal-day.selected{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-cal-day-badge{background:rgba(154,114,40,.15)!important;color:#9a7228!important;}
 body.light-mode .nh-close{background:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+/* Close button hover had no light-mode counterpart — same specificity trap as salah-opt/yn-btn below */
+body.light-mode .nh-close:hover{border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-nav{border-color:#d4cfc5!important;}
 body.light-mode .nh-tab{background:#f0ede6!important;color:#5a5750!important;}
+body.light-mode .nh-tab:hover:not(.on){background:#f5f0e0!important;color:#9a7228!important;}
 body.light-mode .nh-tab.on{background:#f5f0e0!important;color:#9a7228!important;border-bottom-color:#9a7228!important;}
 body.light-mode .nh-search{background:#f0ede6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
 body.light-mode .nh-search-scope{background-color:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
@@ -320,22 +325,31 @@ body.light-mode .nh-field input,body.light-mode .nh-field select,body.light-mode
 body.light-mode .nh-field label{color:#9a9590!important;}
 body.light-mode .nh-field select option{background:#ffffff!important;color:#1a1a18!important;}
 body.light-mode .nh-cb-card{background:#f0ede6!important;border-color:#d4cfc5!important;}
+body.light-mode .nh-cb-card:hover{border-color:#9a7228!important;}
 body.light-mode .nh-sm-btn{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .nh-sm-btn:hover{border-color:#9a7228!important;color:#1a1a18!important;}
 body.light-mode .nh-sm-btn.done{border-color:var(--green)!important;color:var(--green)!important;}
 body.light-mode .nh-sm-btn.done:hover{background:#d8f0de!important;border-color:var(--green)!important;}
 body.light-mode .nh-sm-btn.danger:hover{background:#f5dede!important;border-color:var(--red)!important;color:var(--red)!important;}
 body.light-mode .nh-link{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .nh-link:hover{border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-link.lk:hover{border-color:#0a66c2!important;color:#0a66c2!important;}
+body.light-mode .nh-link.fb:hover{border-color:#1877f2!important;color:#1877f2!important;}
+body.light-mode .nh-link.ph:hover{border-color:#25d366!important;color:#25d366!important;}
+body.light-mode .nh-link.em:hover{border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-tag{background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-stage-badge{background:#f0ede6!important;}
 body.light-mode .nh-tag-chip{background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-tag-chip-x{color:#7a756c!important;}
+body.light-mode .nh-tag-chip-x:hover{color:var(--red)!important;}
 body.light-mode .nh-extra-field-x{color:#9a9590!important;}
+body.light-mode .nh-extra-field-x:hover{color:var(--red)!important;}
 body.light-mode .nh-tag-input-wrap{background:#ffffff!important;border-color:#d4cfc5!important;}
 body.light-mode .nh-tag-input{color:#1a1a18!important;}
 body.light-mode .nh-tag-suggest{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .nh-tag-suggest:hover{border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-tag-suggest-x{color:#9a9590!important;}
+body.light-mode .nh-tag-suggest-x:hover{color:var(--red)!important;}
 body.light-mode .nh-today{background:#fdf0f0!important;border-color:#c08080!important;}
 body.light-mode .nh-today-title{color:#8b2a2a!important;}
 body.light-mode .nh-today-dot{background:#8b2a2a!important;}
@@ -348,6 +362,7 @@ body.light-mode .nh-sf.ov-pill.on{background:#fdf0f0!important;border-color:var(
 body.light-mode .nh-sf-cnt{background:#e8e2d6!important;color:#5a5750!important;}
 body.light-mode .nh-sf.on .nh-sf-cnt{background:rgba(154,114,40,.15)!important;color:#9a7228!important;}
 body.light-mode .nh-manage-btn{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#9a9590!important;}
+body.light-mode .nh-manage-btn:hover{border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-col{background:#f0ede6!important;border-color:#d4cfc5!important;}
 body.light-mode .nh-col-hd:hover{background:#e8e2d6!important;}
 body.light-mode .nh-col-body{border-color:#d4cfc5!important;}
@@ -376,15 +391,20 @@ body.light-mode .nh-next-action-note{color:#5a4a28!important;background:#fdf5dc!
 body.light-mode .nh-btn-save{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-btn-save:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
 body.light-mode .nh-btn-cancel{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .nh-btn-cancel:hover{color:#9a7228!important;}
 body.light-mode .nh-btn-del{background:#f5dede!important;border-color:var(--red)!important;color:var(--red)!important;}
+body.light-mode .nh-btn-del:hover{background:#fdecec!important;}
 body.light-mode .nh-note-entry{background:#e8e2d6!important;border-color:#d4cfc5!important;}
 body.light-mode .nh-note-date{color:#9a9590!important;}
 body.light-mode .nh-note-text{color:#5a5750!important;}
 body.light-mode .nh-note-edit-btn{color:#9a9590!important;}
+body.light-mode .nh-note-edit-btn:hover{color:#9a7228!important;}
 body.light-mode .nh-note-edit-btn.danger:hover{color:var(--red)!important;}
 body.light-mode .nh-note-textarea,body.light-mode .nh-note-edit-area{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
 body.light-mode .nh-note-submit{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-note-submit:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
 body.light-mode .nh-note-save-btn{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-note-save-btn:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
 body.light-mode .nh-sm-item{background:#e8e2d6!important;border-color:#d4cfc5!important;}
 body.light-mode .nh-sm-name{color:#1a1a18!important;}
 body.light-mode .nh-sm-name:hover{border-color:#d4cfc5!important;}
@@ -392,8 +412,10 @@ body.light-mode .nh-sm-name:focus{border-color:#9a7228!important;background:#fff
 body.light-mode .nh-sm-grip{color:#9a9590!important;}
 body.light-mode .nh-sm-input{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
 body.light-mode .nh-sm-addbtn{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-sm-addbtn:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
 body.light-mode .nh-sm-del:hover{color:var(--red)!important;}
 body.light-mode .nh-markdone-confirm{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-markdone-confirm:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
 body.light-mode .nh-markdone-next input[type=date],body.light-mode .nh-markdone-next input[type=text]{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
 body.light-mode .nh-view-field{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .nh-crm-section-head{color:#9a9590!important;border-color:#d4cfc5!important;}
@@ -800,6 +822,7 @@ body.light-mode{
 }
 body.light-mode .header{background:var(--surface);border-bottom-color:var(--border);}
 body.light-mode .back-btn,body.light-mode .dark-toggle,body.light-mode .export-btn,body.light-mode .import-btn,body.light-mode .reset-btn{background:var(--surface2);}
+body.light-mode .dark-toggle:hover{border-color:var(--gold-dim);color:var(--text);}
 body.light-mode .reset-btn{color:var(--red);border-color:#e0c0c0;}
 body.light-mode .back-btn:hover{color:var(--text);border-color:var(--gold-dim);background:#e8e2d6;}
 body.light-mode .export-btn:hover{background:linear-gradient(135deg,#fdf5dc,#f5e8b0);border-color:var(--gold);color:#7a5010;}
@@ -844,9 +867,11 @@ body.light-mode .qr-open-btn:hover{background:linear-gradient(135deg,#d8f0de,#c8
 body.light-mode .btn-donate{background:linear-gradient(135deg,#fdf5dc,#f8edcc);border-color:var(--gold);color:var(--gold);}
 body.light-mode .btn-donate:hover{background:linear-gradient(135deg,#f8edcc,#f0e0b0);}
 body.light-mode .btn-later{background:var(--surface2);border-color:var(--border);}
+body.light-mode .btn-later:hover{border-color:var(--gold-dim);color:var(--text);}
 body.light-mode .import-drop:hover,body.light-mode .import-drop.dragover{background:#f0e8f8;color:var(--purple);border-color:var(--purple);}
 body.light-mode .modal{background:var(--surface);}
 body.light-mode .modal-cancel{background:var(--surface2);border-color:var(--border);}
+body.light-mode .modal-cancel:hover{border-color:var(--gold-dim);color:var(--text);}
 body.light-mode .modal-confirm{background:#f5dede!important;border-color:var(--red)!important;color:var(--red)!important;}
 body.light-mode .modal-confirm:hover{background:#f0c8c8!important;}
 body.light-mode #importConfirmBtn{background:#f0e8f8!important;border-color:var(--purple)!important;color:var(--purple)!important;}
@@ -856,6 +881,7 @@ body.light-mode .support-bkash{background:var(--surface2);border-color:var(--gol
 body.light-mode .progress-track,body.light-mode .bonus-track{background:var(--surface2);}
 body.light-mode .section-label{border-bottom-color:var(--border);}
 body.light-mode .counter-btn{background:var(--surface2);border-color:var(--border);}
+body.light-mode .counter-btn:hover{border-color:var(--gold-dim);color:var(--gold);}
 body.light-mode .qr-session-badge{background:var(--surface2);}
 /* Overlay title headings: gold is hard to read on cream/white, use dark text instead */
 body.light-mode [style*="font-family:'Amiri',serif;font-size:17px;color:#c9a84c"],
@@ -888,12 +914,12 @@ body.light-mode #hadithPrevBtn,body.light-mode #tafsirPrevBtn,
 body.light-mode #bookPrevBtn,body.light-mode #svPrevBtn,
 body.light-mode #asmaulPrevBtn,body.light-mode #zikrReaderPrevBtn,
 body.light-mode #zikrBookPrevBtn{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
-/* Next buttons */
+/* Next buttons — now matches Prev's idle look exactly (was gold/outlined before, which is also why hover looked dead: it was already sitting at the "hover" color) */
 body.light-mode #hadithNextBtn,body.light-mode #tafsirNextBtn,
 body.light-mode #bookNextBtn,body.light-mode #svNextBtn,
 body.light-mode #asmaulNextBtn,body.light-mode #zikrReaderNextBtn,
 body.light-mode #zikrBookNextBtn,body.light-mode #qrNext,
-body.light-mode #pdfReaderNext{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode #pdfReaderNext{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 /* Prev/Next hover (light mode) — was missing entirely, ID specificity blocked any class-based hover */
 body.light-mode #hadithPrevBtn:hover,body.light-mode #tafsirPrevBtn:hover,
 body.light-mode #bookPrevBtn:hover,body.light-mode #svPrevBtn:hover,
@@ -925,13 +951,24 @@ body.light-mode .lr-lang-btn,body.light-mode .lr-type-btn{background:#ece9e2!imp
 body.light-mode .lr-lang-btn[style*="#1a1500"],body.light-mode .lr-lang-btn[style*="background:#1a1500"],
 body.light-mode .lr-type-btn[style*="#1a1500"]{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .lr-lang-btn:hover,body.light-mode .lr-type-btn:hover{border-color:#9a7228!important;color:#9a7228!important;}
+/* ── BMI Calculator (exercise article) — was 100% hardcoded dark, ignored the theme toggle entirely ── */
+body.light-mode #bmiPanel{background:#fdf5dc!important;border-color:#d4cfc5!important;border-top-color:#9a7228!important;}
+body.light-mode .bmi-disclaimer{color:#7a6a40!important;}
+body.light-mode .bmi-section-label{color:#9a7228!important;}
+body.light-mode .bmi-unit{color:#7a6a40!important;}
+body.light-mode #bmi-feet,body.light-mode #bmi-inches,body.light-mode #bmi-kg{background:#ece9e2!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
+body.light-mode #bmi-feet:focus,body.light-mode #bmi-inches:focus,body.light-mode #bmi-kg:focus{border-color:#9a7228!important;}
+/* Calculate button follows the Language Learner word/verb "active" look in warm mode, per request */
+body.light-mode #bmiCalcBtn{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode #bmiCalcBtn:hover{background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode #lrMarkBtn{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
 /* ── Post Writer ── */
 body.light-mode #pwTabLI{background:#f0ede6!important;color:#9a7228!important;}
 body.light-mode #pwTabFB{background:#ece9e2!important;color:#5a5750!important;}
-/* Post Writer platform tabs hover — same pattern as nh-tab (JS sets colors inline, so !important needed) */
-.pw-tab:hover{color:#f0e4c0!important;background:#1a1610!important;}
-body.light-mode .pw-tab:hover{background:#f5f0e0!important;color:#9a7228!important;}
+/* Post Writer platform tabs hover — must be ID-based to beat the ID-based color rules above (ID always
+   out-specificities any number of classes, so a .pw-tab:hover class rule could never win here) */
+#pwTabLI:hover,#pwTabFB:hover{background:#1a1610!important;color:#f0e4c0!important;}
+body.light-mode #pwTabLI:hover,body.light-mode #pwTabFB:hover{background:#f5f0e0!important;color:#9a7228!important;}
 body.light-mode #pwChat{background:#ffffff!important;}
 body.light-mode #pwInputArea{background:#f0ede6!important;border-color:#d4cfc5!important;}
 body.light-mode #pwInput{background:#ffffff!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
@@ -959,7 +996,7 @@ body.light-mode #lrLabelChallenge{color:#2d6b40!important;}
 body.light-mode #lrSpeakingChallenge{color:#1a1a18!important;}
 /* Post Writer Save Key button */
 body.light-mode [onclick="pwSaveKey()"]{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
-[onclick="pwSaveKey()"]:hover{border-color:var(--gold-dim);color:#f0e4c0;}
+[onclick="pwSaveKey()"]:hover{border-color:var(--gold-dim)!important;color:#f0e4c0!important;}
 body.light-mode [onclick="pwSaveKey()"]:hover{border-color:#9a7228!important;color:#9a7228!important;}
 /* ── Dark Mode Toggle ── */
 .dark-toggle{
@@ -5018,28 +5055,28 @@ document.addEventListener('keydown', function(e){
       <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:6px;">Health Screening</div>
       <div style="font-family:'Literata',Georgia,serif;font-size:1.35rem;color:#f0e4c0;margin-bottom:16px;font-weight:700;">BMI Calculator</div>
 
-      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:20px;">
-        <div style="font-size:0.78rem;color:#6a5a30;margin-bottom:20px;line-height:1.65;">BMI is a screening tool, not a diagnosis. It does not account for muscle mass, bone density, or fat distribution. Use it as one data point alongside how you feel, how you perform, and what your doctor tells you.</div>
+      <div id="bmiPanel" style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:24px;margin-bottom:20px;">
+        <div class="bmi-disclaimer" style="font-size:0.78rem;color:#6a5a30;margin-bottom:20px;line-height:1.65;">BMI is a screening tool, not a diagnosis. It does not account for muscle mass, bone density, or fat distribution. Use it as one data point alongside how you feel, how you perform, and what your doctor tells you.</div>
 
         <div style="margin-bottom:16px;">
-          <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#a89060;margin-bottom:8px;">Height</div>
+          <div class="bmi-section-label" style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#a89060;margin-bottom:8px;">Height</div>
           <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:8px;">
               <input type="number" id="bmi-feet" min="0" max="8" placeholder="0" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:64px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
-              <span style="font-size:0.78rem;color:#6a5a30;letter-spacing:0.06em;">ft</span>
+              <span class="bmi-unit" style="font-size:0.78rem;color:#6a5a30;letter-spacing:0.06em;">ft</span>
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
               <input type="number" id="bmi-inches" min="0" max="11" placeholder="0" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:64px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
-              <span style="font-size:0.78rem;color:#6a5a30;letter-spacing:0.06em;">in</span>
+              <span class="bmi-unit" style="font-size:0.78rem;color:#6a5a30;letter-spacing:0.06em;">in</span>
             </div>
           </div>
         </div>
 
         <div style="margin-bottom:22px;">
-          <div style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#a89060;margin-bottom:8px;">Weight</div>
+          <div class="bmi-section-label" style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#a89060;margin-bottom:8px;">Weight</div>
           <div style="display:flex;align-items:center;gap:8px;">
             <input type="number" id="bmi-kg" min="0" max="300" placeholder="0" value="0" style="background:#1a1610;border:1px solid #3a2e14;border-radius:5px;color:#f0e4c0;font-size:0.95rem;padding:8px 10px;outline:none;width:80px;font-family:'DM Mono',monospace;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a2e14'">
-            <span style="font-size:0.78rem;color:#6a5a30;letter-spacing:0.06em;">kg</span>
+              <span class="bmi-unit" style="font-size:0.78rem;color:#6a5a30;letter-spacing:0.06em;">kg</span>
           </div>
         </div>
 

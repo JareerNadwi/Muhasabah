@@ -112,6 +112,9 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-extra-field-x:hover{color:var(--red);}
 .nh-field select option{background:#1a1610;}
 .nh-field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a7870'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+/* Stage selector (CRM Pipeline + Contact Book initial stage) — had no hover feedback at all */
+#nhCrmFStage:hover,#nhCbFStage:hover{border-color:var(--gold-dim);cursor:pointer;}
+body.light-mode #nhCrmFStage:hover,body.light-mode #nhCbFStage:hover{border-color:#9a7228!important;}
 .nh-field textarea{resize:vertical;min-height:60px;font-size:11px;line-height:1.5;}
 .nh-modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end;flex-wrap:wrap;}
 .nh-confirm-msg{font-family:'DM Mono',monospace;font-size:12px;line-height:1.6;color:#e0d4b0;}
@@ -743,6 +746,10 @@ canvas#qrCanvas{
 }
 .qr-nav:hover:not(:disabled){border-color:var(--gold-dim);color:var(--gold);}
 .qr-nav:disabled{opacity:.3;cursor:not-allowed;}
+/* Shared Prev/Next nav buttons for all readers (book, hadith, tafsir, sv, asmaul, zikr) */
+.rdr-nav-btn{background:#1e1a10;border:1px solid #2a2010;color:#8a7840;}
+.rdr-nav-btn:hover:not(:disabled){border-color:var(--gold-dim);color:var(--gold);background:#211b10;}
+.rdr-nav-btn:disabled{opacity:.35;cursor:not-allowed;}
 .qr-page-display{
   font-family:'DM Mono',monospace;font-size:13px;color:#f0e4c0;
   min-width:140px;text-align:center;letter-spacing:.5px;
@@ -820,7 +827,12 @@ body.light-mode .bonus-tag{background:#ede0f5;border-color:#c8a0e0;color:var(--p
 body.light-mode input[type="number"],body.light-mode input[type="text"],body.light-mode textarea,body.light-mode select{background:var(--surface2);border-color:var(--border);color:var(--text);}
 body.light-mode select option{background:var(--surface);}
 body.light-mode .salah-opt{background:var(--surface2);border-color:var(--border);color:var(--text-dim);}
+/* Salah option buttons (Jama'ah/Munfarid/Qadha/Missed) had no visible hover in light mode — the body.light-mode
+   base rule above out-specificities the plain .salah-opt:hover rule, so it never fired. */
+body.light-mode .salah-opt:hover{border-color:#9a7228!important;}
 body.light-mode .yn-btn{background:var(--surface2);border-color:var(--border);color:var(--text-dim);}
+/* Yes/No buttons on goal cards had no visible hover in light mode for the same specificity reason as .salah-opt above */
+body.light-mode .yn-btn:hover{border-color:#9a7228!important;}
 body.light-mode .yn-btn.yes.active{background:#d8f0de;border-color:var(--green);color:var(--green);}
 body.light-mode .yn-btn.no.active{background:#f5dede;border-color:var(--red);color:var(--red);}
 body.light-mode .salah-opt.jamaah.active{background:#d8f0de;border-color:var(--green);color:var(--green);}
@@ -882,6 +894,15 @@ body.light-mode #bookNextBtn,body.light-mode #svNextBtn,
 body.light-mode #asmaulNextBtn,body.light-mode #zikrReaderNextBtn,
 body.light-mode #zikrBookNextBtn,body.light-mode #qrNext,
 body.light-mode #pdfReaderNext{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
+/* Prev/Next hover (light mode) — was missing entirely, ID specificity blocked any class-based hover */
+body.light-mode #hadithPrevBtn:hover,body.light-mode #tafsirPrevBtn:hover,
+body.light-mode #bookPrevBtn:hover,body.light-mode #svPrevBtn:hover,
+body.light-mode #asmaulPrevBtn:hover,body.light-mode #zikrReaderPrevBtn:hover,
+body.light-mode #zikrBookPrevBtn:hover,
+body.light-mode #hadithNextBtn:hover,body.light-mode #tafsirNextBtn:hover,
+body.light-mode #bookNextBtn:hover,body.light-mode #svNextBtn:hover,
+body.light-mode #asmaulNextBtn:hover,body.light-mode #zikrReaderNextBtn:hover,
+body.light-mode #zikrBookNextBtn:hover{background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
 /* Zikr article counter */
 body.light-mode #zikrArticleBar{background:#ece9e2!important;}
 body.light-mode [onclick="zikrArticleTap(-1)"]{background:#fff0f0!important;border-color:#e0c0c0!important;color:#8b2a2a!important;}
@@ -898,13 +919,19 @@ body.light-mode #lrWordRoman,body.light-mode #lrWordType{color:#5a5750!important
 body.light-mode #lrWordNum{color:#9a9590!important;}
 body.light-mode #lrHarakahBtn{background:#f5f0e0!important;border-color:#d4b878!important;color:#9a7228!important;}
 body.light-mode #lrBody{background:#ffffff!important;}
+/* Language Learner lang/word/verb buttons — JS sets colors via inline style, so hover needs !important to win */
+.lr-lang-btn:hover,.lr-type-btn:hover{border-color:var(--gold-dim)!important;color:#f0e4c0!important;}
 body.light-mode .lr-lang-btn,body.light-mode .lr-type-btn{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .lr-lang-btn[style*="#1a1500"],body.light-mode .lr-lang-btn[style*="background:#1a1500"],
 body.light-mode .lr-type-btn[style*="#1a1500"]{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .lr-lang-btn:hover,body.light-mode .lr-type-btn:hover{border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode #lrMarkBtn{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
 /* ── Post Writer ── */
 body.light-mode #pwTabLI{background:#f0ede6!important;color:#9a7228!important;}
 body.light-mode #pwTabFB{background:#ece9e2!important;color:#5a5750!important;}
+/* Post Writer platform tabs hover — same pattern as nh-tab (JS sets colors inline, so !important needed) */
+.pw-tab:hover{color:#f0e4c0!important;background:#1a1610!important;}
+body.light-mode .pw-tab:hover{background:#f5f0e0!important;color:#9a7228!important;}
 body.light-mode #pwChat{background:#ffffff!important;}
 body.light-mode #pwInputArea{background:#f0ede6!important;border-color:#d4cfc5!important;}
 body.light-mode #pwInput{background:#ffffff!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
@@ -930,9 +957,10 @@ body.light-mode #lrLabelSyn,body.light-mode #lrLabelAnt{color:#9a7228!important;
 body.light-mode #lrChallengePanel{background:#f5f0e0!important;border-left-color:#2d7a45!important;border-color:#d4cfc5!important;}
 body.light-mode #lrLabelChallenge{color:#2d6b40!important;}
 body.light-mode #lrSpeakingChallenge{color:#1a1a18!important;}
-/* Post writer save and close buttons */
+/* Post Writer Save Key button */
 body.light-mode [onclick="pwSaveKey()"]{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
-body.light-mode [onclick="closePostWriter()"]{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+[onclick="pwSaveKey()"]:hover{border-color:var(--gold-dim);color:#f0e4c0;}
+body.light-mode [onclick="pwSaveKey()"]:hover{border-color:#9a7228!important;color:#9a7228!important;}
 /* ── Dark Mode Toggle ── */
 .dark-toggle{
   background:var(--surface2);border:1px solid var(--border);
@@ -1508,7 +1536,7 @@ body.overlay-open{overflow:hidden;}
     <button class="qr-nav" id="qrZoomOut" onclick="qrZoom(-1)" title="Zoom Out" disabled>－</button>
     <span id="qrZoomLabel" style="font-family:'DM Mono',monospace;font-size:11px;color:#c5b98a;min-width:40px;text-align:center;">100%</span>
     <button class="qr-nav" id="qrZoomIn" onclick="qrZoom(1)" title="Zoom In">＋</button>
-    <button class="qr-nav" id="qrNext" onclick="qrChangePage(1)" style="background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;">Next →</button>
+    <button class="qr-nav" id="qrNext" onclick="qrChangePage(1)">Next →</button>
   </div>
 </div>
 
@@ -1532,7 +1560,7 @@ body.overlay-open{overflow:hidden;}
     <button class="qr-nav" id="pdfZoomOut" onclick="pdfZoom(-1)" title="Zoom Out" disabled>－</button>
     <span id="pdfZoomLabel" style="font-family:'DM Mono',monospace;font-size:11px;color:#c5b98a;min-width:40px;text-align:center;">100%</span>
     <button class="qr-nav" id="pdfZoomIn" onclick="pdfZoom(1)" title="Zoom In">＋</button>
-    <button class="qr-nav" id="pdfReaderNext" onclick="pdfReaderChangePage(1)" style="background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;">Next →</button>
+    <button class="qr-nav" id="pdfReaderNext" onclick="pdfReaderChangePage(1)">Next →</button>
   </div>
 </div>
 
@@ -4249,8 +4277,8 @@ function renderBookBadge(dk) {
     </div>
     <!-- Nav bar -->
     <div id="bookNav" style="display:none;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;gap:8px;">
-      <button id="bookPrevBtn" onclick="bookNavPrev()" style="flex:1;padding:9px 14px;background:#1e1a10;border:1px solid #2a2010;color:#8a7840;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">← Prev</button>
-      <button id="bookNextBtn" onclick="bookNavNext()" style="flex:2;padding:9px 14px;background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Next →</button>
+      <button id="bookPrevBtn" class="rdr-nav-btn" onclick="bookNavPrev()" style="flex:1;padding:9px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
+      <button id="bookNextBtn" class="rdr-nav-btn" onclick="bookNavNext()" style="flex:2;padding:9px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Next →</button>
     </div>
   </div>
 </div>
@@ -4278,8 +4306,8 @@ function renderBookBadge(dk) {
       </div>
     </div>
     <div id="hadithNav" style="display:none;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;gap:8px;">
-      <button id="hadithPrevBtn" onclick="hadithNavPrev()" style="flex:1;padding:9px 14px;background:#1e1a10;border:1px solid #2a2010;color:#8a7840;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">← Prev</button>
-      <button id="hadithNextBtn" onclick="hadithNavNext()" style="flex:2;padding:9px 14px;background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Next →</button>
+      <button id="hadithPrevBtn" class="rdr-nav-btn" onclick="hadithNavPrev()" style="flex:1;padding:9px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
+      <button id="hadithNextBtn" class="rdr-nav-btn" onclick="hadithNavNext()" style="flex:2;padding:9px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Next →</button>
     </div>
   </div>
 </div>
@@ -4314,8 +4342,8 @@ function renderBookBadge(dk) {
       </div>
     </div>
     <div id="tafsirNav" style="display:none;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;gap:8px;">
-      <button id="tafsirPrevBtn" onclick="tafsirNavPrev()" style="flex:1;padding:9px 14px;background:#1e1a10;border:1px solid #2a2010;color:#8a7840;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">← Prev</button>
-      <button id="tafsirNextBtn" onclick="tafsirNavNext()" style="flex:2;padding:9px 14px;background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Next →</button>
+      <button id="tafsirPrevBtn" class="rdr-nav-btn" onclick="tafsirNavPrev()" style="flex:1;padding:9px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
+      <button id="tafsirNextBtn" class="rdr-nav-btn" onclick="tafsirNavNext()" style="flex:2;padding:9px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Next →</button>
     </div>
   </div>
 </div>
@@ -4348,8 +4376,8 @@ function renderBookBadge(dk) {
       </div>
     </div>
     <div id="svNav" style="display:none;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;gap:8px;display:flex;">
-      <button id="svPrevBtn" onclick="svNavPrev()" style="flex:1;padding:9px 14px;background:#1e1a10;border:1px solid #2a2010;color:#8a7840;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;">← Prev</button>
-      <button id="svNextBtn" onclick="svNavNext()" style="flex:2;padding:9px 14px;background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Next →</button>
+      <button id="svPrevBtn" class="rdr-nav-btn" onclick="svNavPrev()" style="flex:1;padding:9px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
+      <button id="svNextBtn" class="rdr-nav-btn" onclick="svNavNext()" style="flex:2;padding:9px 14px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Next →</button>
     </div>
   </div>
 </div>
@@ -4899,6 +4927,17 @@ function _renderZikrDuas(duas){
 }
 function closeArticle(id){
   document.getElementById(id+'ArticleOverlay').classList.remove('active');
+  if(id === 'exercise') resetBMI();
+}
+function resetBMI(){
+  const feet = document.getElementById('bmi-feet');
+  const inches = document.getElementById('bmi-inches');
+  const kg = document.getElementById('bmi-kg');
+  const result = document.getElementById('bmi-result');
+  if(feet) feet.value = 0;
+  if(inches) inches.value = 0;
+  if(kg) kg.value = 0;
+  if(result) result.style.display = 'none';
 }
 
 function syncZikrArticleCounter(){
@@ -5004,7 +5043,7 @@ document.addEventListener('keydown', function(e){
           </div>
         </div>
 
-        <button onclick="calcBMI()" style="background:linear-gradient(135deg,#c9a84c,#a07830);color:#0d0b08;border:none;border-radius:6px;padding:10px 24px;font-size:0.8rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;width:100%;margin-bottom:18px;font-family:'DM Mono',monospace;">Calculate BMI</button>
+        <button onclick="calcBMI()" id="bmiCalcBtn" style="background:linear-gradient(135deg,#1a1500,#2a2000);color:#c9a84c;border:1px solid #c9a84c;border-radius:6px;padding:10px 24px;font-size:0.8rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;width:100%;margin-bottom:18px;font-family:'DM Mono',monospace;transition:all 0.15s;" onmouseover="this.style.background='linear-gradient(135deg,#2a2000,#3a3000)'" onmouseout="this.style.background='linear-gradient(135deg,#1a1500,#2a2000)'">Calculate BMI</button>
 
         <div id="bmi-result" style="display:none;">
           <div style="text-align:center;padding:18px 12px;border-radius:8px;border:1px solid #2a2010;background:#0d0b08;margin-bottom:16px;">
@@ -5187,9 +5226,9 @@ function calcBMI(){
     </div>
     <!-- Nav bar -->
     <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
-      <button id="asmaulPrevBtn" onclick="asmaulNavPrev()" style="background:#1e1a10;border:1px solid #2a2010;color:#8a7840;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
+      <button id="asmaulPrevBtn" class="rdr-nav-btn" onclick="asmaulNavPrev()" style="padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
       <div id="asmaulPageDisplay" style="font-family:'DM Mono',monospace;font-size:13px;color:#f0e4c0;min-width:110px;text-align:center;letter-spacing:.5px;">Page — / —</div>
-      <button id="asmaulNextBtn" onclick="asmaulNavNext()" style="background:#1a1500;border:1px solid #c9a84c55;color:#c9a84c;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next →</button>
+      <button id="asmaulNextBtn" class="rdr-nav-btn" onclick="asmaulNavNext()" style="padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next →</button>
     </div>
   </div>
 </div>
@@ -5426,9 +5465,9 @@ loadDayData = function(dk){
     <div id="zikrReaderDoneNote" style="display:none;background:#1a1610;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">You have completed all 77 duas today</div>
     <div id="zikrReaderContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#f0e4c0;min-height:0;"></div>
     <div class="zikr-reader-nav" style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
-      <button id="zikrReaderPrevBtn" onclick="zikrNavPrev()" style="background:#1a1610;border:1px solid #2a2010;color:#c5b98a;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Prev</button>
+      <button id="zikrReaderPrevBtn" class="rdr-nav-btn" onclick="zikrNavPrev()" style="padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Prev</button>
       <div id="zikrReaderPageDisplay" style="font-family:'DM Mono',monospace;font-size:13px;color:#f0e4c0;min-width:110px;text-align:center;letter-spacing:.5px;">Dua - / -</div>
-      <button id="zikrReaderNextBtn" onclick="zikrNavNext()" style="background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next</button>
+      <button id="zikrReaderNextBtn" class="rdr-nav-btn" onclick="zikrNavNext()" style="padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next</button>
     </div>
   </div>
 </div>
@@ -5621,9 +5660,9 @@ loadDayData=function(dk){
     <div id="zikrBookDoneNote" style="display:none;background:#1a1610;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">✓ You have read all 123 Duas today — you may continue reviewing</div>
     <div id="zikrBookContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#f0e4c0;min-height:0;"></div>
     <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
-      <button id="zikrBookPrevBtn" onclick="zikrBookNavPrev()" style="background:#1a1610;border:1px solid #2a2010;color:#c5b98a;padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
+      <button id="zikrBookPrevBtn" class="rdr-nav-btn" onclick="zikrBookNavPrev()" style="padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
       <div id="zikrBookPageDisplay" style="font-family:'DM Mono',monospace;font-size:13px;color:#f0e4c0;min-width:110px;text-align:center;letter-spacing:.5px;">Dua — / —</div>
-      <button id="zikrBookNextBtn" onclick="zikrBookNavNext()" style="background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next →</button>
+      <button id="zikrBookNextBtn" class="rdr-nav-btn" onclick="zikrBookNavNext()" style="padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;flex:1;max-width:180px;">Next →</button>
     </div>
   </div>
 </div>
@@ -5881,11 +5920,7 @@ loadDayData = function(dk) {
             font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;transition:all .2s;white-space:nowrap;
           ">Get Key</button>
         </div>
-        <button onclick="closePostWriter()" style="
-          background:#1a1610;border:1px solid #2a2010;color:#7a6a40;
-          width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:13px;
-          display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;
-        ">✕</button>
+        <button class="qr-close" onclick="closePostWriter()" style="flex-shrink:0;">✕ Close</button>
       </div>
     </div>
 
@@ -5898,12 +5933,12 @@ loadDayData = function(dk) {
 
     <!-- Platform tabs -->
     <div style="display:flex;border-bottom:1px solid #2a2010;flex-shrink:0;background:#0f0d0a;">
-      <button id="pwTabLI" onclick="pwSetTab('linkedin')" style="
+      <button id="pwTabLI" class="pw-tab" onclick="pwSetTab('linkedin')" style="
         flex:1;padding:9px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
         border:none;border-bottom:2px solid #c9a84c;cursor:pointer;transition:all .2s;
         background:#141008;color:#c9a84c;
       ">LinkedIn</button>
-      <button id="pwTabFB" onclick="pwSetTab('facebook')" style="
+      <button id="pwTabFB" class="pw-tab" onclick="pwSetTab('facebook')" style="
         flex:1;padding:9px 12px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
         border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;
         background:#0f0d0a;color:#5a4a28;
@@ -7864,10 +7899,12 @@ function nhRenderKanban(){
       const company=(d.company||c?.company||'').toLowerCase();
       const country=(c?.country||'').toLowerCase();
       const tags=(c?.tags||[]).join(' ').toLowerCase();
+      const contact_info=(c?.phone||'').toLowerCase()+(c?.email||'').toLowerCase()+(c?.linkedin||'').toLowerCase();
       if(_crmScope==='name') return name.includes(_crmQ);
       if(_crmScope==='role') return role.includes(_crmQ);
       if(_crmScope==='company') return company.includes(_crmQ);
       if(_crmScope==='country') return country.includes(_crmQ);
+      if(_crmScope==='contact') return contact_info.includes(_crmQ);
       if(_crmScope==='tags') return tags.includes(_crmQ);
       return name.includes(_crmQ)||role.includes(_crmQ)||company.includes(_crmQ)||country.includes(_crmQ)||tags.includes(_crmQ);
     }).sort((a,b)=>(a.contactName||'').localeCompare(b.contactName||''));
@@ -8311,9 +8348,6 @@ function nhOpenMarkDone(dealId,name,mode){
     btn.disabled=false;
     btn.textContent=_nhMarkDoneMode==='assign'?'Save & Set Next Action →':'Save & Mark Done';
   }
-  const _mdDeal=_nhMarkDoneId?_nhDeals.find(d=>d.id===_nhMarkDoneId):null;
-  const _mdStageEl=document.getElementById('nhMarkDoneStage');
-  if(_mdStageEl) _mdStageEl.innerHTML=_nhStages.map(s=>`<option value="${s.id}"${_mdDeal&&_mdDeal.stageId===s.id?' selected':''}>${s.name}</option>`).join('');
   nhOpenModalTop('nhMarkDoneBg');
 }
 function nhCloseMarkDone(){
@@ -8338,8 +8372,6 @@ async function nhMarkDoneSubmitNote(){
     // Plain "Mark Done" — clear any existing next action, deal moves to No Action
     deal.nextAction='';
     deal.nextActionNote='';
-    const _mdS=document.getElementById('nhMarkDoneStage')?.value;
-    if(_mdS) deal.stageId=_mdS;
     await nhSet('_nh_deals',_nhDeals);
     nhCloseMarkDone();
     nhRenderCrm();
@@ -8354,8 +8386,6 @@ async function nhMarkDoneConfirm(){
   if(!deal)return;
   deal.nextAction=dateVal;
   deal.nextActionNote=noteVal;
-  const _mdSC=document.getElementById('nhMarkDoneStage')?.value;
-  if(_mdSC) deal.stageId=_mdSC;
   await nhSet('_nh_deals',_nhDeals);
   nhCloseMarkDone();
   nhRenderCrm();
@@ -8569,8 +8599,8 @@ async function nhSmDone(){
         <div class="nh-subtitle">Contact Book &amp; CRM</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-        <button class="nh-close" onclick="nhImportExcel()" title="Import contacts from Excel (.xlsx)">⬇ Import Data</button>
-        <button class="nh-close" onclick="nhExportExcel()" title="Export all contacts to Excel (.xlsx)">⬆ Export Data</button>
+        <button class="import-btn" onclick="nhImportExcel()" title="Import contacts from Excel (.xlsx)">⬇ Import Data</button>
+        <button class="export-btn" onclick="nhExportExcel()" title="Export all contacts to Excel (.xlsx)">⬆ Export Data</button>
         <button class="nh-close" onclick="closeContactBook()">✕ Close</button>
       </div>
       <input type="file" id="nhImportFileInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="nhHandleImportFile(event)">
@@ -8615,6 +8645,7 @@ async function nhSmDone(){
           <option value="role">Role / Title</option>
           <option value="company">Company</option>
           <option value="country">Country</option>
+          <option value="contact">Contact Info</option>
           <option value="tags">Tags</option>
         </select>
         <input class="nh-search" id="nhCrmSearch" type="text" placeholder="" oninput="nhRenderCrm()">
@@ -8733,11 +8764,6 @@ async function nhSmDone(){
 <div class="nh-modal-bg" id="nhMarkDoneBg" style="z-index:4000;">
   <div class="nh-modal" style="max-width:480px;">
     <div class="nh-modal-title" id="nhMarkDoneName">✓ Mark Done</div>
-    <div class="nh-crm-section-head">Pipeline Controls</div>
-    <div class="nh-field">
-      <label>Stage <span style="font-size:9px;color:var(--gold);font-style:italic;">← tap to change</span></label>
-      <select id="nhMarkDoneStage"></select>
-    </div>
     <div class="nh-field" id="nhMarkDoneNoteField">
       <label>What did you do?</label>
       <textarea class="nh-note-textarea" id="nhMarkDoneNote" style="min-height:100px;pointer-events:auto;touch-action:auto;"></textarea>

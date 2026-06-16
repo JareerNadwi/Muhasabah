@@ -7425,7 +7425,7 @@ async function nhHandleImportFile(e){
       if(!rows.length){alert('No data found in the file.');return;}
       const fieldMap={
         'name':['name','full name','fullname','contact name'],
-        'role':['role','title','job title','position'],
+        'role':['role / title','role/title','role','title','job title','position'],
         'company':['company','organization','org','employer'],
         'country':['country','location','region'],
         'linkedin':['linkedin','linkedin url','linkedin profile'],
@@ -7438,6 +7438,21 @@ async function nhHandleImportFile(e){
       function mapField(row,targets){
         for(const k of Object.keys(row)){
           if(targets.includes(k.toLowerCase().trim()))return String(row[k]||'').trim();
+        }
+        return '';
+      }
+      function mapPhone(row,targets){
+        for(const k of Object.keys(row)){
+          if(targets.includes(k.toLowerCase().trim())){
+            const raw=row[k];
+            if(raw===null||raw===undefined||raw==='')return '';
+            // If Excel parsed it as a number, restore the + prefix
+            let val=String(raw).trim();
+            if(!val||val==='0')return '';
+            // If it looks like a numeric phone (no + and no letters), add +
+            if(/^\d[\d\s\-()]+$/.test(val)) val='+'+val;
+            return val;
+          }
         }
         return '';
       }
@@ -7457,7 +7472,7 @@ async function nhHandleImportFile(e){
           country:mapField(row,fieldMap.country),
           linkedin:mapField(row,fieldMap.linkedin),
           facebook:mapField(row,fieldMap.facebook),
-          phone:mapField(row,fieldMap.phone),
+          phone:mapPhone(row,fieldMap.phone),
           email:mapField(row,fieldMap.email),
           tags,
           notes:mapField(row,fieldMap.notes),
@@ -7465,8 +7480,20 @@ async function nhHandleImportFile(e){
           createdAt:new Date().toISOString()
         };
         _nhContacts.push(contact);
+        // Auto-create CRM deal in Leads stage for every imported contact
+        const existsDeal=_nhDeals.some(d=>d.contactId===contact.id);
+        if(!existsDeal){
+          _nhDeals.push({
+            id:nhId(),contactId:contact.id,contactName:contact.name,
+            company:contact.company||'',stageId:'stage_contacts',
+            nextAction:'',nextActionNote:'',linkedin:contact.linkedin||'',
+            facebook:contact.facebook||'',phone:contact.phone||'',email:contact.email||'',
+            createdAt:new Date().toISOString().slice(0,10),
+          });
+        }
         added++;
       }
+      await nhSet('_nh_deals',_nhDeals);
       await nhSet('_nh_contacts',_nhContacts);
       nhRenderContacts();
       alert(`✅ Import complete.\n\nAdded: ${added} contacts\nSkipped (duplicate or no name): ${skipped}`);

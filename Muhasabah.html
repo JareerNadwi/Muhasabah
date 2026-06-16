@@ -7505,38 +7505,28 @@ async function nhHandleImportFile(e){
 function nhExportExcel(){
   try{
     if(!_nhContacts.length){alert('No contacts to export.');return;}
-    if(typeof XLSX==='undefined'){alert('Export library not loaded. Please check your internet connection and reload.');return;}
-    const s=v=>typeof v==='string'?v:(v==null?'':String(v));
-    const rows=_nhContacts.map(c=>({
-      'Name':s(c.name),
-      'Role / Title':s(c.role),
-      'Company':s(c.company),
-      'Country':s(c.country),
-      'Phone':s(c.phone),
-      'Email':s(c.email),
-      'LinkedIn':s(c.linkedin),
-      'Facebook':s(c.facebook),
-      'Tags':Array.isArray(c.tags)?c.tags.join(', '):s(c.tags),
-      'Notes':s(c.notes),
-      'Added On':c.createdAt?new Date(c.createdAt).toLocaleDateString():''
-    }));
-    const ws=XLSX.utils.json_to_sheet(rows);
-    const range=XLSX.utils.decode_range(ws['!ref']||'A1');
-    for(let R=range.s.r+1;R<=range.e.r;R++){
-      const ca=XLSX.utils.encode_cell({r:R,c:4});
-      if(ws[ca]&&ws[ca].v){ws[ca].t='s';ws[ca].v=String(ws[ca].v);delete ws[ca].z;}
+    function cv(v){
+      if(v===null||v===undefined)return '';
+      if(Array.isArray(v))return v.join(', ');
+      if(typeof v==='object')return '';
+      return String(v);
     }
-    ws['!cols']=[{wch:25},{wch:22},{wch:22},{wch:16},{wch:18},{wch:28},{wch:35},{wch:35},{wch:20},{wch:40},{wch:14}];
-    const wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,'Contacts',ws);
-    const date=new Date().toISOString().slice(0,10);
-    const wbout=XLSX.write(wb,{bookType:'xlsx',type:'array'});
-    const blob=new Blob([wbout],{type:'application/octet-stream'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url;a.download=`Muhasabah_Contacts_${date}.xlsx`;
+    var headers=['Name','Role / Title','Company','Country','Phone','Email','LinkedIn','Facebook','Tags','Notes','Added On'];
+    var csvRows=[headers.map(function(h){return '"'+h+'"';}).join(',')];
+    _nhContacts.forEach(function(c){
+      var tags=Array.isArray(c.tags)?c.tags.join('; '):cv(c.tags);
+      var added=c.createdAt?new Date(c.createdAt).toLocaleDateString():'';
+      var row=[cv(c.name),cv(c.role),cv(c.company),cv(c.country),cv(c.phone),cv(c.email),cv(c.linkedin),cv(c.facebook),tags,cv(c.notes),added];
+      csvRows.push(row.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(','));
+    });
+    var csv='\uFEFF'+csvRows.join('\r\n');
+    var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    var date=new Date().toISOString().slice(0,10);
+    a.href=url;a.download='Muhasabah_Contacts_'+date+'.csv';
     document.body.appendChild(a);a.click();
-    setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+    setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
   }catch(err){
     alert('Export failed: '+err.message);
   }

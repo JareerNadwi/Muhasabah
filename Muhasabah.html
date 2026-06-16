@@ -7850,6 +7850,7 @@ function nhSetFil(val){
 }
 
 function nhRenderKanban(){
+  const _crmQ=(document.getElementById('nhCrmSearch')?.value||'').toLowerCase().trim();
   const el=document.getElementById('nhKanban');
   if(!el)return;
 
@@ -7913,6 +7914,14 @@ function nhRenderKanban(){
 
   let deals=[..._nhDeals];
   if(_nhCrmFil!=='all') deals=deals.filter(d=>d.stageId===_nhCrmFil);
+  if(_crmQ){deals=deals.filter(d=>{
+    const c=_nhContacts.find(x=>x.id===d.contactId);
+    return (d.contactName||'').toLowerCase().includes(_crmQ)||
+      (d.company||'').toLowerCase().includes(_crmQ)||
+      (c?.role||'').toLowerCase().includes(_crmQ)||
+      (c?.country||'').toLowerCase().includes(_crmQ)||
+      (c?.tags||[]).join(' ').toLowerCase().includes(_crmQ);
+  });}
 
   const byStage={};
   _nhStages.forEach(s=>byStage[s.id]=[]);
@@ -8020,7 +8029,8 @@ function nhCrmOpenModal(id,defaultStageId){
   document.getElementById('nhCrmModalTitle').textContent = name;
   // Populate read-only view fields
   const setV=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val||'—';};
-  setV('nhCrmVName',name); setV('nhCrmVCompany',company);
+  const role = c?.role || '';
+  setV('nhCrmVName',name); setV('nhCrmVRole',role); setV('nhCrmVCompany',company);
   // Build clickable link buttons
   const linksEl=document.getElementById('nhCrmVLinks');
   if(linksEl){
@@ -8535,7 +8545,7 @@ async function nhSmDone(){
     <div class="nh-topbar">
       <div>
         <div class="nh-title">🤝 Networking Hub</div>
-        <div class="nh-subtitle">Contact Book &amp; Career CRM</div>
+        <div class="nh-subtitle">Contact Book &amp; CRM</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
         <button class="nh-close" onclick="nhImportExcel()" title="Import contacts from Excel (.xlsx)">⬇ Import Data</button>
@@ -8577,6 +8587,9 @@ async function nhSmDone(){
 
     <!-- CRM Section -->
     <div class="nh-section" data-sec="crm">
+      <div class="nh-controls" style="margin-bottom:10px;">
+        <input class="nh-search" id="nhCrmSearch" type="text" placeholder="Search pipeline..." oninput="nhRenderCrm()">
+      </div>
       <div class="nh-crm-filters" id="nhCrmFil"></div>
       <div class="nh-kanban" id="nhKanban"></div>
     </div>
@@ -8627,6 +8640,7 @@ async function nhSmDone(){
     <!-- Contact info — read only -->
     <div class="nh-crm-section-head">Contact Info (edit in Contact Book)</div>
     <div class="nh-field"><span class="nh-view-label">Name</span><div class="nh-view-field" id="nhCrmVName">—</div></div>
+    <div class="nh-field"><span class="nh-view-label">Role / Title</span><div class="nh-view-field" id="nhCrmVRole">—</div></div>
     <div class="nh-field"><span class="nh-view-label">Company</span><div class="nh-view-field" id="nhCrmVCompany">—</div></div>
     <div class="nh-field"><span class="nh-view-label">Contact Links</span><div class="nh-links" id="nhCrmVLinks" style="margin:4px 0 0;"></div></div>
 

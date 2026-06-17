@@ -473,6 +473,7 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 .back-btn.visible{display:block;}
 .reset-btn{color:#8b3a3a;border-color:#3a1a1a;}
 .reset-btn:hover{color:#c05050;border-color:var(--red);background:#1a0a0a;}
+.day-reset-btn{margin-left:auto;padding:6px 12px;font-size:10px;}
 .export-btn{background:var(--surface2);border:1px solid var(--gold-dim);color:var(--gold);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;transition:all .2s;}
 .export-btn:hover{background:#1a1500;border-color:var(--gold);}
 .import-btn{background:var(--surface2);border:1px solid var(--purple);color:var(--purple-bright);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;transition:all .2s;}
@@ -541,7 +542,7 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 
 /* ── Calendar ── */
 
-.months-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+.months-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:28px;}
 .month-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;}
 .month-name{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
 .days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
@@ -560,6 +561,9 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
   50%{box-shadow:0 0 14px rgba(154,106,191,.6),0 0 22px rgba(154,106,191,.2),0 0 0 1px rgba(154,106,191,.5);}
 }
 .day-num{font-size:12px;color:var(--text-dim);line-height:1;font-weight:600;letter-spacing:.3px;}
+.day-pct{font-size:9px;color:var(--gold);line-height:1;font-weight:700;letter-spacing:.2px;}
+.day-cell.perfect .day-pct{color:var(--green-bright);}
+.day-cell.best-day .day-pct{color:var(--purple-bright);}
 .day-bars{
   display:flex;flex-direction:column;gap:2px;
   width:calc(100% - 8px);
@@ -1046,6 +1050,18 @@ body.overlay-open{overflow:hidden;}
   </div>
 </div>
 
+<!-- Day Reset Modal -->
+<div class="modal-overlay" id="dayResetModal">
+  <div class="modal">
+    <h3>⚠ Reset This Day?</h3>
+    <p>This clears every tracked goal for <strong id="dayResetDateLabel">this day</strong> — salah, Quran, zikr, all yes/no items, everything on this page. Your Networking Hub data (contacts, deals, stages, notes) is stored separately and will <strong>not</strong> be touched, even the "Connected"/"Commented" yes/no items here only reset today's checkmark, not the underlying CRM records.</p>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeDayResetModal()">Cancel — Keep Data</button>
+      <button class="modal-confirm" onclick="confirmDayReset()">Yes, Reset This Day</button>
+    </div>
+  </div>
+</div>
+
 <!-- Reset Modal -->
 <div class="modal-overlay" id="resetModal">
   <div class="modal">
@@ -1124,6 +1140,7 @@ body.overlay-open{overflow:hidden;}
     <div class="daily-pct-display" id="dailyPctLabel">0%</div>
     <div class="daily-bonus-display" id="dailyBonusLabel"></div>
     <div class="daily-total-display" id="dailyTotalLabel"></div>
+    <button class="reset-btn day-reset-btn" onclick="openDayResetModal()" title="Reset only this day's tracked progress">↺ Reset This Day</button>
   </div>
   <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
   <div class="bonus-track"><div class="bonus-fill" id="bonusFill" style="width:0%"></div></div>
@@ -2697,7 +2714,8 @@ function buildCalendar(){
       if(!isFuture&&hasData){
         const goldW=Math.min(sc.core,100);
         const purpleW=Math.min((sc.bonus/100)*100,100);
-        html+=`<div class="day-bars">`
+        html+=`<span class="day-pct">${Math.round(sc.core)}%</span>`
+            +`<div class="day-bars">`
             +`<div class="day-bar-track"><div class="day-bar-fill-gold" style="width:${goldW}%"></div></div>`
             +`<div class="day-bar-track"><div class="day-bar-fill-purple" style="width:${purpleW}%"></div></div>`
             +`</div>`;
@@ -3075,6 +3093,20 @@ function showSavedToast(msg){
 /* ── Reset ── */
 function openResetModal(){document.getElementById('resetModal').classList.add('active');}
 function closeResetModal(){document.getElementById('resetModal').classList.remove('active');}
+function openDayResetModal(){
+  if(!currentDateKey) return;
+  const lbl=document.getElementById('dailyDateLabel').textContent;
+  document.getElementById('dayResetDateLabel').textContent=lbl;
+  document.getElementById('dayResetModal').classList.add('active');
+}
+function closeDayResetModal(){document.getElementById('dayResetModal').classList.remove('active');}
+async function confirmDayReset(){
+  if(!currentDateKey) return;
+  await deleteStore(currentDateKey);
+  delete _cache[currentDateKey];
+  loadDayData(currentDateKey);
+  closeDayResetModal();
+}
 async function confirmReset(){
   const db=await openDB();
   await new Promise((res,rej)=>{
@@ -5332,7 +5364,7 @@ function _asmaulRenderSlide(){
 
   prevBtn.disabled      = _asmaulSlide === 0;
   prevBtn.style.opacity = _asmaulSlide === 0 ? "0.3" : "1";
-  nextBtn.textContent       = isLast ? "✓ Complete" : "Next →";
+  nextBtn.textContent       = isLast ? "✓ Mark Done" : "Next →";
   nextBtn.style.background  = isLast ? "var(--green)"        : "#1e1a10";
   nextBtn.style.borderColor = isLast ? "var(--green-bright)" : "#2a2010";
   nextBtn.style.color       = isLast ? "#fff"                : "#8a7840";
@@ -5558,7 +5590,7 @@ function _zikrRender(){
   var pb=document.getElementById("zikrReaderPrevBtn");
   pb.disabled=_zikrSlide===0;pb.style.opacity=_zikrSlide===0?"0.3":"1";
   var nb=document.getElementById("zikrReaderNextBtn");
-  nb.textContent=isLast?"Complete":"Next";
+  nb.textContent=isLast?"✓ Mark Done":"Next";
   nb.style.background=isLast?"var(--green)":"#1e1a10";
   nb.style.borderColor=isLast?"var(--green-bright)":"#2a2010";
   nb.style.color=isLast?"#fff":"#8a7840";
@@ -5774,7 +5806,7 @@ function _zbRender() {
   pb.style.opacity = _zbSlide === 0 ? '0.3' : '1';
 
   const nb = document.getElementById('zikrBookNextBtn');
-  nb.textContent = isLast ? '✓ Complete' : 'Next →';
+  nb.textContent = isLast ? '✓ Mark Done' : 'Next →';
   nb.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
   nb.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
   nb.style.color       = isLast ? '#fff'                : '#8a7840';

@@ -1414,11 +1414,12 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">📖 Zikr From Book <span class="weight-hint">(Bonus)</span></div>
         <div class="goal-pct-badge bonus" id="pct-zikrBook">+0%</div>
       </div>
-      <div class="num-row">
-        <input type="number" id="zikrBookPages" min="0" max="22" placeholder="0" oninput="saveAndRefresh()">
-        <span class="of-label">Duas &nbsp;/&nbsp; 123 Total</span>
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="zikrBook" data-val="yes" onclick="setYN('zikrBook','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="zikrBook" data-val="no"  onclick="setYN('zikrBook','no')">No</button>
       </div>
-      <div class="sub-label">Max +10% At 123 Duas &nbsp;·&nbsp; ~+0.08% Per Dua</div>
+      <input type="number" id="zikrBookPages" style="display:none;" tabindex="-1" aria-hidden="true">
+      <div class="sub-label">Max +10% &nbsp;·&nbsp; Auto-Yes At All 123 Duas</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openZikrBookReader()">📖 Open Zikr From Book Reader</button>
       <div class="qr-session-badge" id="zikrBookReaderBadge" style="display:none;"></div>
     </div>
@@ -2561,13 +2562,9 @@ function scoreDay(data){
   // Tafsir extra: every 17 above goal = +2.5%
   if(tfCount > 17) bonus += Math.floor((tfCount - 17) / 17) * 2.5;
 
-  // Zikr Book: max +10% at 56 pages — use PDF reader ratio if available
+  // Zikr From Book: max +10% — use reader ratio if available, else manual Yes/No
   const zbRatio = data['zikrBook_bonusRatio'];
-  if(zbRatio !== undefined){
-    bonus += Math.min(zbRatio * 10, 10);
-  } else {
-    bonus+=Math.min((parseInt(data.zikrBookPages)||0)*(10/123),10);
-  }
+  bonus += zbRatio !== undefined ? Math.min(zbRatio * 10, 10) : (data.zikrBook==='yes'?10:0);
 
   // surahKahf +10% bonus — proportional over 110 verses
   const skRatio = data['surahKahf_pdfRatio'];
@@ -2671,9 +2668,7 @@ function bonusScore(data,key){
     }
     case 'zikrBook': {
       const r = data['zikrBook_bonusRatio'];
-      return r !== undefined
-        ? Math.min(Math.round(r * 10 * 10) / 10, 10)
-        : Math.min(Math.round((parseInt(data.zikrBookPages)||0)*(10/123)*10)/10, 10);
+      return r !== undefined ? Math.min(Math.round(r * 10 * 10) / 10, 10) : (data.zikrBook==='yes'?10:0);
     }
     case 'sadaqah':     return Math.min(Math.round((parseInt(data.sadaqahUnits)||0)*(10/50000)*10)/10,10);
     case 'surahKahf': {
@@ -2977,7 +2972,7 @@ function loadDayData(dk){
   });
 
   ['hadith','tafsir','asmaul','zikrMorning','zikrEvening','surahWaqiah','surahMulk','sawm',
-   'exercise','books','language','writingLinkedin','writingFacebook','netConnected','netCommented','surahKahf','tafakkur']
+   'exercise','books','language','writingLinkedin','writingFacebook','netConnected','netCommented','surahKahf','tafakkur','zikrBook']
     .forEach(key=>{
       document.querySelectorAll(`.yn-btn[data-key="${key}"]`).forEach(btn=>btn.classList.toggle('active',btn.dataset.val===data[key]));
     });
@@ -5909,12 +5904,24 @@ async function _zbSaveProgress(reachedEnd) {
   data['zikrBook_bonusRatio'] = ratio;
   data['zikrBook_readerPage'] = _zbSlide + 1;
 
+  // Auto-flip to "Yes" once all 123 duas have been reached
+  if (ratio >= 1) {
+    data['zikrBook'] = 'yes';
+  }
+
   _cache[_zbDK] = data;
   await setStore(_zbDK, data);
 
-  // Auto-fill the duas counter
+  // Auto-fill the hidden duas counter (internal tracking only)
   const inp = document.getElementById('zikrBookPages');
   if (inp) inp.value = duasRead;
+
+  // Reflect auto-completion on the Yes/No buttons
+  if (ratio >= 1) {
+    document.querySelectorAll('.yn-btn[data-key="zikrBook"]').forEach(btn =>
+      btn.classList.toggle('active', btn.dataset.val === 'yes')
+    );
+  }
 
   // If reached end, reset global position to start
   if (reachedEnd) {

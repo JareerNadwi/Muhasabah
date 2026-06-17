@@ -986,6 +986,28 @@ body.light-mode #pwSendBtn:hover{background:linear-gradient(135deg,#ede5cc,#e5da
 body.light-mode #pwApiKeyInput{background:#f0ede6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
 body.light-mode [onclick="openGetKeyModal()"]{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#7a5010!important;}
 body.light-mode [onclick="openGetKeyModal()"]:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
+/* ── Get Key Modal (Gemini API onboarding) — was 100% hardcoded dark, ignored the theme toggle entirely ── */
+body.light-mode #gkmCard{background:#ffffff!important;border-color:#d4cfc5!important;}
+body.light-mode #gkmHeader{background:#f0ede6!important;border-bottom-color:#d4cfc5!important;}
+body.light-mode #gkmSubtitle{color:#9a9590!important;}
+body.light-mode #gkmCloseBtn{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode #gkmCloseBtn:hover{border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode #gkmBody{color:#1a1a18!important;}
+body.light-mode #gkmIntro{color:#5a5750!important;}
+body.light-mode .gkm-accent-strong{color:#1a1a18!important;}
+body.light-mode .gkm-section-label{color:#9a7228!important;}
+body.light-mode .gkm-step{background:#f0ede6!important;border-color:#d4cfc5!important;border-top-color:#9a7228!important;}
+body.light-mode .gkm-step-badge{background:#ece9e2!important;color:#9a9590!important;}
+body.light-mode .gkm-step-title{color:#9a7228!important;}
+body.light-mode .gkm-step-desc{color:#5a5750!important;}
+body.light-mode #gkmStep1Link{background:#ffffff!important;border-color:#d4cfc5!important;color:#9a7228!important;}
+body.light-mode #gkmStep1Link:hover{background:#fdf5dc!important;border-color:#9a7228!important;}
+body.light-mode #gkmFreeTierBox,body.light-mode #gkmPrivacyBox{background:#f5f0e0!important;border-left-color:#9a7228!important;}
+body.light-mode .gkm-info-label{color:#9a7228!important;}
+body.light-mode .gkm-info-text{color:#5a5750!important;}
+body.light-mode #gkmCtaBtn{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#7a5010!important;box-shadow:0 2px 6px rgba(154,114,40,.15)!important;}
+body.light-mode #gkmCtaBtn:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;box-shadow:0 2px 10px rgba(154,114,40,.25)!important;}
+body.light-mode #gkmFooter{color:#9a9590!important;border-top-color:#d4cfc5!important;}
 [onclick="openGetKeyModal()"]:hover{background:linear-gradient(135deg,#2a2000,#342c10)!important;}
 /* Hadith text colors */
 body.light-mode #hadithText{color:#1a1a18!important;}
@@ -6092,15 +6114,15 @@ loadDayData = function(dk) {
 
 <!-- ── Get Key Modal ── -->
 <div id="getKeyOverlay" class="modal-overlay" style="z-index:1200;padding:16px;align-items:flex-start;overflow-y:auto;" onclick="if(event.target===this)closeGetKeyModal()">
-  <div style="display:flex;flex-direction:column;width:100%;max-width:600px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
+  <div id="gkmCard" style="display:flex;flex-direction:column;width:100%;max-width:600px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
 
     <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
+    <div id="gkmHeader" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div>
         <div style="font-family:'Amiri',serif;font-size:19px;color:#c9a84c;">How to Get Your Gemini API Key</div>
-        <div style="font-size:9px;color:#5a4a28;letter-spacing:2.5px;text-transform:uppercase;margin-top:3px;">Free · 2 minutes · No credit card</div>
+        <div id="gkmSubtitle" style="font-size:9px;color:#5a4a28;letter-spacing:2.5px;text-transform:uppercase;margin-top:3px;">Free · 2 minutes · No credit card</div>
       </div>
-      <button onclick="closeGetKeyModal()" style="
+      <button id="gkmCloseBtn" onclick="closeGetKeyModal()" style="
         background:#1a1610;border:1px solid #2a2010;color:#7a6a40;
         width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:13px;
         display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;margin-left:12px;
@@ -6109,10 +6131,10 @@ loadDayData = function(dk) {
     </div>
 
     <!-- Body -->
-    <div style="padding:28px 26px;color:#e8dfc8;font-family:'Amiri',serif;display:flex;flex-direction:column;gap:0;">
+    <div id="gkmBody" style="padding:28px 26px;color:#e8dfc8;font-family:'Amiri',serif;display:flex;flex-direction:column;gap:0;">
 
       <!-- Intro -->
-      <p style="line-height:1.85;font-size:1rem;color:#d4c9ae;margin-bottom:1.4em;">The AI Post Writer runs on <strong style="color:#f0e4c0;">Google Gemini</strong> — Google's AI model. The free tier is generous enough for daily use. You'll need a Google account.</p>
+      <p id="gkmIntro" style="line-height:1.85;font-size:1rem;color:#d4c9ae;margin-bottom:1.4em;">The AI Post Writer runs on <strong class="gkm-accent-strong" style="color:#f0e4c0;">Google Gemini</strong> — Google's AI model. The free tier is generous enough for daily use. You'll need a Google account.</p>
 
       <!-- Gold divider -->
       <div style="display:flex;align-items:center;gap:14px;margin:4px 0 24px;">
@@ -6122,14 +6144,14 @@ loadDayData = function(dk) {
       </div>
 
       <!-- Section label -->
-      <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:18px;">Four Steps</div>
+      <div class="gkm-section-label" style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:18px;">Four Steps</div>
 
       <!-- Step 1 -->
-      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:18px 20px;margin-bottom:14px;">
-        <div style="font-size:0.7rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;letter-spacing:.5px;">Step 1</div>
-        <div style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:10px;">Go to Google AI Studio</div>
-        <div style="font-size:0.95rem;color:#b0a07a;line-height:1.7;margin-bottom:12px;">Open your browser and navigate to the official Google AI Studio API key page:</div>
-        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="
+      <div class="gkm-step" style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:18px 20px;margin-bottom:14px;">
+        <div class="gkm-step-badge" style="font-size:0.7rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;letter-spacing:.5px;">Step 1</div>
+        <div class="gkm-step-title" style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:10px;">Go to Google AI Studio</div>
+        <div class="gkm-step-desc" style="font-size:0.95rem;color:#b0a07a;line-height:1.7;margin-bottom:12px;">Open your browser and navigate to the official Google AI Studio API key page:</div>
+        <a id="gkmStep1Link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="
           display:inline-flex;align-items:center;gap:6px;
           background:#1a1610;border:1px solid #3a2e18;
           color:#c9a84c;padding:7px 14px;border-radius:6px;
@@ -6142,24 +6164,24 @@ loadDayData = function(dk) {
       </div>
 
       <!-- Step 2 -->
-      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:18px 20px;margin-bottom:14px;">
-        <div style="font-size:0.7rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;letter-spacing:.5px;">Step 2</div>
-        <div style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:10px;">Sign In With Google</div>
-        <div style="font-size:0.95rem;color:#b0a07a;line-height:1.7;">If prompted, sign in with any Google account — Gmail works fine. No special permissions or billing setup required.</div>
+      <div class="gkm-step" style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:18px 20px;margin-bottom:14px;">
+        <div class="gkm-step-badge" style="font-size:0.7rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;letter-spacing:.5px;">Step 2</div>
+        <div class="gkm-step-title" style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:10px;">Sign In With Google</div>
+        <div class="gkm-step-desc" style="font-size:0.95rem;color:#b0a07a;line-height:1.7;">If prompted, sign in with any Google account — Gmail works fine. No special permissions or billing setup required.</div>
       </div>
 
       <!-- Step 3 -->
-      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:18px 20px;margin-bottom:14px;">
-        <div style="font-size:0.7rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;letter-spacing:.5px;">Step 3</div>
-        <div style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:10px;">Click "Create API Key"</div>
-        <div style="font-size:0.95rem;color:#b0a07a;line-height:1.7;">You'll see a blue button labeled <span style="font-family:'DM Mono',monospace;color:#e8dfc8;font-size:0.85rem;">+ Create API key</span>. Click it. A key is generated instantly — no project setup needed.</div>
+      <div class="gkm-step" style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:18px 20px;margin-bottom:14px;">
+        <div class="gkm-step-badge" style="font-size:0.7rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;letter-spacing:.5px;">Step 3</div>
+        <div class="gkm-step-title" style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:10px;">Click "Create API Key"</div>
+        <div class="gkm-step-desc" style="font-size:0.95rem;color:#b0a07a;line-height:1.7;">You'll see a blue button labeled <span class="gkm-accent-strong" style="font-family:'DM Mono',monospace;color:#e8dfc8;font-size:0.85rem;">+ Create API key</span>. Click it. A key is generated instantly — no project setup needed.</div>
       </div>
 
       <!-- Step 4 -->
-      <div style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:18px 20px;margin-bottom:24px;">
-        <div style="font-size:0.7rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;letter-spacing:.5px;">Step 4</div>
-        <div style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:10px;">Copy & Paste Here</div>
-        <div style="font-size:0.95rem;color:#b0a07a;line-height:1.7;">Copy the key (it starts with <span style="font-family:'DM Mono',monospace;color:#e8dfc8;font-size:0.85rem;">AIza…</span>). Come back here, paste it into the API Key field above, and hit <strong style="color:#e8dfc8;">Save</strong>. Stored only in your browser — never sent anywhere except Google.</div>
+      <div class="gkm-step" style="background:#141008;border:1px solid #2a2010;border-top:2px solid #c9a84c;border-radius:8px;padding:18px 20px;margin-bottom:24px;">
+        <div class="gkm-step-badge" style="font-size:0.7rem;background:#1e1a10;display:inline-block;padding:3px 10px;border-radius:20px;color:#8a7840;margin-bottom:10px;letter-spacing:.5px;">Step 4</div>
+        <div class="gkm-step-title" style="font-family:'Literata',Georgia,serif;font-size:0.95rem;color:#c9a84c;font-weight:700;margin-bottom:10px;">Copy & Paste Here</div>
+        <div class="gkm-step-desc" style="font-size:0.95rem;color:#b0a07a;line-height:1.7;">Copy the key (it starts with <span class="gkm-accent-strong" style="font-family:'DM Mono',monospace;color:#e8dfc8;font-size:0.85rem;">AIza…</span>). Come back here, paste it into the API Key field above, and hit <strong class="gkm-accent-strong" style="color:#e8dfc8;">Save</strong>. Stored only in your browser — never sent anywhere except Google.</div>
       </div>
 
       <!-- Gold divider -->
@@ -6170,24 +6192,24 @@ loadDayData = function(dk) {
       </div>
 
       <!-- Free tier info box -->
-      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 22px;margin-bottom:20px;">
-        <div style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;">Free Tier Limits</div>
-        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.8;">
-          · <strong style="color:#e8dfc8;">15 requests / minute</strong> — more than enough for writing posts<br>
-          · <strong style="color:#e8dfc8;">1,500 requests / day</strong> — free, no credit card required<br>
-          · Uses <strong style="color:#e8dfc8;">Gemini 2.5 Flash</strong> — Google's latest and smartest model
+      <div id="gkmFreeTierBox" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 22px;margin-bottom:20px;">
+        <div class="gkm-info-label" style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;">Free Tier Limits</div>
+        <div class="gkm-info-text" style="font-size:0.9rem;color:#b0a07a;line-height:1.8;">
+          · <strong class="gkm-accent-strong" style="color:#e8dfc8;">15 requests / minute</strong> — more than enough for writing posts<br>
+          · <strong class="gkm-accent-strong" style="color:#e8dfc8;">1,500 requests / day</strong> — free, no credit card required<br>
+          · Uses <strong class="gkm-accent-strong" style="color:#e8dfc8;">Gemini 2.5 Flash</strong> — Google's latest and smartest model
         </div>
       </div>
 
       <!-- Privacy note -->
-      <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 22px;margin-bottom:28px;">
-        <div style="font-size:0.9rem;color:#b0a07a;line-height:1.8;">
-          <strong style="color:#c9a84c;">Your key stays private.</strong> It is stored only in your browser's local storage. This app never transmits it to any server other than Google's API endpoint.
+      <div id="gkmPrivacyBox" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 22px;margin-bottom:28px;">
+        <div class="gkm-info-text" style="font-size:0.9rem;color:#b0a07a;line-height:1.8;">
+          <strong class="gkm-info-label" style="color:#c9a84c;">Your key stays private.</strong> It is stored only in your browser's local storage. This app never transmits it to any server other than Google's API endpoint.
         </div>
       </div>
 
       <!-- CTA -->
-      <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="
+      <a id="gkmCtaBtn" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="
         display:block;text-align:center;
         background:linear-gradient(135deg,#1a1500,#2a2000);
         border:1px solid #c9a84c;color:#c9a84c;
@@ -6201,7 +6223,7 @@ loadDayData = function(dk) {
         ↗ Open Google AI Studio
       </a>
 
-      <div style="text-align:center;color:#3a2e18;font-size:0.8rem;font-style:italic;margin-top:24px;border-top:1px solid #1e1a10;padding-top:18px;">
+      <div id="gkmFooter" style="text-align:center;color:#3a2e18;font-size:0.8rem;font-style:italic;margin-top:24px;border-top:1px solid #1e1a10;padding-top:18px;">
         May this tool help you share what is good. آمين
       </div>
 

@@ -906,25 +906,23 @@ body.light-mode #asmaulSessionInfo,
 body.light-mode #hadithNav,body.light-mode #tafsirNav,
 body.light-mode #bookNav,body.light-mode #svNav,
 body.light-mode #zikrReaderSessionInfo,body.light-mode #zikrBookSessionInfo{background:#f0ede6!important;border-color:#d4cfc5!important;}
-/* Done notes */
-body.light-mode #hadithDoneNote,body.light-mode #tafsirDoneNote,
-body.light-mode #bookDoneNote,body.light-mode #asmaulDoneNote{
-  background:#e8f5ec!important;color:#2d6b40!important;border-color:#2d6b40!important;
-}
-body.light-mode #zikrReaderDoneNote,body.light-mode #zikrBookDoneNote{
-  background:#1a1610!important;color:var(--green-bright)!important;border-color:#2a2010!important;
-}
+/* Done notes — one consistent style for every reader, dark and light */
+.rdr-done-note{display:none;background:#1a1610;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;}
+body.light-mode .rdr-done-note{background:#e8f5ec!important;border-color:#2d6b40!important;color:#2d6b40!important;}
 /* Prev buttons */
 body.light-mode #hadithPrevBtn,body.light-mode #tafsirPrevBtn,
 body.light-mode #bookPrevBtn,body.light-mode #svPrevBtn,
 body.light-mode #asmaulPrevBtn,body.light-mode #zikrReaderPrevBtn,
 body.light-mode #zikrBookPrevBtn{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 /* Next buttons — now matches Prev's idle look exactly (was gold/outlined before, which is also why hover looked dead: it was already sitting at the "hover" color) */
-body.light-mode #hadithNextBtn,body.light-mode #tafsirNextBtn,
-body.light-mode #bookNextBtn,body.light-mode #svNextBtn,
-body.light-mode #asmaulNextBtn,body.light-mode #zikrReaderNextBtn,
-body.light-mode #zikrBookNextBtn,body.light-mode #qrNext,
+body.light-mode #hadithNextBtn:not(.rdr-nav-done),body.light-mode #tafsirNextBtn:not(.rdr-nav-done),
+body.light-mode #bookNextBtn:not(.rdr-nav-done),body.light-mode #svNextBtn:not(.rdr-nav-done),
+body.light-mode #asmaulNextBtn:not(.rdr-nav-done),body.light-mode #zikrReaderNextBtn:not(.rdr-nav-done),
+body.light-mode #zikrBookNextBtn:not(.rdr-nav-done),body.light-mode #qrNext,
 body.light-mode #pdfReaderNext{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode #qrNext:hover:not(:disabled),body.light-mode #pdfReaderNext:hover:not(:disabled){background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .rdr-nav-done{background:#d8f0de!important;border-color:var(--green)!important;color:var(--green)!important;}
+body.light-mode .rdr-nav-done:hover{background:#c5e8cd!important;border-color:var(--green-bright)!important;color:var(--green-bright)!important;}
 /* Prev/Next hover (light mode) — was missing entirely, ID specificity blocked any class-based hover */
 body.light-mode #hadithPrevBtn:hover,body.light-mode #tafsirPrevBtn:hover,
 body.light-mode #bookPrevBtn:hover,body.light-mode #svPrevBtn:hover,
@@ -934,7 +932,6 @@ body.light-mode #hadithNextBtn:hover:not(.rdr-nav-done),body.light-mode #tafsirN
 body.light-mode #bookNextBtn:hover:not(.rdr-nav-done),body.light-mode #svNextBtn:hover:not(.rdr-nav-done),
 body.light-mode #asmaulNextBtn:hover:not(.rdr-nav-done),body.light-mode #zikrReaderNextBtn:hover:not(.rdr-nav-done),
 body.light-mode #zikrBookNextBtn:hover:not(.rdr-nav-done){background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
-body.light-mode .rdr-nav-done:hover{background:#d8f0de!important;border-color:var(--green)!important;color:var(--green)!important;}
 /* Zikr article counter */
 body.light-mode #zikrArticleBar{background:#ece9e2!important;}
 body.light-mode [onclick="zikrArticleTap(-1)"]{background:#fff0f0!important;border-color:#e0c0c0!important;color:#8b2a2a!important;}
@@ -950,6 +947,7 @@ body.light-mode #lrStory,body.light-mode #lrSimpleMeaning{color:#1a1a18!importan
 body.light-mode #lrWordRoman,body.light-mode #lrWordType{color:#5a5750!important;}
 body.light-mode #lrWordNum{color:#9a9590!important;}
 body.light-mode #lrHarakahBtn{background:#f5f0e0!important;border-color:#d4b878!important;color:#9a7228!important;}
+body.light-mode #lrHarakahBtn:hover{background:#fdf0c8!important;border-color:#9a7228!important;}
 body.light-mode #lrBody{background:#ffffff!important;}
 /* Language Learner lang/word/verb buttons — JS sets colors via inline style, so hover needs !important to win */
 .lr-lang-btn:hover,.lr-type-btn:hover{border-color:var(--gold-dim)!important;color:#f0e4c0!important;}
@@ -967,7 +965,9 @@ body.light-mode #bmi-feet:focus,body.light-mode #bmi-inches:focus,body.light-mod
 /* Calculate button follows the Language Learner word/verb "active" look in warm mode, per request */
 body.light-mode #bmiCalcBtn{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode #bmiCalcBtn:hover{background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
-body.light-mode #lrMarkBtn{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
+/* lrMarkBtn intentionally has no light-mode CSS override — lrRenderMarkBtn() in JS
+   already handles its colors and hover correctly for both themes; a CSS !important
+   rule here would block that and kill the hover, which is exactly what happened before. */
 /* ── Post Writer ── */
 body.light-mode #pwTabLI{background:#f0ede6!important;color:#9a7228!important;}
 body.light-mode #pwTabFB{background:#ece9e2!important;color:#5a5750!important;}
@@ -2792,7 +2792,7 @@ function applyReaderTheme(isLight){
     // Book reader
     'bookLoading','bookContent','bookNav','bookDoneNote','bookPrevBtn','bookNextBtn','bookDayPill',
     // SV reader
-    'svLoading','svContent','svNav','svPrevBtn','svNextBtn','svTranslit',
+    'svLoading','svContent','svNav','svPrevBtn','svNextBtn','svTranslit','svDoneNote',
     // Asmaul reader
     'asmaulDoneNote','asmaulSessionInfo','asmaulContent','asmaulPrevBtn','asmaulNextBtn','asmaulDayPill','asmaulProgressPill','asmaulPageDisplay',
     // Zikr readers
@@ -3821,6 +3821,10 @@ async function openSurahVerseReader(surahNum, title, goalKey){
   _svDK      = currentDateKey || todayKey();
   const overlay = document.getElementById('surahVerseReaderOverlay');
   document.getElementById('svTitle').textContent   = title;
+  const _svCleanTitle = title.replace(/^[^\w]*/, '').trim();
+  const _svDoneNoteEl = document.getElementById('svDoneNote');
+  _svDoneNoteEl.textContent = `✓ You've already completed today's ${_svCleanTitle} — you may continue reviewing`;
+  _svDoneNoteEl.style.display = (getCached(_svDK)[goalKey] === 'yes') ? 'block' : 'none';
   document.getElementById('svLoading').style.display  = 'flex';
   document.getElementById('svContent').style.display  = 'none';
   document.getElementById('svNav').style.display      = 'none';
@@ -4323,7 +4327,7 @@ function renderBookBadge(dk) {
       </div>
     </div>
     <!-- Already done note -->
-    <div id="bookDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">✓ You've already completed today's book</div>
+    <div id="bookDoneNote" class="rdr-done-note">✓ You've already completed today's book — you may continue reviewing</div>
     <!-- Loading -->
     <div id="bookLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:'DM Mono',monospace;background:#0d0b08;">Loading Book.json…</div>
     <!-- Slide content -->
@@ -4371,7 +4375,7 @@ function renderBookBadge(dk) {
         <button class="qr-close" onclick="closeHadithReader()">✕ Save & Exit</button>
       </div>
     </div>
-    <div id="hadithDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">✓ You've already completed today's hadiths</div>
+    <div id="hadithDoneNote" class="rdr-done-note">✓ You've already completed today's hadiths — you may continue reviewing</div>
     <div id="hadithLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:'DM Mono',monospace;background:#0d0b08;">Loading Sahih Bukhari...</div>
     <div id="hadithContent" style="display:none;flex:1;overflow-y:auto;padding:28px 24px;background:#0d0b08;">
       <div id="hadithNum" style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;font-family:'DM Mono',monospace;"></div>
@@ -4400,7 +4404,7 @@ function renderBookBadge(dk) {
         <button class="qr-close" onclick="closeTafsirReader()">✕ Save & Exit</button>
       </div>
     </div>
-    <div id="tafsirDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">✓ You've already completed today's Quran Meaning</div>
+    <div id="tafsirDoneNote" class="rdr-done-note">✓ You've already completed today's Quran Meaning — you may continue reviewing</div>
     <div id="tafsirLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:'DM Mono',monospace;background:#0d0b08;">Loading verses...</div>
     <div id="tafsirContent" style="display:none;flex:1;overflow-y:auto;padding:28px 24px;background:#0d0b08;">
       <div id="tafsirVerseRef" style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;font-family:'DM Mono',monospace;"></div>
@@ -4436,6 +4440,7 @@ function renderBookBadge(dk) {
         <button class="qr-close" onclick="closeSurahVerseReader()">✕ Close</button>
       </div>
     </div>
+    <div id="svDoneNote" class="rdr-done-note"></div>
     <div id="svLoading" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:'DM Mono',monospace;background:#0d0b08;">Loading verses…</div>
     <div id="svContent" style="display:none;flex:1;overflow-y:auto;padding:28px 24px;background:#0d0b08;">
       <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;margin-bottom:20px;">
@@ -4940,8 +4945,8 @@ function closeSalahArticle(){
           <div id="zikrArticleFill" style="height:100%;width:0%;background:linear-gradient(90deg,#4a7c59,#c9a84c);border-radius:3px;transition:width 0.3s ease;"></div>
         </div>
         <div style="display:flex;gap:12px;justify-content:center;margin-bottom:16px;">
-          <button onclick="zikrArticleTap(-1)" style="background:#1a0a0a;border:1px solid #3a1a1a;color:#7a4040;border-radius:8px;padding:14px 36px;font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#8b3a3a';this.style.color='#c05050'" onmouseout="this.style.borderColor='#3a1a1a';this.style.color='#7a4040'">−1</button>
-          <button onclick="zikrArticleTap(1)" style="background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid #c9a84c;color:#c9a84c;border-radius:8px;padding:14px 36px;font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:700;cursor:pointer;letter-spacing:0.05em;transition:all 0.15s;" onmouseover="this.style.background='linear-gradient(135deg,#2a2000,#3a3000)'" onmouseout="this.style.background='linear-gradient(135deg,#1a1500,#2a2000)'">+1</button>
+          <button onclick="zikrArticleTap(-1)" style="background:#1a0a0a;border:1px solid #3a1a1a;color:#7a4040;border-radius:8px;padding:14px 36px;font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.15s;" onmouseover="const L=document.body.classList.contains('light-mode');this.style.borderColor=L?'#c05050':'#8b3a3a';this.style.color='#c05050'" onmouseout="const L=document.body.classList.contains('light-mode');this.style.borderColor=L?'#e0c0c0':'#3a1a1a';this.style.color=L?'#8b2a2a':'#7a4040'">−1</button>
+          <button onclick="zikrArticleTap(1)" style="background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid #c9a84c;color:#c9a84c;border-radius:8px;padding:14px 36px;font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:700;cursor:pointer;letter-spacing:0.05em;transition:all 0.15s;" onmouseover="const L=document.body.classList.contains('light-mode');this.style.background=L?'#f5e8b0':'linear-gradient(135deg,#2a2000,#3a3000)'" onmouseout="const L=document.body.classList.contains('light-mode');this.style.background=L?'#f5f0e0':'linear-gradient(135deg,#1a1500,#2a2000)'">+1</button>
         </div>
         <div id="zikrArticleMsg" style="font-family:'DM Mono',monospace;font-size:0.75rem;color:#5a4a28;letter-spacing:0.1em;min-height:18px;transition:color 0.3s;"></div>
       </div>
@@ -5295,7 +5300,7 @@ function calcBMI(){
     <!-- Session info -->
     <div id="asmaulSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#0d0b08;"></div>
     <!-- Done note -->
-    <div id="asmaulDoneNote" style="display:none;background:#071407;border-bottom:1px solid #3a6a40;padding:7px 18px;font-size:11px;color:#6abf80;text-align:center;flex-shrink:0;">✓ You've completed all 99 Names — you may continue reviewing</div>
+    <div id="asmaulDoneNote" class="rdr-done-note">✓ You've completed all 99 Names — you may continue reviewing</div>
     <!-- Slide content -->
     <div id="asmaulContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#e8dfc8;min-height:0;">
     </div>
@@ -5538,7 +5543,7 @@ loadDayData = function(dk){
       </div>
     </div>
     <div id="zikrReaderSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#141008;"></div>
-    <div id="zikrReaderDoneNote" style="display:none;background:#1a1610;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">You have completed all 77 duas today</div>
+    <div id="zikrReaderDoneNote" class="rdr-done-note">✓ You've completed all 77 duas today — you may continue reviewing</div>
     <div id="zikrReaderContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#f0e4c0;min-height:0;"></div>
     <div class="zikr-reader-nav" style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <button id="zikrReaderPrevBtn" class="rdr-nav-btn" onclick="zikrNavPrev()" style="padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Prev</button>
@@ -5734,7 +5739,7 @@ loadDayData=function(dk){
       </div>
     </div>
     <div id="zikrBookSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#141008;"></div>
-    <div id="zikrBookDoneNote" style="display:none;background:#1a1610;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;">✓ You have read all 123 Duas today — you may continue reviewing</div>
+    <div id="zikrBookDoneNote" class="rdr-done-note">✓ You've read all 123 Duas today — you may continue reviewing</div>
     <div id="zikrBookContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#f0e4c0;min-height:0;"></div>
     <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <button id="zikrBookPrevBtn" class="rdr-nav-btn" onclick="zikrBookNavPrev()" style="padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
@@ -6052,8 +6057,8 @@ loadDayData = function(dk) {
         padding:10px 18px;border-radius:6px;cursor:pointer;
         font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;
         transition:all .2s;white-space:nowrap;
-      " onmouseover="this.style.background='linear-gradient(135deg,#2a2000,#3a3000)'"
-         onmouseout="this.style.background='linear-gradient(135deg,#1a1500,#2a2000)'">Send ↵</button>
+      " onmouseover="const L=document.body.classList.contains('light-mode');this.style.background=L?'linear-gradient(135deg,#ede5cc,#e5dab8)':'linear-gradient(135deg,#2a2000,#3a3000)'"
+         onmouseout="const L=document.body.classList.contains('light-mode');this.style.background=L?'linear-gradient(135deg,#f5f0e0,#ede5cc)':'linear-gradient(135deg,#1a1500,#2a2000)'">Send ↵</button>
     </div>
   </div>
 </div>

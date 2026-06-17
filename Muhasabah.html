@@ -1173,9 +1173,13 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">📖 Quran <span class="weight-hint">(10% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-quran">0%</div>
       </div>
-      <div class="quran-row">
-        <select id="quranJuzz" onchange="saveAndRefresh()"><option value="">Starting Juzz?</option></select>
-        <select id="quranQuarter" onchange="saveAndRefresh()">
+      <div class="yn-group">
+        <button class="yn-btn yes" data-key="quran" data-val="yes" onclick="setYN('quran','yes')">Yes</button>
+        <button class="yn-btn no"  data-key="quran" data-val="no"  onclick="setYN('quran','no')">No</button>
+      </div>
+      <div class="quran-row" style="display:none;">
+        <select id="quranJuzz"><option value="">Starting Juzz?</option></select>
+        <select id="quranQuarter">
           <option value="0">No Recitation</option>
           <option value="0.25">1/4 Juzz</option>
           <option value="0.5">2/4 Juzz</option>
@@ -1219,7 +1223,7 @@ body.overlay-open{overflow:hidden;}
           <option value="10">10 Full Juzz (+45% Bonus)</option>
         </select>
       </div>
-      <div class="sub-label">Goal: 1 Juzz/Day = Full 10% Core &nbsp;·&nbsp; Every Extra Juzz = +5% Bonus</div>
+      <div class="sub-label">1 Full Juzz = Yes (10% Core) &nbsp;·&nbsp; Every Page After = Proportional Bonus</div>
       <button class="qr-open-btn" onclick="openQuranReader()">📖 Open Quran Reader</button>
       <div class="qr-session-badge" id="quranSessionBadge" style="display:none;"></div>
     </div>
@@ -1910,8 +1914,20 @@ async function closeQuranReader(){
   if(!dayData.quranSessions) dayData.quranSessions = [];
   dayData.quranSessions.push({start: startQuranPage, end: endQuranPage, pages: pagesRead, juzz: sessionJuzz});
 
+  // Auto-flip to "Yes" once a full juzz has been reached today
+  if (todayTotal >= 1) {
+    dayData.quran = 'yes';
+  }
+
   _cache[currentDateKey] = dayData;
   await setStore(currentDateKey, dayData);
+
+  // Reflect auto-completion on the Yes/No buttons
+  if (todayTotal >= 1) {
+    document.querySelectorAll('.yn-btn[data-key="quran"]').forEach(btn =>
+      btn.classList.toggle('active', btn.dataset.val === 'yes')
+    );
+  }
 
   // If last page reached, reset global position so next open starts from page 1
   if(qrCurPage >= QR_LAST_PAGE){
@@ -2475,10 +2491,10 @@ function scoreDay(data){
     else if(v==='qaza')     core+=0.5;
   });
 
-  // Quran 10% — PDF reader wins over manual dropdown
+  // Quran 10% — PDF reader wins over manual Yes/No
   const qRaw = data.quranPdfJuzz !== undefined
     ? parseFloat(data.quranPdfJuzz) || 0
-    : parseFloat(data.quranQuarter) || 0;
+    : (data.quran==='yes' ? 1 : 0);
   core+=Math.min(qRaw*10,10);
 
   // Tahajjud 10% (goal = 4 rakat)
@@ -2547,7 +2563,7 @@ function scoreDay(data){
   // Nafl +0.2%/rakat, max +10%
   bonus+=Math.min((parseInt(data.naflRakat)||0)*0.2,10);
 
-  // Quran extra: every juzz above 1 = +5% (quarters proportional)
+  // Quran extra: every juzz above 1 = +5% (page-proportional via reader)
   if(qRaw>1) bonus+=(qRaw-1)*5;
 
   // Zikr extra: every 1500 above goal = +2.5%
@@ -2595,7 +2611,7 @@ function goalScore(data,key){
     case 'quran': {
       const q = data.quranPdfJuzz !== undefined
         ? parseFloat(data.quranPdfJuzz) || 0
-        : parseFloat(data.quranQuarter) || 0;
+        : (data.quran==='yes' ? 1 : 0);
       return Math.min(Math.round(q * 100), 100);
     }
     case 'tahajjud': return Math.min(Math.round(((parseInt(data.tahajjudRakat)||0)/4)*100),100);
@@ -2972,7 +2988,7 @@ function loadDayData(dk){
   });
 
   ['hadith','tafsir','asmaul','zikrMorning','zikrEvening','surahWaqiah','surahMulk','sawm',
-   'exercise','books','language','writingLinkedin','writingFacebook','netConnected','netCommented','surahKahf','tafakkur','zikrBook']
+   'exercise','books','language','writingLinkedin','writingFacebook','netConnected','netCommented','surahKahf','tafakkur','zikrBook','quran']
     .forEach(key=>{
       document.querySelectorAll(`.yn-btn[data-key="${key}"]`).forEach(btn=>btn.classList.toggle('active',btn.dataset.val===data[key]));
     });

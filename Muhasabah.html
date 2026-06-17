@@ -2589,6 +2589,7 @@ function scoreDay(data){
   // Sadaqah: max +10% at 50,000 units
   bonus+=Math.min((parseInt(data.sadaqahUnits)||0)*(10/50000),10);
 
+  bonus=Math.min(bonus,50);
   bonus=Math.round(bonus*10)/10;
   core =Math.round(core*10)/10;
   return {core, bonus, total:Math.round((core+bonus)*10)/10};
@@ -2727,7 +2728,7 @@ function buildCalendar(){
            +`<span class="day-num">${d}</span>`;
       if(!isFuture&&hasData){
         const goldW=Math.min(sc.core,100);
-        const purpleW=Math.min((sc.bonus/100)*100,100);
+        const purpleW=Math.min((sc.bonus/50)*100,100);
         html+=`<span class="day-pct">${Math.round(sc.total)}%</span>`
             +`<div class="day-bars">`
             +`<div class="day-bar-track"><div class="day-bar-fill-gold" style="width:${goldW}%"></div></div>`

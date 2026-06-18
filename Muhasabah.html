@@ -639,6 +639,10 @@ select option{background:#1c1f1c;}
 .yn-fill-label-active{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;color:var(--fill-text);clip-path:inset(0 100% 0 0);transition:clip-path .16s ease;}
 .yn-fill-btn.yes{--fill-bg:#1a3020;--fill-text:var(--green-bright);}
 .yn-fill-btn.no {--fill-bg:#2a1515;--fill-text:#c05050;}
+/* Read-only status display (currently Quran's reader-driven Yes/No) — no
+   pointer affordance, since pressing it does nothing. */
+.yn-fill-btn[data-readonly]{cursor:default;}
+.yn-fill-btn[data-readonly]:not(.active):hover{border-color:var(--border);}
 
 /* ── Salah ── */
 .salah-hint{font-size:9px;color:var(--text-muted);margin-bottom:10px;line-height:1.6;background:var(--surface2);padding:7px 10px;border-radius:4px;}
@@ -892,6 +896,7 @@ body.light-mode .yn-btn.no.active{background:#f5dede;border-color:var(--red);col
 body.light-mode .yn-fill-btn{background:var(--surface2);border-color:var(--border);color:var(--text-dim);}
 body.light-mode .yn-fill-btn:hover{border-color:#9a7228!important;}
 body.light-mode .yn-fill-btn.active{border-color:var(--fill-text);}
+body.light-mode .yn-fill-btn[data-readonly]:not(.active):hover{border-color:var(--border)!important;}
 body.light-mode .yn-fill-btn.yes{--fill-bg:#d8f0de;--fill-text:var(--green);}
 body.light-mode .yn-fill-btn.no {--fill-bg:#f5dede;--fill-text:var(--red);}
 body.light-mode .salah-opt.jamaah  {--fill-bg:#d8f0de;--fill-text:var(--green);}
@@ -1227,12 +1232,12 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge" id="pct-quran">0%</div>
       </div>
       <div class="yn-group">
-        <div class="yn-fill-btn yes" data-yn="quran" data-val="yes">
+        <div class="yn-fill-btn yes" data-yn="quran" data-val="yes" data-readonly="true">
           <div class="yn-fill"></div>
           <span class="yn-fill-label-base">Yes</span>
           <span class="yn-fill-label-active">Yes</span>
         </div>
-        <div class="yn-fill-btn no" data-yn="quran" data-val="no">
+        <div class="yn-fill-btn no" data-yn="quran" data-val="no" data-readonly="true">
           <div class="yn-fill"></div>
           <span class="yn-fill-label-base">No</span>
           <span class="yn-fill-label-active">No</span>
@@ -3336,7 +3341,7 @@ async function finalizeYnFill(key,newVal){
   refreshScores();
 }
 
-document.querySelectorAll('.yn-fill-btn').forEach(el=>{
+document.querySelectorAll('.yn-fill-btn:not([data-readonly])').forEach(el=>{
   el.addEventListener('pointerdown',onYnFillPointerDown);
   el.addEventListener('pointerup',onYnFillPointerCancel);
   el.addEventListener('pointerleave',onYnFillPointerCancel);

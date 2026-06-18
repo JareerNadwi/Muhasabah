@@ -2058,6 +2058,30 @@ async function setQrLastPage(pdfPageNum){
   }catch(e){}
 }
 
+/* IDB helpers for per-type last page (used by Zikr From Book's global resume) */
+async function getPdfLastPage(idbKey){
+  try{
+    const db = await openDB();
+    return new Promise(res => {
+      const req = db.transaction(STORE,'readonly').objectStore(STORE).get(idbKey);
+      req.onsuccess = () => res(req.result ? req.result.data : null);
+      req.onerror   = () => res(null);
+    });
+  }catch(e){ return null; }
+}
+
+async function setPdfLastPage(idbKey, pageNum){
+  try{
+    const db = await openDB();
+    return new Promise((res,rej) => {
+      const tx = db.transaction(STORE,'readwrite');
+      tx.objectStore(STORE).put({dk: idbKey, data: pageNum});
+      tx.oncomplete = () => res();
+      tx.onerror    = e => rej(e.target.error);
+    });
+  }catch(e){}
+}
+
 /* The Asmaul Husna / Zikr Morning / Zikr Evening readers used to share a
    generic PDF.js-based reader here. They've since moved to dedicated JSON
    slide readers (openAsmaulReader / openZikrReader). The Surah verse reader
@@ -5695,9 +5719,19 @@ async function _zbLoadDuas() {
   if (_zbDuas) return true;
   try {
     const res = await fetch(BASE_URL + 'Zikr%20From%20Book.json');
-    if (!res.ok) throw new Error('duas.json HTTP ' + res.status);
+    if (!res.ok) throw new Error('Zikr From Book.json HTTP ' + res.status);
     const json = await res.json();
-    _zbDuas = json.duas || [];
+    // Accept a few likely shapes — a bare array, or wrapped under a common key —
+    // rather than silently assuming `.duas` and ending up with an empty list.
+    const list = Array.isArray(json) ? json
+      : Array.isArray(json.duas) ? json.duas
+      : Array.isArray(json.data) ? json.data
+      : Array.isArray(json.items) ? json.items
+      : null;
+    if (!list || list.length === 0) {
+      throw new Error('Loaded the file, but could not find a dua list inside it. Expected either a top-level array, or an object with a "duas" array — check the JSON\'s actual structure.');
+    }
+    _zbDuas = list;
     return true;
   } catch(e) {
     document.getElementById('zikrBookContent').innerHTML =
@@ -5709,7 +5743,11 @@ async function _zbLoadDuas() {
 /* ── Render a single dua slide ── */
 function _zbRender() {
   const dua = _zbDuas[_zbSlide];
-  if (!dua) return;
+  if (!dua) {
+    document.getElementById('zikrBookContent').innerHTML =
+      '<div style="color:#c05050;padding:20px;font-family:\'DM Mono\',monospace;font-size:12px;">⚠ Could not display dua ' + (_zbSlide + 1) + ' — the loaded list only has ' + _zbDuas.length + ' entries. Try closing and reopening the reader.</div>';
+    return;
+  }
 
   const isLast = _zbSlide >= ZIKR_BOOK_TOTAL - 1;
   const num = _zbSlide + 1;
@@ -5886,7 +5924,6 @@ function _zbRenderBadge() {
   const last = allSessions[allSessions.length - 1];
   const bonusRatio = parseFloat(data['zikrBook_bonusRatio']) || 0;
   const pct = Math.round(bonusRatio * 100);
-  const globalPos = data['zikrBook_readerPage'] || last.end;
   const cycles = [];
   let _cycle = [];
   allSessions.forEach(s => {
@@ -5903,7 +5940,7 @@ function _zbRenderBadge() {
   badge.innerHTML =
     '<span style="color:var(--gold);">📖 Today: ' + count + ' Session' + (count !== 1 ? 's' : '') + ' &nbsp;·&nbsp; ' + totalDuas + ' Dua' + (totalDuas !== 1 ? 's' : '') + ' Read (' + pct + '%)</span>' +
     '<br><span style="font-size:9px;color:#a89060;">' + sessionsLine + '</span>' +
-    '<br><span style="font-size:9px;color:#a89060;">Last: Duas ' + last.start + '–' + last.end + ' (' + last.duas + ' Dua' + (last.duas !== 1 ? 's' : '') + ') · Global Dua ' + globalPos + '/' + ZIKR_BOOK_TOTAL + '</span>';
+    '<br><span style="font-size:9px;color:#a89060;">Last: Duas ' + last.start + '–' + last.end + ' (' + last.duas + ' Dua' + (last.duas !== 1 ? 's' : '') + ')</span>';
 }
 
 /* ── Keyboard nav ── */

@@ -633,12 +633,24 @@ select option{background:#1c1f1c;}
 .salah-row{display:flex;align-items:center;gap:8px;}
 .salah-name{width:72px;font-size:11px;color:var(--text-dim);flex-shrink:0;}
 .salah-options{display:flex;gap:6px;flex:1;}
-.salah-opt{flex:1;padding:8px 4px;text-align:center;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.3px;transition:all .15s;}
+.salah-opt{position:relative;flex:1;padding:8px 4px;text-align:center;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.3px;transition:border-color .15s;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
 .salah-opt:hover{border-color:var(--gold-dim);}
-.salah-opt.jamaah.active  {background:#1a3020;border-color:var(--green-bright);color:var(--green-bright);}
-.salah-opt.munfarid.active{background:#1a2818;border-color:var(--green);color:#7ab88a;}
-.salah-opt.qaza.active    {background:#2a2010;border-color:#8a6030;color:#c09050;}
-.salah-opt.missed.active  {background:#2a1515;border-color:var(--red);color:#c05050;}
+.salah-opt.active{border-color:var(--fill-text);}
+/* Long-press fill: width sweeps 0%->100% to select (left to right), 100%->0% to deselect (the
+   filled edge recedes right to left). .holding gets the slow press-duration transition; the base
+   rule below is the fast snap-back used when a press is released early or cancelled. */
+.salah-opt-fill{position:absolute;inset:0;width:0%;background:var(--fill-bg);z-index:1;pointer-events:none;transition:width .16s ease;}
+.salah-opt.holding .salah-opt-fill{transition:width .6s linear;}
+.salah-opt.holding .salah-opt-label-active{transition:clip-path .6s linear;}
+.salah-opt-label-base,.salah-opt-label-active{position:relative;display:block;pointer-events:none;}
+.salah-opt-label-base{z-index:2;}
+/* Colored label sits exactly over the muted one and is revealed by an inset clip-path tracking
+   the same progress as the fill, so the text recolors right at the fill's leading edge. */
+.salah-opt-label-active{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;color:var(--fill-text);clip-path:inset(0 100% 0 0);transition:clip-path .16s ease;}
+.salah-opt.jamaah  {--fill-bg:#1a3020;--fill-text:var(--green-bright);}
+.salah-opt.munfarid{--fill-bg:#1a2818;--fill-text:#7ab88a;}
+.salah-opt.qaza    {--fill-bg:#2a2010;--fill-text:#c09050;}
+.salah-opt.missed  {--fill-bg:#2a1515;--fill-text:#c05050;}
 
 /* ── Layout Helpers ── */
 .num-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
@@ -858,15 +870,16 @@ body.light-mode .salah-opt{background:var(--surface2);border-color:var(--border)
 /* Salah option buttons (Jama'ah/Munfarid/Qadha/Missed) had no visible hover in light mode — the body.light-mode
    base rule above out-specificities the plain .salah-opt:hover rule, so it never fired. */
 body.light-mode .salah-opt:hover{border-color:#9a7228!important;}
+body.light-mode .salah-opt.active{border-color:var(--fill-text);}
 body.light-mode .yn-btn{background:var(--surface2);border-color:var(--border);color:var(--text-dim);}
 /* Yes/No buttons on goal cards had no visible hover in light mode for the same specificity reason as .salah-opt above */
 body.light-mode .yn-btn:hover{border-color:#9a7228!important;}
 body.light-mode .yn-btn.yes.active{background:#d8f0de;border-color:var(--green);color:var(--green);}
 body.light-mode .yn-btn.no.active{background:#f5dede;border-color:var(--red);color:var(--red);}
-body.light-mode .salah-opt.jamaah.active{background:#d8f0de;border-color:var(--green);color:var(--green);}
-body.light-mode .salah-opt.munfarid.active{background:#e5f5e8;border-color:var(--green);color:var(--green);}
-body.light-mode .salah-opt.qaza.active{background:#fdf0d8;border-color:#c09050;color:#9a7030;}
-body.light-mode .salah-opt.missed.active{background:#f5dede;border-color:var(--red);color:var(--red);}
+body.light-mode .salah-opt.jamaah  {--fill-bg:#d8f0de;--fill-text:var(--green);}
+body.light-mode .salah-opt.munfarid{--fill-bg:#e5f5e8;--fill-text:var(--green);}
+body.light-mode .salah-opt.qaza    {--fill-bg:#fdf0d8;--fill-text:#9a7030;}
+body.light-mode .salah-opt.missed  {--fill-bg:#f5dede;--fill-text:var(--red);}
 body.light-mode .qr-open-btn{background:linear-gradient(135deg,#e8f5ec,#d8f0de)!important;border-color:var(--green)!important;color:var(--green)!important;}
 body.light-mode .qr-open-btn:hover{background:linear-gradient(135deg,#d8f0de,#c8e8d0)!important;box-shadow:0 0 10px rgba(45,107,64,.12)!important;}
 body.light-mode .btn-donate{background:linear-gradient(135deg,#fdf5dc,#f8edcc);border-color:var(--gold);color:var(--gold);}
@@ -2932,9 +2945,20 @@ function buildSalahGrid(){
     const row=document.createElement('div');row.className='salah-row';
     let html=`<div class="salah-name">${salah}</div><div class="salah-options" id="salah_${salah}">`;
     SALAH_OPTS.forEach(opt=>{
-      html+=`<div class="salah-opt ${opt.cls}" data-salah="${salah}" data-val="${opt.key}" onclick="setSalah('${salah}','${opt.key}')">${opt.label}</div>`;
+      html+=`<div class="salah-opt ${opt.cls}" data-salah="${salah}" data-val="${opt.key}">`
+          + `<div class="salah-opt-fill"></div>`
+          + `<span class="salah-opt-label-base">${opt.label}</span>`
+          + `<span class="salah-opt-label-active">${opt.label}</span>`
+          + `</div>`;
     });
     html+=`</div>`;row.innerHTML=html;grid.appendChild(row);
+  });
+  grid.querySelectorAll('.salah-opt').forEach(el=>{
+    el.addEventListener('pointerdown',onSalahOptPointerDown);
+    el.addEventListener('pointerup',onSalahOptPointerCancel);
+    el.addEventListener('pointerleave',onSalahOptPointerCancel);
+    el.addEventListener('pointercancel',onSalahOptPointerCancel);
+    el.addEventListener('contextmenu',e=>e.preventDefault());
   });
 }
 
@@ -3007,7 +3031,11 @@ function loadDayData(dk){
   const salahs=data.salahs||{};
   SALAHS.forEach(salah=>{
     const val=salahs[salah]||'';
-    document.querySelectorAll(`[data-salah="${salah}"]`).forEach(el=>el.classList.toggle('active',el.dataset.val===val));
+    document.querySelectorAll(`[data-salah="${salah}"]`).forEach(el=>{
+      const isActive=el.dataset.val===val;
+      el.classList.toggle('active',isActive);
+      setSalahOptProgress(el,isActive?100:0);
+    });
   });
 
   ['hadith','tafsir','asmaul','zikrMorning','zikrEvening','surahWaqiah','surahMulk','sawm',
@@ -3097,11 +3125,78 @@ function refreshScores(){
   });
 }
 
-async function setSalah(salah,val){
+const SALAH_HOLD_MS=600;
+let _salahPress=null;
+
+function setSalahOptProgress(el,pct){
+  const fill=el.querySelector('.salah-opt-fill');
+  const label=el.querySelector('.salah-opt-label-active');
+  if(fill) fill.style.width=pct+'%';
+  if(label) label.style.clipPath=`inset(0 ${100-pct}% 0 0)`;
+}
+
+function onSalahOptPointerDown(e){
+  e.preventDefault();
+  const el=e.currentTarget;
+  if(_salahPress) salahOptResolveCancel();
+
+  const optionsEl=el.closest('.salah-options');
+  const activeEl=optionsEl.querySelector('.salah-opt.active');
+  let mode,partner=null;
+  if(activeEl===el)      mode='deselect';
+  else if(activeEl){ mode='switch'; partner=activeEl; }
+  else               mode='select';
+
+  el.classList.add('holding');
+  if(partner) partner.classList.add('holding');
+  // Defer to the next frame so the slow .holding transition is the one that
+  // actually engages, rather than the fast snap-back transition firing on
+  // the same tick the class was added.
+  requestAnimationFrame(()=>{
+    setSalahOptProgress(el, mode==='deselect'?0:100);
+    if(partner) setSalahOptProgress(partner,0);
+  });
+
+  const timer=setTimeout(()=>salahOptCommit(el,mode,partner), SALAH_HOLD_MS);
+  _salahPress={el,partner,mode,timer};
+}
+
+function onSalahOptPointerCancel(e){
+  if(!_salahPress || _salahPress.el!==e.currentTarget) return;
+  salahOptResolveCancel();
+}
+
+/* Released or slid off before the hold completed — snap back to whatever
+   state the row was actually in, no data change. */
+function salahOptResolveCancel(){
+  const {el,partner,mode,timer}=_salahPress;
+  clearTimeout(timer);
+  el.classList.remove('holding');
+  setSalahOptProgress(el, mode==='deselect'?100:0);
+  if(partner){
+    partner.classList.remove('holding');
+    setSalahOptProgress(partner,100);
+  }
+  _salahPress=null;
+}
+
+/* Hold completed — lock the visual state and persist it. */
+function salahOptCommit(el,mode,partner){
+  el.classList.remove('holding');
+  if(partner) partner.classList.remove('holding');
+  setSalahOptProgress(el, mode==='deselect'?0:100);
+  if(partner) setSalahOptProgress(partner,0);
+  _salahPress=null;
+
+  const salah=el.dataset.salah;
+  const newVal = mode==='deselect' ? null : el.dataset.val;
+  finalizeSalah(salah,newVal);
+}
+
+async function finalizeSalah(salah,newVal){
   if(!currentDateKey) return;
   const data={...getCached(currentDateKey)};
   if(!data.salahs) data.salahs={};
-  const newVal = data.salahs[salah]===val ? null : val;
   if(newVal===null) delete data.salahs[salah]; else data.salahs[salah]=newVal;
   _cache[currentDateKey]=data;
   await setStore(currentDateKey,data);

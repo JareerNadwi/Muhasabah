@@ -810,7 +810,7 @@ canvas#qrCanvas{
   font-size:11px;letter-spacing:1px;transition:all .2s;
 }
 .qr-open-btn:hover{background:linear-gradient(135deg,#152010,#253525);box-shadow:0 0 12px rgba(74,124,89,.2);}
-.qr-pages-today{font-size:11px;color:var(--text-dim);background:var(--surface2);padding:9px 10px;border-radius:var(--radius);text-align:center;letter-spacing:.5px;}
+.qr-pages-today{font-size:13px;color:var(--text-dim);background:var(--surface2);padding:9px 10px;border-radius:var(--radius);text-align:center;letter-spacing:.5px;}
 .qr-session-badge{
   margin-top:8px;font-size:10px;color:var(--text-muted);letter-spacing:.5px;
   background:var(--surface2);padding:5px 8px;border-radius:3px;line-height:1.6;
@@ -1209,7 +1209,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">📖 Quran <span class="weight-hint">(10% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-quran">0%</div>
       </div>
-      <div class="qr-pages-today" id="quranPagesToday">📖 0 Pages Read Today</div>
+      <div class="qr-pages-today" id="quranPagesToday">0 Pages Read Today</div>
       <div class="quran-row" style="display:none;">
         <select id="quranJuzz"><option value="">Starting Juzz?</option></select>
         <select id="quranQuarter">
@@ -1974,7 +1974,7 @@ async function closeQuranReader(){
     + `<br><span style="font-size:9px;color:#a89060;">Total: ${firstSession.start}–${lastSession.end} (${totalPages} Pages, ≈ ${todayTotal.toFixed(2)} Juzz)</span>`
     + `<br><span style="font-size:9px;color:#a89060;">Last: Pages ${startQuranPage}–${endQuranPage} (${pagesRead} Pages, ${sessionJuzz.toFixed(2)} Juzz)</span>`;
   const pagesToday = document.getElementById('quranPagesToday');
-  if(pagesToday) pagesToday.textContent = `📖 ${totalPages} Page${totalPages !== 1 ? 's' : ''} Read Today`;
+  if(pagesToday) pagesToday.textContent = `${totalPages} Page${totalPages !== 1 ? 's' : ''} Read Today`;
 
   await saveAndRefresh();
 }
@@ -3042,7 +3042,7 @@ function loadDayData(dk){
   const quranPagesToday = document.getElementById('quranPagesToday');
   if(quranPagesToday){
     const totalPages = (data.quranSessions||[]).reduce((s,x)=>s+x.pages,0);
-    quranPagesToday.textContent = `📖 ${totalPages} Page${totalPages !== 1 ? 's' : ''} Read Today`;
+    quranPagesToday.textContent = `${totalPages} Page${totalPages !== 1 ? 's' : ''} Read Today`;
   }
   refreshScores();
 }

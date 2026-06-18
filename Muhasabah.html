@@ -634,8 +634,8 @@ select option{background:#1c1f1c;}
 .yn-btn-holdable.holding{border-color:var(--fill-text);}
 .yn-btn-holdable.holding .step-fill{transition:width .6s linear;}
 .yn-btn-holdable.holding .step-label-active{transition:clip-path .6s linear;}
-.yn-btn-holdable.yes{--fill-bg:#1a3020;--fill-text:var(--green-bright);}
-.yn-btn-holdable.no{--fill-bg:#2a1515;--fill-text:#c05050;}
+.yn-btn-holdable.yes{--fill-bg:#22503a;--fill-text:var(--green-bright);}
+.yn-btn-holdable.no{--fill-bg:#4a1818;--fill-text:#e06060;}
 
 /* ── Salah ── */
 .salah-hint{font-size:9px;color:var(--text-muted);margin-bottom:10px;line-height:1.6;background:var(--surface2);padding:7px 10px;border-radius:4px;}
@@ -1509,15 +1509,15 @@ body.overlay-open{overflow:hidden;}
       </div>
       <input type="number" id="sunnahRakat" min="0" max="17" placeholder="0" style="display:none;">
       <div class="stepper-row" style="gap:5px;">
-        <div class="step-btn minus" data-target="sunnahRakat" data-delta="-1" style="padding:0;width:34px;min-width:0;font-size:11px;">
-          <div class="step-fill"></div>
-          <span class="step-label-base">−1</span>
-          <span class="step-label-active">−1</span>
-        </div>
         <div class="step-btn minus" data-target="sunnahRakat" data-delta="-2" style="padding:0;width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−2</span>
           <span class="step-label-active">−2</span>
+        </div>
+        <div class="step-btn minus" data-target="sunnahRakat" data-delta="-1" style="padding:0;width:34px;min-width:0;font-size:11px;">
+          <div class="step-fill"></div>
+          <span class="step-label-base">−1</span>
+          <span class="step-label-active">−1</span>
         </div>
         <div class="qr-pages-today" id="sunnahSalahDisplay" data-suffix="Rakat Prayed Today" style="flex:1;">0 Rakat Prayed Today</div>
         <div class="step-btn plus" data-target="sunnahRakat" data-delta="1" style="padding:0;width:34px;min-width:0;font-size:11px;">

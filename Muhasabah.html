@@ -3151,14 +3151,19 @@ function onSalahOptPointerDown(e){
   if(partner) partner.classList.add('holding');
   // Defer to the next frame so the slow .holding transition is the one that
   // actually engages, rather than the fast snap-back transition firing on
-  // the same tick the class was added.
-  requestAnimationFrame(()=>{
+  // the same tick the class was added. This must be cancellable: a tap fast
+  // enough to release before this frame paints would otherwise leave the
+  // callback queued, and it would stomp on the cancel's revert a moment
+  // later — visually re-filling the button with no underlying selection
+  // behind it (the actual bug: a button looking selected while contributing
+  // nothing to the saved data or score).
+  const raf=requestAnimationFrame(()=>{
     setSalahOptProgress(el, mode==='deselect'?0:100);
     if(partner) setSalahOptProgress(partner,0);
   });
 
   const timer=setTimeout(()=>salahOptCommit(el,mode,partner), SALAH_HOLD_MS);
-  _salahPress={el,partner,mode,timer};
+  _salahPress={el,partner,mode,timer,raf};
 }
 
 function onSalahOptPointerCancel(e){
@@ -3169,8 +3174,9 @@ function onSalahOptPointerCancel(e){
 /* Released or slid off before the hold completed — snap back to whatever
    state the row was actually in, no data change. */
 function salahOptResolveCancel(){
-  const {el,partner,mode,timer}=_salahPress;
+  const {el,partner,mode,timer,raf}=_salahPress;
   clearTimeout(timer);
+  cancelAnimationFrame(raf);
   el.classList.remove('holding');
   setSalahOptProgress(el, mode==='deselect'?100:0);
   if(partner){
@@ -3182,6 +3188,7 @@ function salahOptResolveCancel(){
 
 /* Hold completed — lock the visual state and persist it. */
 function salahOptCommit(el,mode,partner){
+  cancelAnimationFrame(_salahPress.raf);
   el.classList.remove('holding');
   if(partner) partner.classList.remove('holding');
   setSalahOptProgress(el, mode==='deselect'?0:100);
@@ -3200,7 +3207,14 @@ async function finalizeSalah(salah,newVal){
   if(newVal===null) delete data.salahs[salah]; else data.salahs[salah]=newVal;
   _cache[currentDateKey]=data;
   await setStore(currentDateKey,data);
-  document.querySelectorAll(`[data-salah="${salah}"]`).forEach(el=>el.classList.toggle('active',el.dataset.val===newVal));
+  // Resync the whole row from the saved value, not just the two elements
+  // touched by this press — guarantees the visual state can never drift
+  // out of sync with what's actually stored, regardless of cause.
+  document.querySelectorAll(`[data-salah="${salah}"]`).forEach(el=>{
+    const isActive=el.dataset.val===newVal;
+    el.classList.toggle('active',isActive);
+    setSalahOptProgress(el,isActive?100:0);
+  });
   refreshScores();
 }
 

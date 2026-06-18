@@ -3900,11 +3900,11 @@ async function openHadithReader(){
 
     const savedIdx = await getReaderResume('_hadith_resume_' + _hadithDK);
     const alreadyDone = getCached(_hadithDK).hadith === 'yes';
-    // If already done today, start from beginning in read-only mode (won't accumulate more progress)
+    // If already done today, show the last page (progress is locked either way)
     // If not done, resume from where we left off (or beginning)
     let startIdx;
     if(alreadyDone){
-      startIdx = 0; // show from beginning, but progress is locked
+      startIdx = (savedIdx !== null) ? Math.min(savedIdx, HADITHS_PER_DAY - 1) : HADITHS_PER_DAY - 1;
     } else {
       startIdx = (savedIdx !== null && savedIdx + 1 < HADITHS_PER_DAY) ? savedIdx + 1 : 0;
     }
@@ -4062,7 +4062,7 @@ async function openTafsirReader(){
     const alreadyDoneTafsir = getCached(_tafsirDK).tafsir === 'yes';
     let startIdx;
     if(alreadyDoneTafsir){
-      startIdx = 0;
+      startIdx = (savedIdx !== null) ? Math.min(savedIdx, _tafsirSlice.length - 1) : _tafsirSlice.length - 1;
     } else {
       startIdx = (savedIdx !== null && savedIdx + 1 < _tafsirSlice.length) ? savedIdx + 1 : 0;
     }

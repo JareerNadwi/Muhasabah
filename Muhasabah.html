@@ -680,7 +680,7 @@ select option{background:#1c1f1c;}
 .zikr-step-btn.minus.holding{border-color:#c05050;}
 .zikr-step-btn.plus{background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid #c9a84c;--fill-bg:#3a3000;--fill-text:#c9a84c;}
 .zikr-step-btn.plus .step-label-base{color:#c9a84c;}
-.zikr-step-btn.plus:hover{background:linear-gradient(135deg,#2a2000,#3a3000);}
+.zikr-step-btn.plus:hover{border-color:#e0c070;}
 
 /* ── Layout Helpers ── */
 .num-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
@@ -988,7 +988,7 @@ body.light-mode .zikr-step-btn.minus:hover{border-color:#c05050!important;}
 body.light-mode .zikr-step-btn.minus:hover .step-label-base{color:#c05050!important;}
 body.light-mode .zikr-step-btn.plus{background:#f5f0e0!important;border-color:#9a7228!important;--fill-bg:#f5e8b0;--fill-text:#9a7228;}
 body.light-mode .zikr-step-btn.plus .step-label-base{color:#9a7228!important;}
-body.light-mode .zikr-step-btn.plus:hover{background:#f5e8b0!important;}
+body.light-mode .zikr-step-btn.plus:hover{border-color:#7a5010!important;}
 /* ── Language Learner ── */
 body.light-mode #lrHero{background:#f5f0e0!important;border-color:#d4cfc5!important;border-top-color:#9a7228!important;}
 body.light-mode #lrCollPanel,body.light-mode #lrConjPanel,
@@ -1330,33 +1330,33 @@ body.overlay-open{overflow:hidden;}
       </div>
       <input type="number" id="zikrCount" min="0" placeholder="0" style="display:none;">
       <div class="stepper-row" style="gap:5px;">
-        <div class="step-btn minus" data-target="zikrCount" data-delta="-100" style="padding:8px 4px;min-width:0;font-size:11px;">
+        <div class="step-btn minus" data-target="zikrCount" data-delta="-100" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−100</span>
           <span class="step-label-active">−100</span>
         </div>
-        <div class="step-btn minus" data-target="zikrCount" data-delta="-10" style="padding:8px 4px;min-width:0;font-size:11px;">
+        <div class="step-btn minus" data-target="zikrCount" data-delta="-10" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−10</span>
           <span class="step-label-active">−10</span>
         </div>
-        <div class="step-btn minus" data-target="zikrCount" data-delta="-1" style="padding:8px 4px;min-width:0;font-size:11px;">
+        <div class="step-btn minus" data-target="zikrCount" data-delta="-1" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−1</span>
           <span class="step-label-active">−1</span>
         </div>
         <div class="qr-pages-today" id="zikrDisplay" data-suffix="Zikr Counted Today" style="flex:1;">0 Zikr Counted Today</div>
-        <div class="step-btn plus" data-target="zikrCount" data-delta="1" style="padding:8px 4px;min-width:0;font-size:11px;">
+        <div class="step-btn plus" data-target="zikrCount" data-delta="1" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+1</span>
           <span class="step-label-active">+1</span>
         </div>
-        <div class="step-btn plus" data-target="zikrCount" data-delta="10" style="padding:8px 4px;min-width:0;font-size:11px;">
+        <div class="step-btn plus" data-target="zikrCount" data-delta="10" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+10</span>
           <span class="step-label-active">+10</span>
         </div>
-        <div class="step-btn plus" data-target="zikrCount" data-delta="100" style="padding:8px 4px;min-width:0;font-size:11px;">
+        <div class="step-btn plus" data-target="zikrCount" data-delta="100" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+100</span>
           <span class="step-label-active">+100</span>
@@ -5254,32 +5254,32 @@ function closeSalahArticle(){
           <div id="zikrArticleFill" style="height:100%;width:0%;background:linear-gradient(90deg,#4a7c59,#c9a84c);border-radius:3px;transition:width 0.3s ease;"></div>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:16px;">
-          <div class="zikr-step-btn minus" data-target="zikrCount" data-delta="-100" style="padding:14px 18px;">
+          <div class="zikr-step-btn minus" data-target="zikrCount" data-delta="-100" style="width:80px;padding:14px 0;">
             <div class="step-fill"></div>
             <span class="step-label-base">−100</span>
             <span class="step-label-active">−100</span>
           </div>
-          <div class="zikr-step-btn minus" data-target="zikrCount" data-delta="-10" style="padding:14px 18px;">
+          <div class="zikr-step-btn minus" data-target="zikrCount" data-delta="-10" style="width:80px;padding:14px 0;">
             <div class="step-fill"></div>
             <span class="step-label-base">−10</span>
             <span class="step-label-active">−10</span>
           </div>
-          <div class="zikr-step-btn minus" data-target="zikrCount" data-delta="-1">
+          <div class="zikr-step-btn minus" data-target="zikrCount" data-delta="-1" style="width:80px;padding:14px 0;">
             <div class="step-fill"></div>
             <span class="step-label-base">−1</span>
             <span class="step-label-active">−1</span>
           </div>
-          <div class="zikr-step-btn plus" data-target="zikrCount" data-delta="1">
+          <div class="zikr-step-btn plus" data-target="zikrCount" data-delta="1" style="width:80px;padding:14px 0;">
             <div class="step-fill"></div>
             <span class="step-label-base">+1</span>
             <span class="step-label-active">+1</span>
           </div>
-          <div class="zikr-step-btn plus" data-target="zikrCount" data-delta="10" style="padding:14px 18px;">
+          <div class="zikr-step-btn plus" data-target="zikrCount" data-delta="10" style="width:80px;padding:14px 0;">
             <div class="step-fill"></div>
             <span class="step-label-base">+10</span>
             <span class="step-label-active">+10</span>
           </div>
-          <div class="zikr-step-btn plus" data-target="zikrCount" data-delta="100" style="padding:14px 18px;">
+          <div class="zikr-step-btn plus" data-target="zikrCount" data-delta="100" style="width:80px;padding:14px 0;">
             <div class="step-fill"></div>
             <span class="step-label-base">+100</span>
             <span class="step-label-active">+100</span>

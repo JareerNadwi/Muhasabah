@@ -6056,7 +6056,7 @@ loadDayData=function(dk){
       </div>
     </div>
     <div id="zikrBookSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#141008;"></div>
-    <div id="zikrBookDoneNote" class="rdr-done-note">✓ You've read all 123 Duas today — you may continue reviewing</div>
+    <div id="zikrBookDoneNote" class="rdr-done-note">✓ You've completed the book — you may start again</div>
     <div id="zikrBookContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#f0e4c0;min-height:0;"></div>
     <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <button id="zikrBookPrevBtn" class="rdr-nav-btn" onclick="zikrBookNavPrev()" style="padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
@@ -6170,13 +6170,15 @@ async function openZikrBookReader() {
 
   // Global resume from IDB
   const savedIdx = await getPdfLastPage(ZIKR_BOOK_IDX_KEY);
-  _zbCompleted = false; // no yes/no completion — it's bonus scoring
+  // data.zikrBook gets set to 'yes' once all 123 duas have been read (see
+  // _zbSaveProgress) — same per-day completion flag the other readers use.
+  _zbCompleted = getCached(_zbDK).zikrBook === 'yes';
 
   // Resume from saved position (global, persists across days)
   _zbSlide = (savedIdx !== null && savedIdx >= 0) ? Math.min(savedIdx, ZIKR_BOOK_TOTAL - 1) : 0;
   _zbStartSlide = _zbSlide;
 
-  document.getElementById('zikrBookDoneNote').style.display = 'none';
+  document.getElementById('zikrBookDoneNote').style.display = _zbCompleted ? 'block' : 'none';
   _zbRender();
   await _zbSaveProgress(false);
 }
@@ -6913,6 +6915,8 @@ async function pwSend() {
       </div>
     </div>
 
+    <div id="lrDoneNote" class="rdr-done-note">✓ You've completed today's language learning — you may continue reviewing</div>
+
     <!-- Content body -->
     <div id="lrBody" style="padding:24px 20px;display:flex;flex-direction:column;gap:18px;">
 
@@ -7551,6 +7555,8 @@ function lrSaveRatioToDay() {
   document.querySelectorAll('.yn-btn[data-key="language"]').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.val === yesVal);
   });
+  const doneNoteEl = document.getElementById('lrDoneNote');
+  if (doneNoteEl) doneNoteEl.style.display = allDone ? 'block' : 'none';
   setStore(currentDateKey, data).then(() => refreshScores());
 }
 
@@ -7629,6 +7635,8 @@ async function openLanguageReader() {
   overlay.scrollTop = 0;
   document.body.classList.add('overlay-open');
   reThemeIfLight();
+  const _lrDK = currentDateKey || todayKey();
+  document.getElementById('lrDoneNote').style.display = (getCached(_lrDK).language === 'yes') ? 'block' : 'none';
   if (!LR_LOADED['en'] && !LR_ERROR['en']) {
     document.getElementById('lrNoData').style.display = 'block';
     document.getElementById('lrNoData').textContent = 'Loading…';

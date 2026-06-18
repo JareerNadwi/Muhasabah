@@ -622,7 +622,7 @@ select option{background:#1c1f1c;}
 
 /* ── Yes/No ── */
 .yn-group{display:flex;gap:8px;}
-.yn-btn{flex:1;padding:0;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;text-align:center;transition:all .15s;}
+.yn-btn{flex:1;padding:0;height:36px;line-height:36px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;text-align:center;transition:all .15s;}
 .yn-btn:hover{border-color:var(--gold-dim);}
 .yn-btn.yes.active{background:#1a3020;border-color:var(--green-bright);color:var(--green-bright);}
 .yn-btn.no.active{background:#2a1515;border-color:var(--red);color:#c05050;}
@@ -684,7 +684,7 @@ select option{background:#1c1f1c;}
 .step-btn.holding .yn-holdable-label-active,.zikr-step-btn.holding .yn-holdable-label-active{transition:clip-path .3s linear;}
 
 /* Card-context size (Tahajjud ±2, Zikr ±1/±10/±100) */
-.step-btn{flex:0 0 auto;min-width:42px;height:36px;padding:0 10px;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);font-size:12px;letter-spacing:.3px;transition:border-color .15s;}
+.step-btn{flex:0 0 auto;min-width:42px;height:36px;line-height:36px;padding:0 10px;text-align:center;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);font-size:12px;letter-spacing:.3px;transition:border-color .15s;}
 .step-btn:hover{border-color:var(--gold-dim);}
 .step-btn.holding{border-color:var(--fill-text);}
 .step-btn.minus{--fill-bg:#2a1010;--fill-text:var(--red);}
@@ -711,7 +711,7 @@ select option{background:#1c1f1c;}
 .net-sub-row{display:flex;align-items:center;gap:6px;}
 .net-sub-label{font-size:10px;color:var(--text-dim);flex:1;line-height:1.3;}
 .yn-mini{display:flex;gap:4px;width:110px;flex-shrink:0;}
-.yn-mini .yn-btn{padding:0 4px;font-size:9px;height:28px;}
+.yn-mini .yn-btn{padding:0 4px;font-size:9px;height:28px;line-height:28px;}
 
 /* ── Counter Box ── */
 .counter-box{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
@@ -858,7 +858,7 @@ canvas#qrCanvas{
   font-size:11px;letter-spacing:1px;transition:all .2s;
 }
 .qr-open-btn:hover{background:linear-gradient(135deg,#152010,#253525);box-shadow:0 0 12px rgba(74,124,89,.2);}
-.qr-pages-today{font-size:13px;color:var(--text-dim);background:var(--surface2);height:36px;display:flex;align-items:center;justify-content:center;padding:0 10px;border-radius:var(--radius);text-align:center;letter-spacing:.5px;}
+.qr-pages-today{font-size:13px;color:var(--text-dim);background:var(--surface2);height:36px;line-height:36px;padding:0 10px;border-radius:var(--radius);text-align:center;letter-spacing:.5px;}
 .qr-session-badge{
   margin-top:8px;font-size:10px;color:var(--text-muted);letter-spacing:.5px;
   background:var(--surface2);padding:5px 8px;border-radius:3px;line-height:1.6;
@@ -1348,33 +1348,33 @@ body.overlay-open{overflow:hidden;}
       </div>
       <input type="number" id="zikrCount" min="0" placeholder="0" style="display:none;">
       <div class="stepper-row" style="gap:5px;">
-        <div class="step-btn minus" data-target="zikrCount" data-delta="-100" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
+        <div class="step-btn minus" data-target="zikrCount" data-delta="-100" style="width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−100</span>
           <span class="step-label-active">−100</span>
         </div>
-        <div class="step-btn minus" data-target="zikrCount" data-delta="-10" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
+        <div class="step-btn minus" data-target="zikrCount" data-delta="-10" style="width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−10</span>
           <span class="step-label-active">−10</span>
         </div>
-        <div class="step-btn minus" data-target="zikrCount" data-delta="-1" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
+        <div class="step-btn minus" data-target="zikrCount" data-delta="-1" style="width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−1</span>
           <span class="step-label-active">−1</span>
         </div>
         <div class="qr-pages-today" id="zikrDisplay" data-suffix="Zikr Counted Today" style="flex:1;">0 Zikr Counted Today</div>
-        <div class="step-btn plus" data-target="zikrCount" data-delta="1" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
+        <div class="step-btn plus" data-target="zikrCount" data-delta="1" style="width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+1</span>
           <span class="step-label-active">+1</span>
         </div>
-        <div class="step-btn plus" data-target="zikrCount" data-delta="10" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
+        <div class="step-btn plus" data-target="zikrCount" data-delta="10" style="width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+10</span>
           <span class="step-label-active">+10</span>
         </div>
-        <div class="step-btn plus" data-target="zikrCount" data-delta="100" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
+        <div class="step-btn plus" data-target="zikrCount" data-delta="100" style="width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+100</span>
           <span class="step-label-active">+100</span>
@@ -1509,23 +1509,23 @@ body.overlay-open{overflow:hidden;}
       </div>
       <input type="number" id="sunnahRakat" min="0" max="17" placeholder="0" style="display:none;">
       <div class="stepper-row" style="gap:5px;">
-        <div class="step-btn minus" data-target="sunnahRakat" data-delta="-2" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
-          <div class="step-fill"></div>
-          <span class="step-label-base">−2</span>
-          <span class="step-label-active">−2</span>
-        </div>
-        <div class="step-btn minus" data-target="sunnahRakat" data-delta="-1" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
+        <div class="step-btn minus" data-target="sunnahRakat" data-delta="-1" style="width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−1</span>
           <span class="step-label-active">−1</span>
         </div>
+        <div class="step-btn minus" data-target="sunnahRakat" data-delta="-2" style="width:34px;min-width:0;font-size:11px;">
+          <div class="step-fill"></div>
+          <span class="step-label-base">−2</span>
+          <span class="step-label-active">−2</span>
+        </div>
         <div class="qr-pages-today" id="sunnahSalahDisplay" data-suffix="Rakat Prayed Today" style="flex:1;">0 Rakat Prayed Today</div>
-        <div class="step-btn plus" data-target="sunnahRakat" data-delta="1" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
+        <div class="step-btn plus" data-target="sunnahRakat" data-delta="1" style="width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+1</span>
           <span class="step-label-active">+1</span>
         </div>
-        <div class="step-btn plus" data-target="sunnahRakat" data-delta="2" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
+        <div class="step-btn plus" data-target="sunnahRakat" data-delta="2" style="width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+2</span>
           <span class="step-label-active">+2</span>
@@ -1592,43 +1592,43 @@ body.overlay-open{overflow:hidden;}
       </div>
       <input type="number" id="sadaqahUnits" min="0" placeholder="0" style="display:none;">
       <div class="stepper-row" style="gap:4px;flex-wrap:wrap;">
-        <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-500" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+        <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-500" style="width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−500</span>
           <span class="step-label-active">−500</span>
         </div>
-        <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-100" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+        <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-100" style="width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−100</span>
           <span class="step-label-active">−100</span>
         </div>
-        <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-10" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+        <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-10" style="width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−10</span>
           <span class="step-label-active">−10</span>
         </div>
-        <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-1" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+        <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-1" style="width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−1</span>
           <span class="step-label-active">−1</span>
         </div>
         <div class="qr-pages-today" id="sadaqahDisplay" data-suffix="Money Donated Today" style="flex:1;min-width:110px;">0 Money Donated Today</div>
-        <div class="step-btn plus" data-target="sadaqahUnits" data-delta="1" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+        <div class="step-btn plus" data-target="sadaqahUnits" data-delta="1" style="width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+1</span>
           <span class="step-label-active">+1</span>
         </div>
-        <div class="step-btn plus" data-target="sadaqahUnits" data-delta="10" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+        <div class="step-btn plus" data-target="sadaqahUnits" data-delta="10" style="width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+10</span>
           <span class="step-label-active">+10</span>
         </div>
-        <div class="step-btn plus" data-target="sadaqahUnits" data-delta="100" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+        <div class="step-btn plus" data-target="sadaqahUnits" data-delta="100" style="width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+100</span>
           <span class="step-label-active">+100</span>
         </div>
-        <div class="step-btn plus" data-target="sadaqahUnits" data-delta="1000" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+        <div class="step-btn plus" data-target="sadaqahUnits" data-delta="1000" style="width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+1000</span>
           <span class="step-label-active">+1000</span>
@@ -1685,7 +1685,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge" id="pct-language">0%</div>
       </div>
       <div class="qr-pages-today" id="languageLearnedToday">0 Words · 0 Verbs Learnt Today</div>
-      <div class="sub-label">Goal: Study Today's Word In Your Language(s) = Full 5% Core</div>
+      <div class="sub-label">Goal: Study Today's Words and Verbs In Your Language(s) = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openLanguageReader()">🗣 Open Language Learner</button>
       <div class="qr-session-badge" id="langSessionBadge" style="display:none;color:#c9a84c;"></div>
     </div>
@@ -2668,6 +2668,11 @@ function applyReaderTheme(isLight){
     'bookLoading','bookContent','bookNav','bookDoneNote','bookPrevBtn','bookNextBtn','bookDayPill',
     // SV reader
     'svLoading','svContent','svNav','svPrevBtn','svNextBtn','svTranslit','svDoneNote',
+    // Session badges on goal cards — their innerHTML contains inline style= spans that
+    // must not be mutated by the theme engine or they lose their content on toggle
+    'quranSessionBadge','zikrBookReaderBadge','surahWaqiahSessionBadge','surahMulkSessionBadge',
+    'surahKahfSessionBadge','zikrMorningSessionBadge','zikrEveningSessionBadge','asmaulSessionBadge',
+    'bookSessionBadge','langSessionBadge',
     // Asmaul reader
     'asmaulDoneNote','asmaulContent','asmaulPrevBtn','asmaulNextBtn','asmaulDayPill','asmaulProgressPill','asmaulPageDisplay',
     // Zikr readers
@@ -3060,6 +3065,12 @@ function onYnPointerDown(e){
 
   if(mode === 'deselect')               setYnProgress(el, 100);
   else if(mode === 'switch' && partner) setYnProgress(partner, 100);
+
+  // Force the browser to flush layout so the initial fill position is committed
+  // before the .holding transition kicks in — without this reflow the browser
+  // may batch the initial-set and the animated-target together, skipping the animation
+  void el.getBoundingClientRect();
+  if(partner) void partner.getBoundingClientRect();
 
   el.classList.add('holding');
   if(partner) partner.classList.add('holding');
@@ -3838,11 +3849,12 @@ async function _saveHadithProgress(read, done){
   if(_hadithAlreadyDone) return;
   const existing = getCached(_hadithDK);
   const sessions = existing.hadith_sessions ? [...existing.hadith_sessions] : [];
-  const entry    = { start: _hadithSessionStart+1, end: read };
+  const cappedRead = Math.min(read, HADITHS_PER_DAY);
+  const entry    = { start: _hadithSessionStart+1, end: cappedRead };
   if(sessions.length && sessions[sessions.length-1].start === _hadithSessionStart+1)
     sessions[sessions.length-1] = entry;
   else sessions.push(entry);
-  const patch = { hadith_sessions: sessions, hadith_ratio: Math.min(read/HADITHS_PER_DAY,1) };
+  const patch = { hadith_sessions: sessions, hadith_ratio: Math.min(cappedRead/HADITHS_PER_DAY,1) };
   if(done) patch.hadith = 'yes';
   await saveReaderData(_hadithDK, patch);
 }
@@ -3989,11 +4001,12 @@ async function _saveTafsirProgress(read, done){
   const total    = _tafsirSlice.length;
   const existing = getCached(_tafsirDK);
   const sessions = existing.tafsir_sessions ? [...existing.tafsir_sessions] : [];
-  const entry    = { start: _tafsirSessionStart+1, end: read };
+  const cappedRead = Math.min(read, total);
+  const entry    = { start: _tafsirSessionStart+1, end: cappedRead };
   if(sessions.length && sessions[sessions.length-1].start === _tafsirSessionStart+1)
     sessions[sessions.length-1] = entry;
   else sessions.push(entry);
-  const patch = { tafsir_sessions: sessions, tafsir_ratio: Math.min(read/total,1) };
+  const patch = { tafsir_sessions: sessions, tafsir_ratio: Math.min(cappedRead/total,1) };
   if(done) patch.tafsir = 'yes';
   await saveReaderData(_tafsirDK, patch);
 }
@@ -4139,9 +4152,11 @@ async function _saveSvProgress(readCount, done){
   const data = Object.assign({}, getCached(_svDK));
   if(!data[sessKey]) data[sessKey] = [];
   const sessions = data[sessKey];
-  const versesThisSess = readCount - _svStartIdx;
+  // Cap readCount at total so a close-after-completion never records one extra verse
+  const cappedCount = Math.min(readCount, total);
+  const versesThisSess = cappedCount - _svStartIdx;
   if(versesThisSess > 0){
-    const entry = {start: _svStartIdx + 1, end: readCount, verses: versesThisSess};
+    const entry = {start: _svStartIdx + 1, end: cappedCount, verses: versesThisSess};
     if(sessions.length && sessions[sessions.length-1].start === _svStartIdx + 1)
       sessions[sessions.length-1] = entry;
     else sessions.push(entry);
@@ -5514,7 +5529,7 @@ function calcBMI(){
       </div>
     </div>
     <!-- Done note -->
-    <div id="asmaulDoneNote" class="rdr-done-note">✓ You've completed all 99 Names — you may continue reviewing</div>
+    <div id="asmaulDoneNote" class="rdr-done-note">✓ You've already completed all 99 Names for today — you may continue reviewing</div>
     <!-- Slide content -->
     <div id="asmaulContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#e8dfc8;min-height:0;">
     </div>
@@ -5747,7 +5762,7 @@ loadDayData = function(dk){
         <button class="qr-close" onclick="closeZikrReader()">✕ Save &amp; Exit</button>
       </div>
     </div>
-    <div id="zikrReaderDoneNote" class="rdr-done-note">✓ You've completed all 77 duas today — you may continue reviewing</div>
+    <div id="zikrReaderDoneNote" class="rdr-done-note">✓ You've already completed all 77 duas today — you may continue reviewing</div>
     <div id="zikrReaderContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#f0e4c0;min-height:0;"></div>
     <div class="zikr-reader-nav" style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <button id="zikrReaderPrevBtn" class="rdr-nav-btn" onclick="zikrNavPrev()" style="padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">Prev</button>

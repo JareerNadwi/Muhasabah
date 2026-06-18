@@ -669,7 +669,7 @@ select option{background:#1c1f1c;}
 /* ── Fill/label animation — shared by salah-opt, step-btn, and yn-btn-holdable ── */
 .step-fill{position:absolute;inset:0;width:0%;background:var(--fill-bg);z-index:1;pointer-events:none;transition:width .16s ease;}
 .step-label-base,.step-label-active{position:relative;display:block;pointer-events:none;}
-.step-label-base{z-index:2;}
+.step-label-base{z-index:2;color:inherit;}
 .step-label-active{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;color:var(--fill-text);clip-path:inset(0 100% 0 0);transition:clip-path .16s ease;}
 
 /* ── Long-press stepper buttons ── */
@@ -1327,13 +1327,11 @@ body.overlay-open{overflow:hidden;}
         <div class="step-btn minus" data-target="tahajjudRakat" data-delta="-2">
           <div class="step-fill"></div>
           <span class="step-label-base">−2</span>
-          <span class="step-label-active">−2</span>
         </div>
         <div class="qr-pages-today" id="tahajjudDisplay" data-suffix="Rakat Prayed Today" style="flex:1;">0 Rakat Prayed Today</div>
         <div class="step-btn plus" data-target="tahajjudRakat" data-delta="2">
           <div class="step-fill"></div>
           <span class="step-label-base">+2</span>
-          <span class="step-label-active">+2</span>
         </div>
       </div>
       <div class="sub-label">Goal: 4 Rakat = Full 10% Core &nbsp;·&nbsp; Every Extra 4 Rakat = +5% Bonus</div>
@@ -1351,33 +1349,27 @@ body.overlay-open{overflow:hidden;}
         <div class="step-btn minus" data-target="zikrCount" data-delta="-100" style="padding:0;width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−100</span>
-          <span class="step-label-active">−100</span>
         </div>
         <div class="step-btn minus" data-target="zikrCount" data-delta="-10" style="padding:0;width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−10</span>
-          <span class="step-label-active">−10</span>
         </div>
         <div class="step-btn minus" data-target="zikrCount" data-delta="-1" style="padding:0;width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−1</span>
-          <span class="step-label-active">−1</span>
         </div>
         <div class="qr-pages-today" id="zikrDisplay" data-suffix="Zikr Counted Today" style="flex:1;">0 Zikr Counted Today</div>
         <div class="step-btn plus" data-target="zikrCount" data-delta="1" style="padding:0;width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+1</span>
-          <span class="step-label-active">+1</span>
         </div>
         <div class="step-btn plus" data-target="zikrCount" data-delta="10" style="padding:0;width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+10</span>
-          <span class="step-label-active">+10</span>
         </div>
         <div class="step-btn plus" data-target="zikrCount" data-delta="100" style="padding:0;width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+100</span>
-          <span class="step-label-active">+100</span>
         </div>
       </div>
       <div class="sub-label">Goal: 1500 Zikr = Full 5% Core &nbsp;·&nbsp; Every Extra 1500 Zikr = +2.5% Bonus</div>
@@ -1489,12 +1481,10 @@ body.overlay-open{overflow:hidden;}
         <div class="yn-btn yn-btn-holdable yes" data-key="sawm" data-val="yes">
           <div class="step-fill"></div>
           <span class="step-label-base">Yes</span>
-          <span class="step-label-active">Yes</span>
         </div>
         <div class="yn-btn yn-btn-holdable no" data-key="sawm" data-val="no">
           <div class="step-fill"></div>
           <span class="step-label-base">No</span>
-          <span class="step-label-active">No</span>
         </div>
       </div>
       <div class="sub-label">+10% Bonus For Fasting Today</div>
@@ -1512,23 +1502,19 @@ body.overlay-open{overflow:hidden;}
         <div class="step-btn minus" data-target="sunnahRakat" data-delta="-2" style="padding:0;width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−2</span>
-          <span class="step-label-active">−2</span>
         </div>
         <div class="step-btn minus" data-target="sunnahRakat" data-delta="-1" style="padding:0;width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−1</span>
-          <span class="step-label-active">−1</span>
         </div>
         <div class="qr-pages-today" id="sunnahSalahDisplay" data-suffix="Rakat Prayed Today" style="flex:1;">0 Rakat Prayed Today</div>
         <div class="step-btn plus" data-target="sunnahRakat" data-delta="1" style="padding:0;width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+1</span>
-          <span class="step-label-active">+1</span>
         </div>
         <div class="step-btn plus" data-target="sunnahRakat" data-delta="2" style="padding:0;width:34px;min-width:0;font-size:11px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+2</span>
-          <span class="step-label-active">+2</span>
         </div>
       </div>
       <div class="sub-label">Max +10% At 17 Rakat</div>
@@ -1546,13 +1532,11 @@ body.overlay-open{overflow:hidden;}
         <div class="step-btn minus" data-target="naflRakat" data-delta="-2">
           <div class="step-fill"></div>
           <span class="step-label-base">−2</span>
-          <span class="step-label-active">−2</span>
         </div>
         <div class="qr-pages-today" id="naflSalahDisplay" data-suffix="Rakat Prayed Today" style="flex:1;">0 Rakat Prayed Today</div>
         <div class="step-btn plus" data-target="naflRakat" data-delta="2">
           <div class="step-fill"></div>
           <span class="step-label-base">+2</span>
-          <span class="step-label-active">+2</span>
         </div>
       </div>
       <div class="sub-label">Max +10% At 50 Rakat</div>
@@ -1595,43 +1579,35 @@ body.overlay-open{overflow:hidden;}
         <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-500" style="padding:0;width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−500</span>
-          <span class="step-label-active">−500</span>
         </div>
         <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-100" style="padding:0;width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−100</span>
-          <span class="step-label-active">−100</span>
         </div>
         <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-10" style="padding:0;width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−10</span>
-          <span class="step-label-active">−10</span>
         </div>
         <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-1" style="padding:0;width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">−1</span>
-          <span class="step-label-active">−1</span>
         </div>
         <div class="qr-pages-today" id="sadaqahDisplay" data-suffix="Money Donated Today" style="flex:1;min-width:110px;">0 Money Donated Today</div>
         <div class="step-btn plus" data-target="sadaqahUnits" data-delta="1" style="padding:0;width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+1</span>
-          <span class="step-label-active">+1</span>
         </div>
         <div class="step-btn plus" data-target="sadaqahUnits" data-delta="10" style="padding:0;width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+10</span>
-          <span class="step-label-active">+10</span>
         </div>
         <div class="step-btn plus" data-target="sadaqahUnits" data-delta="100" style="padding:0;width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+100</span>
-          <span class="step-label-active">+100</span>
         </div>
         <div class="step-btn plus" data-target="sadaqahUnits" data-delta="500" style="padding:0;width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
           <span class="step-label-base">+500</span>
-          <span class="step-label-active">+500</span>
         </div>
       </div>
       <div class="sub-label">Max +10% At 50,000 Money Donated</div>
@@ -1654,12 +1630,10 @@ body.overlay-open{overflow:hidden;}
         <div class="yn-btn yn-btn-holdable yes" data-key="exercise" data-val="yes">
           <div class="step-fill"></div>
           <span class="step-label-base">Yes</span>
-          <span class="step-label-active">Yes</span>
         </div>
         <div class="yn-btn yn-btn-holdable no" data-key="exercise" data-val="no">
           <div class="step-fill"></div>
           <span class="step-label-base">No</span>
-          <span class="step-label-active">No</span>
         </div>
       </div>
       <div class="sub-label">Goal: 30 Minutes Of Exercise = Full 5% Core</div>
@@ -1700,12 +1674,10 @@ body.overlay-open{overflow:hidden;}
         <div class="yn-btn yn-btn-holdable yes" data-key="tafakkur" data-val="yes">
           <div class="step-fill"></div>
           <span class="step-label-base">Yes</span>
-          <span class="step-label-active">Yes</span>
         </div>
         <div class="yn-btn yn-btn-holdable no" data-key="tafakkur" data-val="no">
           <div class="step-fill"></div>
           <span class="step-label-base">No</span>
-          <span class="step-label-active">No</span>
         </div>
       </div>
       <div class="sub-label">Goal: Reflect &amp; Contemplate Today = Full 5% Core</div>
@@ -1725,12 +1697,10 @@ body.overlay-open{overflow:hidden;}
             <div class="yn-btn yn-btn-holdable yes" data-key="writingLinkedin" data-val="yes">
               <div class="step-fill"></div>
               <span class="step-label-base">Yes</span>
-              <span class="step-label-active">Yes</span>
             </div>
             <div class="yn-btn yn-btn-holdable no" data-key="writingLinkedin" data-val="no">
               <div class="step-fill"></div>
               <span class="step-label-base">No</span>
-              <span class="step-label-active">No</span>
             </div>
           </div>
         </div>
@@ -1740,12 +1710,10 @@ body.overlay-open{overflow:hidden;}
             <div class="yn-btn yn-btn-holdable yes" data-key="writingFacebook" data-val="yes">
               <div class="step-fill"></div>
               <span class="step-label-base">Yes</span>
-              <span class="step-label-active">Yes</span>
             </div>
             <div class="yn-btn yn-btn-holdable no" data-key="writingFacebook" data-val="no">
               <div class="step-fill"></div>
               <span class="step-label-base">No</span>
-              <span class="step-label-active">No</span>
             </div>
           </div>
         </div>
@@ -1767,12 +1735,10 @@ body.overlay-open{overflow:hidden;}
             <div class="yn-btn yn-btn-holdable yes" data-key="netConnected" data-val="yes">
               <div class="step-fill"></div>
               <span class="step-label-base">Yes</span>
-              <span class="step-label-active">Yes</span>
             </div>
             <div class="yn-btn yn-btn-holdable no" data-key="netConnected" data-val="no">
               <div class="step-fill"></div>
               <span class="step-label-base">No</span>
-              <span class="step-label-active">No</span>
             </div>
           </div>
         </div>
@@ -1782,12 +1748,10 @@ body.overlay-open{overflow:hidden;}
             <div class="yn-btn yn-btn-holdable yes" data-key="netCommented" data-val="yes">
               <div class="step-fill"></div>
               <span class="step-label-base">Yes</span>
-              <span class="step-label-active">Yes</span>
             </div>
             <div class="yn-btn yn-btn-holdable no" data-key="netCommented" data-val="no">
               <div class="step-fill"></div>
               <span class="step-label-base">No</span>
-              <span class="step-label-active">No</span>
             </div>
           </div>
         </div>
@@ -2962,9 +2926,7 @@ function runStepperRefresh(targetId){
 
 function setStepProgress(el,pct){
   const fill=el.querySelector('.step-fill');
-  const label=el.querySelector('.step-label-active');
   if(fill) fill.style.width=pct+'%';
-  if(label) label.style.clipPath=`inset(0 ${100-pct}% 0 0)`;
 }
 
 function onStepPointerDown(e){
@@ -3046,9 +3008,7 @@ var _ynPress = null;
 
 function setYnProgress(el, pct){
   var fill = el.querySelector('.step-fill');
-  var label = el.querySelector('.step-label-active');
   if(fill) fill.style.width = pct + '%';
-  if(label) label.style.clipPath = 'inset(0 ' + (100 - pct) + '% 0 0)';
 }
 
 function onYnPointerDown(e){
@@ -5157,32 +5117,26 @@ function closeSalahArticle(){
           <div class="zikr-step-btn minus" data-target="zikrCount" data-delta="-100" style="width:80px;padding:14px 0;">
             <div class="step-fill"></div>
             <span class="step-label-base">−100</span>
-            <span class="step-label-active">−100</span>
           </div>
           <div class="zikr-step-btn minus" data-target="zikrCount" data-delta="-10" style="width:80px;padding:14px 0;">
             <div class="step-fill"></div>
             <span class="step-label-base">−10</span>
-            <span class="step-label-active">−10</span>
           </div>
           <div class="zikr-step-btn minus" data-target="zikrCount" data-delta="-1" style="width:80px;padding:14px 0;">
             <div class="step-fill"></div>
             <span class="step-label-base">−1</span>
-            <span class="step-label-active">−1</span>
           </div>
           <div class="zikr-step-btn plus" data-target="zikrCount" data-delta="1" style="width:80px;padding:14px 0;">
             <div class="step-fill"></div>
             <span class="step-label-base">+1</span>
-            <span class="step-label-active">+1</span>
           </div>
           <div class="zikr-step-btn plus" data-target="zikrCount" data-delta="10" style="width:80px;padding:14px 0;">
             <div class="step-fill"></div>
             <span class="step-label-base">+10</span>
-            <span class="step-label-active">+10</span>
           </div>
           <div class="zikr-step-btn plus" data-target="zikrCount" data-delta="100" style="width:80px;padding:14px 0;">
             <div class="step-fill"></div>
             <span class="step-label-base">+100</span>
-            <span class="step-label-active">+100</span>
           </div>
         </div>
         <div id="zikrArticleMsg" style="font-family:'DM Mono',monospace;font-size:0.75rem;color:#5a4a28;letter-spacing:0.1em;min-height:18px;transition:color 0.3s;"></div>

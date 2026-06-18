@@ -627,6 +627,16 @@ select option{background:#1c1f1c;}
 .yn-btn.yes.active{background:#1a3020;border-color:var(--green-bright);color:var(--green-bright);}
 .yn-btn.no.active{background:#2a1515;border-color:var(--red);color:#c05050;}
 
+/* Hold-to-confirm variant — only applied where explicitly opted in (Sawm),
+   other yn-btn groups remain plain click. Reuses the same fill/label classes
+   as the stepper buttons since the mechanic is identical. */
+.yn-btn-holdable{position:relative;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+.yn-btn-holdable.holding{border-color:var(--fill-text);}
+.yn-btn-holdable.holding .step-fill{transition:width .6s linear;}
+.yn-btn-holdable.holding .step-label-active{transition:clip-path .6s linear;}
+.yn-btn-holdable.yes{--fill-bg:#1a3020;--fill-text:var(--green-bright);}
+.yn-btn-holdable.no{--fill-bg:#2a1515;--fill-text:#c05050;}
+
 /* ── Salah ── */
 .salah-hint{font-size:9px;color:var(--text-muted);margin-bottom:10px;line-height:1.6;background:var(--surface2);padding:7px 10px;border-radius:4px;}
 .salah-grid{display:flex;flex-direction:column;gap:9px;}
@@ -907,6 +917,8 @@ body.light-mode .yn-btn{background:var(--surface2);border-color:var(--border);co
 body.light-mode .yn-btn:hover{border-color:#9a7228!important;}
 body.light-mode .yn-btn.yes.active{background:#d8f0de;border-color:var(--green);color:var(--green);}
 body.light-mode .yn-btn.no.active{background:#f5dede;border-color:var(--red);color:var(--red);}
+body.light-mode .yn-btn-holdable.yes{--fill-bg:#d8f0de;--fill-text:var(--green);}
+body.light-mode .yn-btn-holdable.no{--fill-bg:#f5dede;--fill-text:var(--red);}
 body.light-mode .salah-opt.jamaah  {--fill-bg:#d8f0de;--fill-text:var(--green);}
 body.light-mode .salah-opt.munfarid{--fill-bg:#e5f5e8;--fill-text:var(--green);}
 body.light-mode .salah-opt.qaza    {--fill-bg:#fdf0d8;--fill-text:#9a7030;}
@@ -1466,8 +1478,16 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge bonus" id="pct-sawm">+0%</div>
       </div>
       <div class="yn-group">
-        <button class="yn-btn yes" data-key="sawm" data-val="yes" onclick="setYN('sawm','yes')">Yes</button>
-        <button class="yn-btn no"  data-key="sawm" data-val="no"  onclick="setYN('sawm','no')">No</button>
+        <div class="yn-btn yn-btn-holdable yes" data-key="sawm" data-val="yes">
+          <div class="step-fill"></div>
+          <span class="step-label-base">Yes</span>
+          <span class="step-label-active">Yes</span>
+        </div>
+        <div class="yn-btn yn-btn-holdable no" data-key="sawm" data-val="no">
+          <div class="step-fill"></div>
+          <span class="step-label-base">No</span>
+          <span class="step-label-active">No</span>
+        </div>
       </div>
       <div class="sub-label">+10% Bonus For Fasting Today</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('sawm')">🌙 Open Sawm Article</button>
@@ -1479,9 +1499,29 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">🌿 Sunnah Salah <span class="weight-hint">(Bonus)</span></div>
         <div class="goal-pct-badge bonus" id="pct-sunnahSalah">+0%</div>
       </div>
-      <div class="num-row">
-        <input type="number" id="sunnahRakat" min="0" max="17" placeholder="0" oninput="saveAndRefresh()">
-        <span class="of-label">Rakat &nbsp;/&nbsp; 17 Max</span>
+      <input type="number" id="sunnahRakat" min="0" max="17" placeholder="0" style="display:none;">
+      <div class="stepper-row" style="gap:5px;">
+        <div class="step-btn minus" data-target="sunnahRakat" data-delta="-2" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
+          <div class="step-fill"></div>
+          <span class="step-label-base">−2</span>
+          <span class="step-label-active">−2</span>
+        </div>
+        <div class="step-btn minus" data-target="sunnahRakat" data-delta="-1" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
+          <div class="step-fill"></div>
+          <span class="step-label-base">−1</span>
+          <span class="step-label-active">−1</span>
+        </div>
+        <div class="qr-pages-today" id="sunnahSalahDisplay" data-suffix="Rakat Prayed Today" style="flex:1;">0 Rakat Prayed Today</div>
+        <div class="step-btn plus" data-target="sunnahRakat" data-delta="1" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
+          <div class="step-fill"></div>
+          <span class="step-label-base">+1</span>
+          <span class="step-label-active">+1</span>
+        </div>
+        <div class="step-btn plus" data-target="sunnahRakat" data-delta="2" style="width:34px;min-width:0;padding:8px 0;font-size:11px;">
+          <div class="step-fill"></div>
+          <span class="step-label-base">+2</span>
+          <span class="step-label-active">+2</span>
+        </div>
       </div>
       <div class="sub-label">Max +10% At 17 Rakat &nbsp;·&nbsp; ~+0.59% Per Rakat</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('sunnahSalah')">🌿 Open Sunnah Salah Article</button>
@@ -1493,9 +1533,19 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">✨ Nafl Salah <span class="weight-hint">(Bonus)</span></div>
         <div class="goal-pct-badge bonus" id="pct-naflSalah">+0%</div>
       </div>
-      <div class="num-row">
-        <input type="number" id="naflRakat" min="0" placeholder="0" oninput="saveAndRefresh()">
-        <span class="of-label">Rakat &nbsp;/&nbsp; 50 Max</span>
+      <input type="number" id="naflRakat" min="0" placeholder="0" style="display:none;">
+      <div class="stepper-row">
+        <div class="step-btn minus" data-target="naflRakat" data-delta="-2">
+          <div class="step-fill"></div>
+          <span class="step-label-base">−2</span>
+          <span class="step-label-active">−2</span>
+        </div>
+        <div class="qr-pages-today" id="naflSalahDisplay" data-suffix="Rakat Prayed Today" style="flex:1;">0 Rakat Prayed Today</div>
+        <div class="step-btn plus" data-target="naflRakat" data-delta="2">
+          <div class="step-fill"></div>
+          <span class="step-label-base">+2</span>
+          <span class="step-label-active">+2</span>
+        </div>
       </div>
       <div class="sub-label">Max +10% At 50 Rakat &nbsp;·&nbsp; +0.2% Per Rakat</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('naflSalah')">✨ Open Nafl Salah Article</button>
@@ -1507,10 +1557,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">📖 Zikr From Book <span class="weight-hint">(Bonus)</span></div>
         <div class="goal-pct-badge bonus" id="pct-zikrBook">+0%</div>
       </div>
-      <div class="yn-group">
-        <button class="yn-btn yes" data-key="zikrBook" data-val="yes" onclick="setYN('zikrBook','yes')">Yes</button>
-        <button class="yn-btn no"  data-key="zikrBook" data-val="no"  onclick="setYN('zikrBook','no')">No</button>
-      </div>
+      <div class="qr-pages-today" id="zikrBookReadToday">0 Duas Read Today</div>
       <input type="number" id="zikrBookPages" style="display:none;" tabindex="-1" aria-hidden="true">
       <div class="sub-label">Max +10% &nbsp;·&nbsp; Auto-Yes At All 123 Duas</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openZikrBookReader()">📖 Open Zikr From Book Reader</button>
@@ -1523,10 +1570,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">📜 Surah Al-Kahf <span class="weight-hint">(Bonus)</span></div>
         <div class="goal-pct-badge bonus" id="pct-surahKahf">+0%</div>
       </div>
-      <div class="yn-group">
-        <button class="yn-btn yes" data-key="surahKahf" data-val="yes" onclick="setYN('surahKahf','yes')">Yes</button>
-        <button class="yn-btn no"  data-key="surahKahf" data-val="no"  onclick="setYN('surahKahf','no')">No</button>
-      </div>
+      <div class="qr-pages-today" id="surahKahfReadToday">0 Verses Read Today</div>
       <div class="sub-label">Max +10% Bonus At Full Surah</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahKahf')">📜 Open Surah Al-Kahf Reader</button>
       <div class="qr-session-badge" id="surahKahfSessionBadge" style="display:none;"></div>
@@ -1538,9 +1582,49 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">💛 Sadaqah <span class="weight-hint">(Bonus)</span></div>
         <div class="goal-pct-badge bonus" id="pct-sadaqah">+0%</div>
       </div>
-      <div class="num-row">
-        <input type="number" id="sadaqahUnits" min="0" placeholder="0" oninput="saveAndRefresh()">
-        <span class="of-label">Money Donated</span>
+      <input type="number" id="sadaqahUnits" min="0" placeholder="0" style="display:none;">
+      <div class="stepper-row" style="gap:4px;flex-wrap:wrap;">
+        <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-500" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+          <div class="step-fill"></div>
+          <span class="step-label-base">−500</span>
+          <span class="step-label-active">−500</span>
+        </div>
+        <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-50" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+          <div class="step-fill"></div>
+          <span class="step-label-base">−50</span>
+          <span class="step-label-active">−50</span>
+        </div>
+        <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-2" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+          <div class="step-fill"></div>
+          <span class="step-label-base">−2</span>
+          <span class="step-label-active">−2</span>
+        </div>
+        <div class="step-btn minus" data-target="sadaqahUnits" data-delta="-1" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+          <div class="step-fill"></div>
+          <span class="step-label-base">−1</span>
+          <span class="step-label-active">−1</span>
+        </div>
+        <div class="qr-pages-today" id="sadaqahDisplay" data-suffix="Units Donated Today" style="flex:1;min-width:110px;">0 Units Donated Today</div>
+        <div class="step-btn plus" data-target="sadaqahUnits" data-delta="1" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+          <div class="step-fill"></div>
+          <span class="step-label-base">+1</span>
+          <span class="step-label-active">+1</span>
+        </div>
+        <div class="step-btn plus" data-target="sadaqahUnits" data-delta="2" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+          <div class="step-fill"></div>
+          <span class="step-label-base">+2</span>
+          <span class="step-label-active">+2</span>
+        </div>
+        <div class="step-btn plus" data-target="sadaqahUnits" data-delta="50" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+          <div class="step-fill"></div>
+          <span class="step-label-base">+50</span>
+          <span class="step-label-active">+50</span>
+        </div>
+        <div class="step-btn plus" data-target="sadaqahUnits" data-delta="500" style="width:34px;min-width:0;padding:8px 0;font-size:10px;">
+          <div class="step-fill"></div>
+          <span class="step-label-base">+500</span>
+          <span class="step-label-active">+500</span>
+        </div>
       </div>
       <div class="sub-label">Max +10% At 50,000 Units</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('sadaqah')">💛 Open Sadaqah Article</button>
@@ -1948,6 +2032,40 @@ function updateSessionInfo(){
   }
 }
 
+/* Single source of truth for the Quran badge — called from closeQuranReader
+   (right after a session is saved) and from loadDayData (on every day
+   switch/reload). Sessions within one continuous read collapse into a
+   single range; if the Quran was finished and restarted on the same day,
+   that boundary starts a new range instead of folding into one misleading
+   span (e.g. "606–5"). */
+function renderQuranBadge(dayData){
+  const badge = document.getElementById('quranSessionBadge');
+  if(!dayData.quranSessions || dayData.quranSessions.length === 0){
+    badge.style.display = 'none';
+    return;
+  }
+  badge.style.display = 'block';
+  const total = parseFloat(dayData.quranPdfJuzz) || 0;
+  const sessionCount = dayData.quranSessions.length;
+  const totalPagesToday = dayData.quranSessions.reduce((s,x)=>s+x.pages,0);
+  const cycles = [];
+  let _cycle = [];
+  dayData.quranSessions.forEach(s => {
+    _cycle.push(s);
+    if(s.end >= QR_LAST_PAGE){ cycles.push(_cycle); _cycle = []; }
+  });
+  if(_cycle.length) cycles.push(_cycle);
+  const restartedToday = cycles.length > 1;
+  const rangeText = cycles.map(c => `${c[0].start}–${c[c.length-1].end}`).join(', ');
+  const last = dayData.quranSessions[dayData.quranSessions.length - 1];
+  const sessionsLine = `Total: ${rangeText} (${totalPagesToday} Pages, ≈ ${total.toFixed(2)} Juzz)`
+    + (restartedToday ? ' — Quran Completed &amp; Restarted Today' : '');
+  badge.innerHTML =
+    `<span style="color:var(--gold);">📖 Today: ${sessionCount} Session${sessionCount !== 1 ? 's' : ''} &nbsp;·&nbsp; ≈ ${total.toFixed(2)} Juzz Total</span>`
+    + `<br><span style="font-size:9px;color:#a89060;">${sessionsLine}</span>`
+    + `<br><span style="font-size:9px;color:#a89060;">Last: Pages ${last.start}–${last.end} (${last.pages} Pages, ${last.juzz.toFixed(2)} Juzz)</span>`;
+}
+
 async function closeQuranReader(){
   const overlay = document.getElementById('quranReaderOverlay');
   overlay.classList.remove('active');
@@ -1998,26 +2116,9 @@ async function closeQuranReader(){
   // Show today's total in badge. Sessions within one continuous read collapse
   // into a single range; if the Quran was finished and restarted today, that
   // boundary starts a new range instead of folding into one misleading span.
-  const badge = document.getElementById('quranSessionBadge');
-  badge.style.display = 'block';
-  const sessionCount = dayData.quranSessions.length;
-  const totalPagesToday = dayData.quranSessions.reduce((s,x)=>s+x.pages,0);
-  const cycles = [];
-  let _cycle = [];
-  dayData.quranSessions.forEach(s => {
-    _cycle.push(s);
-    if(s.end >= QR_LAST_PAGE){ cycles.push(_cycle); _cycle = []; }
-  });
-  if(_cycle.length) cycles.push(_cycle);
-  const restartedToday = cycles.length > 1;
-  const rangeText = cycles.map(c => `${c[0].start}–${c[c.length-1].end}`).join(', ');
-  const sessionsLine = `Total: ${rangeText} (${totalPagesToday} Pages, ≈ ${todayTotal.toFixed(2)} Juzz)`
-    + (restartedToday ? ' — Quran Completed &amp; Restarted Today' : '');
-  badge.innerHTML =
-    `<span style="color:var(--gold);">📖 Today: ${sessionCount} Session${sessionCount !== 1 ? 's' : ''} &nbsp;·&nbsp; ≈ ${todayTotal.toFixed(2)} Juzz Total</span>`
-    + `<br><span style="font-size:9px;color:#a89060;">${sessionsLine}</span>`
-    + `<br><span style="font-size:9px;color:#a89060;">Last: Pages ${startQuranPage}–${endQuranPage} (${pagesRead} Pages, ${sessionJuzz.toFixed(2)} Juzz)</span>`;
+  renderQuranBadge(dayData);
   const pagesToday = document.getElementById('quranPagesToday');
+  const totalPagesToday = dayData.quranSessions.reduce((s,x)=>s+x.pages,0);
   if(pagesToday) pagesToday.textContent = `${totalPagesToday} Page${totalPagesToday !== 1 ? 's' : ''} Read Today`;
 
   await saveAndRefresh();
@@ -2648,6 +2749,9 @@ function loadDayData(dk){
     .forEach(id=>{document.getElementById(id).value=data[id]||'';});
   runStepperRefresh('tahajjudRakat');
   runStepperRefresh('zikrCount');
+  runStepperRefresh('sunnahRakat');
+  runStepperRefresh('naflRakat');
+  runStepperRefresh('sadaqahUnits');
 
   // Sync zikrBookPages from PDF reader sessions (auto-fill from reading)
   const zbPagesToday = data['zikrBook_pagesToday'];
@@ -2658,21 +2762,7 @@ function loadDayData(dk){
   document.getElementById('quranQuarter').value   =data.quranQuarter||'0';
 
   // Show Quran session badge if reader was used today
-  const badge = document.getElementById('quranSessionBadge');
-  if(data.quranSessions && data.quranSessions.length > 0){
-    badge.style.display='block';
-    const total   = parseFloat(data.quranPdfJuzz) || 0;
-    const count   = data.quranSessions.length;
-    const first   = data.quranSessions[0];
-    const last    = data.quranSessions[data.quranSessions.length - 1];
-    const totPg   = data.quranSessions.reduce((s,x)=>s+x.pages,0);
-    badge.innerHTML =
-      `<span style="color:var(--gold);">📖 Today: ${count} Session${count !== 1 ? 's' : ''} &nbsp;·&nbsp; ≈ ${total.toFixed(2)} Juzz Total</span>`
-      + `<br><span style="font-size:9px;color:#a89060;">Total: ${first.start}–${last.end} (${totPg} Pages, ≈ ${total.toFixed(2)} Juzz)</span>`
-      + `<br><span style="font-size:9px;color:#a89060;">Last: Pages ${last.start}–${last.end} (${last.pages} Pages, ${last.juzz.toFixed(2)} Juzz)</span>`;
-  } else {
-    badge.style.display='none';
-  }
+  renderQuranBadge(data);
 
   // Zikr From Book badge — rendered by _zbRenderBadge via patched loadDayData
 
@@ -2753,6 +2843,18 @@ function refreshReadTodayDisplays(){
   if(sm){
     const count = (data.surahMulk_svSessions || []).reduce((s,x)=>s+x.verses,0);
     sm.textContent = `${count} Verse${count !== 1 ? 's' : ''} Read Today`;
+  }
+
+  const zb = document.getElementById('zikrBookReadToday');
+  if(zb){
+    const count = parseInt(data['zikrBook_pagesToday']) || 0;
+    zb.textContent = `${count} Dua${count !== 1 ? 's' : ''} Read Today`;
+  }
+
+  const sk = document.getElementById('surahKahfReadToday');
+  if(sk){
+    const count = (data.surahKahf_svSessions || []).reduce((s,x)=>s+x.verses,0);
+    sk.textContent = `${count} Verse${count !== 1 ? 's' : ''} Read Today`;
   }
 }
 
@@ -2855,6 +2957,89 @@ registerStepperRefresh('zikrCount', val=>{
 });
 registerStepperRefresh('zikrCount', val=>{
   if(typeof updateZikrArticleUI==='function') updateZikrArticleUI(val);
+});
+registerStepperRefresh('sunnahRakat', val=>{
+  const d=document.getElementById('sunnahSalahDisplay');
+  if(d) d.textContent = `${val} ${d.dataset.suffix}`;
+});
+registerStepperRefresh('naflRakat', val=>{
+  const d=document.getElementById('naflSalahDisplay');
+  if(d) d.textContent = `${val} ${d.dataset.suffix}`;
+});
+registerStepperRefresh('sadaqahUnits', val=>{
+  const d=document.getElementById('sadaqahDisplay');
+  if(d) d.textContent = `${val} ${d.dataset.suffix}`;
+});
+
+/* ── Hold-to-confirm Yes/No (Sawm) ──
+   Same press/fill/cancel/commit shape as Salah and the steppers, but for a
+   plain binary toggle. The actual data mutation is left entirely to the
+   existing setYN() — this only drives the visual hold and then calls it. */
+const YN_HOLD_MS = 600;
+let _ynPress = null;
+
+function setYnProgress(el,pct){
+  const fill=el.querySelector('.step-fill');
+  const label=el.querySelector('.step-label-active');
+  if(fill) fill.style.width=pct+'%';
+  if(label) label.style.clipPath=`inset(0 ${100-pct}% 0 0)`;
+}
+
+function onYnPointerDown(e){
+  e.preventDefault();
+  const el=e.currentTarget;
+  if(_ynPress) ynResolveCancel();
+
+  const group=el.closest('.yn-group');
+  const activeEl=group.querySelector('.yn-btn.active');
+  let mode,partner=null;
+  if(activeEl===el)      mode='deselect';
+  else if(activeEl){ mode='switch'; partner=activeEl; }
+  else               mode='select';
+
+  el.classList.add('holding');
+  if(partner) partner.classList.add('holding');
+  const raf=requestAnimationFrame(()=>{
+    setYnProgress(el, mode==='deselect'?0:100);
+    if(partner) setYnProgress(partner,0);
+  });
+  const timer=setTimeout(()=>ynCommit(el,mode,partner), YN_HOLD_MS);
+  _ynPress={el,partner,mode,timer,raf};
+}
+function onYnPointerCancel(e){
+  if(!_ynPress || _ynPress.el!==e.currentTarget) return;
+  ynResolveCancel();
+}
+function ynResolveCancel(){
+  const {el,partner,mode,timer,raf}=_ynPress;
+  clearTimeout(timer);
+  cancelAnimationFrame(raf);
+  el.classList.remove('holding');
+  setYnProgress(el, mode==='deselect'?100:0);
+  if(partner){
+    partner.classList.remove('holding');
+    setYnProgress(partner,100);
+  }
+  _ynPress=null;
+}
+function ynCommit(el,mode,partner){
+  cancelAnimationFrame(_ynPress.raf);
+  el.classList.remove('holding');
+  if(partner) partner.classList.remove('holding');
+  setYnProgress(el,0);
+  if(partner) setYnProgress(partner,0);
+  _ynPress=null;
+  setYN(el.dataset.key, el.dataset.val);
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.yn-btn-holdable').forEach(el=>{
+    el.addEventListener('pointerdown',onYnPointerDown);
+    el.addEventListener('pointerup',onYnPointerCancel);
+    el.addEventListener('pointerleave',onYnPointerCancel);
+    el.addEventListener('pointercancel',onYnPointerCancel);
+    el.addEventListener('contextmenu',e=>e.preventDefault());
+  });
 });
 
 /* Called by interactive controls (salah, yn) — saves to IDB + updates cache */
@@ -5888,6 +6073,7 @@ async function _zbSaveProgress(reachedEnd) {
   }
 
   refreshScores();
+  refreshReadTodayDisplays();
   _zbRenderBadge();
 }
 

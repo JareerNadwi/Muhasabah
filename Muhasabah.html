@@ -666,22 +666,21 @@ select option{background:#1c1f1c;}
 .yn-holdable-fill{position:absolute;inset:0;width:0%;background:var(--fill-bg);z-index:1;pointer-events:none;transition:width .16s ease;}
 .yn-btn-holdable.holding .yn-holdable-fill{transition:width .6s linear;}
 .yn-btn-holdable.holding .yn-holdable-label-active{transition:clip-path .6s linear;}
-/* ── Yes/No holdable buttons (Sawm, Exercise, etc.) ── */
-.yn-holdable-fill{position:absolute;inset:0;width:0%;background:var(--fill-bg);z-index:1;pointer-events:none;transition:width .16s ease;}
-.yn-btn-holdable.holding .yn-holdable-fill{transition:width .6s linear;}
-.yn-btn-holdable.holding .yn-holdable-label-active{transition:clip-path .6s linear;}
-.yn-holdable-label-base,.yn-holdable-label-active{position:relative;display:block;pointer-events:none;}
-.yn-holdable-label-base{z-index:2;}
-.yn-holdable-label-active{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;color:var(--fill-text);clip-path:inset(0 100% 0 0);transition:clip-path .16s ease;}
-
-/* ── Long-press stepper buttons (Tahajjud/Zikr counters + Zikr Article) ── */
-.stepper-row{display:flex;align-items:center;gap:8px;}
+/* ── Fill/label animation — shared by salah-opt, step-btn, and yn-btn-holdable ── */
 .step-fill{position:absolute;inset:0;width:0%;background:var(--fill-bg);z-index:1;pointer-events:none;transition:width .16s ease;}
-.step-btn.holding .step-fill,.zikr-step-btn.holding .step-fill{transition:width .3s linear;}
-.step-btn.holding .step-label-active,.zikr-step-btn.holding .step-label-active{transition:clip-path .3s linear;}
 .step-label-base,.step-label-active{position:relative;display:block;pointer-events:none;}
 .step-label-base{z-index:2;}
 .step-label-active{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;color:var(--fill-text);clip-path:inset(0 100% 0 0);transition:clip-path .16s ease;}
+
+/* ── Long-press stepper buttons ── */
+.stepper-row{display:flex;align-items:center;gap:8px;}
+.step-btn,.zikr-step-btn{position:relative;overflow:hidden;cursor:pointer;font-family:'DM Mono',monospace;font-weight:700;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+.step-btn.holding .step-fill,.zikr-step-btn.holding .step-fill{transition:width .3s linear;}
+.step-btn.holding .step-label-active,.zikr-step-btn.holding .step-label-active{transition:clip-path .3s linear;}
+
+/* ── Yes/No holdable buttons ── */
+.yn-btn-holdable.holding .step-fill{transition:width .6s linear;}
+.yn-btn-holdable.holding .step-label-active{transition:clip-path .6s linear;}
 .step-btn,.zikr-step-btn{position:relative;overflow:hidden;cursor:pointer;font-family:'DM Mono',monospace;font-weight:700;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
 
 /* Card-context size (Tahajjud ±2, Zikr ±1/±10/±100) */
@@ -1488,14 +1487,14 @@ body.overlay-open{overflow:hidden;}
       </div>
       <div class="yn-group">
         <div class="yn-btn yn-btn-holdable yes" data-key="sawm" data-val="yes">
-          <div class="yn-holdable-fill"></div>
-          <span class="yn-holdable-label-base">Yes</span>
-          <span class="yn-holdable-label-active">Yes</span>
+          <div class="step-fill"></div>
+          <span class="step-label-base">Yes</span>
+          <span class="step-label-active">Yes</span>
         </div>
         <div class="yn-btn yn-btn-holdable no" data-key="sawm" data-val="no">
-          <div class="yn-holdable-fill"></div>
-          <span class="yn-holdable-label-base">No</span>
-          <span class="yn-holdable-label-active">No</span>
+          <div class="step-fill"></div>
+          <span class="step-label-base">No</span>
+          <span class="step-label-active">No</span>
         </div>
       </div>
       <div class="sub-label">+10% Bonus For Fasting Today</div>
@@ -1629,10 +1628,10 @@ body.overlay-open{overflow:hidden;}
           <span class="step-label-base">+100</span>
           <span class="step-label-active">+100</span>
         </div>
-        <div class="step-btn plus" data-target="sadaqahUnits" data-delta="1000" style="padding:0;width:34px;min-width:0;font-size:10px;">
+        <div class="step-btn plus" data-target="sadaqahUnits" data-delta="500" style="padding:0;width:34px;min-width:0;font-size:10px;">
           <div class="step-fill"></div>
-          <span class="step-label-base">+1000</span>
-          <span class="step-label-active">+1000</span>
+          <span class="step-label-base">+500</span>
+          <span class="step-label-active">+500</span>
         </div>
       </div>
       <div class="sub-label">Max +10% At 50,000 Money Donated</div>
@@ -1653,14 +1652,14 @@ body.overlay-open{overflow:hidden;}
       </div>
       <div class="yn-group">
         <div class="yn-btn yn-btn-holdable yes" data-key="exercise" data-val="yes">
-          <div class="yn-holdable-fill"></div>
-          <span class="yn-holdable-label-base">Yes</span>
-          <span class="yn-holdable-label-active">Yes</span>
+          <div class="step-fill"></div>
+          <span class="step-label-base">Yes</span>
+          <span class="step-label-active">Yes</span>
         </div>
         <div class="yn-btn yn-btn-holdable no" data-key="exercise" data-val="no">
-          <div class="yn-holdable-fill"></div>
-          <span class="yn-holdable-label-base">No</span>
-          <span class="yn-holdable-label-active">No</span>
+          <div class="step-fill"></div>
+          <span class="step-label-base">No</span>
+          <span class="step-label-active">No</span>
         </div>
       </div>
       <div class="sub-label">Goal: 30 Minutes Of Exercise = Full 5% Core</div>
@@ -1699,14 +1698,14 @@ body.overlay-open{overflow:hidden;}
       </div>
       <div class="yn-group">
         <div class="yn-btn yn-btn-holdable yes" data-key="tafakkur" data-val="yes">
-          <div class="yn-holdable-fill"></div>
-          <span class="yn-holdable-label-base">Yes</span>
-          <span class="yn-holdable-label-active">Yes</span>
+          <div class="step-fill"></div>
+          <span class="step-label-base">Yes</span>
+          <span class="step-label-active">Yes</span>
         </div>
         <div class="yn-btn yn-btn-holdable no" data-key="tafakkur" data-val="no">
-          <div class="yn-holdable-fill"></div>
-          <span class="yn-holdable-label-base">No</span>
-          <span class="yn-holdable-label-active">No</span>
+          <div class="step-fill"></div>
+          <span class="step-label-base">No</span>
+          <span class="step-label-active">No</span>
         </div>
       </div>
       <div class="sub-label">Goal: Reflect &amp; Contemplate Today = Full 5% Core</div>
@@ -1723,30 +1722,30 @@ body.overlay-open{overflow:hidden;}
         <div class="net-sub-row">
           <span class="net-sub-label">LinkedIn Post <span class="weight-hint">(2.5%)</span></span>
           <div class="yn-mini" style="width:220px;">
-            <div class="yn-btn yn-btn-holdable yes" data-key="writingLinkedin" data-val="yes" style="padding:5px 4px;font-size:9px;">
-              <div class="yn-holdable-fill"></div>
-              <span class="yn-holdable-label-base">Yes</span>
-              <span class="yn-holdable-label-active">Yes</span>
+            <div class="yn-btn yn-btn-holdable yes" data-key="writingLinkedin" data-val="yes">
+              <div class="step-fill"></div>
+              <span class="step-label-base">Yes</span>
+              <span class="step-label-active">Yes</span>
             </div>
-            <div class="yn-btn yn-btn-holdable no" data-key="writingLinkedin" data-val="no" style="padding:5px 4px;font-size:9px;">
-              <div class="yn-holdable-fill"></div>
-              <span class="yn-holdable-label-base">No</span>
-              <span class="yn-holdable-label-active">No</span>
+            <div class="yn-btn yn-btn-holdable no" data-key="writingLinkedin" data-val="no">
+              <div class="step-fill"></div>
+              <span class="step-label-base">No</span>
+              <span class="step-label-active">No</span>
             </div>
           </div>
         </div>
         <div class="net-sub-row">
           <span class="net-sub-label">Facebook Post <span class="weight-hint">(2.5%)</span></span>
           <div class="yn-mini" style="width:220px;">
-            <div class="yn-btn yn-btn-holdable yes" data-key="writingFacebook" data-val="yes" style="padding:5px 4px;font-size:9px;">
-              <div class="yn-holdable-fill"></div>
-              <span class="yn-holdable-label-base">Yes</span>
-              <span class="yn-holdable-label-active">Yes</span>
+            <div class="yn-btn yn-btn-holdable yes" data-key="writingFacebook" data-val="yes">
+              <div class="step-fill"></div>
+              <span class="step-label-base">Yes</span>
+              <span class="step-label-active">Yes</span>
             </div>
-            <div class="yn-btn yn-btn-holdable no" data-key="writingFacebook" data-val="no" style="padding:5px 4px;font-size:9px;">
-              <div class="yn-holdable-fill"></div>
-              <span class="yn-holdable-label-base">No</span>
-              <span class="yn-holdable-label-active">No</span>
+            <div class="yn-btn yn-btn-holdable no" data-key="writingFacebook" data-val="no">
+              <div class="step-fill"></div>
+              <span class="step-label-base">No</span>
+              <span class="step-label-active">No</span>
             </div>
           </div>
         </div>
@@ -1765,30 +1764,30 @@ body.overlay-open{overflow:hidden;}
         <div class="net-sub-row">
           <span class="net-sub-label">Connected With 5+ People <span class="weight-hint">(2.5%)</span></span>
           <div class="yn-mini" style="width:220px;">
-            <div class="yn-btn yn-btn-holdable yes" data-key="netConnected" data-val="yes" style="padding:5px 4px;font-size:9px;">
-              <div class="yn-holdable-fill"></div>
-              <span class="yn-holdable-label-base">Yes</span>
-              <span class="yn-holdable-label-active">Yes</span>
+            <div class="yn-btn yn-btn-holdable yes" data-key="netConnected" data-val="yes">
+              <div class="step-fill"></div>
+              <span class="step-label-base">Yes</span>
+              <span class="step-label-active">Yes</span>
             </div>
-            <div class="yn-btn yn-btn-holdable no" data-key="netConnected" data-val="no" style="padding:5px 4px;font-size:9px;">
-              <div class="yn-holdable-fill"></div>
-              <span class="yn-holdable-label-base">No</span>
-              <span class="yn-holdable-label-active">No</span>
+            <div class="yn-btn yn-btn-holdable no" data-key="netConnected" data-val="no">
+              <div class="step-fill"></div>
+              <span class="step-label-base">No</span>
+              <span class="step-label-active">No</span>
             </div>
           </div>
         </div>
         <div class="net-sub-row">
           <span class="net-sub-label">Built Rapport With 5+ People <span class="weight-hint">(2.5%)</span></span>
           <div class="yn-mini" style="width:220px;">
-            <div class="yn-btn yn-btn-holdable yes" data-key="netCommented" data-val="yes" style="padding:5px 4px;font-size:9px;">
-              <div class="yn-holdable-fill"></div>
-              <span class="yn-holdable-label-base">Yes</span>
-              <span class="yn-holdable-label-active">Yes</span>
+            <div class="yn-btn yn-btn-holdable yes" data-key="netCommented" data-val="yes">
+              <div class="step-fill"></div>
+              <span class="step-label-base">Yes</span>
+              <span class="step-label-active">Yes</span>
             </div>
-            <div class="yn-btn yn-btn-holdable no" data-key="netCommented" data-val="no" style="padding:5px 4px;font-size:9px;">
-              <div class="yn-holdable-fill"></div>
-              <span class="yn-holdable-label-base">No</span>
-              <span class="yn-holdable-label-active">No</span>
+            <div class="yn-btn yn-btn-holdable no" data-key="netCommented" data-val="no">
+              <div class="step-fill"></div>
+              <span class="step-label-base">No</span>
+              <span class="step-label-active">No</span>
             </div>
           </div>
         </div>
@@ -2962,8 +2961,8 @@ function runStepperRefresh(targetId){
 }
 
 function setStepProgress(el,pct){
-  const fill=el.querySelector('.yn-holdable-fill');
-  const label=el.querySelector('.yn-holdable-label-active');
+  const fill=el.querySelector('.step-fill');
+  const label=el.querySelector('.step-label-active');
   if(fill) fill.style.width=pct+'%';
   if(label) label.style.clipPath=`inset(0 ${100-pct}% 0 0)`;
 }
@@ -3046,8 +3045,8 @@ var YN_HOLD_MS = 600;
 var _ynPress = null;
 
 function setYnProgress(el, pct){
-  var fill = el.querySelector('.yn-holdable-fill');
-  var label = el.querySelector('.yn-holdable-label-active');
+  var fill = el.querySelector('.step-fill');
+  var label = el.querySelector('.step-label-active');
   if(fill) fill.style.width = pct + '%';
   if(label) label.style.clipPath = 'inset(0 ' + (100 - pct) + '% 0 0)';
 }
@@ -3064,14 +3063,20 @@ function onYnPointerDown(e){
   else if(activeEl){ mode = 'switch'; partner = activeEl; }
   else               mode = 'select';
 
-  if(mode === 'deselect')               setYnProgress(el, 100);
-  else if(mode === 'switch' && partner) setYnProgress(partner, 100);
+  // Explicitly set starting fill positions before adding .holding so the
+  // browser has a concrete start value for each transition
+  if(mode === 'deselect'){
+    setYnProgress(el, 100);      // seat at 100 — will drain to 0
+  } else if(mode === 'switch'){
+    setYnProgress(el, 0);        // seat at 0  — will fill to 100
+    if(partner) setYnProgress(partner, 100); // seat at 100 — will drain to 0
+  } else {
+    setYnProgress(el, 0);        // seat at 0  — will fill to 100
+  }
 
-  // Force the browser to flush layout so the initial fill position is committed
-  // before the .holding transition kicks in — without this reflow the browser
-  // may batch the initial-set and the animated-target together, skipping the animation
-  void el.getBoundingClientRect();
-  if(partner) void partner.getBoundingClientRect();
+  // Force reflow so browser commits the starting values before transition begins
+  void el.offsetWidth;
+  if(partner) void partner.offsetWidth;
 
   el.classList.add('holding');
   if(partner) partner.classList.add('holding');

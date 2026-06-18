@@ -1998,22 +1998,29 @@ async function closeQuranReader(){
   // Show today's total in badge
   const badge = document.getElementById('quranSessionBadge');
   badge.style.display = 'block';
-  const sessionCount = dayData.quranSessions.length;
-  const firstSession = dayData.quranSessions[0];
-  const lastSession  = dayData.quranSessions[dayData.quranSessions.length - 1];
-  const totalPages   = dayData.quranSessions.reduce((s,x)=>s+x.pages,0);
-  // If the Quran was finished and then restarted today, a single first-to-last
-  // range would read backwards (e.g. "600–5") — list each session instead.
-  const wrappedToday = dayData.quranSessions.some((s,i) => i < dayData.quranSessions.length - 1 && s.end >= QR_LAST_PAGE);
-  const totalRangeText = wrappedToday
-    ? dayData.quranSessions.map(s => `${s.start}–${s.end}`).join(', ')
-    : `${firstSession.start}–${lastSession.end}`;
+  // If the Quran was finished and restarted today, the tail end of the old
+  // cycle (e.g. pages 606–610) doesn't belong in "today's" range — only the
+  // sessions from the most recent restart onward represent the current read.
+  let cycleSessions = dayData.quranSessions;
+  for(let i = dayData.quranSessions.length - 2; i >= 0; i--){
+    if(dayData.quranSessions[i].end >= QR_LAST_PAGE){
+      cycleSessions = dayData.quranSessions.slice(i + 1);
+      break;
+    }
+  }
+  const sessionCount = cycleSessions.length;
+  const firstSession = cycleSessions[0];
+  const lastSession   = cycleSessions[cycleSessions.length - 1];
+  const cycleTotalPages = cycleSessions.reduce((s,x)=>s+x.pages,0);
+  const cycleJuzz        = cycleSessions.reduce((s,x)=>s+x.juzz,0);
   badge.innerHTML =
-    `<span style="color:var(--gold);">📖 Today: ${sessionCount} Session${sessionCount !== 1 ? 's' : ''} &nbsp;·&nbsp; ≈ ${todayTotal.toFixed(2)} Juzz Total</span>`
-    + `<br><span style="font-size:9px;color:#a89060;">Total: ${totalRangeText} (${totalPages} Pages, ≈ ${todayTotal.toFixed(2)} Juzz)${wrappedToday ? ' — Quran Completed &amp; Restarted Today' : ''}</span>`
+    `<span style="color:var(--gold);">📖 Today: ${sessionCount} Session${sessionCount !== 1 ? 's' : ''} &nbsp;·&nbsp; ≈ ${cycleJuzz.toFixed(2)} Juzz Total</span>`
+    + `<br><span style="font-size:9px;color:#a89060;">Total: Page ${firstSession.start}–${lastSession.end} (${cycleTotalPages} Pages, ≈ ${cycleJuzz.toFixed(2)} Juzz)</span>`
     + `<br><span style="font-size:9px;color:#a89060;">Last: Pages ${startQuranPage}–${endQuranPage} (${pagesRead} Pages, ${sessionJuzz.toFixed(2)} Juzz)</span>`;
+  // This display is the true full-day total, regardless of any same-day restart
+  const totalPagesToday = dayData.quranSessions.reduce((s,x)=>s+x.pages,0);
   const pagesToday = document.getElementById('quranPagesToday');
-  if(pagesToday) pagesToday.textContent = `${totalPages} Page${totalPages !== 1 ? 's' : ''} Read Today`;
+  if(pagesToday) pagesToday.textContent = `${totalPagesToday} Page${totalPagesToday !== 1 ? 's' : ''} Read Today`;
 
   await saveAndRefresh();
 }
@@ -5870,27 +5877,31 @@ function _zbRenderBadge() {
   const badge = document.getElementById('zikrBookReaderBadge');
   if (!badge) return;
   const data = getCached(_zbDK || todayKey());
-  const sessions = data['zikrBook_sessions'];
-  if (!sessions || sessions.length === 0) { badge.style.display = 'none'; return; }
+  const allSessions = data['zikrBook_sessions'];
+  if (!allSessions || allSessions.length === 0) { badge.style.display = 'none'; return; }
+
+  // If the book was finished and restarted today, the tail end of the old
+  // cycle doesn't belong in "today's" range — only sessions from the most
+  // recent restart onward represent the current read.
+  let sessions = allSessions;
+  for (let i = allSessions.length - 2; i >= 0; i--) {
+    if (allSessions[i].end >= ZIKR_BOOK_TOTAL) {
+      sessions = allSessions.slice(i + 1);
+      break;
+    }
+  }
 
   const count = sessions.length;
   const first = sessions[0];
   const last = sessions[sessions.length - 1];
   const totalDuas = sessions.reduce((s, x) => s + x.duas, 0);
-  const bonusRatio = parseFloat(data['zikrBook_bonusRatio']) || 0;
-  const pct = Math.round(bonusRatio * 100);
+  const pct = Math.round(Math.min(totalDuas / ZIKR_BOOK_TOTAL, 1) * 100);
   const globalPos = data['zikrBook_readerPage'] || last.end;
-  // If the book was finished and then restarted today, a single first-to-last
-  // range would read backwards (e.g. "Dua 100–10") — list each session instead.
-  const wrappedToday = sessions.some((s, i) => i < sessions.length - 1 && s.end >= ZIKR_BOOK_TOTAL);
-  const totalRangeText = wrappedToday
-    ? sessions.map(s => `Dua ${s.start}–${s.end}`).join(', ')
-    : `Dua ${first.start}–${last.end}`;
 
   badge.style.display = 'block';
   badge.innerHTML =
     '<span style="color:var(--gold);">📖 Today: ' + count + ' Session' + (count !== 1 ? 's' : '') + ' &nbsp;·&nbsp; ' + totalDuas + ' Dua' + (totalDuas !== 1 ? 's' : '') + ' Read (' + pct + '%)</span>' +
-    '<br><span style="font-size:9px;color:#a89060;">Total: ' + totalRangeText + ' (' + totalDuas + ' Dua' + (totalDuas !== 1 ? 's' : '') + ' Today)' + (wrappedToday ? ' — Book Completed &amp; Restarted Today' : '') + '</span>' +
+    '<br><span style="font-size:9px;color:#a89060;">Total: Dua ' + first.start + '–' + last.end + ' (' + totalDuas + ' Dua' + (totalDuas !== 1 ? 's' : '') + ' Today)</span>' +
     '<br><span style="font-size:9px;color:#a89060;">Last: Duas ' + last.start + '–' + last.end + ' (' + last.duas + ' Dua' + (last.duas !== 1 ? 's' : '') + ') · Global Dua ' + globalPos + '/' + ZIKR_BOOK_TOTAL + '</span>';
 }
 

@@ -1372,10 +1372,8 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">📚 Hadith <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-hadith">0%</div>
       </div>
-      <div class="num-row">
-        <input type="number" id="hadithManual" min="0" placeholder="0" oninput="saveAndRefresh()">
-        <span class="of-label">Hadith &nbsp;/&nbsp; 5 Goal</span>
-      </div>
+      <div class="qr-pages-today" id="hadithReadToday">0 Hadiths Read Today</div>
+      <input type="number" id="hadithManual" min="0" placeholder="0" style="display:none;">
       <div class="sub-label">Goal: 5 Hadiths = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openHadithReader()">📚 Open Hadith Reader</button>
       <div class="qr-session-badge" id="hadithSessionBadge" style="display:none;"></div>
@@ -1387,10 +1385,8 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">🔍 Quran Meaning <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-tafsir">0%</div>
       </div>
-      <div class="num-row">
-        <input type="number" id="tafsirManual" min="0" placeholder="0" oninput="saveAndRefresh()">
-        <span class="of-label">Verse &nbsp;/&nbsp; 17 Goal</span>
-      </div>
+      <div class="qr-pages-today" id="tafsirReadToday">0 Verses Read Today</div>
+      <input type="number" id="tafsirManual" min="0" placeholder="0" style="display:none;">
       <div class="sub-label">Goal: 17 Verses = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openTafsirReader()">🔍 Open Quran Meaning Reader</button>
       <div class="qr-session-badge" id="tafsirSessionBadge" style="display:none;"></div>
@@ -1402,10 +1398,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">🌿 Asmaul Husna <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-asmaul">0%</div>
       </div>
-      <div class="yn-group">
-        <button class="yn-btn yes" data-key="asmaul" data-val="yes" onclick="setYN('asmaul','yes')">Yes</button>
-        <button class="yn-btn no"  data-key="asmaul" data-val="no"  onclick="setYN('asmaul','no')">No</button>
-      </div>
+      <div class="qr-pages-today" id="asmaulReadToday">0 Names Read Today</div>
       <div class="sub-label">Goal: Read All 99 Names Of Allah SWT = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openAsmaulReader()">🌿 Open Asmaul Husna Reader</button>
       <div class="qr-session-badge" id="asmaulSessionBadge" style="display:none;"></div>
@@ -1417,10 +1410,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">☀️ Morning Zikr <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-zikrMorning">0%</div>
       </div>
-      <div class="yn-group">
-        <button class="yn-btn yes" data-key="zikrMorning" data-val="yes" onclick="setYN('zikrMorning','yes')">Yes</button>
-        <button class="yn-btn no"  data-key="zikrMorning" data-val="no"  onclick="setYN('zikrMorning','no')">No</button>
-      </div>
+      <div class="qr-pages-today" id="zikrMorningReadToday">0 Duas Read Today</div>
       <div class="sub-label">Goal: Read All 77 Duas = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openZikrReader('morning')">☀️ Open Zikr Morning Reader</button>
       <div class="qr-session-badge" id="zikrMorningSessionBadge" style="display:none;"></div>
@@ -1432,10 +1422,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">🌆 Evening Zikr <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-zikrEvening">0%</div>
       </div>
-      <div class="yn-group">
-        <button class="yn-btn yes" data-key="zikrEvening" data-val="yes" onclick="setYN('zikrEvening','yes')">Yes</button>
-        <button class="yn-btn no"  data-key="zikrEvening" data-val="no"  onclick="setYN('zikrEvening','no')">No</button>
-      </div>
+      <div class="qr-pages-today" id="zikrEveningReadToday">0 Duas Read Today</div>
       <div class="sub-label">Goal: Read All 77 Duas = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openZikrReader('evening')">🌆 Open Zikr Evening Reader</button>
       <div class="qr-session-badge" id="zikrEveningSessionBadge" style="display:none;"></div>
@@ -1447,10 +1434,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">📜 Surah Al-Waqiah <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-surahWaqiah">0%</div>
       </div>
-      <div class="yn-group">
-        <button class="yn-btn yes" data-key="surahWaqiah" data-val="yes" onclick="setYN('surahWaqiah','yes')">Yes</button>
-        <button class="yn-btn no"  data-key="surahWaqiah" data-val="no"  onclick="setYN('surahWaqiah','no')">No</button>
-      </div>
+      <div class="qr-pages-today" id="surahWaqiahReadToday">0 Verses Read Today</div>
       <div class="sub-label">Goal: Read All 96 Verses = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahWaqiah')">📜 Open Surah Al-Waqiah Reader</button>
       <div class="qr-session-badge" id="surahWaqiahSessionBadge" style="display:none;"></div>
@@ -1462,10 +1446,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">📜 Surah Al-Mulk <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-surahMulk">0%</div>
       </div>
-      <div class="yn-group">
-        <button class="yn-btn yes" data-key="surahMulk" data-val="yes" onclick="setYN('surahMulk','yes')">Yes</button>
-        <button class="yn-btn no"  data-key="surahMulk" data-val="no"  onclick="setYN('surahMulk','no')">No</button>
-      </div>
+      <div class="qr-pages-today" id="surahMulkReadToday">0 Verses Read Today</div>
       <div class="sub-label">Goal: Read All 30 Verses = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahMulk')">📜 Open Surah Al-Mulk Reader</button>
       <div class="qr-session-badge" id="surahMulkSessionBadge" style="display:none;"></div>
@@ -3103,7 +3084,63 @@ function loadDayData(dk){
     const totalPages = (data.quranSessions||[]).reduce((s,x)=>s+x.pages,0);
     quranPagesToday.textContent = `${totalPages} Page${totalPages !== 1 ? 's' : ''} Read Today`;
   }
+  refreshReadTodayDisplays();
   refreshScores();
+}
+
+/* Read-today displays for Hadith, Quran Meaning, Asmaul Husna, Zikr Morning/Evening,
+   and Surah Al-Waqiah/Al-Mulk — mirrors Quran's "Pages Read Today" pattern. Hadith
+   and Tafsir give manual entry priority over the reader's ratio, matching how
+   scoreDay() decides which one counts; the rest are reader-only. */
+function refreshReadTodayDisplays(){
+  if(!currentDateKey) return;
+  const data = getCached(currentDateKey);
+
+  const hd = document.getElementById('hadithReadToday');
+  if(hd){
+    const manual = parseInt(data.hadithManual) || 0;
+    const ratio  = data['hadith_ratio'];
+    const count  = manual > 0 ? manual : (ratio !== undefined ? Math.round(ratio * HADITHS_PER_DAY) : 0);
+    hd.textContent = `${count} Hadith${count !== 1 ? 's' : ''} Read Today`;
+  }
+
+  const tf = document.getElementById('tafsirReadToday');
+  if(tf){
+    const manual = parseInt(data.tafsirManual) || 0;
+    const ratio  = data['tafsir_ratio'];
+    const count  = manual > 0 ? manual : (ratio !== undefined ? Math.round(ratio * VERSES_PER_DAY) : 0);
+    tf.textContent = `${count} Verse${count !== 1 ? 's' : ''} Read Today`;
+  }
+
+  const am = document.getElementById('asmaulReadToday');
+  if(am){
+    const count = Math.round((data['asmaul_pdfRatio'] || 0) * 99);
+    am.textContent = `${count} Name${count !== 1 ? 's' : ''} Read Today`;
+  }
+
+  const zm = document.getElementById('zikrMorningReadToday');
+  if(zm){
+    const count = Math.round((data['zikrMorning_pdfRatio'] || 0) * 77);
+    zm.textContent = `${count} Dua${count !== 1 ? 's' : ''} Read Today`;
+  }
+
+  const ze = document.getElementById('zikrEveningReadToday');
+  if(ze){
+    const count = Math.round((data['zikrEvening_pdfRatio'] || 0) * 77);
+    ze.textContent = `${count} Dua${count !== 1 ? 's' : ''} Read Today`;
+  }
+
+  const sw = document.getElementById('surahWaqiahReadToday');
+  if(sw){
+    const count = (data.surahWaqiah_svSessions || []).reduce((s,x)=>s+x.verses,0);
+    sw.textContent = `${count} Verse${count !== 1 ? 's' : ''} Read Today`;
+  }
+
+  const sm = document.getElementById('surahMulkReadToday');
+  if(sm){
+    const count = (data.surahMulk_svSessions || []).reduce((s,x)=>s+x.verses,0);
+    sm.textContent = `${count} Verse${count !== 1 ? 's' : ''} Read Today`;
+  }
 }
 
 function collectData(){
@@ -3213,6 +3250,7 @@ async function saveAndRefresh(){
   const data=collectData();
   _cache[currentDateKey]=data;
   await setStore(currentDateKey,data);
+  refreshReadTodayDisplays();
   refreshScores();
 }
 
@@ -3771,6 +3809,7 @@ async function saveReaderData(dk, patch){
   const d = Object.assign({}, getCached(dk), patch);
   _cache[dk] = d;
   await setStore(dk, d);
+  refreshReadTodayDisplays();
   refreshScores();
   renderHadithBadge(dk);
   renderTafsirBadge(dk);
@@ -4248,6 +4287,7 @@ async function _saveSvProgress(readCount, done){
       btn.classList.toggle('active', btn.dataset.val === 'yes')
     );
   }
+  refreshReadTodayDisplays();
   refreshScores();
   _renderSvBadge(_svDK, _svGoalKey);
 }
@@ -5762,6 +5802,7 @@ async function _saveAsmaulProgress(done){
       btn.classList.toggle("active", btn.dataset.val === "yes");
     });
   }
+  refreshReadTodayDisplays();
   refreshScores();
   renderAsmaulBadge(_asmaulDK);
 }
@@ -5963,6 +6004,7 @@ async function _saveZikrProgress(done){
   if(done)data[_zikrGoalKey()]="yes";
   _cache[_zikrDK]=data;await setStore(_zikrDK,data);
   if(done){document.querySelectorAll(".yn-btn[data-key=\""+_zikrGoalKey()+"\"]").forEach(function(b){b.classList.toggle("active",b.dataset.val==="yes");});}
+  refreshReadTodayDisplays();
   refreshScores();renderZikrBadge(_zikrDK,_zikrMode);
 }
 async function closeZikrReader(){

@@ -652,6 +652,36 @@ select option{background:#1c1f1c;}
 .salah-opt.qaza    {--fill-bg:#2a2010;--fill-text:#c09050;}
 .salah-opt.missed  {--fill-bg:#2a1515;--fill-text:#c05050;}
 
+/* ── Long-press stepper buttons (Tahajjud/Zikr counters + Zikr Article) ──
+   Same fill/clip-path mechanic as Salah, half the hold time (300ms vs 600ms),
+   and no persistent "active" state since these are momentary actions, not
+   toggles — they snap back to empty right after firing. */
+.stepper-row{display:flex;align-items:center;gap:8px;}
+.step-fill{position:absolute;inset:0;width:0%;background:var(--fill-bg);z-index:1;pointer-events:none;transition:width .16s ease;}
+.step-label-base,.step-label-active{position:relative;display:block;pointer-events:none;}
+.step-label-base{z-index:2;}
+.step-label-active{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;color:var(--fill-text);clip-path:inset(0 100% 0 0);transition:clip-path .16s ease;}
+.step-btn,.zikr-step-btn{position:relative;overflow:hidden;cursor:pointer;font-family:'DM Mono',monospace;font-weight:700;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+.step-btn.holding .step-fill,.zikr-step-btn.holding .step-fill{transition:width .3s linear;}
+.step-btn.holding .step-label-active,.zikr-step-btn.holding .step-label-active{transition:clip-path .3s linear;}
+
+/* Card-context size (Tahajjud ±2, Zikr ±1/±10/±100) */
+.step-btn{flex:0 0 auto;min-width:42px;padding:8px 10px;text-align:center;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);font-size:12px;letter-spacing:.3px;transition:border-color .15s;}
+.step-btn:hover{border-color:var(--gold-dim);}
+.step-btn.holding{border-color:var(--fill-text);}
+.step-btn.minus{--fill-bg:#2a1010;--fill-text:var(--red);}
+.step-btn.plus {--fill-bg:#2a2000;--fill-text:var(--gold);}
+
+/* Zikr Article's bigger tactile buttons — same mechanic, matches the reader's existing scale */
+.zikr-step-btn{border-radius:8px;padding:14px 36px;font-size:0.95rem;transition:border-color .15s,background .15s;}
+.zikr-step-btn.minus{background:#1a0a0a;border:1px solid #3a1a1a;--fill-bg:#3a1515;--fill-text:#c05050;}
+.zikr-step-btn.minus .step-label-base{color:#7a4040;}
+.zikr-step-btn.minus:hover{border-color:#8b3a3a;}
+.zikr-step-btn.minus.holding{border-color:#c05050;}
+.zikr-step-btn.plus{background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid #c9a84c;--fill-bg:#3a3000;--fill-text:#c9a84c;}
+.zikr-step-btn.plus .step-label-base{color:#c9a84c;}
+.zikr-step-btn.plus:hover{background:linear-gradient(135deg,#2a2000,#3a3000);}
+
 /* ── Layout Helpers ── */
 .num-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
 .num-row input{flex:1;}
@@ -881,6 +911,10 @@ body.light-mode .salah-opt.jamaah  {--fill-bg:#d8f0de;--fill-text:var(--green);}
 body.light-mode .salah-opt.munfarid{--fill-bg:#e5f5e8;--fill-text:var(--green);}
 body.light-mode .salah-opt.qaza    {--fill-bg:#fdf0d8;--fill-text:#9a7030;}
 body.light-mode .salah-opt.missed  {--fill-bg:#f5dede;--fill-text:var(--red);}
+body.light-mode .step-btn{background:var(--surface2);border-color:var(--border);color:var(--text-dim);}
+body.light-mode .step-btn:hover{border-color:#9a7228!important;}
+body.light-mode .step-btn.minus{--fill-bg:#fbe0e0;}
+body.light-mode .step-btn.plus {--fill-bg:#fdf0d0;}
 body.light-mode .qr-open-btn{background:linear-gradient(135deg,#e8f5ec,#d8f0de)!important;border-color:var(--green)!important;color:var(--green)!important;}
 body.light-mode .qr-open-btn:hover{background:linear-gradient(135deg,#d8f0de,#c8e8d0)!important;box-shadow:0 0 10px rgba(45,107,64,.12)!important;}
 body.light-mode .btn-donate{background:linear-gradient(135deg,#fdf5dc,#f8edcc);border-color:var(--gold);color:var(--gold);}
@@ -948,10 +982,13 @@ body.light-mode #asmaulNextBtn:hover:not(.rdr-nav-done),body.light-mode #zikrRea
 body.light-mode #zikrBookNextBtn:hover:not(.rdr-nav-done){background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
 /* Zikr article counter */
 body.light-mode #zikrArticleBar{background:#ece9e2!important;}
-body.light-mode [onclick="zikrArticleTap(-1)"]{background:#fff0f0!important;border-color:#e0c0c0!important;color:#8b2a2a!important;}
-body.light-mode [onclick="zikrArticleTap(-1)"]:hover{border-color:#c05050!important;color:#c05050!important;}
-body.light-mode [onclick="zikrArticleTap(1)"]{background:#f5f0e0!important;border-color:#9a7228!important;color:#9a7228!important;}
-body.light-mode [onclick="zikrArticleTap(1)"]:hover{background:#f5e8b0!important;}
+body.light-mode .zikr-step-btn.minus{background:#fff0f0!important;border-color:#e0c0c0!important;--fill-bg:#ffd8d8;--fill-text:#c05050;}
+body.light-mode .zikr-step-btn.minus .step-label-base{color:#8b2a2a!important;}
+body.light-mode .zikr-step-btn.minus:hover{border-color:#c05050!important;}
+body.light-mode .zikr-step-btn.minus:hover .step-label-base{color:#c05050!important;}
+body.light-mode .zikr-step-btn.plus{background:#f5f0e0!important;border-color:#9a7228!important;--fill-bg:#f5e8b0;--fill-text:#9a7228;}
+body.light-mode .zikr-step-btn.plus .step-label-base{color:#9a7228!important;}
+body.light-mode .zikr-step-btn.plus:hover{background:#f5e8b0!important;}
 /* ── Language Learner ── */
 body.light-mode #lrHero{background:#f5f0e0!important;border-color:#d4cfc5!important;border-top-color:#9a7228!important;}
 body.light-mode #lrCollPanel,body.light-mode #lrConjPanel,
@@ -1267,9 +1304,19 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">🌙 Tahajjud <span class="weight-hint">(10% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-tahajjud">0%</div>
       </div>
-      <div class="num-row">
-        <input type="number" id="tahajjudRakat" min="0" placeholder="0" oninput="saveAndRefresh()">
-        <span class="of-label">Rakat &nbsp;/&nbsp; 4 Goal</span>
+      <input type="number" id="tahajjudRakat" min="0" placeholder="0" style="display:none;">
+      <div class="stepper-row">
+        <div class="step-btn minus" data-target="tahajjudRakat" data-delta="-2">
+          <div class="step-fill"></div>
+          <span class="step-label-base">−2</span>
+          <span class="step-label-active">−2</span>
+        </div>
+        <div class="qr-pages-today" id="tahajjudDisplay" data-suffix="Rakat Prayed Today" style="flex:1;">0 Rakat Prayed Today</div>
+        <div class="step-btn plus" data-target="tahajjudRakat" data-delta="2">
+          <div class="step-fill"></div>
+          <span class="step-label-base">+2</span>
+          <span class="step-label-active">+2</span>
+        </div>
       </div>
       <div class="sub-label">Goal: 4 Rakat = Full 10% Core &nbsp;·&nbsp; Every Extra 4 Rakat = +5% Bonus</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('tahajjud')">🌙 Open Tahajjud Article</button>
@@ -1281,9 +1328,29 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">📿 Zikr <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-zikr">0%</div>
       </div>
-      <div class="num-row">
-        <input type="number" id="zikrCount" min="0" placeholder="0" oninput="saveAndRefresh()">
-        <span class="of-label">Zikr &nbsp;/&nbsp; 1500 Goal</span>
+      <input type="number" id="zikrCount" min="0" placeholder="0" style="display:none;">
+      <div class="stepper-row">
+        <div class="step-btn minus" data-target="zikrCount" data-delta="-10">
+          <div class="step-fill"></div>
+          <span class="step-label-base">−10</span>
+          <span class="step-label-active">−10</span>
+        </div>
+        <div class="step-btn minus" data-target="zikrCount" data-delta="-1">
+          <div class="step-fill"></div>
+          <span class="step-label-base">−1</span>
+          <span class="step-label-active">−1</span>
+        </div>
+        <div class="qr-pages-today" id="zikrDisplay" data-suffix="Zikr Counted Today" style="flex:1;">0 Zikr Counted Today</div>
+        <div class="step-btn plus" data-target="zikrCount" data-delta="1">
+          <div class="step-fill"></div>
+          <span class="step-label-base">+1</span>
+          <span class="step-label-active">+1</span>
+        </div>
+        <div class="step-btn plus" data-target="zikrCount" data-delta="10">
+          <div class="step-fill"></div>
+          <span class="step-label-base">+10</span>
+          <span class="step-label-active">+10</span>
+        </div>
       </div>
       <div class="sub-label">Goal: 1500 Zikr = Full 5% Core &nbsp;·&nbsp; Every Extra 1500 Zikr = +2.5% Bonus</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('zikr')">📿 Open Zikr Reader</button>
@@ -2596,11 +2663,11 @@ function scoreDay(data){
   // Quran extra: every juzz above 1 = +5% (page-proportional via reader)
   if(qRaw>1) bonus+=(qRaw-1)*5;
 
-  // Zikr extra: every 1500 above goal = +2.5%
-  if(zikr>1500) bonus+=Math.floor((zikr-1500)/1500)*2.5;
+  // Zikr extra: every 1500 above goal = +2.5%, proportional
+  if(zikr>1500) bonus+=((zikr-1500)/1500)*2.5;
 
-  // Tahajjud extra: every 4 rakat above goal = +5%
-  if(tah>4) bonus+=Math.floor((tah-4)/4)*5;
+  // Tahajjud extra: every 4 rakat above goal = +5%, proportional
+  if(tah>4) bonus+=((tah-4)/4)*5;
 
   // Hadith extra: every 5 above goal = +2.5%
   if(hdCount > 5) bonus += Math.floor((hdCount - 5) / 5) * 2.5;
@@ -2967,6 +3034,8 @@ function loadDayData(dk){
   const data=getCached(dk);
   ['zikrCount','tahajjudRakat','sunnahRakat','naflRakat','zikrBookPages','sadaqahUnits','hadithManual','tafsirManual']
     .forEach(id=>{document.getElementById(id).value=data[id]||'';});
+  runStepperRefresh('tahajjudRakat');
+  runStepperRefresh('zikrCount');
 
   // Sync zikrBookPages from PDF reader sessions (auto-fill from reading)
   const zbPagesToday = data['zikrBook_pagesToday'];
@@ -3064,6 +3133,83 @@ function counterStep(id, delta){
   el.value = Math.max(0, cur + delta);
   saveAndRefresh();
 }
+
+/* ── Long-press stepper buttons (Tahajjud/Zikr counters + Zikr Article) ──
+   Same press/fill/cancel/commit shape as Salah, half the hold time, and no
+   persistent selection state — each successful hold just fires counterStep
+   once and snaps back empty, ready for the next press. A small registry
+   lets multiple displays (a card's stat box, the Zikr Article's big counter)
+   refresh off the same underlying field without hardcoding them together. */
+const STEP_HOLD_MS = 300;
+let _stepPress = null;
+const STEPPER_REFRESH = {};
+
+function registerStepperRefresh(targetId, fn){
+  (STEPPER_REFRESH[targetId] = STEPPER_REFRESH[targetId] || []).push(fn);
+}
+function runStepperRefresh(targetId){
+  const val = parseInt(document.getElementById(targetId)?.value) || 0;
+  (STEPPER_REFRESH[targetId] || []).forEach(fn => fn(val));
+}
+
+function setStepProgress(el,pct){
+  const fill=el.querySelector('.step-fill');
+  const label=el.querySelector('.step-label-active');
+  if(fill) fill.style.width=pct+'%';
+  if(label) label.style.clipPath=`inset(0 ${100-pct}% 0 0)`;
+}
+
+function onStepPointerDown(e){
+  e.preventDefault();
+  const el=e.currentTarget;
+  if(_stepPress) stepResolveCancel();
+  el.classList.add('holding');
+  const raf=requestAnimationFrame(()=>setStepProgress(el,100));
+  const timer=setTimeout(()=>stepCommit(el), STEP_HOLD_MS);
+  _stepPress={el,timer,raf};
+}
+function onStepPointerCancel(e){
+  if(!_stepPress || _stepPress.el!==e.currentTarget) return;
+  stepResolveCancel();
+}
+function stepResolveCancel(){
+  const {el,timer,raf}=_stepPress;
+  clearTimeout(timer);
+  cancelAnimationFrame(raf);
+  el.classList.remove('holding');
+  setStepProgress(el,0);
+  _stepPress=null;
+}
+function stepCommit(el){
+  cancelAnimationFrame(_stepPress.raf);
+  el.classList.remove('holding');
+  setStepProgress(el,0);
+  _stepPress=null;
+  const targetId=el.dataset.target;
+  const delta=parseInt(el.dataset.delta);
+  counterStep(targetId, delta);
+  runStepperRefresh(targetId);
+}
+
+document.querySelectorAll('.step-btn,.zikr-step-btn').forEach(el=>{
+  el.addEventListener('pointerdown',onStepPointerDown);
+  el.addEventListener('pointerup',onStepPointerCancel);
+  el.addEventListener('pointerleave',onStepPointerCancel);
+  el.addEventListener('pointercancel',onStepPointerCancel);
+  el.addEventListener('contextmenu',e=>e.preventDefault());
+});
+
+registerStepperRefresh('tahajjudRakat', val=>{
+  const d=document.getElementById('tahajjudDisplay');
+  if(d) d.textContent = `${val} ${d.dataset.suffix}`;
+});
+registerStepperRefresh('zikrCount', val=>{
+  const d=document.getElementById('zikrDisplay');
+  if(d) d.textContent = `${val} ${d.dataset.suffix}`;
+});
+registerStepperRefresh('zikrCount', val=>{
+  if(typeof updateZikrArticleUI==='function') updateZikrArticleUI(val);
+});
 
 /* Called by interactive controls (salah, yn) — saves to IDB + updates cache */
 async function saveAndRefresh(){
@@ -5092,8 +5238,16 @@ function closeSalahArticle(){
           <div id="zikrArticleFill" style="height:100%;width:0%;background:linear-gradient(90deg,#4a7c59,#c9a84c);border-radius:3px;transition:width 0.3s ease;"></div>
         </div>
         <div style="display:flex;gap:12px;justify-content:center;margin-bottom:16px;">
-          <button onclick="zikrArticleTap(-1)" style="background:#1a0a0a;border:1px solid #3a1a1a;color:#7a4040;border-radius:8px;padding:14px 36px;font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='#8b3a3a';this.style.color='#c05050'" onmouseout="this.style.borderColor='#3a1a1a';this.style.color='#7a4040'">−1</button>
-          <button onclick="zikrArticleTap(1)" style="background:linear-gradient(135deg,#1a1500,#2a2000);border:1px solid #c9a84c;color:#c9a84c;border-radius:8px;padding:14px 36px;font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:700;cursor:pointer;letter-spacing:0.05em;transition:all 0.15s;" onmouseover="this.style.background='linear-gradient(135deg,#2a2000,#3a3000)'" onmouseout="this.style.background='linear-gradient(135deg,#1a1500,#2a2000)'">+1</button>
+          <div class="zikr-step-btn minus" data-target="zikrCount" data-delta="-1">
+            <div class="step-fill"></div>
+            <span class="step-label-base">−1</span>
+            <span class="step-label-active">−1</span>
+          </div>
+          <div class="zikr-step-btn plus" data-target="zikrCount" data-delta="1">
+            <div class="step-fill"></div>
+            <span class="step-label-base">+1</span>
+            <span class="step-label-active">+1</span>
+          </div>
         </div>
         <div id="zikrArticleMsg" style="font-family:'DM Mono',monospace;font-size:0.75rem;color:#5a4a28;letter-spacing:0.1em;min-height:18px;transition:color 0.3s;"></div>
       </div>

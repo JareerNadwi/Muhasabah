@@ -857,7 +857,7 @@ body.light-mode .qr-canvas-wrap,body.light-mode .qr-loading{background:#ffffff!i
 body.light-mode .qr-nav{background:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .qr-nav:hover:not(:disabled){border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .qr-page-display{color:#1a1a18!important;}
-body.light-mode #qrZoomLabel,body.light-mode #pdfZoomLabel{color:#5a5750!important;}
+body.light-mode #qrZoomLabel{color:#5a5750!important;}
 
 /* ── Light Mode ── */
 body.light-mode{
@@ -950,10 +950,9 @@ body.light-mode #svLoading,body.light-mode #svContent,
 body.light-mode #asmaulContent,
 body.light-mode #zikrReaderContent,body.light-mode #zikrBookContent{background:#ffffff!important;border-color:#d4cfc5!important;}
 /* Nav bars / session-info bars (cream, matches header) */
-body.light-mode #asmaulSessionInfo,
 body.light-mode #hadithNav,body.light-mode #tafsirNav,
 body.light-mode #bookNav,body.light-mode #svNav,
-body.light-mode #zikrReaderSessionInfo,body.light-mode #zikrBookSessionInfo{background:#f0ede6!important;border-color:#d4cfc5!important;}
+body.light-mode #zikrBookSessionInfo{background:#f0ede6!important;border-color:#d4cfc5!important;}
 /* Done notes — one consistent style for every reader, dark and light */
 .rdr-done-note{display:none;background:#1a1610;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;}
 body.light-mode .rdr-done-note{background:#e8f5ec!important;border-color:#2d6b40!important;color:#2d6b40!important;}
@@ -966,9 +965,8 @@ body.light-mode #zikrBookPrevBtn{background:#ece9e2!important;border-color:#d4cf
 body.light-mode #hadithNextBtn:not(.rdr-nav-done),body.light-mode #tafsirNextBtn:not(.rdr-nav-done),
 body.light-mode #bookNextBtn:not(.rdr-nav-done),body.light-mode #svNextBtn:not(.rdr-nav-done),
 body.light-mode #asmaulNextBtn:not(.rdr-nav-done),body.light-mode #zikrReaderNextBtn:not(.rdr-nav-done),
-body.light-mode #zikrBookNextBtn:not(.rdr-nav-done),body.light-mode #qrNext,
-body.light-mode #pdfReaderNext{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
-body.light-mode #qrNext:hover:not(:disabled),body.light-mode #pdfReaderNext:hover:not(:disabled){background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode #zikrBookNextBtn:not(.rdr-nav-done),body.light-mode #qrNext{background:#ece9e2!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode #qrNext:hover:not(:disabled){background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .rdr-nav-done{background:#d8f0de!important;border-color:var(--green)!important;color:var(--green)!important;}
 body.light-mode .rdr-nav-done:hover{background:#c5e8cd!important;border-color:var(--green-bright)!important;color:var(--green-bright)!important;}
 /* Prev/Next hover (light mode) — was missing entirely, ID specificity blocked any class-based hover */
@@ -1695,29 +1693,6 @@ body.overlay-open{overflow:hidden;}
   </div>
 </div>
 
-<!-- ══ Generic PDF Reader Overlay (shared for Zikr / Morning / Evening) ══ -->
-<div class="quran-reader-overlay" id="pdfReaderOverlay">
-  <div class="qr-topbar">
-    <div>
-      <div class="qr-title" id="pdfReaderTitle">PDF Reader</div>
-      <div class="qr-info" id="pdfReaderInfo"></div>
-    </div>
-    <div class="qr-session-info" id="pdfReaderSessionInfo"></div>
-    <button class="qr-close" onclick="closePdfReader()">✕ Save & Exit</button>
-  </div>
-  <div class="qr-canvas-wrap">
-    <div class="qr-loading" id="pdfReaderLoading">Loading…</div>
-    <canvas id="pdfReaderCanvas"></canvas>
-  </div>
-  <div class="qr-bottombar">
-    <button class="qr-nav" id="pdfReaderPrev" onclick="pdfReaderChangePage(-1)">← Prev</button>
-    <div class="qr-page-display" id="pdfReaderPageDisplay">Page — / —</div>
-    <button class="qr-nav" id="pdfZoomOut" onclick="pdfZoom(-1)" title="Zoom Out" disabled>－</button>
-    <span id="pdfZoomLabel" style="font-family:'DM Mono',monospace;font-size:11px;color:#c5b98a;min-width:40px;text-align:center;">100%</span>
-    <button class="qr-nav" id="pdfZoomIn" onclick="pdfZoom(1)" title="Zoom In">＋</button>
-    <button class="qr-nav" id="pdfReaderNext" onclick="pdfReaderChangePage(1)">Next →</button>
-  </div>
-</div>
 
 <script>
 /* ══════════════════════════════════════════════════════════
@@ -1850,8 +1825,6 @@ let qrRendering  = false;
 let qrScale      = 1.5;
 let qrZoomLevel  = 0;   // incremental zoom: 0 = default, +1 = +25%, etc.
 
-let pdfZoomLevel = 0;   // same for generic PDF reader
-
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -1961,8 +1934,12 @@ async function qrChangePage(delta){
 
 function updateSessionInfo(){
   if(!qrStartPage) return;
-  const pagesRead = Math.max(0, qrCurPage - qrStartPage + 1);
   const el = document.getElementById('qrSessionInfo');
+  if(qrCurPage >= QR_LAST_PAGE){
+    el.textContent = "✓ You've completed the Quran — you may start again";
+    return;
+  }
+  const pagesRead = Math.max(0, qrCurPage - qrStartPage + 1);
   if(pagesRead > 0){
     const juzzRead = pagesReadToJuzz(pagesRead, qrStartPage);
     el.textContent = `This Session: ${pagesRead} page${pagesRead!==1?'s':''} read  ·  ≈ ${juzzRead.toFixed(2)} Juzz`;
@@ -2025,9 +2002,15 @@ async function closeQuranReader(){
   const firstSession = dayData.quranSessions[0];
   const lastSession  = dayData.quranSessions[dayData.quranSessions.length - 1];
   const totalPages   = dayData.quranSessions.reduce((s,x)=>s+x.pages,0);
+  // If the Quran was finished and then restarted today, a single first-to-last
+  // range would read backwards (e.g. "600–5") — list each session instead.
+  const wrappedToday = dayData.quranSessions.some((s,i) => i < dayData.quranSessions.length - 1 && s.end >= QR_LAST_PAGE);
+  const totalRangeText = wrappedToday
+    ? dayData.quranSessions.map(s => `${s.start}–${s.end}`).join(', ')
+    : `${firstSession.start}–${lastSession.end}`;
   badge.innerHTML =
     `<span style="color:var(--gold);">📖 Today: ${sessionCount} Session${sessionCount !== 1 ? 's' : ''} &nbsp;·&nbsp; ≈ ${todayTotal.toFixed(2)} Juzz Total</span>`
-    + `<br><span style="font-size:9px;color:#a89060;">Total: ${firstSession.start}–${lastSession.end} (${totalPages} Pages, ≈ ${todayTotal.toFixed(2)} Juzz)</span>`
+    + `<br><span style="font-size:9px;color:#a89060;">Total: ${totalRangeText} (${totalPages} Pages, ≈ ${todayTotal.toFixed(2)} Juzz)${wrappedToday ? ' — Quran Completed &amp; Restarted Today' : ''}</span>`
     + `<br><span style="font-size:9px;color:#a89060;">Last: Pages ${startQuranPage}–${endQuranPage} (${pagesRead} Pages, ${sessionJuzz.toFixed(2)} Juzz)</span>`;
   const pagesToday = document.getElementById('quranPagesToday');
   if(pagesToday) pagesToday.textContent = `${totalPages} Page${totalPages !== 1 ? 's' : ''} Read Today`;
@@ -2043,16 +2026,6 @@ function qrZoom(direction){
   document.getElementById('qrZoomIn').disabled  = qrZoomLevel === QR_ZOOM_MAX;
   document.getElementById('qrZoomLabel').textContent = (100 + qrZoomLevel * 25) + '%';
   qrRenderPage(qrCurPage);
-}
-
-/* ── Generic PDF Reader Zoom ── */
-const PDF_ZOOM_MAX = 4;
-function pdfZoom(direction){
-  pdfZoomLevel = Math.max(0, Math.min(PDF_ZOOM_MAX, pdfZoomLevel + direction));
-  document.getElementById('pdfZoomOut').disabled    = pdfZoomLevel === 0;
-  document.getElementById('pdfZoomIn').disabled     = pdfZoomLevel === PDF_ZOOM_MAX;
-  document.getElementById('pdfZoomLabel').textContent = (100 + pdfZoomLevel * 25) + '%';
-  pdfReaderRenderPage(pdfReaderCurPage);
 }
 
 /* IDB helpers for Quran reader last-page persistence (global, not per-day) */
@@ -2080,376 +2053,15 @@ async function setQrLastPage(pdfPageNum){
   }catch(e){}
 }
 
-/* ══════════════════════════════════════════════════════════
-   GENERIC PDF READER — Zikr / Zikr Morning / Zikr Evening
-
-   Zikr:        Reference only — no completion, no badge, always page 1.
-   Zikr Morning: Resumes from next page. Reaching last page → auto-complete yes.
-   Zikr Evening: Resumes from next page. Reaching last page → auto-complete yes.
-══════════════════════════════════════════════════════════ */
-const PDF_READER_CONFIG = {
-  zikr: {
-    pdfPath:          'Zikr.pdf',
-    title:            '📿 Zikr',
-    resume:           false,   // reference only — always page 1
-    goalKey:          null,    // no auto-complete
-    badgeId:          null,
-    idbKey:           null,
-    autoCompleteOnClose: false,
-    globalResume:     false,
-  },
-  zikrMorning: {
-    pdfPath:          'Zikr%20Morning.pdf',
-    title:            '☀️ Zikr Morning',
-    resume:           true,    // per-day resume (resets each day)
-    goalKey:          'zikrMorning',
-    badgeId:          'zikrMorningSessionBadge',
-    idbKey:           '_pdf_lastpage_zikrMorning',
-    autoCompleteOnClose: false,
-    globalResume:     false,
-  },
-  zikrEvening: {
-    pdfPath:          'Zikr%20Evening.pdf',
-    title:            '🌆 Zikr Evening',
-    resume:           true,
-    goalKey:          'zikrEvening',
-    badgeId:          'zikrEveningSessionBadge',
-    idbKey:           '_pdf_lastpage_zikrEvening',
-    autoCompleteOnClose: false,
-    globalResume:     false,
-  },
-  asmaul: {
-    pdfPath:          'Asmaul%20Husna.pdf',
-    title:            '🌿 Asmaul Husna',
-    resume:           true,    // per-day resume (resets each day)
-    goalKey:          'asmaul',
-    badgeId:          'asmaulSessionBadge',
-    idbKey:           '_pdf_lastpage_asmaul',
-    autoCompleteOnClose: false,
-    globalResume:     false,
-  },
-  zikrBook: null, // handled by JSON reader (openZikrBookReader)
-  surahWaqiah: {
-    pdfPath:          'Surah%20Al-Waqiah.pdf',
-    title:            '📜 Surah Al-Waqiah',
-    resume:           true,    // per-day resume (resets each day)
-    goalKey:          'surahWaqiah',
-    badgeId:          'surahWaqiahSessionBadge',
-    idbKey:           '_pdf_lastpage_surahWaqiah',
-    autoCompleteOnClose: false,
-    globalResume:     false,
-  },
-  surahMulk: {
-    pdfPath:          'Surah%20Al-Mulk.pdf',
-    title:            '📜 Surah Al-Mulk',
-    resume:           true,    // per-day resume (resets each day)
-    goalKey:          'surahMulk',
-    badgeId:          'surahMulkSessionBadge',
-    idbKey:           '_pdf_lastpage_surahMulk',
-    autoCompleteOnClose: false,
-    globalResume:     false,
-  },
-  surahKahf: {
-    pdfPath:          'Surah%20Al-Kahf.pdf',
-    title:            '📜 Surah Al-Kahf',
-    resume:           true,    // per-day resume (resets each day)
-    goalKey:          'surahKahf',
-    badgeId:          'surahKahfSessionBadge',
-    idbKey:           '_pdf_lastpage_surahKahf',
-    autoCompleteOnClose: false,
-    globalResume:     false,
-  },
-};
-
-let pdfReaderType      = null;
-let pdfReaderDoc       = {};   // loaded pdfjsLib docs cached per type
-let pdfReaderCurPage   = 1;
-let pdfReaderStartPage = 1;    // page this session started on (for resume types)
-let pdfReaderLastPage  = 1;    // total pages in PDF
-let pdfReaderRendering = false;
-
-/* IDB helpers for per-type last page (resume only) */
-async function getPdfLastPage(idbKey){
-  try{
-    const db = await openDB();
-    return new Promise(res => {
-      const req = db.transaction(STORE,'readonly').objectStore(STORE).get(idbKey);
-      req.onsuccess = () => res(req.result ? req.result.data : null);
-      req.onerror   = () => res(null);
-    });
-  }catch(e){ return null; }
-}
-
-async function setPdfLastPage(idbKey, pageNum){
-  try{
-    const db = await openDB();
-    return new Promise((res,rej) => {
-      const tx = db.transaction(STORE,'readwrite');
-      tx.objectStore(STORE).put({dk: idbKey, data: pageNum});
-      tx.oncomplete = () => res();
-      tx.onerror    = e => rej(e.target.error);
-    });
-  }catch(e){}
-}
-
+/* The Asmaul Husna / Zikr Morning / Zikr Evening readers used to share a
+   generic PDF.js-based reader here. They've since moved to dedicated JSON
+   slide readers (openAsmaulReader / openZikrReader). The Surah verse reader
+   and Zikr From Book still route through this entry point by name. */
 async function openPdfReader(type){
-  // Surah Waqiah and Mulk use the verse reader, not PDF
   if(type === 'surahWaqiah'){ openSurahVerseReader(56, '📜 Surah Al-Waqiah', 'surahWaqiah'); return; }
   if(type === 'surahMulk'){   openSurahVerseReader(67, '📜 Surah Al-Mulk',   'surahMulk');   return; }
   if(type === 'surahKahf'){   openSurahVerseReader(18, '📜 Surah Al-Kahf',   'surahKahf');   return; }
   if(type === 'zikrBook'){ openZikrBookReader(); return; }
-  pdfReaderType = type;
-  const cfg = PDF_READER_CONFIG[type];
-  if(!cfg) return;
-
-  document.getElementById('pdfReaderTitle').textContent = cfg.title;
-  document.getElementById('pdfReaderInfo').textContent  = cfg.title + ' — PDF Reader';
-  document.getElementById('pdfReaderSessionInfo').textContent = '';
-  document.getElementById('pdfReaderSessionInfo').style.color = 'var(--gold)';
-  document.getElementById('pdfReaderLoading').style.display = 'flex';
-  document.getElementById('pdfReaderLoading').textContent   = 'Loading…';
-  document.getElementById('pdfReaderCanvas').style.display  = 'none';
-  document.getElementById('pdfReaderOverlay').classList.add('active');
-  reThemeIfLight();
-  // Reset zoom
-  pdfZoomLevel = 0;
-  const _pzi = document.getElementById('pdfZoomIn'); if(_pzi){ _pzi.style.display=''; _pzi.disabled=false; }
-  const _pzo = document.getElementById('pdfZoomOut'); if(_pzo){ _pzo.style.display=''; _pzo.disabled=true; }
-  const _pzl = document.getElementById('pdfZoomLabel'); if(_pzl) _pzl.textContent='100%';
-
-  if(!pdfReaderDoc[type]){
-    try{
-      pdfReaderDoc[type] = await pdfjsLib.getDocument(cfg.pdfPath).promise;
-    }catch(e){
-      document.getElementById('pdfReaderLoading').textContent =
-        '⚠ Could Not Load PDF — Make sure ' + cfg.title + ' PDF is in the same folder as this HTML.';
-      return;
-    }
-  }
-
-  pdfReaderLastPage = pdfReaderDoc[type].numPages;
-
-  if(cfg.globalResume && cfg.idbKey){
-    // zikrBook: resume globally from IDB (persists across days)
-    const last = await getPdfLastPage(cfg.idbKey);
-    pdfReaderCurPage = last ? Math.min(last + 1, pdfReaderLastPage) : 1;
-  } else if(cfg.resume && cfg.idbKey && currentDateKey){
-    // zikrMorning/Evening: resume within same day from day data, else page 1
-    const dayData = getCached(currentDateKey);
-    const savedPage = dayData[type + '_readerPage'];
-    pdfReaderCurPage = savedPage ? Math.min(savedPage + 1, pdfReaderLastPage) : 1;
-  } else {
-    pdfReaderCurPage = 1;
-  }
-  pdfReaderStartPage = pdfReaderCurPage;
-
-  await pdfReaderRenderPage(pdfReaderCurPage);
-}
-
-let _pdfRenderTask = null;
-
-async function pdfReaderRenderPage(pageNum){
-  if(_pdfRenderTask){
-    try{ _pdfRenderTask.cancel(); }catch(e){}
-    _pdfRenderTask = null;
-  }
-  pdfReaderRendering = true;
-
-  const type = pdfReaderType;
-  const cfg  = PDF_READER_CONFIG[type];
-  document.getElementById('pdfReaderLoading').style.display = 'flex';
-  document.getElementById('pdfReaderCanvas').style.display  = 'none';
-
-  try{
-    const page = await pdfReaderDoc[type].getPage(pageNum);
-    const wrap = document.querySelector('#pdfReaderOverlay .qr-canvas-wrap');
-    const maxW = wrap.clientWidth  - 20;
-    const maxH = wrap.clientHeight - 20;
-    const vp0  = page.getViewport({scale:1});
-    const base = Math.min(maxW/vp0.width, maxH/vp0.height, 2.2);
-    const scale= base * (1 + pdfZoomLevel * 0.25);
-    const vp   = page.getViewport({scale});
-
-    const canvas = document.getElementById('pdfReaderCanvas');
-    canvas.width  = vp.width;
-    canvas.height = vp.height;
-    _pdfRenderTask = page.render({canvasContext:canvas.getContext('2d'), viewport:vp});
-    await _pdfRenderTask.promise;
-    _pdfRenderTask = null;
-
-    canvas.style.display = 'block';
-    document.getElementById('pdfReaderLoading').style.display = 'none';
-
-    document.getElementById('pdfReaderPageDisplay').textContent =
-      `Page ${pageNum} / ${pdfReaderLastPage}`;
-    document.getElementById('pdfReaderInfo').textContent =
-      cfg.title + `  ·  Page ${pageNum} of ${pdfReaderLastPage}`;
-
-    const isZoomed = pdfZoomLevel > 0;
-    document.getElementById('pdfReaderPrev').disabled = isZoomed || pageNum <= 1;
-    document.getElementById('pdfReaderNext').disabled = isZoomed || pageNum >= pdfReaderLastPage;
-
-    const sessionEl = document.getElementById('pdfReaderSessionInfo');
-    if(cfg.autoCompleteOnClose){
-      sessionEl.textContent = `Page ${pageNum} Of ${pdfReaderLastPage} — Exit & Save To Mark Complete`;
-      sessionEl.style.color = 'var(--gold)';
-    } else if(cfg.globalResume){
-      sessionEl.textContent = `Page ${pageNum} Of ${pdfReaderLastPage}`;
-      sessionEl.style.color = 'var(--gold)';
-    } else if(cfg.goalKey){
-      if(pageNum >= pdfReaderLastPage){
-        sessionEl.textContent = '✓ Last Page Reached — Exit & Save To Complete Goal';
-        sessionEl.style.color = 'var(--green-bright)';
-      } else {
-        const rem = pdfReaderLastPage - pageNum;
-        sessionEl.textContent = `${rem} Page${rem !== 1 ? 's' : ''} Remaining`;
-        sessionEl.style.color = 'var(--gold)';
-      }
-    } else {
-      sessionEl.textContent = `Reference — Page ${pageNum} Of ${pdfReaderLastPage}`;
-      sessionEl.style.color = 'var(--text-muted)';
-    }
-
-    if(cfg.globalResume && cfg.idbKey){
-      await setPdfLastPage(cfg.idbKey, pageNum);
-    }
-  }catch(e){
-    if(e && e.name !== 'RenderingCancelledException'){
-      document.getElementById('pdfReaderLoading').textContent = '⚠ Error Rendering Page';
-    }
-  }
-  pdfReaderRendering = false;
-}
-
-async function pdfReaderChangePage(delta){
-  const next = pdfReaderCurPage + delta;
-  if(next < 1 || next > pdfReaderLastPage) return;
-  pdfReaderCurPage = next;
-  await pdfReaderRenderPage(pdfReaderCurPage);
-}
-
-async function closePdfReader(){
-  const overlay = document.getElementById('pdfReaderOverlay');
-  overlay.classList.remove('active');
-  // Reset zoom state
-  pdfZoomLevel = 0;
-  const zi = document.getElementById('pdfZoomIn'); if(zi){ zi.style.display=''; zi.disabled=false; }
-  const zo = document.getElementById('pdfZoomOut'); if(zo){ zo.style.display=''; zo.disabled=true; }
-  const zl = document.getElementById('pdfZoomLabel'); if(zl) zl.textContent='100%';
-
-  const type = pdfReaderType;
-  pdfReaderType = null;
-  if(!type || !currentDateKey) return;
-
-  const cfg = PDF_READER_CONFIG[type];
-  if(!cfg) return; // handled by custom reader (e.g. zikrBook)
-  const pagesRead  = Math.max(0, pdfReaderCurPage - pdfReaderStartPage + 1);
-  const reachedEnd = pdfReaderCurPage >= pdfReaderLastPage;
-
-  // ── Zikr (reference only) ──
-  if(!cfg.goalKey && !cfg.globalResume && !cfg.autoCompleteOnClose) return;
-
-  const data = {...getCached(currentDateKey)};
-
-  // ── Asmaul Husna: mark yes on any close ──
-  if(cfg.autoCompleteOnClose){
-    data[cfg.goalKey] = 'yes';
-    _cache[currentDateKey] = data;
-    await setStore(currentDateKey, data);
-    document.querySelectorAll(`.yn-btn[data-key="${cfg.goalKey}"]`).forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.val === 'yes');
-    });
-    const badge = document.getElementById(cfg.badgeId);
-    if(badge){
-      badge.style.display = 'block';
-      badge.innerHTML =
-        `<span style="color:var(--gold);">📖 Opened &amp; read — Page ${pdfReaderCurPage} of ${pdfReaderLastPage}</span>`
-        + `<br><span style="font-size:9px;color:#a89060;">Goal marked complete ✓</span>`;
-    }
-    await saveAndRefresh();
-    return;
-  }
-
-  // ── Zikr From Book: global resume, bonus scoring via pages ──
-  if(cfg.globalResume){
-    // Track today's reading in day data for display
-    if(!data[type + '_sessions']) data[type + '_sessions'] = [];
-    data[type + '_sessions'].push({start: pdfReaderStartPage, end: pdfReaderCurPage, pages: pagesRead});
-    const totalPagesToday = data[type + '_sessions'].reduce((s,x)=>s+x.pages, 0);
-    data[type + '_pagesToday']  = totalPagesToday;
-    data[type + '_readerPage']  = pdfReaderCurPage;
-    // Bonus: pages read today / total pages × 10 (max +10%)
-    const bonusRatio = Math.min(totalPagesToday / pdfReaderLastPage, 1);
-    data[type + '_bonusRatio']  = bonusRatio;
-    _cache[currentDateKey] = data;
-    await setStore(currentDateKey, data);
-
-    // If last page reached, reset global position so next open starts from page 1
-    if(reachedEnd && cfg.idbKey){
-      await setPdfLastPage(cfg.idbKey, null);
-    }
-
-    const badge = document.getElementById(cfg.badgeId);
-    if(badge){
-      badge.style.display = 'block';
-      const sessions = data[type + '_sessions'];
-      const count    = sessions.length;
-      const first    = sessions[0];
-      const last     = sessions[sessions.length - 1];
-      const pct      = Math.round(bonusRatio * 100);
-      badge.innerHTML =
-        `<span style="color:var(--gold);">📖 Today: ${count} Session${count!==1?'s':''} &nbsp;·&nbsp; ${totalPagesToday} Page${totalPagesToday!==1?'s':''} Read (${pct}%)</span>`
-        + `<br><span style="font-size:9px;color:#a89060;">Total: Duas ${first.start}–${last.end} (${totalPagesToday} Dua${totalPagesToday!==1?'s':''} Today)</span>`
-        + `<br><span style="font-size:9px;color:#a89060;">Last: Duas ${last.start}–${last.end} (${pagesRead} Dua${pagesRead!==1?'s':''}) · Global Dua ${pdfReaderCurPage}/${pdfReaderLastPage}</span>`;
-    }
-    // Auto-fill the pages counter in the UI
-    const zikrBookInput = document.getElementById('zikrBookPages');
-    if(zikrBookInput) zikrBookInput.value = totalPagesToday;
-    await saveAndRefresh();
-    return;
-  }
-
-  // ── Zikr Morning / Evening: per-day sessions, proportional scoring ──
-  if(!data[type + '_sessions']) data[type + '_sessions'] = [];
-  data[type + '_sessions'].push({start: pdfReaderStartPage, end: pdfReaderCurPage, pages: pagesRead});
-
-  const totalPages = data[type + '_sessions'].reduce((s,x)=>s+x.pages, 0);
-  const ratio      = Math.min(totalPages / pdfReaderLastPage, 1);
-  data[type + '_pdfRatio']  = ratio;
-  data[type + '_readerPage']= pdfReaderCurPage;
-  data[type + '_totalPages']= totalPages;
-
-  if(reachedEnd){
-    data[cfg.goalKey]          = 'yes';
-    data[type + '_readerDone'] = true;
-  }
-
-  _cache[currentDateKey] = data;
-  await setStore(currentDateKey, data);
-
-  document.querySelectorAll(`.yn-btn[data-key="${cfg.goalKey}"]`).forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.val === (reachedEnd ? 'yes' : data[cfg.goalKey]));
-  });
-
-  const badge = document.getElementById(cfg.badgeId);
-  if(badge){
-    badge.style.display = 'block';
-    badge.style.color   = '';
-    const sessions  = data[type + '_sessions'];
-    const count     = sessions.length;
-    const first     = sessions[0];
-    const last      = sessions[sessions.length - 1];
-    const pct       = Math.round(ratio * 100);
-    const headerTxt = reachedEnd
-      ? `✓ ${count} Session${count!==1?'s':''} &nbsp;·&nbsp; Completed — ${pdfReaderLastPage} Page${pdfReaderLastPage!==1?'s':''}`
-      : `${count} Session${count!==1?'s':''} &nbsp;·&nbsp; ${totalPages} / ${pdfReaderLastPage} Page${pdfReaderLastPage!==1?'s':''} (${pct}%)`;
-    badge.innerHTML =
-      `<span style="color:var(--gold);">📖 Today: ${headerTxt}</span>`
-      + `<br><span style="font-size:9px;color:#a89060;">Total: Pages ${first.start}–${last.end} (${totalPages} Page${totalPages!==1?'s':''} Today)</span>`
-      + `<br><span style="font-size:9px;color:#a89060;">Last: Pages ${last.start}–${last.end} (${pagesRead} Page${pagesRead!==1?'s':''}) </span>`;
-  }
-
-  await saveAndRefresh();
 }
 
 
@@ -2877,10 +2489,10 @@ function applyReaderTheme(isLight){
     // SV reader
     'svLoading','svContent','svNav','svPrevBtn','svNextBtn','svTranslit','svDoneNote',
     // Asmaul reader
-    'asmaulDoneNote','asmaulSessionInfo','asmaulContent','asmaulPrevBtn','asmaulNextBtn','asmaulDayPill','asmaulProgressPill','asmaulPageDisplay',
+    'asmaulDoneNote','asmaulContent','asmaulPrevBtn','asmaulNextBtn','asmaulDayPill','asmaulProgressPill','asmaulPageDisplay',
     // Zikr readers
-    'zikrReaderSessionInfo','zikrReaderDoneNote','zikrReaderPrevBtn','zikrReaderNextBtn','zikrReaderProgressPill','zikrReaderPageDisplay','zikrReaderTitle','zikrReaderDayPill',
-    'zikrBookDoneNote','zikrBookPrevBtn','zikrBookNextBtn','zikrBookDayPill',
+    'zikrReaderDoneNote','zikrReaderPrevBtn','zikrReaderNextBtn','zikrReaderProgressPill','zikrReaderPageDisplay','zikrReaderTitle','zikrReaderDayPill',
+    'zikrBookPrevBtn','zikrBookNextBtn','zikrBookDayPill',
     // Language learner — all panels have display toggled by JS
     'lrNoData','lrContent','lrHero','lrCollPanel','lrConjPanel','lrStoryPanel','lrSynAntPanel','lrChallengePanel','lrMarkWrap','lrMarkBtn',
     'lrTitle','lrBody','lrHarakahBtn','lrWordNum','lrWordMain','lrWordRoman','lrWordType','lrWordMeaning','lrSimpleMeaning',
@@ -3032,34 +2644,6 @@ function loadDayData(dk){
   } else {
     badge.style.display='none';
   }
-
-  // Show zikr reader badges (Morning and Evening only — Zikr is reference-only)
-  ['zikrMorning','zikrEvening','surahWaqiah','surahMulk','asmaul'].forEach(type => {
-    const cfg = PDF_READER_CONFIG[type];
-    const b = document.getElementById(cfg.badgeId);
-    if(!b) return;
-    const sessions = data[type + '_sessions'];
-    if(sessions && sessions.length > 0){
-      b.style.display = 'block';
-      const done       = data[type + '_readerDone'];
-      const ratio      = parseFloat(data[type + '_pdfRatio']) || 0;
-      const totalPages = data[type + '_totalPages'] || 0;
-      const count      = sessions.length;
-      const first      = sessions[0];
-      const last       = sessions[sessions.length - 1];
-      const pct        = Math.round(ratio * 100);
-      const headerTxt  = done
-        ? `✓ ${count} Session${count!==1?'s':''} &nbsp;·&nbsp; Completed — ${totalPages} Page${totalPages!==1?'s':''}`
-        : `${count} Session${count!==1?'s':''} &nbsp;·&nbsp; ${totalPages} Page${totalPages!==1?'s':''} (${pct}%)`;
-      b.innerHTML =
-        `<span style="color:var(--gold);">📖 Today: ${headerTxt}</span>`
-        + `<br><span style="font-size:9px;color:#a89060;">Total: Pages ${first.start}–${last.end} (${totalPages} Page${totalPages!==1?'s':''} Today)</span>`
-        + `<br><span style="font-size:9px;color:#a89060;">Last: Pages ${last.start}–${last.end} (${last.pages} Page${last.pages!==1?'s':''}) </span>`;
-      b.style.color = '';
-    } else {
-      b.style.display = 'none';
-    }
-  });
 
   // Zikr From Book badge — rendered by _zbRenderBadge via patched loadDayData
 
@@ -4347,14 +3931,6 @@ document.addEventListener('keydown', e => {
   if(qrO && qrO.classList.contains('active')){
     e.preventDefault();
     if(next) qrChangePage(1); else qrChangePage(-1);
-    return;
-  }
-
-  /* Generic PDF reader (Zikr Morning/Evening/Waqiah/Mulk/Asmaul/ZikrBook) */
-  const pdfO = document.getElementById('pdfReaderOverlay');
-  if(pdfO && pdfO.classList.contains('active')){
-    e.preventDefault();
-    if(next) pdfReaderChangePage(1); else pdfReaderChangePage(-1);
     return;
   }
 
@@ -5654,8 +5230,6 @@ function calcBMI(){
         <button class="qr-close" onclick="closeAsmaulReader()">✕ Save & Exit</button>
       </div>
     </div>
-    <!-- Session info -->
-    <div id="asmaulSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#0d0b08;"></div>
     <!-- Done note -->
     <div id="asmaulDoneNote" class="rdr-done-note">✓ You've completed all 99 Names — you may continue reviewing</div>
     <!-- Slide content -->
@@ -5708,16 +5282,11 @@ function _asmaulRenderSlide(){
   const nextBtn  = document.getElementById("asmaulNextBtn");
   const pill     = document.getElementById("asmaulProgressPill");
   const pageDisp = document.getElementById("asmaulPageDisplay");
-  const sessInfo = document.getElementById("asmaulSessionInfo");
 
   const isLast    = _asmaulSlide >= ASMAUL_TOTAL_SLIDES - 1;
-  const pagesLeft = ASMAUL_TOTAL_SLIDES - 1 - _asmaulSlide;
 
   pill.textContent     = (_asmaulSlide + 1) + " / " + ASMAUL_TOTAL_SLIDES;
   pageDisp.textContent = "Page " + (_asmaulSlide + 1) + " / " + ASMAUL_TOTAL_SLIDES;
-
-  sessInfo.textContent = pagesLeft + " page" + (pagesLeft !== 1 ? "s" : "") + " remaining";
-  sessInfo.style.color = "var(--gold)";
 
   prevBtn.disabled      = _asmaulSlide === 0;
   prevBtn.style.opacity = _asmaulSlide === 0 ? "0.3" : "1";
@@ -5895,7 +5464,6 @@ loadDayData = function(dk){
         <button class="qr-close" onclick="closeZikrReader()">✕ Save &amp; Exit</button>
       </div>
     </div>
-    <div id="zikrReaderSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#141008;"></div>
     <div id="zikrReaderDoneNote" class="rdr-done-note">✓ You've completed all 77 duas today — you may continue reviewing</div>
     <div id="zikrReaderContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#f0e4c0;min-height:0;"></div>
     <div class="zikr-reader-nav" style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
@@ -5938,12 +5506,9 @@ async function _loadZikrMorningEvening(mode){
 function _zikrRender(){
   var dua=_zikrDuas()[_zikrSlide];
   var isLast=_zikrSlide>=ZIKR_TOTAL-1;
-  var rem=ZIKR_TOTAL-1-_zikrSlide;
   var num=_zikrSlide+1;
   document.getElementById("zikrReaderProgressPill").textContent=num+" / "+ZIKR_TOTAL;
   document.getElementById("zikrReaderPageDisplay").textContent="Dua "+num+" / "+ZIKR_TOTAL;
-  var si=document.getElementById("zikrReaderSessionInfo");
-  si.textContent=rem+" dua"+(rem!==1?"s":"")+" remaining";si.style.color="var(--gold)";
   var pb=document.getElementById("zikrReaderPrevBtn");
   pb.disabled=_zikrSlide===0;pb.style.opacity=_zikrSlide===0?"0.3":"1";
   var nb=document.getElementById("zikrReaderNextBtn");
@@ -6092,7 +5657,6 @@ loadDayData=function(dk){
       </div>
     </div>
     <div id="zikrBookSessionInfo" style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#141008;"></div>
-    <div id="zikrBookDoneNote" class="rdr-done-note">✓ You've completed the book — you may start again</div>
     <div id="zikrBookContent" style="flex:1;overflow-y:auto;padding:16px 18px;background:#0d0b08;color:#f0e4c0;min-height:0;"></div>
     <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 18px;border-top:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <button id="zikrBookPrevBtn" class="rdr-nav-btn" onclick="zikrBookNavPrev()" style="padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;transition:all .2s;">← Prev</button>
@@ -6144,15 +5708,13 @@ function _zbRender() {
 
   const isLast = _zbSlide >= ZIKR_BOOK_TOTAL - 1;
   const num = _zbSlide + 1;
-  const rem = ZIKR_BOOK_TOTAL - 1 - _zbSlide;
   const numStr = num < 10 ? '0' + num : '' + num;
 
   document.getElementById('zikrBookProgressPill').textContent = num + ' / ' + ZIKR_BOOK_TOTAL;
   document.getElementById('zikrBookPageDisplay').textContent = 'Dua ' + num + ' / ' + ZIKR_BOOK_TOTAL;
 
-  const si = document.getElementById('zikrBookSessionInfo');
-  si.textContent = rem + ' dua' + (rem !== 1 ? 's' : '') + ' remaining';
-  si.style.color = 'var(--gold)';
+  document.getElementById('zikrBookSessionInfo').textContent =
+    isLast ? "✓ You've completed the book — you may start again" : '';
 
   const pb = document.getElementById('zikrBookPrevBtn');
   pb.disabled = _zbSlide === 0;
@@ -6209,7 +5771,6 @@ async function openZikrBookReader() {
   _zbSlide = (savedIdx !== null && savedIdx >= 0) ? Math.min(savedIdx, ZIKR_BOOK_TOTAL - 1) : 0;
   _zbStartSlide = _zbSlide;
 
-  document.getElementById('zikrBookDoneNote').style.display = _zbCompleted ? 'block' : 'none';
   _zbRender();
   await _zbSaveProgress(false);
 }
@@ -6253,7 +5814,10 @@ async function _zbSaveProgress(reachedEnd) {
 
   const totalDuasToday = lastSess.reduce((s, x) => s + x.duas, 0);
   data['zikrBook_pagesToday'] = totalDuasToday;
-  data['zikrBook_bonusRatio'] = ratio;
+  // Once the book is finished today, a later restart shouldn't drag the
+  // bonus back down — only let the ratio increase within the same day.
+  const prevRatio = parseFloat(getCached(_zbDK)['zikrBook_bonusRatio']) || 0;
+  data['zikrBook_bonusRatio'] = Math.max(ratio, prevRatio);
   data['zikrBook_readerPage'] = _zbSlide + 1;
 
   // Auto-flip to "Yes" once all 123 duas have been reached
@@ -6290,9 +5854,15 @@ async function closeZikrBookReader() {
   if (!_zbDK) return;
   // Save current progress first
   await _zbSaveProgress(false);
-  // Then save NEXT dua index so next open resumes from the dua after this one
-  const nextSlide = Math.min(_zbSlide + 1, ZIKR_BOOK_TOTAL - 1);
-  await setPdfLastPage(ZIKR_BOOK_IDX_KEY, nextSlide);
+  // Once the book is finished, always start from the first page next time —
+  // otherwise resume from the dua after this one, as usual.
+  const justCompleted = getCached(_zbDK).zikrBook === 'yes';
+  if (justCompleted) {
+    await setPdfLastPage(ZIKR_BOOK_IDX_KEY, 0);
+  } else {
+    const nextSlide = Math.min(_zbSlide + 1, ZIKR_BOOK_TOTAL - 1);
+    await setPdfLastPage(ZIKR_BOOK_IDX_KEY, nextSlide);
+  }
 }
 
 /* ── Badge ── */
@@ -6310,11 +5880,17 @@ function _zbRenderBadge() {
   const bonusRatio = parseFloat(data['zikrBook_bonusRatio']) || 0;
   const pct = Math.round(bonusRatio * 100);
   const globalPos = data['zikrBook_readerPage'] || last.end;
+  // If the book was finished and then restarted today, a single first-to-last
+  // range would read backwards (e.g. "Dua 100–10") — list each session instead.
+  const wrappedToday = sessions.some((s, i) => i < sessions.length - 1 && s.end >= ZIKR_BOOK_TOTAL);
+  const totalRangeText = wrappedToday
+    ? sessions.map(s => `Dua ${s.start}–${s.end}`).join(', ')
+    : `Dua ${first.start}–${last.end}`;
 
   badge.style.display = 'block';
   badge.innerHTML =
     '<span style="color:var(--gold);">📖 Today: ' + count + ' Session' + (count !== 1 ? 's' : '') + ' &nbsp;·&nbsp; ' + totalDuas + ' Dua' + (totalDuas !== 1 ? 's' : '') + ' Read (' + pct + '%)</span>' +
-    '<br><span style="font-size:9px;color:#a89060;">Total: Dua ' + first.start + '–' + last.end + ' (' + totalDuas + ' Dua' + (totalDuas !== 1 ? 's' : '') + ' Today)</span>' +
+    '<br><span style="font-size:9px;color:#a89060;">Total: ' + totalRangeText + ' (' + totalDuas + ' Dua' + (totalDuas !== 1 ? 's' : '') + ' Today)' + (wrappedToday ? ' — Book Completed &amp; Restarted Today' : '') + '</span>' +
     '<br><span style="font-size:9px;color:#a89060;">Last: Duas ' + last.start + '–' + last.end + ' (' + last.duas + ' Dua' + (last.duas !== 1 ? 's' : '') + ') · Global Dua ' + globalPos + '/' + ZIKR_BOOK_TOTAL + '</span>';
 }
 

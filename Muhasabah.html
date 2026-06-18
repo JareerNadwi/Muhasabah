@@ -1466,7 +1466,7 @@ body.overlay-open{overflow:hidden;}
         <button class="yn-btn yes" data-key="surahMulk" data-val="yes" onclick="setYN('surahMulk','yes')">Yes</button>
         <button class="yn-btn no"  data-key="surahMulk" data-val="no"  onclick="setYN('surahMulk','no')">No</button>
       </div>
-      <div class="sub-label">Goal: Read All 29 Verses = Full 5% Core</div>
+      <div class="sub-label">Goal: Read All 30 Verses = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahMulk')">📜 Open Surah Al-Mulk Reader</button>
       <div class="qr-session-badge" id="surahMulkSessionBadge" style="display:none;"></div>
     </div>
@@ -3705,7 +3705,7 @@ const BASE_URL          = 'https://jareernadwi.github.io/Muhasabah/';
 
 const SURAH_LENGTHS = [7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,
   110,98,135,112,78,118,64,77,227,93,88,69,60,34,30,73,54,45,83,182,88,75,85,54,53,
-  89,59,37,35,31,31,18,45,60,49,62,39,40,96,67,29,53,44,55,26,24,43,6,11,29,28,52,
+  89,59,37,35,31,31,18,45,60,49,62,39,40,96,67,29,53,44,55,26,24,43,6,11,30,28,52,
   28,28,20,56,40,31,50,45,6,29,22,59,85,8,8,72,28,31,28,28,20,94,6,5,8,29,7,22,6,
   71,65,30,54,26,20,19,18,26,25,25,26,25,32,24,20,28,36,22,26,24,27,33,7,50,11,11,
   9,12,10,7,5,8,14,19,3,22,21,28,18,22,15,12,13,14,18,17,9,12,14,16,19,14,16,4,11,
@@ -4262,7 +4262,7 @@ function _renderSvBadge(dk, goalKey){
   const sessKey  = goalKey + '_svSessions';
   const sessions = data[sessKey];
   if(!sessions || sessions.length === 0){ badge.style.display = 'none'; return; }
-  const totalMap = { surahWaqiah: 96, surahMulk: 29, surahKahf: 110 };
+  const totalMap = { surahWaqiah: 96, surahMulk: 30, surahKahf: 110 };
   const total      = totalMap[goalKey] || SURAH_LENGTHS[(goalKey === 'surahWaqiah' ? 55 : goalKey === 'surahMulk' ? 66 : 17)];
   const done       = data[goalKey] === 'yes';
   const totalVerses = sessions.reduce((s,x) => s + x.verses, 0);

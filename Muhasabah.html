@@ -5676,13 +5676,8 @@ function _asmaulRenderSlide(){
   pill.textContent     = (_asmaulSlide + 1) + " / " + ASMAUL_TOTAL_SLIDES;
   pageDisp.textContent = "Page " + (_asmaulSlide + 1) + " / " + ASMAUL_TOTAL_SLIDES;
 
-  if(isLast){
-    sessInfo.textContent = "✓ Last page — Exit & Save to complete";
-    sessInfo.style.color = "var(--green-bright)";
-  } else {
-    sessInfo.textContent = pagesLeft + " page" + (pagesLeft !== 1 ? "s" : "") + " remaining";
-    sessInfo.style.color = "var(--gold)";
-  }
+  sessInfo.textContent = pagesLeft + " page" + (pagesLeft !== 1 ? "s" : "") + " remaining";
+  sessInfo.style.color = "var(--gold)";
 
   prevBtn.disabled      = _asmaulSlide === 0;
   prevBtn.style.opacity = _asmaulSlide === 0 ? "0.3" : "1";
@@ -5907,8 +5902,7 @@ function _zikrRender(){
   document.getElementById("zikrReaderProgressPill").textContent=num+" / "+ZIKR_TOTAL;
   document.getElementById("zikrReaderPageDisplay").textContent="Dua "+num+" / "+ZIKR_TOTAL;
   var si=document.getElementById("zikrReaderSessionInfo");
-  if(isLast){si.textContent="Last dua - Exit & Save to complete";si.style.color="var(--green-bright)";}
-  else{si.textContent=rem+" dua"+(rem!==1?"s":"")+" remaining";si.style.color="var(--gold)";}
+  si.textContent=rem+" dua"+(rem!==1?"s":"")+" remaining";si.style.color="var(--gold)";
   var pb=document.getElementById("zikrReaderPrevBtn");
   pb.disabled=_zikrSlide===0;pb.style.opacity=_zikrSlide===0?"0.3":"1";
   var nb=document.getElementById("zikrReaderNextBtn");
@@ -6115,13 +6109,8 @@ function _zbRender() {
   document.getElementById('zikrBookPageDisplay').textContent = 'Dua ' + num + ' / ' + ZIKR_BOOK_TOTAL;
 
   const si = document.getElementById('zikrBookSessionInfo');
-  if (isLast) {
-    si.textContent = '✓ Last dua — Exit & Save to complete';
-    si.style.color = 'var(--green-bright)';
-  } else {
-    si.textContent = rem + ' dua' + (rem !== 1 ? 's' : '') + ' remaining';
-    si.style.color = 'var(--gold)';
-  }
+  si.textContent = rem + ' dua' + (rem !== 1 ? 's' : '') + ' remaining';
+  si.style.color = 'var(--gold)';
 
   const pb = document.getElementById('zikrBookPrevBtn');
   pb.disabled = _zbSlide === 0;

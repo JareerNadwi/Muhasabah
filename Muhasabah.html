@@ -627,23 +627,6 @@ select option{background:#1c1f1c;}
 .yn-btn.yes.active{background:#1a3020;border-color:var(--green-bright);color:var(--green-bright);}
 .yn-btn.no.active{background:#2a1515;border-color:var(--red);color:#c05050;}
 
-/* ── Yes/No, long-press fill variant (currently just Quran's manual entry) ── */
-.yn-fill-btn{position:relative;flex:1;padding:9px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;text-align:center;transition:border-color .15s;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
-.yn-fill-btn:hover{border-color:var(--gold-dim);}
-.yn-fill-btn.active{border-color:var(--fill-text);}
-.yn-fill{position:absolute;inset:0;width:0%;background:var(--fill-bg);z-index:1;pointer-events:none;transition:width .16s ease;}
-.yn-fill-btn.holding .yn-fill{transition:width .6s linear;}
-.yn-fill-btn.holding .yn-fill-label-active{transition:clip-path .6s linear;}
-.yn-fill-label-base,.yn-fill-label-active{position:relative;display:block;pointer-events:none;}
-.yn-fill-label-base{z-index:2;}
-.yn-fill-label-active{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;color:var(--fill-text);clip-path:inset(0 100% 0 0);transition:clip-path .16s ease;}
-.yn-fill-btn.yes{--fill-bg:#1a3020;--fill-text:var(--green-bright);}
-.yn-fill-btn.no {--fill-bg:#2a1515;--fill-text:#c05050;}
-/* Read-only status display (currently Quran's reader-driven Yes/No) — no
-   pointer affordance, since pressing it does nothing. */
-.yn-fill-btn[data-readonly]{cursor:default;}
-.yn-fill-btn[data-readonly]:not(.active):hover{border-color:var(--border);}
-
 /* ── Salah ── */
 .salah-hint{font-size:9px;color:var(--text-muted);margin-bottom:10px;line-height:1.6;background:var(--surface2);padding:7px 10px;border-radius:4px;}
 .salah-grid{display:flex;flex-direction:column;gap:9px;}
@@ -827,6 +810,7 @@ canvas#qrCanvas{
   font-size:11px;letter-spacing:1px;transition:all .2s;
 }
 .qr-open-btn:hover{background:linear-gradient(135deg,#152010,#253525);box-shadow:0 0 12px rgba(74,124,89,.2);}
+.qr-pages-today{font-size:11px;color:var(--text-dim);background:var(--surface2);padding:9px 10px;border-radius:var(--radius);text-align:center;letter-spacing:.5px;}
 .qr-session-badge{
   margin-top:8px;font-size:10px;color:var(--text-muted);letter-spacing:.5px;
   background:var(--surface2);padding:5px 8px;border-radius:3px;line-height:1.6;
@@ -893,12 +877,6 @@ body.light-mode .yn-btn{background:var(--surface2);border-color:var(--border);co
 body.light-mode .yn-btn:hover{border-color:#9a7228!important;}
 body.light-mode .yn-btn.yes.active{background:#d8f0de;border-color:var(--green);color:var(--green);}
 body.light-mode .yn-btn.no.active{background:#f5dede;border-color:var(--red);color:var(--red);}
-body.light-mode .yn-fill-btn{background:var(--surface2);border-color:var(--border);color:var(--text-dim);}
-body.light-mode .yn-fill-btn:hover{border-color:#9a7228!important;}
-body.light-mode .yn-fill-btn.active{border-color:var(--fill-text);}
-body.light-mode .yn-fill-btn[data-readonly]:not(.active):hover{border-color:var(--border)!important;}
-body.light-mode .yn-fill-btn.yes{--fill-bg:#d8f0de;--fill-text:var(--green);}
-body.light-mode .yn-fill-btn.no {--fill-bg:#f5dede;--fill-text:var(--red);}
 body.light-mode .salah-opt.jamaah  {--fill-bg:#d8f0de;--fill-text:var(--green);}
 body.light-mode .salah-opt.munfarid{--fill-bg:#e5f5e8;--fill-text:var(--green);}
 body.light-mode .salah-opt.qaza    {--fill-bg:#fdf0d8;--fill-text:#9a7030;}
@@ -1231,18 +1209,7 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">📖 Quran <span class="weight-hint">(10% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-quran">0%</div>
       </div>
-      <div class="yn-group">
-        <div class="yn-fill-btn yes" data-yn="quran" data-val="yes" data-readonly="true">
-          <div class="yn-fill"></div>
-          <span class="yn-fill-label-base">Yes</span>
-          <span class="yn-fill-label-active">Yes</span>
-        </div>
-        <div class="yn-fill-btn no" data-yn="quran" data-val="no" data-readonly="true">
-          <div class="yn-fill"></div>
-          <span class="yn-fill-label-base">No</span>
-          <span class="yn-fill-label-active">No</span>
-        </div>
-      </div>
+      <div class="qr-pages-today" id="quranPagesToday">📖 0 Pages Read Today</div>
       <div class="quran-row" style="display:none;">
         <select id="quranJuzz"><option value="">Starting Juzz?</option></select>
         <select id="quranQuarter">
@@ -1980,22 +1947,15 @@ async function closeQuranReader(){
   if(!dayData.quranSessions) dayData.quranSessions = [];
   dayData.quranSessions.push({start: startQuranPage, end: endQuranPage, pages: pagesRead, juzz: sessionJuzz});
 
-  // Auto-flip to "Yes" once a full juzz has been reached today
+  // Auto-flip to "yes" once a full juzz has been reached today — scoring still
+  // falls back to this when quranPdfJuzz is undefined, so it's kept exactly
+  // as before even though there's no longer a button reflecting it.
   if (todayTotal >= 1) {
     dayData.quran = 'yes';
   }
 
   _cache[currentDateKey] = dayData;
   await setStore(currentDateKey, dayData);
-
-  // Reflect auto-completion on the Yes/No buttons
-  if (todayTotal >= 1) {
-    document.querySelectorAll('.yn-fill-btn[data-yn="quran"]').forEach(el => {
-      const isYes = el.dataset.val === 'yes';
-      el.classList.toggle('active', isYes);
-      setYnFillProgress(el, isYes ? 100 : 0);
-    });
-  }
 
   // If last page reached, reset global position so next open starts from page 1
   if(qrCurPage >= QR_LAST_PAGE){
@@ -2013,6 +1973,8 @@ async function closeQuranReader(){
     `<span style="color:var(--gold);">📖 Today: ${sessionCount} Session${sessionCount !== 1 ? 's' : ''} &nbsp;·&nbsp; ≈ ${todayTotal.toFixed(2)} Juzz Total</span>`
     + `<br><span style="font-size:9px;color:#a89060;">Total: ${firstSession.start}–${lastSession.end} (${totalPages} Pages, ≈ ${todayTotal.toFixed(2)} Juzz)</span>`
     + `<br><span style="font-size:9px;color:#a89060;">Last: Pages ${startQuranPage}–${endQuranPage} (${pagesRead} Pages, ${sessionJuzz.toFixed(2)} Juzz)</span>`;
+  const pagesToday = document.getElementById('quranPagesToday');
+  if(pagesToday) pagesToday.textContent = `📖 ${totalPages} Page${totalPages !== 1 ? 's' : ''} Read Today`;
 
   await saveAndRefresh();
 }
@@ -3077,11 +3039,11 @@ function loadDayData(dk){
       document.querySelectorAll(`.yn-btn[data-key="${key}"]`).forEach(btn=>btn.classList.toggle('active',btn.dataset.val===data[key]));
     });
 
-  document.querySelectorAll('.yn-fill-btn[data-yn="quran"]').forEach(el=>{
-    const isActive=el.dataset.val===data.quran;
-    el.classList.toggle('active',isActive);
-    setYnFillProgress(el,isActive?100:0);
-  });
+  const quranPagesToday = document.getElementById('quranPagesToday');
+  if(quranPagesToday){
+    const totalPages = (data.quranSessions||[]).reduce((s,x)=>s+x.pages,0);
+    quranPagesToday.textContent = `📖 ${totalPages} Page${totalPages !== 1 ? 's' : ''} Read Today`;
+  }
   refreshScores();
 }
 
@@ -3256,98 +3218,6 @@ async function finalizeSalah(salah,newVal){
   });
   refreshScores();
 }
-
-/* ── Yes/No, long-press fill variant ──
-   Same long-press-to-toggle mechanic as Salah (hold to fill, hold the active
-   one to drain it back out), generalized for two-option Yes/No groups via
-   data-yn instead of data-salah. Currently wired up only for Quran's manual
-   entry — the PDF reader's auto-completion writes data.quran directly and
-   stays on its own separate code path, untouched by any of this. */
-const YN_FILL_HOLD_MS=600;
-let _ynFillPress=null;
-
-function setYnFillProgress(el,pct){
-  const fill=el.querySelector('.yn-fill');
-  const label=el.querySelector('.yn-fill-label-active');
-  if(fill) fill.style.width=pct+'%';
-  if(label) label.style.clipPath=`inset(0 ${100-pct}% 0 0)`;
-}
-
-function onYnFillPointerDown(e){
-  e.preventDefault();
-  const el=e.currentTarget;
-  if(_ynFillPress) ynFillResolveCancel();
-
-  const groupEl=el.closest('.yn-group');
-  const activeEl=groupEl.querySelector('.yn-fill-btn.active');
-  let mode,partner=null;
-  if(activeEl===el)      mode='deselect';
-  else if(activeEl){ mode='switch'; partner=activeEl; }
-  else               mode='select';
-
-  el.classList.add('holding');
-  if(partner) partner.classList.add('holding');
-  const raf=requestAnimationFrame(()=>{
-    setYnFillProgress(el, mode==='deselect'?0:100);
-    if(partner) setYnFillProgress(partner,0);
-  });
-
-  const timer=setTimeout(()=>ynFillCommit(el,mode,partner), YN_FILL_HOLD_MS);
-  _ynFillPress={el,partner,mode,timer,raf};
-}
-
-function onYnFillPointerCancel(e){
-  if(!_ynFillPress || _ynFillPress.el!==e.currentTarget) return;
-  ynFillResolveCancel();
-}
-
-function ynFillResolveCancel(){
-  const {el,partner,mode,timer,raf}=_ynFillPress;
-  clearTimeout(timer);
-  cancelAnimationFrame(raf);
-  el.classList.remove('holding');
-  setYnFillProgress(el, mode==='deselect'?100:0);
-  if(partner){
-    partner.classList.remove('holding');
-    setYnFillProgress(partner,100);
-  }
-  _ynFillPress=null;
-}
-
-function ynFillCommit(el,mode,partner){
-  cancelAnimationFrame(_ynFillPress.raf);
-  el.classList.remove('holding');
-  if(partner) partner.classList.remove('holding');
-  setYnFillProgress(el, mode==='deselect'?0:100);
-  if(partner) setYnFillProgress(partner,0);
-  _ynFillPress=null;
-
-  const key=el.dataset.yn;
-  const newVal = mode==='deselect' ? null : el.dataset.val;
-  finalizeYnFill(key,newVal);
-}
-
-async function finalizeYnFill(key,newVal){
-  if(!currentDateKey) return;
-  const data={...getCached(currentDateKey)};
-  if(newVal===null) delete data[key]; else data[key]=newVal;
-  _cache[currentDateKey]=data;
-  await setStore(currentDateKey,data);
-  document.querySelectorAll(`.yn-fill-btn[data-yn="${key}"]`).forEach(el=>{
-    const isActive=el.dataset.val===newVal;
-    el.classList.toggle('active',isActive);
-    setYnFillProgress(el,isActive?100:0);
-  });
-  refreshScores();
-}
-
-document.querySelectorAll('.yn-fill-btn:not([data-readonly])').forEach(el=>{
-  el.addEventListener('pointerdown',onYnFillPointerDown);
-  el.addEventListener('pointerup',onYnFillPointerCancel);
-  el.addEventListener('pointerleave',onYnFillPointerCancel);
-  el.addEventListener('pointercancel',onYnFillPointerCancel);
-  el.addEventListener('contextmenu',e=>e.preventDefault());
-});
 
 async function setYN(key,val){
   if(!currentDateKey) return;

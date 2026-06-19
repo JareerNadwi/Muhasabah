@@ -714,7 +714,7 @@ select option{background:#1c1f1c;}
 .net-sub{display:flex;flex-direction:column;gap:5px;}
 .net-sub-row{display:flex;align-items:center;gap:6px;}
 .net-sub-label{font-size:10px;color:var(--text-dim);flex:1;line-height:1.3;}
-.yn-mini{display:flex;gap:4px;width:110px;flex-shrink:0;}
+.yn-mini{display:flex;gap:4px;width:160px;flex-shrink:0;}
 .yn-mini .yn-btn{padding:0 4px;font-size:9px;height:28px;line-height:28px;}
 
 /* ── Counter Box ── */
@@ -729,7 +729,7 @@ select option{background:#1c1f1c;}
 .counter-input{flex:1;text-align:center;}
 
 /* ── Save ── */
-.save-btn{margin-top:28px;width:100%;padding:15px;background:var(--green);border:none;border-radius:var(--radius);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.save-btn{display:block;margin:28px auto 0;width:100%;max-width:860px;padding:15px;background:var(--green);border:none;border-radius:var(--radius);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
 .save-btn:hover{background:var(--green-bright);color:#0d0f0e;}
 #savedToast{display:none;text-align:center;margin-top:10px;font-size:11px;color:var(--green-bright);letter-spacing:1px;}
 
@@ -1694,6 +1694,11 @@ body.overlay-open{overflow:hidden;}
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('tafakkur')">🌿 Open Tafakkur Article</button>
     </div>
 
+  </div><!-- /growth -->
+
+  <!-- ══ Writing & Networking ══ -->
+  <div class="goals-grid">
+
     <!-- Writing 5% -->
     <div class="goal-card" id="card-writing">
       <div class="goal-top">
@@ -1703,7 +1708,7 @@ body.overlay-open{overflow:hidden;}
       <div class="net-sub">
         <div class="net-sub-row">
           <span class="net-sub-label">LinkedIn Post <span class="weight-hint">(2.5%)</span></span>
-          <div class="yn-mini" style="width:220px;">
+          <div class="yn-mini">
             <div class="salah-opt jamaah yn-opt" data-key="writingLinkedin" data-val="yes">
               <div class="salah-opt-fill"></div>
               <span class="salah-opt-label-base">Yes</span>
@@ -1719,7 +1724,7 @@ body.overlay-open{overflow:hidden;}
         </div>
         <div class="net-sub-row">
           <span class="net-sub-label">Facebook Post <span class="weight-hint">(2.5%)</span></span>
-          <div class="yn-mini" style="width:220px;">
+          <div class="yn-mini">
             <div class="salah-opt jamaah yn-opt" data-key="writingFacebook" data-val="yes">
               <div class="salah-opt-fill"></div>
               <span class="salah-opt-label-base">Yes</span>
@@ -1746,7 +1751,7 @@ body.overlay-open{overflow:hidden;}
       <div class="net-sub">
         <div class="net-sub-row">
           <span class="net-sub-label">Connected With 5+ People <span class="weight-hint">(2.5%)</span></span>
-          <div class="yn-mini" style="width:220px;">
+          <div class="yn-mini">
             <div class="salah-opt jamaah yn-opt" data-key="netConnected" data-val="yes">
               <div class="salah-opt-fill"></div>
               <span class="salah-opt-label-base">Yes</span>
@@ -1762,7 +1767,7 @@ body.overlay-open{overflow:hidden;}
         </div>
         <div class="net-sub-row">
           <span class="net-sub-label">Built Rapport With 5+ People <span class="weight-hint">(2.5%)</span></span>
-          <div class="yn-mini" style="width:220px;">
+          <div class="yn-mini">
             <div class="salah-opt jamaah yn-opt" data-key="netCommented" data-val="yes">
               <div class="salah-opt-fill"></div>
               <span class="salah-opt-label-base">Yes</span>
@@ -1780,7 +1785,7 @@ body.overlay-open{overflow:hidden;}
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openContactBook()">📒 Open Contact Book &amp; CRM</button>
     </div>
 
-  </div><!-- /growth -->
+  </div><!-- /writing-networking -->
 
   <button class="save-btn" onclick="saveDayAndExport()">Save Day</button>
   <div id="savedToast">✓ Saved</div>

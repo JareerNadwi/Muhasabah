@@ -981,6 +981,9 @@ body.light-mode #zikrBookSessionInfo{background:#f0ede6!important;border-color:#
 /* Done notes — one consistent style for every reader, dark and light */
 .rdr-done-note{display:none;background:#1a1610;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;flex-shrink:0;}
 body.light-mode .rdr-done-note{background:#e8f5ec!important;border-color:#2d6b40!important;color:#2d6b40!important;}
+.qr-session-info.completed{background:#1a1610;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;}
+body.light-mode .qr-session-info.completed{background:#e8f5ec!important;border-color:#2d6b40!important;color:#2d6b40!important;}
+body.light-mode #zikrBookSessionInfo.completed{background:#e8f5ec!important;border-color:#2d6b40!important;color:#2d6b40!important;}
 /* Prev buttons */
 body.light-mode #hadithPrevBtn,body.light-mode #tafsirPrevBtn,
 body.light-mode #bookPrevBtn,body.light-mode #svPrevBtn,
@@ -1209,9 +1212,103 @@ body.overlay-open{overflow:hidden;}
 
 <!-- Read Me Modal -->
 <div class="modal-overlay" id="readMeModal">
-  <div class="modal" style="max-width:500px;border-color:var(--purple);text-align:left;">
-    <h3 style="color:var(--purple-bright);margin-bottom:16px;">&#x1F4D6; Read Me</h3>
-    <p style="color:var(--text-dim);font-size:12px;line-height:1.8;">Contents coming soon. This section will contain guidance on how to use the tracker.</p>
+  <div class="modal" style="max-width:560px;border-color:var(--purple);text-align:left;max-height:85vh;overflow-y:auto;">
+    <h3 style="color:var(--purple-bright);margin-bottom:4px;">📖 Read Me</h3>
+    <p style="color:var(--text-muted);font-size:10px;letter-spacing:.5px;margin-bottom:20px;">HOW TO USE MUHASABAH</p>
+
+    <div style="color:var(--text-dim);font-size:11px;line-height:1.9;">
+
+      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">⚠ IMPORTANT — HOLD TO CONFIRM</p>
+      <p style="margin-bottom:16px;">Every Yes / No button requires a <strong style="color:var(--text);">long press (hold)</strong> to register. Tap and hold until the button fills — then release. This prevents accidental taps from corrupting your data. The same applies to Salah options (Jamā'ah, Munfarid, Qadhā, Missed).</p>
+
+      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">📅 NAVIGATION</p>
+      <p style="margin-bottom:16px;">Use the calendar at the top to switch between days. Tap any date to load that day's data. You can log past days at any time — data is stored locally on your device via IndexedDB and persists between sessions.</p>
+
+      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">📊 SCORING SYSTEM</p>
+      <p style="margin-bottom:8px;"><strong style="color:var(--text);">Core Score</strong> is capped at 100%. Every goal below (except Bonus) contributes to it. <strong style="color:var(--text);">Bonus Score</strong> is capped at 50% and sits on top of core — your total can reach 150%.</p>
+      <p style="margin-bottom:16px;">A <strong style="color:var(--text);">Perfect Day</strong> (100% core) is marked on the calendar in green. Scores update live as you log.</p>
+
+      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:10px;">🕌 CORE GOALS (100% MAX)</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">🕌 Salah — 10%</p>
+      <p style="margin-bottom:12px;">Each of the 5 daily prayers contributes 2%. Log each prayer individually: Jamā'ah (congregation) = 2%, Munfarid (alone) = 1.5%, Qadhā (make-up) = 0.5%, Missed = 0%. All 5 at Jamā'ah = full 10%. Use the Open Salah Article button to read about the importance and rulings of Salah.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">📖 Quran — 10%</p>
+      <p style="margin-bottom:12px;">Goal is 1 Juzz per day. Use the built-in Quran PDF reader (Imdadia Hafezi edition) — it tracks your pages automatically and calculates Juzz read. Reading more than 1 Juzz in a day earns bonus points (+5% per extra Juzz). Hold Yes/No to log manually if not using the reader.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">🌙 Tahajjud — 10%</p>
+      <p style="margin-bottom:12px;">Goal is 4 rakat. Use the +/− buttons to log how many rakat you prayed. Proportional scoring: 2 rakat = 5%, 4 rakat = 10%. Extra rakat above 4 earn bonus points (+5% per additional 4 rakat).</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">📿 Zikr — 5%</p>
+      <p style="margin-bottom:12px;">Goal is 1,500 counts. Use the +/− buttons to log your count. Proportional scoring up to 1,500. Every additional 1,500 above the goal earns +2.5% bonus.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">📚 Hadith — 5%</p>
+      <p style="margin-bottom:12px;">Goal is 5 hadiths per day. Use the built-in Bukhari reader — it tracks your progress through 5 daily hadiths automatically. Or log manually with the number input. Proportional scoring up to 5.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">🔍 Quran Meaning — 5%</p>
+      <p style="margin-bottom:12px;">Goal is 17 verses per day using the Tafsir reader (Saheeh International). The reader assigns a daily batch of 17 verses and tracks progress verse by verse. Proportional scoring up to 17 verses.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">🌿 Asmaul Husna — 5%</p>
+      <p style="margin-bottom:12px;">Read and reflect on the 99 Names of Allah using the built-in slide reader. Proportional scoring based on how many names you complete. Full completion = 5%.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">☀️ Morning Zikr — 5%</p>
+      <p style="margin-bottom:12px;">Complete the morning adhkar using the built-in slide reader. Proportional scoring. Hold Yes to log manually if preferred.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">🌆 Evening Zikr — 5%</p>
+      <p style="margin-bottom:12px;">Complete the evening adhkar using the built-in slide reader. Proportional scoring. Hold Yes to log manually if preferred.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">📜 Surah Al-Waqiah — 5%</p>
+      <p style="margin-bottom:12px;">Read all 96 verses using the built-in verse reader (Arabic + transliteration + meaning). Proportional scoring per verse read. Known to be a protection against poverty — daily recitation is a prophetic recommendation.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">📜 Surah Al-Mulk — 5%</p>
+      <p style="margin-bottom:12px;">Read all 30 verses using the built-in verse reader. Proportional scoring. Intercedes for the reader on the Day of Judgement — reciting it nightly is a confirmed Sunnah.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">🏃 Exercise — 5%</p>
+      <p style="margin-bottom:12px;">Hold Yes when you have completed your exercise for the day. Binary — either done (5%) or not (0%). Use the Exercise Article button to read about Islamic perspective on physical health and a basic BMI calculator.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">📕 Book — 5%</p>
+      <p style="margin-bottom:12px;">A 365-day curated reading plan covering 15 categories. Open the Book reader — each day has an assigned book with bite-sized lessons. Proportional scoring per lesson completed. Full day = 5%.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">🗣 Language — 5%</p>
+      <p style="margin-bottom:12px;">Daily vocabulary learning across Arabic, English, Bengali, Urdu, and Hindi. Open the Language Learner and select your language. Each day has a new word with full breakdown — collocations, conjugations, story, and speaking challenge. Proportional scoring.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">🌿 Tafakkur — 5%</p>
+      <p style="margin-bottom:12px;">Contemplation and reflection on the signs of Allah. Hold Yes when you have spent intentional time in tafakkur — reflecting on creation, your purpose, or the names of Allah. Binary scoring.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">✍️ Writing — 5%</p>
+      <p style="margin-bottom:12px;">Split into two sub-goals of 2.5% each: LinkedIn Post and Facebook Post. Hold Yes on each when published. Use the AI Post Writer tool to draft posts with Gemini.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">🤝 Networking — 5%</p>
+      <p style="margin-bottom:12px;">Split into two sub-goals of 2.5% each: Connected with 5+ people and Built rapport with 5+ people (commented, messaged, followed up). Hold Yes on each when done. Use the Networking Hub to manage contacts and your CRM pipeline.</p>
+
+      <p style="color:var(--purple-bright);font-size:10px;letter-spacing:1px;margin-bottom:10px;margin-top:4px;">✨ BONUS GOALS (50% MAX)</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">🌙 Sawm — +10%</p>
+      <p style="margin-bottom:12px;">Fasting. Hold Yes on any day you fasted — Ramadan, Monday/Thursday, Ayyam al-Bid, or voluntary. Flat +10% bonus.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">🌿 Sunnah Salah — up to +10%</p>
+      <p style="margin-bottom:12px;">Log your Sunnah rakat using +/− buttons. Goal is 17 rakat (full Sunnah set). Proportional up to +10%. Every rakat counts.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">✨ Nafl Salah — up to +10%</p>
+      <p style="margin-bottom:12px;">Log voluntary prayers beyond Sunnah. Each rakat = +0.2%, capped at +10% (50 rakat).</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">📖 Zikr From Book — up to +10%</p>
+      <p style="margin-bottom:12px;">123 duas sourced from the book الدعاء من الكتاب والسنة — with full Arabic (harakah), transliteration, and meaning. Read through them using the slide reader. Proportional scoring up to +10%.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">📜 Surah Al-Kahf — up to +10%</p>
+      <p style="margin-bottom:12px;">Read all 110 verses using the built-in verse reader. Proportional per verse. Reciting on Fridays is a confirmed Sunnah with immense reward. Full completion = +10% bonus.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">💛 Sadaqah — up to +10%</p>
+      <p style="margin-bottom:12px;">Log how much you donated using the +/− counter. Goal is 50,000 units (your local currency). Proportional up to +10%. Any amount counts — even small sadaqah is never insignificant.</p>
+
+      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">💾 DATA & BACKUP</p>
+      <p style="margin-bottom:16px;">Your data lives on your device. Use the <strong style="color:var(--text);">Export</strong> button regularly to download a JSON backup. Use <strong style="color:var(--text);">Import</strong> to restore from a backup or transfer to another device. Do not clear your browser storage without exporting first.</p>
+
+      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">🌙 / ☀️ THEME</p>
+      <p style="margin-bottom:0;">Toggle between dark mode and light/warm mode using the moon/sun button at the top right.</p>
+
+    </div>
+
     <div class="modal-btns" style="margin-top:24px;">
       <button class="modal-cancel" onclick="closeReadMe()">Close</button>
     </div>
@@ -2067,10 +2164,10 @@ function updateSessionInfo(){
   const el = document.getElementById('qrSessionInfo');
   if(qrCurPage >= QR_LAST_PAGE){
     el.textContent = "✓ You've completed the Quran — you may start again";
-    el.style.cssText = 'background:#1a1610;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;';
+    el.classList.add('completed');
     return;
   }
-  el.style.cssText = '';
+  el.classList.remove('completed');
   const pagesRead = Math.max(0, qrCurPage - qrStartPage + 1);
   if(pagesRead > 0){
     const juzzRead = pagesReadToJuzz(pagesRead, qrStartPage);
@@ -2685,6 +2782,8 @@ function applyReaderTheme(isLight){
     'pwTabLI','pwTabFB','pwChat','pwInputArea','pwInput','pwSendBtn','pwApiKeyInput','pwApiKeySection',
     // Zikr article
     'zikrArticleCount','zikrArticleBar','zikrArticleFill','zikrArticleMsg',
+    // Session info bars (completion state managed by CSS class, not inline style)
+    'qrSessionInfo','zikrBookSessionInfo',
   ]);
 
   const DARK_BG_MAP={
@@ -6008,9 +6107,7 @@ function _zbRender() {
 
   const _zbSessEl = document.getElementById('zikrBookSessionInfo');
   _zbSessEl.textContent = isLast ? "✓ You've completed the book — you may start again" : '';
-  _zbSessEl.style.cssText = isLast
-    ? 'background:#1a1610;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;'
-    : 'font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#141008;';
+  _zbSessEl.classList.toggle('completed', isLast);
 
   const pb = document.getElementById('zikrBookPrevBtn');
   pb.disabled = _zbSlide === 0;

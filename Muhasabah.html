@@ -1212,14 +1212,20 @@ body.overlay-open{overflow:hidden;}
 
 <!-- Read Me Modal -->
 <div class="modal-overlay" id="readMeModal">
-  <div class="modal" style="max-width:560px;border-color:var(--purple);text-align:left;max-height:85vh;overflow-y:auto;">
-    <h3 style="color:var(--purple-bright);margin-bottom:4px;">📖 Read Me</h3>
-    <p style="color:var(--text-muted);font-size:10px;letter-spacing:.5px;margin-bottom:20px;">HOW TO USE MUHASABAH</p>
+  <div class="modal" style="max-width:560px;border-color:var(--purple);text-align:left;max-height:85vh;overflow-y:auto;padding:0;">
+    <div style="position:sticky;top:0;z-index:10;background:var(--surface);border-bottom:1px solid var(--purple);padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <h3 style="color:var(--purple-bright);margin:0 0 2px;">📖 Read Me</h3>
+        <p style="color:var(--text-muted);font-size:10px;letter-spacing:.5px;margin:0;">HOW TO USE MUHASABAH</p>
+      </div>
+      <button class="modal-cancel" onclick="closeReadMe()" style="margin:0;flex-shrink:0;">✕ Close</button>
+    </div>
+    <div style="padding:20px 18px 24px;">
 
     <div style="color:var(--text-dim);font-size:11px;line-height:1.9;">
 
       <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">⚠ IMPORTANT — HOLD TO CONFIRM</p>
-      <p style="margin-bottom:16px;">Every Yes / No button requires a <strong style="color:var(--text);">long press (hold)</strong> to register. Tap and hold until the button fills — then release. This prevents accidental taps from corrupting your data. The same applies to Salah options (Jamā'ah, Munfarid, Qadhā, Missed).</p>
+      <p style="margin-bottom:16px;">Every button requires a <strong style="color:var(--text);">long press (hold)</strong> to register — Yes / No buttons, Salah options (Jamā'ah, Munfarid, Qadhā, Missed), and all +/− stepper buttons. Tap and hold until the button fills, then release. This prevents accidental taps from corrupting your data.</p>
 
       <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">📅 NAVIGATION</p>
       <p style="margin-bottom:16px;">Use the calendar at the top to switch between days. Tap any date to load that day's data. You can log past days at any time — data is stored locally on your device via IndexedDB and persists between sessions.</p>
@@ -1237,16 +1243,16 @@ body.overlay-open{overflow:hidden;}
       <p style="margin-bottom:12px;">Goal is 1 Juzz per day. Use the built-in Quran PDF reader (Imdadia Hafezi edition) — it tracks your pages automatically and calculates Juzz read. Reading more than 1 Juzz in a day earns bonus points (+5% per extra Juzz). Hold Yes/No to log manually if not using the reader.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">🌙 Tahajjud — 10%</p>
-      <p style="margin-bottom:12px;">Goal is 4 rakat. Use the +/− buttons to log how many rakat you prayed. Proportional scoring: 2 rakat = 5%, 4 rakat = 10%. Extra rakat above 4 earn bonus points (+5% per additional 4 rakat).</p>
+      <p style="margin-bottom:12px;">Goal is 4 rakat. Hold and release the +/− buttons to log how many rakat you prayed. Proportional scoring: 2 rakat = 5%, 4 rakat = 10%. Extra rakat above 4 earn bonus points (+5% per additional 4 rakat).</p>
 
       <p style="margin-bottom:4px;color:var(--text);">📿 Zikr — 5%</p>
-      <p style="margin-bottom:12px;">Goal is 1,500 counts. Use the +/− buttons to log your count. Proportional scoring up to 1,500. Every additional 1,500 above the goal earns +2.5% bonus.</p>
+      <p style="margin-bottom:12px;">Goal is 1,500 counts. Hold and release the +/− buttons to log your count. Proportional scoring up to 1,500. Every additional 1,500 above the goal earns +2.5% bonus.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">📚 Hadith — 5%</p>
-      <p style="margin-bottom:12px;">Goal is 5 hadiths per day. Use the built-in Bukhari reader — it tracks your progress through 5 daily hadiths automatically. Or log manually with the number input. Proportional scoring up to 5.</p>
+      <p style="margin-bottom:12px;">Goal is 5 hadiths per day. Use the built-in Bukhari reader — it tracks your progress automatically. Or hold and release the +/− buttons to log manually. Proportional scoring up to 5. The reader takes priority over manual entry if both are used.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">🔍 Quran Meaning — 5%</p>
-      <p style="margin-bottom:12px;">Goal is 17 verses per day using the Tafsir reader (Saheeh International). The reader assigns a daily batch of 17 verses and tracks progress verse by verse. Proportional scoring up to 17 verses.</p>
+      <p style="margin-bottom:12px;">Goal is 17 verses per day using the Tafsir reader (Saheeh International). The reader assigns a daily batch and tracks progress verse by verse. Or hold and release the +/− buttons to log manually. Proportional scoring up to 17. The reader takes priority over manual entry if both are used.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">🌿 Asmaul Husna — 5%</p>
       <p style="margin-bottom:12px;">Read and reflect on the 99 Names of Allah using the built-in slide reader. Proportional scoring based on how many names you complete. Full completion = 5%.</p>
@@ -1264,7 +1270,7 @@ body.overlay-open{overflow:hidden;}
       <p style="margin-bottom:12px;">Read all 30 verses using the built-in verse reader. Proportional scoring. Intercedes for the reader on the Day of Judgement — reciting it nightly is a confirmed Sunnah.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">🏃 Exercise — 5%</p>
-      <p style="margin-bottom:12px;">Hold Yes when you have completed your exercise for the day. Binary — either done (5%) or not (0%). Use the Exercise Article button to read about Islamic perspective on physical health and a basic BMI calculator.</p>
+      <p style="margin-bottom:12px;">Hold Yes when you have completed your exercise for the day. Binary — either done (5%) or not (0%). Use the Exercise Article button to read about the Islamic perspective on physical health and a basic BMI calculator.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">📕 Book — 5%</p>
       <p style="margin-bottom:12px;">A 365-day curated reading plan covering 15 categories. Open the Book reader — each day has an assigned book with bite-sized lessons. Proportional scoring per lesson completed. Full day = 5%.</p>
@@ -1287,10 +1293,10 @@ body.overlay-open{overflow:hidden;}
       <p style="margin-bottom:12px;">Fasting. Hold Yes on any day you fasted — Ramadan, Monday/Thursday, Ayyam al-Bid, or voluntary. Flat +10% bonus.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">🌿 Sunnah Salah — up to +10%</p>
-      <p style="margin-bottom:12px;">Log your Sunnah rakat using +/− buttons. Goal is 17 rakat (full Sunnah set). Proportional up to +10%. Every rakat counts.</p>
+      <p style="margin-bottom:12px;">Hold and release the +/− buttons to log your Sunnah rakat. Goal is 17 rakat (full Sunnah set). Proportional up to +10%. Every rakat counts.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">✨ Nafl Salah — up to +10%</p>
-      <p style="margin-bottom:12px;">Log voluntary prayers beyond Sunnah. Each rakat = +0.2%, capped at +10% (50 rakat).</p>
+      <p style="margin-bottom:12px;">Hold and release the +/− buttons to log voluntary prayers beyond Sunnah. Each rakat = +0.2%, capped at +10% (50 rakat).</p>
 
       <p style="margin-bottom:4px;color:var(--text);">📖 Zikr From Book — up to +10%</p>
       <p style="margin-bottom:12px;">123 duas sourced from the book الدعاء من الكتاب والسنة — with full Arabic (harakah), transliteration, and meaning. Read through them using the slide reader. Proportional scoring up to +10%.</p>
@@ -1299,7 +1305,7 @@ body.overlay-open{overflow:hidden;}
       <p style="margin-bottom:12px;">Read all 110 verses using the built-in verse reader. Proportional per verse. Reciting on Fridays is a confirmed Sunnah with immense reward. Full completion = +10% bonus.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">💛 Sadaqah — up to +10%</p>
-      <p style="margin-bottom:12px;">Log how much you donated using the +/− counter. Goal is 50,000 units (your local currency). Proportional up to +10%. Any amount counts — even small sadaqah is never insignificant.</p>
+      <p style="margin-bottom:12px;">Hold and release the +/− buttons to log how much you donated. Goal is 50,000 units (your local currency). Proportional up to +10%. Any amount counts — even small sadaqah is never insignificant.</p>
 
       <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">💾 DATA & BACKUP</p>
       <p style="margin-bottom:16px;">Your data lives on your device. Use the <strong style="color:var(--text);">Export</strong> button regularly to download a JSON backup. Use <strong style="color:var(--text);">Import</strong> to restore from a backup or transfer to another device. Do not clear your browser storage without exporting first.</p>
@@ -1309,8 +1315,6 @@ body.overlay-open{overflow:hidden;}
 
     </div>
 
-    <div class="modal-btns" style="margin-top:24px;">
-      <button class="modal-cancel" onclick="closeReadMe()">Close</button>
     </div>
   </div>
 </div>
@@ -1484,8 +1488,18 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">📚 Hadith <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-hadith">0%</div>
       </div>
-      <div class="qr-pages-today" id="hadithReadToday">0 Hadiths Read Today</div>
       <input type="number" id="hadithManual" min="0" placeholder="0" style="display:none;">
+      <div class="stepper-row">
+        <div class="step-btn minus" data-target="hadithManual" data-delta="-1">
+          <div class="step-fill"></div>
+          <span class="step-label-base">−1</span>
+        </div>
+        <div class="qr-pages-today" id="hadithReadToday" data-suffix="Hadiths Read Today" style="flex:1;">0 Hadiths Read Today</div>
+        <div class="step-btn plus" data-target="hadithManual" data-delta="1">
+          <div class="step-fill"></div>
+          <span class="step-label-base">+1</span>
+        </div>
+      </div>
       <div class="sub-label">Goal: 5 Hadiths = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openHadithReader()">📚 Open Hadith Reader</button>
       <div class="qr-session-badge" id="hadithSessionBadge" style="display:none;"></div>
@@ -1497,8 +1511,18 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-name">🔍 Quran Meaning <span class="weight-hint">(5% Of Core)</span></div>
         <div class="goal-pct-badge" id="pct-tafsir">0%</div>
       </div>
-      <div class="qr-pages-today" id="tafsirReadToday">0 Verses Read Today</div>
       <input type="number" id="tafsirManual" min="0" placeholder="0" style="display:none;">
+      <div class="stepper-row">
+        <div class="step-btn minus" data-target="tafsirManual" data-delta="-1">
+          <div class="step-fill"></div>
+          <span class="step-label-base">−1</span>
+        </div>
+        <div class="qr-pages-today" id="tafsirReadToday" data-suffix="Verses Read Today" style="flex:1;">0 Verses Read Today</div>
+        <div class="step-btn plus" data-target="tafsirManual" data-delta="1">
+          <div class="step-fill"></div>
+          <span class="step-label-base">+1</span>
+        </div>
+      </div>
       <div class="sub-label">Goal: 17 Verses = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openTafsirReader()">🔍 Open Quran Meaning Reader</button>
       <div class="qr-session-badge" id="tafsirSessionBadge" style="display:none;"></div>
@@ -3131,6 +3155,16 @@ registerStepperRefresh('sadaqahUnits', val=>{
   const d=document.getElementById('sadaqahDisplay');
   if(d) d.textContent = `${val} Money Donated Today`;
 });
+registerStepperRefresh('hadithManual', val=>{
+  const d=document.getElementById('hadithReadToday');
+  if(d) d.textContent = `${val} ${d.dataset.suffix||'Hadiths Read Today'}`;
+  refreshScores();
+});
+registerStepperRefresh('tafsirManual', val=>{
+  const d=document.getElementById('tafsirReadToday');
+  if(d) d.textContent = `${val} ${d.dataset.suffix||'Verses Read Today'}`;
+  refreshScores();
+});
 
 /* ── Hold-to-confirm Yes/No (Sawm) ──
    Same press/fill/cancel/commit shape as Salah and the steppers, but for a
@@ -3670,7 +3704,10 @@ async function confirmImport(){
 
 /* ── Read Me ── */
 function openReadMe(){
-  document.getElementById('readMeModal').classList.add('active');
+  const modal = document.getElementById('readMeModal');
+  modal.classList.add('active');
+  const inner = modal.querySelector('.modal');
+  if(inner) inner.scrollTop = 0;
 }
 function closeReadMe(){
   document.getElementById('readMeModal').classList.remove('active');

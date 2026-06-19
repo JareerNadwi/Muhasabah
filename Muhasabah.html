@@ -1983,10 +1983,18 @@ async function openQuranReader(){
 
   if(!qrPdfDoc){
     try{
-      qrPdfDoc = await pdfjsLib.getDocument(QR_PDF_PATH).promise;
+      const loadTimeout = new Promise((_,rej)=>
+        setTimeout(()=>rej(new Error('timeout')), 20000)
+      );
+      qrPdfDoc = await Promise.race([
+        pdfjsLib.getDocument(QR_PDF_PATH).promise,
+        loadTimeout
+      ]);
     }catch(e){
       document.getElementById('qrLoading').textContent =
-        '⚠ Could Not Load Quran PDF — Google Drive may be blocking the request. Try opening the file locally or hosting on GitHub Pages.';
+        e.message === 'timeout'
+          ? '⚠ Quran PDF took too long to load — check your connection or try again.'
+          : '⚠ Could Not Load Quran PDF — Google Drive may be blocking the request. Try opening the file locally or hosting on GitHub Pages.';
       return;
     }
   }

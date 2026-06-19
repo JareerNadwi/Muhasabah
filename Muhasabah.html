@@ -2067,8 +2067,10 @@ function updateSessionInfo(){
   const el = document.getElementById('qrSessionInfo');
   if(qrCurPage >= QR_LAST_PAGE){
     el.textContent = "✓ You've completed the Quran — you may start again";
+    el.style.cssText = 'background:#1a1610;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;';
     return;
   }
+  el.style.cssText = '';
   const pagesRead = Math.max(0, qrCurPage - qrStartPage + 1);
   if(pagesRead > 0){
     const juzzRead = pagesReadToJuzz(pagesRead, qrStartPage);
@@ -4068,12 +4070,14 @@ async function openSurahVerseReader(surahNum, title, goalKey){
     document.getElementById('svLoading').style.display = 'none';
     document.getElementById('svContent').style.display = 'block';
     document.getElementById('svNav').style.display     = 'flex';
-    // Resume from next verse after last saved position
+    // Resume: _svSaved = total means completed — show last verse but don't count it as new
     const _svIdxKey = _svGoalKey + '_readerIdx';
     const _svSaved  = getCached(_svDK)[_svIdxKey];
+    const total     = _svSlice.length;
     const _svResume = (_svSaved !== undefined && _svSaved >= 0)
-      ? Math.min(_svSaved, _svSlice.length - 1) : 0;
-    _svStartIdx = _svResume;
+      ? Math.min(_svSaved, total - 1) : 0;
+    // If saved index is at or past end (done sentinel), start session counter past end so 0 new verses counted
+    _svStartIdx = (_svSaved !== undefined && _svSaved >= total) ? total : _svResume;
     _svIdx      = _svResume;
     renderSurahVerse(_svResume);
   } catch(e){
@@ -4186,12 +4190,17 @@ function _renderSvBadge(dk, goalKey){
 }
 
 async function closeSurahVerseReader(){
-  // Save current progress then store NEXT verse idx so resume starts from there
   if(_svDK && _svGoalKey && _svSlice.length > 0){
-    await _saveSvProgress(_svIdx + 1, false);
+    const total  = _svSlice.length;
+    const isDone = getCached(_svDK)[_svGoalKey] === 'yes';
+    if(!isDone){
+      // Only save progress if not already marked done (svNavNext handles the done path)
+      await _saveSvProgress(_svIdx + 1, false);
+    }
     const idxKey = _svGoalKey + '_readerIdx';
     const d = Object.assign({}, getCached(_svDK));
-    d[idxKey] = Math.min(_svIdx + 1, _svSlice.length - 1); // next verse (0-based)
+    // Store past-end sentinel when done so next open sets _svStartIdx = total → versesThisSess = 0
+    d[idxKey] = isDone ? total : Math.min(_svIdx + 1, total - 1);
     _cache[_svDK] = d;
     await setStore(_svDK, d);
   }
@@ -5997,8 +6006,11 @@ function _zbRender() {
   document.getElementById('zikrBookProgressPill').textContent = num + ' / ' + ZIKR_BOOK_TOTAL;
   document.getElementById('zikrBookPageDisplay').textContent = 'Dua ' + num + ' / ' + ZIKR_BOOK_TOTAL;
 
-  document.getElementById('zikrBookSessionInfo').textContent =
-    isLast ? "✓ You've completed the book — you may start again" : '';
+  const _zbSessEl = document.getElementById('zikrBookSessionInfo');
+  _zbSessEl.textContent = isLast ? "✓ You've completed the book — you may start again" : '';
+  _zbSessEl.style.cssText = isLast
+    ? 'background:#1a1610;border-bottom:1px solid #2a2010;padding:7px 18px;font-size:11px;color:var(--green-bright);text-align:center;'
+    : 'font-size:10px;color:var(--gold);letter-spacing:.5px;text-align:center;padding:5px 0 2px;flex-shrink:0;background:#141008;';
 
   const pb = document.getElementById('zikrBookPrevBtn');
   pb.disabled = _zbSlide === 0;

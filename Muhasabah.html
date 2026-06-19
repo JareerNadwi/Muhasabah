@@ -624,8 +624,8 @@ select option{background:#1c1f1c;}
 .yn-group{display:flex;gap:8px;}
 .yn-btn{flex:1;padding:0;height:36px;line-height:36px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;text-align:center;transition:all .15s;}
 .yn-btn:hover{border-color:var(--gold-dim);}
-.yn-btn.yes.active{background:#1a3020;border-color:var(--green-bright);color:var(--green-bright);}
-.yn-btn.no.active{background:#2a1515;border-color:var(--red);color:#c05050;}
+.yn-btn.yes.active{border-color:var(--green-bright);color:var(--green-bright);}
+.yn-btn.no.active{border-color:var(--red);color:#c05050;}
 
 /* Hold-to-confirm variant — only applied where explicitly opted in (Sawm),
    other yn-btn groups remain plain click. Reuses the same fill/label classes
@@ -663,9 +663,9 @@ select option{background:#1c1f1c;}
 .salah-opt.missed  {--fill-bg:#2a1515;--fill-text:#c05050;}
 
 /* ── Yes/No holdable (same mechanic as salah-opt, own class names) ── */
-.yn-holdable-fill{position:absolute;inset:0;width:0%;background:var(--fill-bg);z-index:1;pointer-events:none;transition:width .16s ease;}
-.yn-btn-holdable.holding .yn-holdable-fill{transition:width .6s linear;}
-.yn-btn-holdable.holding .yn-holdable-label-active{transition:clip-path .6s linear;}
+.yn-opt-fill{position:absolute;inset:0;width:0%;background:var(--fill-bg);z-index:1;pointer-events:none;transition:width .16s ease;}
+.yn-btn-holdable.holding .yn-opt-fill{transition:width .6s linear;}
+.yn-btn-holdable.holding .yn-opt-label-active{transition:clip-path .6s linear;}
 /* ── Fill/label animation — shared by salah-opt, step-btn, and yn-btn-holdable ── */
 .step-fill{position:absolute;inset:0;width:0%;background:var(--fill-bg);z-index:1;pointer-events:none;transition:width .16s ease;}
 .step-label-base,.step-label-active{position:relative;display:block;pointer-events:none;}
@@ -678,9 +678,13 @@ select option{background:#1c1f1c;}
 .step-btn.holding .step-fill,.zikr-step-btn.holding .step-fill{transition:width .3s linear;}
 .step-btn.holding .step-label-active,.zikr-step-btn.holding .step-label-active{transition:clip-path .3s linear;}
 
-/* ── Yes/No holdable buttons ── */
-.yn-btn-holdable.holding .step-fill{transition:width .6s linear;}
-.yn-btn-holdable.holding .step-label-active{transition:clip-path .6s linear;}
+/* ── Yes/No holdable (exact same pattern as salah-opt) ── */
+.yn-opt-fill{position:absolute;inset:0;width:0%;background:var(--fill-bg);z-index:1;pointer-events:none;transition:width .16s ease;}
+.yn-btn-holdable.holding .yn-opt-fill{transition:width .6s linear;}
+.yn-btn-holdable.holding .yn-opt-label-active{transition:clip-path .6s linear;}
+.yn-opt-label-base,.yn-opt-label-active{position:relative;display:block;pointer-events:none;}
+.yn-opt-label-base{z-index:2;}
+.yn-opt-label-active{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;color:var(--fill-text);clip-path:inset(0 100% 0 0);transition:clip-path .16s ease;}
 .step-btn,.zikr-step-btn{position:relative;overflow:hidden;cursor:pointer;font-family:'DM Mono',monospace;font-weight:700;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
 
 /* Card-context size (Tahajjud ±2, Zikr ±1/±10/±100) */
@@ -923,8 +927,8 @@ body.light-mode .salah-opt.active{border-color:var(--fill-text);}
 body.light-mode .yn-btn{background:var(--surface2);border-color:var(--border);color:var(--text-dim);}
 /* Yes/No buttons on goal cards had no visible hover in light mode for the same specificity reason as .salah-opt above */
 body.light-mode .yn-btn:hover{border-color:#9a7228!important;}
-body.light-mode .yn-btn.yes.active{background:#d8f0de;border-color:var(--green);color:var(--green);}
-body.light-mode .yn-btn.no.active{background:#f5dede;border-color:var(--red);color:var(--red);}
+body.light-mode .yn-btn.yes.active{border-color:var(--green);color:var(--green);}
+body.light-mode .yn-btn.no.active{border-color:var(--red);color:var(--red);}
 body.light-mode .yn-btn-holdable.yes{--fill-bg:#d8f0de;--fill-text:var(--green);}
 body.light-mode .yn-btn-holdable.no{--fill-bg:#f5dede;--fill-text:var(--red);}
 body.light-mode .salah-opt.jamaah  {--fill-bg:#d8f0de;--fill-text:var(--green);}
@@ -1478,13 +1482,15 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge bonus" id="pct-sawm">+0%</div>
       </div>
       <div class="yn-group">
-        <div class="yn-btn yn-btn-holdable yes" data-key="sawm" data-val="yes">
-          <div class="step-fill"></div>
-          <span class="step-label-base">Yes</span>
+        <div class="salah-opt jamaah yn-opt" data-key="sawm" data-val="yes">
+          <div class="salah-opt-fill"></div>
+          <span class="salah-opt-label-base">Yes</span>
+          <span class="salah-opt-label-active">Yes</span>
         </div>
-        <div class="yn-btn yn-btn-holdable no" data-key="sawm" data-val="no">
-          <div class="step-fill"></div>
-          <span class="step-label-base">No</span>
+        <div class="salah-opt missed yn-opt" data-key="sawm" data-val="no">
+          <div class="salah-opt-fill"></div>
+          <span class="salah-opt-label-base">No</span>
+          <span class="salah-opt-label-active">No</span>
         </div>
       </div>
       <div class="sub-label">+10% Bonus For Fasting Today</div>
@@ -1627,13 +1633,15 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge" id="pct-exercise">0%</div>
       </div>
       <div class="yn-group">
-        <div class="yn-btn yn-btn-holdable yes" data-key="exercise" data-val="yes">
-          <div class="step-fill"></div>
-          <span class="step-label-base">Yes</span>
+        <div class="salah-opt jamaah yn-opt" data-key="exercise" data-val="yes">
+          <div class="salah-opt-fill"></div>
+          <span class="salah-opt-label-base">Yes</span>
+          <span class="salah-opt-label-active">Yes</span>
         </div>
-        <div class="yn-btn yn-btn-holdable no" data-key="exercise" data-val="no">
-          <div class="step-fill"></div>
-          <span class="step-label-base">No</span>
+        <div class="salah-opt missed yn-opt" data-key="exercise" data-val="no">
+          <div class="salah-opt-fill"></div>
+          <span class="salah-opt-label-base">No</span>
+          <span class="salah-opt-label-active">No</span>
         </div>
       </div>
       <div class="sub-label">Goal: 30 Minutes Of Exercise = Full 5% Core</div>
@@ -1671,13 +1679,15 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge" id="pct-tafakkur">0%</div>
       </div>
       <div class="yn-group">
-        <div class="yn-btn yn-btn-holdable yes" data-key="tafakkur" data-val="yes">
-          <div class="step-fill"></div>
-          <span class="step-label-base">Yes</span>
+        <div class="salah-opt jamaah yn-opt" data-key="tafakkur" data-val="yes">
+          <div class="salah-opt-fill"></div>
+          <span class="salah-opt-label-base">Yes</span>
+          <span class="salah-opt-label-active">Yes</span>
         </div>
-        <div class="yn-btn yn-btn-holdable no" data-key="tafakkur" data-val="no">
-          <div class="step-fill"></div>
-          <span class="step-label-base">No</span>
+        <div class="salah-opt missed yn-opt" data-key="tafakkur" data-val="no">
+          <div class="salah-opt-fill"></div>
+          <span class="salah-opt-label-base">No</span>
+          <span class="salah-opt-label-active">No</span>
         </div>
       </div>
       <div class="sub-label">Goal: Reflect &amp; Contemplate Today = Full 5% Core</div>
@@ -1694,29 +1704,34 @@ body.overlay-open{overflow:hidden;}
         <div class="net-sub-row">
           <span class="net-sub-label">LinkedIn Post <span class="weight-hint">(2.5%)</span></span>
           <div class="yn-mini" style="width:220px;">
-            <div class="yn-btn yn-btn-holdable yes" data-key="writingLinkedin" data-val="yes">
-              <div class="step-fill"></div>
-              <span class="step-label-base">Yes</span>
+            <div class="salah-opt jamaah yn-opt" data-key="writingLinkedin" data-val="yes">
+              <div class="salah-opt-fill"></div>
+              <span class="salah-opt-label-base">Yes</span>
+              <span class="salah-opt-label-active">Yes</span>
             </div>
-            <div class="yn-btn yn-btn-holdable no" data-key="writingLinkedin" data-val="no">
-              <div class="step-fill"></div>
-              <span class="step-label-base">No</span>
+            <div class="salah-opt missed yn-opt" data-key="writingLinkedin" data-val="no">
+              <div class="salah-opt-fill"></div>
+              <span class="salah-opt-label-base">No</span>
+              <span class="salah-opt-label-active">No</span>
+            </div>
             </div>
           </div>
         </div>
         <div class="net-sub-row">
           <span class="net-sub-label">Facebook Post <span class="weight-hint">(2.5%)</span></span>
           <div class="yn-mini" style="width:220px;">
-            <div class="yn-btn yn-btn-holdable yes" data-key="writingFacebook" data-val="yes">
-              <div class="step-fill"></div>
-              <span class="step-label-base">Yes</span>
+            <div class="salah-opt jamaah yn-opt" data-key="writingFacebook" data-val="yes">
+              <div class="salah-opt-fill"></div>
+              <span class="salah-opt-label-base">Yes</span>
+              <span class="salah-opt-label-active">Yes</span>
             </div>
-            <div class="yn-btn yn-btn-holdable no" data-key="writingFacebook" data-val="no">
-              <div class="step-fill"></div>
-              <span class="step-label-base">No</span>
+            <div class="salah-opt missed yn-opt" data-key="writingFacebook" data-val="no">
+              <div class="salah-opt-fill"></div>
+              <span class="salah-opt-label-base">No</span>
+              <span class="salah-opt-label-active">No</span>
+            </div>
             </div>
           </div>
-        </div>
       </div>
       <div class="sub-label">Goal: Write 1 LinkedIn Post + 1 Facebook Post = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openPostWriter()">✦ Open AI Post Writer</button>
@@ -1732,29 +1747,34 @@ body.overlay-open{overflow:hidden;}
         <div class="net-sub-row">
           <span class="net-sub-label">Connected With 5+ People <span class="weight-hint">(2.5%)</span></span>
           <div class="yn-mini" style="width:220px;">
-            <div class="yn-btn yn-btn-holdable yes" data-key="netConnected" data-val="yes">
-              <div class="step-fill"></div>
-              <span class="step-label-base">Yes</span>
+            <div class="salah-opt jamaah yn-opt" data-key="netConnected" data-val="yes">
+              <div class="salah-opt-fill"></div>
+              <span class="salah-opt-label-base">Yes</span>
+              <span class="salah-opt-label-active">Yes</span>
             </div>
-            <div class="yn-btn yn-btn-holdable no" data-key="netConnected" data-val="no">
-              <div class="step-fill"></div>
-              <span class="step-label-base">No</span>
+            <div class="salah-opt missed yn-opt" data-key="netConnected" data-val="no">
+              <div class="salah-opt-fill"></div>
+              <span class="salah-opt-label-base">No</span>
+              <span class="salah-opt-label-active">No</span>
+            </div>
             </div>
           </div>
         </div>
         <div class="net-sub-row">
           <span class="net-sub-label">Built Rapport With 5+ People <span class="weight-hint">(2.5%)</span></span>
           <div class="yn-mini" style="width:220px;">
-            <div class="yn-btn yn-btn-holdable yes" data-key="netCommented" data-val="yes">
-              <div class="step-fill"></div>
-              <span class="step-label-base">Yes</span>
+            <div class="salah-opt jamaah yn-opt" data-key="netCommented" data-val="yes">
+              <div class="salah-opt-fill"></div>
+              <span class="salah-opt-label-base">Yes</span>
+              <span class="salah-opt-label-active">Yes</span>
             </div>
-            <div class="yn-btn yn-btn-holdable no" data-key="netCommented" data-val="no">
-              <div class="step-fill"></div>
-              <span class="step-label-base">No</span>
+            <div class="salah-opt missed yn-opt" data-key="netCommented" data-val="no">
+              <div class="salah-opt-fill"></div>
+              <span class="salah-opt-label-base">No</span>
+              <span class="salah-opt-label-active">No</span>
+            </div>
             </div>
           </div>
-        </div>
       </div>
       <div class="sub-label">Goal: Connect &amp; Build Rapport With 5+ People = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openContactBook()">📒 Open Contact Book &amp; CRM</button>
@@ -2798,10 +2818,10 @@ function loadDayData(dk){
   ['hadith','tafsir','asmaul','zikrMorning','zikrEvening','surahWaqiah','surahMulk','sawm',
    'exercise','books','language','writingLinkedin','writingFacebook','netConnected','netCommented','surahKahf','tafakkur','zikrBook']
     .forEach(key=>{
-      document.querySelectorAll(`.yn-btn[data-key="${key}"]`).forEach(btn=>{
+      document.querySelectorAll(`.yn-opt[data-key="${key}"]`).forEach(btn=>{
         const active = btn.dataset.val===data[key];
         btn.classList.toggle('active', active);
-        if(btn.classList.contains('yn-btn-holdable')) setYnProgress(btn, active?100:0);
+        setSalahOptProgress(btn, active ? 100 : 0);
       });
     });
 
@@ -3003,88 +3023,70 @@ registerStepperRefresh('sadaqahUnits', val=>{
    Same press/fill/cancel/commit shape as Salah and the steppers, but for a
    plain binary toggle. The actual data mutation is left entirely to the
    existing setYN() — this only drives the visual hold and then calls it. */
-var YN_HOLD_MS = 600;
-var _ynPress = null;
+/* ── Yes/No opt buttons — exact copy of salah-opt mechanic, calls setYN ── */
+let _ynOptPress = null;
 
-function setYnProgress(el, pct){
-  var fill = el.querySelector('.step-fill');
-  if(fill) fill.style.width = pct + '%';
-}
-
-function onYnPointerDown(e){
+function onYnOptPointerDown(e){
   e.preventDefault();
-  var el = e.currentTarget;
-  if(_ynPress) ynResolveCancel();
+  const el = e.currentTarget;
+  if(_ynOptPress) ynOptResolveCancel();
 
-  var group = el.closest('.yn-group') || el.closest('.yn-mini');
-  var activeEl = group ? group.querySelector('.yn-btn.active') : null;
-  var mode, partner = null;
-  if(activeEl === el)     mode = 'deselect';
+  const group = el.closest('.yn-group') || el.closest('.yn-mini');
+  const activeEl = group ? group.querySelector('.yn-opt.active') : null;
+  let mode, partner = null;
+  if(activeEl === el)      mode = 'deselect';
   else if(activeEl){ mode = 'switch'; partner = activeEl; }
   else               mode = 'select';
 
-  // Explicitly set starting fill positions before adding .holding so the
-  // browser has a concrete start value for each transition
-  if(mode === 'deselect'){
-    setYnProgress(el, 100);      // seat at 100 — will drain to 0
-  } else if(mode === 'switch'){
-    setYnProgress(el, 0);        // seat at 0  — will fill to 100
-    if(partner) setYnProgress(partner, 100); // seat at 100 — will drain to 0
-  } else {
-    setYnProgress(el, 0);        // seat at 0  — will fill to 100
-  }
-
-  // Force reflow so browser commits the starting values before transition begins
-  void el.offsetWidth;
-  if(partner) void partner.offsetWidth;
-
   el.classList.add('holding');
   if(partner) partner.classList.add('holding');
-  var raf = requestAnimationFrame(function(){
-    setYnProgress(el, mode === 'deselect' ? 0 : 100);
-    if(partner) setYnProgress(partner, 0);
+  const raf = requestAnimationFrame(() => {
+    setSalahOptProgress(el, mode === 'deselect' ? 0 : 100);
+    if(partner) setSalahOptProgress(partner, 0);
   });
-  var timer = setTimeout(function(){ ynCommit(el, mode, partner); }, YN_HOLD_MS);
-  _ynPress = {el:el, partner:partner, mode:mode, timer:timer, raf:raf};
+  const timer = setTimeout(() => ynOptCommit(el, mode, partner), SALAH_HOLD_MS);
+  _ynOptPress = {el, partner, mode, timer, raf};
 }
 
-function onYnPointerCancel(e){
-  if(!_ynPress || _ynPress.el !== e.currentTarget) return;
-  ynResolveCancel();
+function onYnOptPointerCancel(e){
+  if(!_ynOptPress || _ynOptPress.el !== e.currentTarget) return;
+  ynOptResolveCancel();
 }
 
-function ynResolveCancel(){
-  var p = _ynPress; _ynPress = null;
-  clearTimeout(p.timer);
-  cancelAnimationFrame(p.raf);
-  p.el.classList.remove('holding');
-  setYnProgress(p.el, p.mode === 'deselect' ? 100 : 0);
-  if(p.partner){
-    p.partner.classList.remove('holding');
-    setYnProgress(p.partner, 100);
+function ynOptResolveCancel(){
+  const {el, partner, mode, timer, raf} = _ynOptPress;
+  clearTimeout(timer);
+  cancelAnimationFrame(raf);
+  el.classList.remove('holding');
+  setSalahOptProgress(el, mode === 'deselect' ? 100 : 0);
+  if(partner){
+    partner.classList.remove('holding');
+    setSalahOptProgress(partner, 100);
   }
+  _ynOptPress = null;
 }
 
-function ynCommit(el, mode, partner){
-  _ynPress = null;
+function ynOptCommit(el, mode, partner){
+  cancelAnimationFrame(_ynOptPress.raf);
   el.classList.remove('holding');
   if(partner) partner.classList.remove('holding');
-  setYnProgress(el, mode === 'deselect' ? 0 : 100);
-  if(partner) setYnProgress(partner, 0);
+  setSalahOptProgress(el, mode === 'deselect' ? 0 : 100);
+  if(partner) setSalahOptProgress(partner, 0);
+  _ynOptPress = null;
   setYN(el.dataset.key, el.dataset.val);
 }
 
-function bindYnHoldable(container){
-  (container || document).querySelectorAll('.yn-btn-holdable').forEach(function(el){
-    el.addEventListener('pointerdown', onYnPointerDown);
-    el.addEventListener('pointerup', onYnPointerCancel);
-    el.addEventListener('pointerleave', onYnPointerCancel);
-    el.addEventListener('pointercancel', onYnPointerCancel);
-    el.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+function bindYnOpt(container){
+  (container || document).querySelectorAll('.yn-opt').forEach(el => {
+    el.addEventListener('pointerdown', onYnOptPointerDown);
+    el.addEventListener('pointerup', onYnOptPointerCancel);
+    el.addEventListener('pointerleave', onYnOptPointerCancel);
+    el.addEventListener('pointercancel', onYnOptPointerCancel);
+    el.addEventListener('contextmenu', e => e.preventDefault());
   });
 }
 
-document.addEventListener('DOMContentLoaded', function(){ bindYnHoldable(); });
+document.addEventListener('DOMContentLoaded', function(){ bindYnOpt(); });
 
 /* Called by interactive controls (salah, yn) — saves to IDB + updates cache */
 async function saveAndRefresh(){
@@ -3248,12 +3250,10 @@ async function setYN(key,val){
   if(newVal===null) delete data[key]; else data[key]=newVal;
   _cache[currentDateKey]=data;
   await setStore(currentDateKey,data);
-  document.querySelectorAll(`.yn-btn[data-key="${key}"]`).forEach(btn=>{
+  document.querySelectorAll(`.yn-opt[data-key="${key}"]`).forEach(btn=>{
     const active = btn.dataset.val===newVal;
     btn.classList.toggle('active', active);
-    // Sync fill for holdable buttons: active = 100 (so next deselect/switch
-    // has a full bar to drain from), inactive = 0
-    if(btn.classList.contains('yn-btn-holdable')) setYnProgress(btn, active?100:0);
+    setSalahOptProgress(btn, active ? 100 : 0);
   });
   refreshScores();
 }
@@ -4135,7 +4135,7 @@ async function _saveSvProgress(readCount, done){
   _cache[_svDK] = data;
   await setStore(_svDK, data);
   if(done){
-    document.querySelectorAll('.yn-btn[data-key="'+_svGoalKey+'"]').forEach(btn =>
+    document.querySelectorAll('.yn-opt[data-key="'+_svGoalKey+'"]').forEach(btn =>
       btn.classList.toggle('active', btn.dataset.val === 'yes')
     );
   }
@@ -5625,7 +5625,7 @@ async function _saveAsmaulProgress(done){
   _cache[_asmaulDK] = data;
   await setStore(_asmaulDK, data);
   if(done){
-    document.querySelectorAll(".yn-btn[data-key=\"asmaul\"]").forEach(function(btn){
+    document.querySelectorAll(".yn-opt[data-key=\"asmaul\"]").forEach(function(btn){
       btn.classList.toggle("active", btn.dataset.val === "yes");
     });
   }
@@ -5826,7 +5826,7 @@ async function _saveZikrProgress(done){
   data[_zikrRatioKey()]=ratio;data[_zikrIdxKey()]=_zikrSlide;
   if(done)data[_zikrGoalKey()]="yes";
   _cache[_zikrDK]=data;await setStore(_zikrDK,data);
-  if(done){document.querySelectorAll(".yn-btn[data-key=\""+_zikrGoalKey()+"\"]").forEach(function(b){b.classList.toggle("active",b.dataset.val==="yes");});}
+  if(done){document.querySelectorAll(".yn-opt[data-key=\""+_zikrGoalKey()+"\"]").forEach(function(b){b.classList.toggle("active",b.dataset.val==="yes");});}
   refreshReadTodayDisplays();
   refreshScores();renderZikrBadge(_zikrDK,_zikrMode);
 }
@@ -6106,7 +6106,7 @@ async function _zbSaveProgress(reachedEnd) {
 
   // Reflect auto-completion on the Yes/No buttons
   if (ratio >= 1) {
-    document.querySelectorAll('.yn-btn[data-key="zikrBook"]').forEach(btn =>
+    document.querySelectorAll('.yn-opt[data-key="zikrBook"]').forEach(btn =>
       btn.classList.toggle('active', btn.dataset.val === 'yes')
     );
   }
@@ -7438,7 +7438,7 @@ function lrSaveRatioToDay() {
   _cache[currentDateKey] = data;
   // Update Yes/No button visual state
   const yesVal = allDone ? 'yes' : null;
-  document.querySelectorAll('.yn-btn[data-key="language"]').forEach(btn => {
+  document.querySelectorAll('.yn-opt[data-key="language"]').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.val === yesVal);
   });
   const doneNoteEl = document.getElementById('lrDoneNote');

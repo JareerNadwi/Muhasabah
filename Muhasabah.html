@@ -602,7 +602,7 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 
 /* ── Goal Cards ── */
 .goals-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
-.goal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;transition:border-color .2s;}
+.goal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;transition:border-color .2s;min-width:0;}
 .goal-card.completed{border-color:var(--green);}
 .goal-card.partial{border-color:var(--gold-dim);}
 .goal-card.bonus-card{border-color:#2a1a3a;}
@@ -712,9 +712,10 @@ select option{background:#1c1f1c;}
 .quran-row{display:flex;gap:8px;margin-bottom:6px;}
 .quran-row select{flex:1;}
 .net-sub{display:flex;flex-direction:column;gap:5px;}
-.net-sub-row{display:flex;align-items:center;gap:6px;}
-.net-sub-label{font-size:10px;color:var(--text-dim);flex:1;line-height:1.3;}
-.yn-mini{display:flex;gap:4px;width:160px;flex-shrink:0;}
+.net-sub-row{display:flex;align-items:center;gap:6px;min-width:0;}
+.net-sub-label{font-size:10px;color:var(--text-dim);flex:1;min-width:0;line-height:1.3;}
+.yn-mini{display:flex;gap:4px;flex-shrink:0;width:auto;}
+.yn-mini .salah-opt{min-width:42px;}
 .yn-mini .yn-btn{padding:0 4px;font-size:9px;height:28px;line-height:28px;}
 
 /* ── Counter Box ── */

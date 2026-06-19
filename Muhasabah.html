@@ -601,13 +601,8 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 .bonus-tag{font-size:8px;letter-spacing:1px;color:var(--purple-bright);background:#1a102a;border:1px solid var(--purple);padding:2px 8px;border-radius:10px;}
 
 /* ── Goal Cards ── */
-.goals-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;align-items:stretch;}
+.goals-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
 .goal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;transition:border-color .2s;min-width:0;display:flex;flex-direction:column;}
-.goal-card .qr-open-btn{margin-top:8px;}
-.goal-card .sub-label{margin-top:auto;padding-top:6px;}
-.goal-card .sub-label + .qr-open-btn{margin-top:6px;}
-.goal-card .salah-hint{margin-top:auto;padding-top:6px;}
-.goal-card .salah-hint + .qr-open-btn{margin-top:6px;}
 .goal-card.completed{border-color:var(--green);}
 .goal-card.partial{border-color:var(--gold-dim);}
 .goal-card.bonus-card{border-color:#2a1a3a;}
@@ -643,7 +638,7 @@ select option{background:#1c1f1c;}
 .yn-btn-holdable.no{--fill-bg:#4a1818;--fill-text:#e06060;}
 
 /* ── Salah ── */
-.salah-hint{font-size:9px;color:var(--text-muted);margin-top:6px;margin-bottom:0;line-height:1.6;background:var(--surface2);padding:7px 10px;border-radius:4px;}
+.salah-hint{font-size:9px;color:var(--text-muted);margin-bottom:10px;line-height:1.6;background:var(--surface2);padding:7px 10px;border-radius:4px;}
 .salah-grid{display:flex;flex-direction:column;gap:9px;}
 .salah-row{display:flex;align-items:center;gap:8px;}
 .salah-name{width:72px;font-size:11px;color:var(--text-dim);flex-shrink:0;}
@@ -678,7 +673,7 @@ select option{background:#1c1f1c;}
 .step-label-active{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;color:var(--fill-text);clip-path:inset(0 100% 0 0);transition:clip-path .16s ease;}
 
 /* ── Long-press stepper buttons ── */
-.stepper-row{display:flex;align-items:center;gap:8px;margin-top:0;}
+.stepper-row{display:flex;align-items:center;gap:8px;}
 .step-btn,.zikr-step-btn{position:relative;overflow:hidden;cursor:pointer;font-family:'DM Mono',monospace;font-weight:700;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
 .step-btn.holding .step-fill,.zikr-step-btn.holding .step-fill{transition:width .3s linear;}
 .step-btn.holding .step-label-active,.zikr-step-btn.holding .step-label-active{transition:clip-path .3s linear;}
@@ -861,14 +856,14 @@ canvas#qrCanvas{
   font-family:'DM Mono',monospace;
 }
 .qr-open-btn{
-  margin-top:8px;width:100%;padding:10px;box-sizing:border-box;
+  margin-top:10px;width:100%;padding:10px;
   background:linear-gradient(135deg,#0f1a12,#1a2a1a);
   border:1px solid var(--green);border-radius:var(--radius);
   color:var(--green-bright);cursor:pointer;font-family:'DM Mono',monospace;
   font-size:11px;letter-spacing:1px;transition:all .2s;
 }
 .qr-open-btn:hover{background:linear-gradient(135deg,#152010,#253525);box-shadow:0 0 12px rgba(74,124,89,.2);}
-.qr-pages-today{font-size:13px;color:var(--text-dim);background:var(--surface2);height:36px;line-height:36px;padding:0 10px;border-radius:var(--radius);text-align:center;letter-spacing:.5px;margin-bottom:0;}
+.qr-pages-today{font-size:13px;color:var(--text-dim);background:var(--surface2);height:36px;line-height:36px;padding:0 10px;border-radius:var(--radius);text-align:center;letter-spacing:.5px;}
 .qr-session-badge{
   margin-top:8px;font-size:10px;color:var(--text-muted);letter-spacing:.5px;
   background:var(--surface2);padding:5px 8px;border-radius:3px;line-height:1.6;
@@ -1261,11 +1256,11 @@ body.overlay-open{overflow:hidden;}
         <div class="goal-pct-badge" id="pct-salah">0%</div>
       </div>
       <div class="salah-grid" id="salahGrid"></div>
-      <div class="salah-hint">
+      <div class="salah-hint" style="margin-top:6px;margin-bottom:0;">
         Jamā'ah = 100% &nbsp;·&nbsp; Munfarid = 75% &nbsp;·&nbsp; Qadhā = 25% &nbsp;·&nbsp; Missed = 0%<br>
         Each Of The 5 Prayers Contributes 2% To Core Score &nbsp;·&nbsp; All 5 Jamā'ah = Full 10%
       </div>
-      <button class="qr-open-btn" onclick="openSalahArticle()">🕌 Open Salah Article</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openSalahArticle()">🕌 Open Salah Article</button>
     </div>
 
     <!-- Quran 10% -->
@@ -1345,7 +1340,7 @@ body.overlay-open{overflow:hidden;}
         </div>
       </div>
       <div class="sub-label">Goal: 4 Rakat = Full 10% Core &nbsp;·&nbsp; Every Extra 4 Rakat = +5% Bonus</div>
-      <button class="qr-open-btn" onclick="openArticle('tahajjud')">🌙 Open Tahajjud Article</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('tahajjud')">🌙 Open Tahajjud Article</button>
     </div>
 
     <!-- Zikr 5% -->
@@ -1383,7 +1378,7 @@ body.overlay-open{overflow:hidden;}
         </div>
       </div>
       <div class="sub-label">Goal: 1500 Zikr = Full 5% Core &nbsp;·&nbsp; Every Extra 1500 Zikr = +2.5% Bonus</div>
-      <button class="qr-open-btn" onclick="openArticle('zikr')">📿 Open Zikr Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('zikr')">📿 Open Zikr Reader</button>
     </div>
 
     <!-- Hadith 5% -->
@@ -1395,7 +1390,7 @@ body.overlay-open{overflow:hidden;}
       <div class="qr-pages-today" id="hadithReadToday">0 Hadiths Read Today</div>
       <input type="number" id="hadithManual" min="0" placeholder="0" style="display:none;">
       <div class="sub-label">Goal: 5 Hadiths = Full 5% Core</div>
-      <button class="qr-open-btn" onclick="openHadithReader()">📚 Open Hadith Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openHadithReader()">📚 Open Hadith Reader</button>
       <div class="qr-session-badge" id="hadithSessionBadge" style="display:none;"></div>
     </div>
 
@@ -1408,7 +1403,7 @@ body.overlay-open{overflow:hidden;}
       <div class="qr-pages-today" id="tafsirReadToday">0 Verses Read Today</div>
       <input type="number" id="tafsirManual" min="0" placeholder="0" style="display:none;">
       <div class="sub-label">Goal: 17 Verses = Full 5% Core</div>
-      <button class="qr-open-btn" onclick="openTafsirReader()">🔍 Open Quran Meaning Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openTafsirReader()">🔍 Open Quran Meaning Reader</button>
       <div class="qr-session-badge" id="tafsirSessionBadge" style="display:none;"></div>
     </div>
 
@@ -1420,7 +1415,7 @@ body.overlay-open{overflow:hidden;}
       </div>
       <div class="qr-pages-today" id="asmaulReadToday">0 Names Read Today</div>
       <div class="sub-label">Goal: Read All 99 Names Of Allah SWT = Full 5% Core</div>
-      <button class="qr-open-btn" onclick="openAsmaulReader()">🌿 Open Asmaul Husna Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openAsmaulReader()">🌿 Open Asmaul Husna Reader</button>
       <div class="qr-session-badge" id="asmaulSessionBadge" style="display:none;"></div>
     </div>
 
@@ -1432,7 +1427,7 @@ body.overlay-open{overflow:hidden;}
       </div>
       <div class="qr-pages-today" id="zikrMorningReadToday">0 Duas Read Today</div>
       <div class="sub-label">Goal: Read All 77 Duas = Full 5% Core</div>
-      <button class="qr-open-btn" onclick="openZikrReader('morning')">☀️ Open Zikr Morning Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openZikrReader('morning')">☀️ Open Zikr Morning Reader</button>
       <div class="qr-session-badge" id="zikrMorningSessionBadge" style="display:none;"></div>
     </div>
 
@@ -1444,7 +1439,7 @@ body.overlay-open{overflow:hidden;}
       </div>
       <div class="qr-pages-today" id="zikrEveningReadToday">0 Duas Read Today</div>
       <div class="sub-label">Goal: Read All 77 Duas = Full 5% Core</div>
-      <button class="qr-open-btn" onclick="openZikrReader('evening')">🌆 Open Zikr Evening Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openZikrReader('evening')">🌆 Open Zikr Evening Reader</button>
       <div class="qr-session-badge" id="zikrEveningSessionBadge" style="display:none;"></div>
     </div>
 
@@ -1456,7 +1451,7 @@ body.overlay-open{overflow:hidden;}
       </div>
       <div class="qr-pages-today" id="surahWaqiahReadToday">0 Verses Read Today</div>
       <div class="sub-label">Goal: Read All 96 Verses = Full 5% Core</div>
-      <button class="qr-open-btn" onclick="openPdfReader('surahWaqiah')">📜 Open Surah Al-Waqiah Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahWaqiah')">📜 Open Surah Al-Waqiah Reader</button>
       <div class="qr-session-badge" id="surahWaqiahSessionBadge" style="display:none;"></div>
     </div>
 
@@ -1468,7 +1463,7 @@ body.overlay-open{overflow:hidden;}
       </div>
       <div class="qr-pages-today" id="surahMulkReadToday">0 Verses Read Today</div>
       <div class="sub-label">Goal: Read All 30 Verses = Full 5% Core</div>
-      <button class="qr-open-btn" onclick="openPdfReader('surahMulk')">📜 Open Surah Al-Mulk Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahMulk')">📜 Open Surah Al-Mulk Reader</button>
       <div class="qr-session-badge" id="surahMulkSessionBadge" style="display:none;"></div>
     </div>
 
@@ -1500,7 +1495,7 @@ body.overlay-open{overflow:hidden;}
         </div>
       </div>
       <div class="sub-label">+10% Bonus For Fasting Today</div>
-      <button class="qr-open-btn" onclick="openArticle('sawm')">🌙 Open Sawm Article</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('sawm')">🌙 Open Sawm Article</button>
     </div>
 
     <!-- Sunnah Salah +10% max -->
@@ -1530,7 +1525,7 @@ body.overlay-open{overflow:hidden;}
         </div>
       </div>
       <div class="sub-label">Max +10% At 17 Rakat</div>
-      <button class="qr-open-btn" onclick="openArticle('sunnahSalah')">🌿 Open Sunnah Salah Article</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('sunnahSalah')">🌿 Open Sunnah Salah Article</button>
     </div>
 
     <!-- Nafl Salah +10% max -->
@@ -1552,7 +1547,7 @@ body.overlay-open{overflow:hidden;}
         </div>
       </div>
       <div class="sub-label">Max +10% At 50 Rakat</div>
-      <button class="qr-open-btn" onclick="openArticle('naflSalah')">✨ Open Nafl Salah Article</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('naflSalah')">✨ Open Nafl Salah Article</button>
     </div>
 
     <!-- Zikr From Book +10% max -->
@@ -1564,7 +1559,7 @@ body.overlay-open{overflow:hidden;}
       <div class="qr-pages-today" id="zikrBookReadToday">0 Duas Read Today</div>
       <input type="number" id="zikrBookPages" style="display:none;" tabindex="-1" aria-hidden="true">
       <div class="sub-label">Max +10% At 123 Duas Read</div>
-      <button class="qr-open-btn" onclick="openZikrBookReader()">📖 Open Zikr From Book Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openZikrBookReader()">📖 Open Zikr From Book Reader</button>
       <div class="qr-session-badge" id="zikrBookReaderBadge" style="display:none;"></div>
     </div>
 
@@ -1576,7 +1571,7 @@ body.overlay-open{overflow:hidden;}
       </div>
       <div class="qr-pages-today" id="surahKahfReadToday">0 Verses Read Today</div>
       <div class="sub-label">Max +10% At All 110 Verses Read</div>
-      <button class="qr-open-btn" onclick="openPdfReader('surahKahf')">📜 Open Surah Al-Kahf Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPdfReader('surahKahf')">📜 Open Surah Al-Kahf Reader</button>
       <div class="qr-session-badge" id="surahKahfSessionBadge" style="display:none;"></div>
     </div>
 
@@ -1623,7 +1618,7 @@ body.overlay-open{overflow:hidden;}
         </div>
       </div>
       <div class="sub-label">Max +10% At 50,000 Money Donated</div>
-      <button class="qr-open-btn" onclick="openArticle('sadaqah')">💛 Open Sadaqah Article</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('sadaqah')">💛 Open Sadaqah Article</button>
     </div>
 
   </div><!-- /bonus ibadah -->
@@ -1651,7 +1646,7 @@ body.overlay-open{overflow:hidden;}
         </div>
       </div>
       <div class="sub-label">Goal: 30 Minutes Of Exercise = Full 5% Core</div>
-      <button class="qr-open-btn" onclick="openArticle('exercise')">🏃 Open Exercise Article</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('exercise')">🏃 Open Exercise Article</button>
     </div>
 
     <!-- Book 5% -->
@@ -1662,7 +1657,7 @@ body.overlay-open{overflow:hidden;}
       </div>
       <div class="qr-pages-today" id="bookReadToday">0 Pages Read Today</div>
       <div class="sub-label">Goal: Read Today's Book = Full 5% Core</div>
-      <button class="qr-open-btn" onclick="openBookReader()">📗 Open Book Reader</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openBookReader()">📗 Open Book Reader</button>
       <div class="qr-session-badge" id="bookSessionBadge" style="display:none;"></div>
     </div>
 
@@ -1674,7 +1669,7 @@ body.overlay-open{overflow:hidden;}
       </div>
       <div class="qr-pages-today" id="languageLearnedToday">0 Words · 0 Verbs Learnt Today</div>
       <div class="sub-label">Goal: Study Today's Words and Verbs In Your Language(s) = Full 5% Core</div>
-      <button class="qr-open-btn" onclick="openLanguageReader()">🗣 Open Language Learner</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openLanguageReader()">🗣 Open Language Learner</button>
       <div class="qr-session-badge" id="langSessionBadge" style="display:none;color:#c9a84c;"></div>
     </div>
 
@@ -1697,7 +1692,7 @@ body.overlay-open{overflow:hidden;}
         </div>
       </div>
       <div class="sub-label">Goal: Reflect &amp; Contemplate Today = Full 5% Core</div>
-      <button class="qr-open-btn" onclick="openArticle('tafakkur')">🌿 Open Tafakkur Article</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('tafakkur')">🌿 Open Tafakkur Article</button>
     </div>
 
   </div><!-- /growth -->
@@ -1744,7 +1739,7 @@ body.overlay-open{overflow:hidden;}
         </div>
       </div>
       <div class="sub-label">Goal: Write 1 LinkedIn Post + 1 Facebook Post = Full 5% Core</div>
-      <button class="qr-open-btn" onclick="openPostWriter()">✦ Open AI Post Writer</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openPostWriter()">✦ Open AI Post Writer</button>
     </div>
 
     <!-- Networking 5% -->
@@ -1786,7 +1781,7 @@ body.overlay-open{overflow:hidden;}
         </div>
       </div>
       <div class="sub-label">Goal: Connect &amp; Build Rapport With 5+ People = Full 5% Core</div>
-      <button class="qr-open-btn" onclick="openContactBook()">📒 Open Contact Book &amp; CRM</button>
+      <button class="qr-open-btn" style="margin-top:8px;" onclick="openContactBook()">📒 Open Contact Book &amp; CRM</button>
     </div>
 
   </div><!-- /writing-networking -->

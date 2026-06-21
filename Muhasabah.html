@@ -1967,13 +1967,13 @@ let currentDateKey=null;
 
 /* ══════════════════════════════════════════════════════════
    QURAN READER
-   PDF: Imdadia-Hafezi-Quran.pdf (must be in same folder as HTML)
+   PDF: fetched from GitHub Pages (jareernadwi.github.io/Muhasabah) — requires internet
    PDF page 1 = Cover, PDF page 2 = Quran page 1 (Fatiha)
    PDF pages 2–613 = 612 Quran pages, page 614 = Index
    Quran page N = PDF page N+1
    30 juzz × ~20.4 pages each
 ══════════════════════════════════════════════════════════ */
-const QR_PDF_PATH    = 'Imdadia%20Hafezi%20Quran.pdf';
+const QR_PDF_PATH    = 'https://jareernadwi.github.io/Muhasabah/Imdadia%20Hafezi%20Quran.pdf';
 const QR_FIRST_PAGE  = 1;   // PDF page 1 = Fatiha
 const QR_LAST_PAGE   = 610; // last page of Quran
 const QR_TOTAL_QURAN = 610; // total pages
@@ -2096,7 +2096,7 @@ async function openQuranReader(){
       document.getElementById('qrLoading').textContent =
         e.message === 'timeout'
           ? '⚠ Quran PDF took too long to load — check your connection or try again.'
-          : '⚠ Could Not Load Quran PDF — Google Drive may be blocking the request. Try opening the file locally or hosting on GitHub Pages.';
+          : '⚠ Could Not Load Quran PDF — check your internet connection and try again.';
       return;
     }
   }

@@ -893,6 +893,7 @@ body.light-mode{
 }
 body.light-mode .header{background:var(--surface);border-bottom-color:var(--border);}
 body.light-mode .back-btn,body.light-mode .dark-toggle,body.light-mode .export-btn,body.light-mode .import-btn,body.light-mode .reset-btn{background:var(--surface2);}
+body.light-mode .save-btn{color:#ffffff;}
 body.light-mode .dark-toggle:hover{border-color:var(--gold-dim);color:var(--text);}
 body.light-mode .reset-btn{color:var(--red);border-color:#e0c0c0;}
 body.light-mode .back-btn:hover{color:var(--text);border-color:var(--gold-dim);background:#e8e2d6;}
@@ -2402,7 +2403,15 @@ async function getAllStoredData(){
     const req=tx.objectStore(STORE).getAll();
     req.onsuccess=()=>{
       const out={};
-      (req.result||[]).forEach(row=>{if(Object.keys(row.data).length>0)out[row.dk]=row.data;});
+      (req.result||[]).forEach(row=>{
+        const d=row.data;
+        // Skip only genuinely empty day records ({}). Resume pointers (Quran
+        // last page, Hadith/Tafsir/Book/Asmaul/Zikr-From-Book indices) are
+        // stored as plain numbers under special keys — Object.keys(42) is []
+        // so the old check silently dropped every one of them from exports.
+        const isEmptyObj = d && typeof d==='object' && !Array.isArray(d) && Object.keys(d).length===0;
+        if(d!==null && d!==undefined && !isEmptyObj) out[row.dk]=d;
+      });
       res(out);
     };
     req.onerror=e=>rej(e.target.error);

@@ -917,6 +917,16 @@ body.past-day-locked #dailyView select{
 body.past-day-locked #pastDayBanner{display:block;}
 body.light-mode #pastDayBanner{background:#fdf5dc!important;border-color:#c8a96e!important;color:#7a5010!important;}
 
+/* ── Dev mode badge ── */
+#devModeBadge{
+  display:none;position:fixed;bottom:12px;left:12px;z-index:99999;
+  background:#3a0a0a;border:1px solid #c05050;color:#e07070;
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;
+  padding:4px 10px;border-radius:6px;pointer-events:none;
+}
+body.dev-mode #devModeBadge{display:block;}
+body.light-mode #devModeBadge{background:#fde8e8!important;border-color:#c05050!important;color:#8b2a2a!important;}
+
 /* ── New-day modal ── */
 #newDayModal .modal{border-color:#c9a84c;max-width:400px;}
 #newDayModal .modal h3{color:#c9a84c;}
@@ -1191,6 +1201,9 @@ body.overlay-open{overflow:hidden;}
     <button class="reset-btn" onclick="openResetModal()">Reset All Data</button>
   </div>
 </div>
+
+<!-- Dev mode indicator -->
+<div id="devModeBadge">⚙ DEV MODE</div>
 
 <!-- New Day Modal -->
 <div class="modal-overlay" id="newDayModal">
@@ -1557,7 +1570,7 @@ body.overlay-open{overflow:hidden;}
       </div>
       <input type="number" id="tafsirManual" min="0" placeholder="0" style="display:none;">
       <div class="qr-pages-today" id="tafsirReadToday" data-suffix="Verses Read Today">0 Verses Read Today</div>
-      <div class="sub-label">Goal: 17 Verses = Full 5% Core</div>
+      <div class="sub-label">Goal: 10 Verses = Full 5% Core</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openTafsirReader()">🔍 Open Quran Meaning Reader</button>
       <div class="qr-session-badge" id="tafsirSessionBadge" style="display:none;"></div>
     </div>
@@ -2829,8 +2842,10 @@ function openDay(dk){
   // - anything older than yesterday: always locked
   // - yesterday: locked only once today has been entered this session
   // - today: never locked
+  // Lock rules — bypassed entirely in dev mode
+  const devMode = document.body.classList.contains('dev-mode');
   const todayEntered = (()=>{ try{ return sessionStorage.getItem('_muh_today_entered')==='1'; }catch(e){return false;} })();
-  const shouldLock = dk < yesterday || (dk === yesterday && todayEntered);
+  const shouldLock = !devMode && (dk < yesterday || (dk === yesterday && todayEntered));
 
   if(shouldLock){
     document.body.classList.add('past-day-locked');
@@ -3052,17 +3067,13 @@ function refreshReadTodayDisplays(){
 
   const hd = document.getElementById('hadithReadToday');
   if(hd){
-    const manual = parseInt(data.hadithManual) || 0;
-    const ratio  = data['hadith_ratio'];
-    const count  = manual > 0 ? manual : (ratio !== undefined ? Math.round(ratio * HADITHS_PER_DAY) : 0);
+    const count = data['hadith_read_cap'] || 0;
     hd.textContent = `${count} Hadith${count !== 1 ? 's' : ''} Read Today`;
   }
 
   const tf = document.getElementById('tafsirReadToday');
   if(tf){
-    const manual = parseInt(data.tafsirManual) || 0;
-    const ratio  = data['tafsir_ratio'];
-    const count  = manual > 0 ? manual : (ratio !== undefined ? Math.round(ratio * VERSES_PER_DAY) : 0);
+    const count = data['tafsir_read_cap'] || 0;
     tf.textContent = `${count} Verse${count !== 1 ? 's' : ''} Read Today`;
   }
 
@@ -3205,9 +3216,24 @@ document.addEventListener('DOMContentLoaded', function(){
   _checkNewDayNotification();
 });
 
+/* ── Dev mode ── */
+function toggleDevMode(){
+  const on = document.body.classList.toggle('dev-mode');
+  // When turning off, re-evaluate lock for current day
+  if(!on && currentDateKey) openDay(currentDateKey);
+  console.log('Dev mode:', on ? 'ON' : 'OFF');
+}
+document.addEventListener('keydown', function(e){
+  if(e.ctrlKey && e.shiftKey && e.key === 'D'){
+    e.preventDefault();
+    toggleDevMode();
+  }
+});
+
 /* ── New-day notification ── */
 const _ND_KEY = '_muh_last_seen_date';
 function _checkNewDayNotification(){
+  if(document.body.classList.contains('dev-mode')) return;
   try {
     const today = todayKey();
     const lastSeen = sessionStorage.getItem(_ND_KEY);
@@ -3821,10 +3847,8 @@ function closeReadMe(){
    HADITH & TAFSIR READERS
    ════════════════════════════════════════════════════ */
 
-const HADITH_START_DATE = '2026-01-01';
-const TAFSIR_START_DATE = '2026-01-01';
 const HADITHS_PER_DAY   = 5;
-const VERSES_PER_DAY    = 17;
+const VERSES_PER_DAY    = 10;
 const TOTAL_VERSES      = 6236;
 const BASE_URL          = 'https://jareernadwi.github.io/Muhasabah/';
 
@@ -3891,6 +3915,30 @@ async function setReaderResume(key, val){
   }catch(e){}
 }
 
+/* ── Global pointer helpers (IndexedDB, never reset) ── */
+async function getGptr(key){
+  try{
+    const db = await openDB();
+    return new Promise(res=>{
+      const tx  = db.transaction(STORE,'readonly');
+      const req = tx.objectStore(STORE).get(key);
+      req.onsuccess = ()=> res(req.result ? (req.result.data ?? 0) : 0);
+      req.onerror   = ()=> res(0);
+    });
+  }catch(e){ return 0; }
+}
+async function setGptr(key, val){
+  try{
+    const db = await openDB();
+    return new Promise((res,rej)=>{
+      const tx = db.transaction(STORE,'readwrite');
+      tx.objectStore(STORE).put({dk:key, data:val});
+      tx.oncomplete = ()=> res();
+      tx.onerror    = e => rej(e.target.error);
+    });
+  }catch(e){}
+}
+
 /* Save + refresh */
 async function saveReaderData(dk, patch){
   const d = Object.assign({}, getCached(dk), patch);
@@ -3907,46 +3955,82 @@ function renderHadithBadge(dk){
   const data  = getCached(dk);
   const badge = document.getElementById('hadithSessionBadge');
   if(!badge) return;
-  const sessions = data.hadith_sessions || [];
-  if(!sessions.length){ badge.style.display='none'; return; }
+  const cap   = data.hadith_read_cap || 0;
+  if(!cap){ badge.style.display='none'; return; }
   const done  = data.hadith === 'yes';
-  const ratio = parseFloat(data.hadith_ratio) || 0;
-  const read  = Math.round(ratio * HADITHS_PER_DAY);
-  const pct   = Math.round(ratio * 100);
-  const count = sessions.length;
-  const first = sessions[0];
-  const last  = sessions[sessions.length-1];
-  const headerTxt = done
-    ? `${count} Session${count!==1?'s':''} \u00b7 Completed \u2713 \u2014 ${HADITHS_PER_DAY} Hadith${HADITHS_PER_DAY!==1?'s':''}`
-    : `${count} Session${count!==1?'s':''} \u00b7 ${read} / ${HADITHS_PER_DAY} Hadith${read!==1?'s':''} (${pct}%)`;
+  const pct   = Math.round((cap / HADITHS_PER_DAY) * 100);
+  const startPtr = data.hadith_start_ptr ?? 0;
+  // Build range label — may wrap
+  const total = 7563; // Bukhari total (updated on load if different)
   badge.style.display = 'block';
+  const rangeLabel = _buildHadithRangeLabel(startPtr, cap, data._hadithTotal || 7563);
+  const statusTxt = done
+    ? `Completed ✓ — ${HADITHS_PER_DAY} Hadiths`
+    : `${cap} / ${HADITHS_PER_DAY} Hadiths (${pct}%)`;
   badge.innerHTML =
-    `<span style="color:var(--gold);">\u{1F4DA} Today: ${headerTxt}</span>`
-    +`<br><span style="font-size:9px;color:#a89060;">Total: Hadiths ${first.start}\u2013${last.end} (${last.end} Hadith${last.end!==1?'s':''})</span>`
-    +`<br><span style="font-size:9px;color:#a89060;">Last: Hadiths ${last.start}\u2013${last.end} (${last.end - last.start + 1} Hadith${(last.end-last.start+1)!==1?'s':''})</span>`;
+    `<span style="color:${done?'var(--green-bright)':'var(--gold)'};">📚 Today: ${statusTxt}</span>`
+    +`<br><span style="font-size:9px;color:#a89060;">${rangeLabel}</span>`;
+}
+
+function _buildHadithRangeLabel(startPtr, count, total){
+  if(!count) return '';
+  const segments = [];
+  let ptr = startPtr % total;
+  let remaining = count;
+  const segStart = ptr + 1;
+  const toEnd = total - ptr;
+  if(remaining <= toEnd){
+    segments.push((ptr+1) + '\u2013' + (ptr+remaining));
+  } else {
+    segments.push((ptr+1) + '\u2013' + total);
+    remaining -= toEnd;
+    segments.push('1\u2013' + remaining);
+  }
+  return 'Hadiths ' + segments.join(', ');
+}
+
+function _buildTafsirRangeLabel(startPtr, count, total){
+  if(!count) return '';
+  const segments = [];
+  let ptr = startPtr % total;
+  let remaining = count;
+  const toEnd = total - ptr;
+  if(remaining <= toEnd){
+    const s = globalVerseToSurahAyah(ptr+1);
+    const e = globalVerseToSurahAyah(ptr+remaining);
+    if(s.surah === e.surah){
+      segments.push(SURAH_NAMES[s.surah]+' '+s.ayah+'\u2013'+e.ayah);
+    } else {
+      segments.push(SURAH_NAMES[s.surah]+' '+s.ayah+' \u2013 '+SURAH_NAMES[e.surah]+' '+e.ayah);
+    }
+  } else {
+    const s1 = globalVerseToSurahAyah(ptr+1);
+    const e1 = globalVerseToSurahAyah(total);
+    segments.push(SURAH_NAMES[s1.surah]+' '+s1.ayah+' \u2013 '+SURAH_NAMES[e1.surah]+' '+e1.ayah);
+    const s2 = globalVerseToSurahAyah(1);
+    const e2 = globalVerseToSurahAyah(remaining - toEnd);
+    segments.push(SURAH_NAMES[s2.surah]+' '+s2.ayah+' \u2013 '+SURAH_NAMES[e2.surah]+' '+e2.ayah);
+  }
+  return segments.join(', ');
 }
 
 function renderTafsirBadge(dk){
   const data  = getCached(dk);
   const badge = document.getElementById('tafsirSessionBadge');
   if(!badge) return;
-  const sessions = data.tafsir_sessions || [];
-  if(!sessions.length){ badge.style.display='none'; return; }
+  const cap   = data.tafsir_read_cap || 0;
+  if(!cap){ badge.style.display='none'; return; }
   const done  = data.tafsir === 'yes';
-  const ratio = parseFloat(data.tafsir_ratio) || 0;
-  const read  = Math.round(ratio * VERSES_PER_DAY);
-  const pct   = Math.round(ratio * 100);
-  const count = sessions.length;
-  const first = sessions[0];
-  const last  = sessions[sessions.length-1];
-  const headerTxt = done
-    ? `${count} Session${count!==1?'s':''} \u00b7 Completed \u2713 \u2014 ${VERSES_PER_DAY} Verse${VERSES_PER_DAY!==1?'s':''}`
-    : `${count} Session${count!==1?'s':''} \u00b7 ${read} / ${VERSES_PER_DAY} Verse${read!==1?'s':''} (${pct}%)`;
+  const pct   = Math.round((cap / VERSES_PER_DAY) * 100);
+  const startPtr = data.tafsir_start_ptr ?? 0;
+  const rangeLabel = _buildTafsirRangeLabel(startPtr, cap, TOTAL_VERSES);
+  const statusTxt = done
+    ? `Completed ✓ — ${VERSES_PER_DAY} Verses`
+    : `${cap} / ${VERSES_PER_DAY} Verses (${pct}%)`;
   badge.style.display = 'block';
   badge.innerHTML =
-    `<span style="color:var(--gold);">\u{1F50D} Today: ${headerTxt}</span>`
-    +`<br><span style="font-size:9px;color:#a89060;">Total: Verses ${first.start}\u2013${last.end} (${last.end} Verse${last.end!==1?'s':''})</span>`
-    +`<br><span style="font-size:9px;color:#a89060;">Last: Verses ${last.start}\u2013${last.end} (${last.end - last.start + 1} Verse${(last.end-last.start+1)!==1?'s':''})</span>`;
+    `<span style="color:${done?'var(--green-bright)':'var(--gold)'};">🔍 Today: ${statusTxt}</span>`
+    +`<br><span style="font-size:9px;color:#a89060;">${rangeLabel}</span>`;
 }
 
 /* Scoring updates */
@@ -3955,18 +4039,16 @@ function getTafsirScore(data){ return Math.min(Math.round((parseFloat(data.tafsi
 
 /* ══════ HADITH READER ══════ */
 let _hadithBook = null;
-let _hadithData = [];
-let _hadithIdx  = 0;
+let _hadithData = [];   // today's slice (up to HADITHS_PER_DAY items, may wrap)
+let _hadithIdx  = 0;   // index within _hadithData
 let _hadithDK   = '';
-let _hadithSessionStart = 0;
-let _hadithAlreadyDone  = false;
+let _hadithReviewMode = false;
+let _hadithStartPtr   = 0; // global ptr at session open (for badge)
 
 async function openHadithReader(){
   _hadithDK = currentDateKey || todayKey();
   document.getElementById('hadithReaderOverlay').classList.add('active');
   reThemeIfLight();
-  const already = getCached(_hadithDK).hadith === 'yes';
-  document.getElementById('hadithDoneNote').style.display = already ? 'block' : 'none';
   document.getElementById('hadithLoading').style.display  = 'flex';
   document.getElementById('hadithContent').style.display  = 'none';
   document.getElementById('hadithNav').style.display      = 'none';
@@ -3979,98 +4061,149 @@ async function openHadithReader(){
       const json = await res.json();
       _hadithBook = json.hadiths || [];
     }
-    const total    = _hadithBook.length;
-    const di       = dayIdx(HADITH_START_DATE, _hadithDK);
-    const dayStart = (di * HADITHS_PER_DAY) % total;
-    _hadithData    = [];
-    for(let i = 0; i < HADITHS_PER_DAY; i++) _hadithData.push(_hadithBook[(dayStart+i)%total]);
+    const total = _hadithBook.length;
 
-    const savedIdx = await getReaderResume('_hadith_resume_' + _hadithDK);
-    const alreadyDone = getCached(_hadithDK).hadith === 'yes';
-    // If already done today, show the last page (progress is locked either way)
-    // If not done, resume from where we left off (or beginning)
-    let startIdx;
-    if(alreadyDone){
-      startIdx = (savedIdx !== null) ? Math.min(savedIdx, HADITHS_PER_DAY - 1) : HADITHS_PER_DAY - 1;
-    } else {
-      startIdx = (savedIdx !== null && savedIdx + 1 < HADITHS_PER_DAY) ? savedIdx + 1 : 0;
+    // Load today's cap and global pointer
+    const todayData  = getCached(_hadithDK);
+    const cap        = todayData.hadith_read_cap || 0;
+    const alreadyDone= todayData.hadith === 'yes';
+    _hadithReviewMode = alreadyDone || cap >= HADITHS_PER_DAY;
+
+    // Load or initialise the global pointer
+    let gptr = await getGptr('_gptr_hadith');
+
+    if(_hadithReviewMode){
+      // Review: show all hadiths read today navigably
+      const startPtr = todayData.hadith_start_ptr ?? 0;
+      _hadithStartPtr = startPtr;
+      _hadithData = [];
+      const readCount = Math.min(cap, HADITHS_PER_DAY);
+      for(let i = 0; i < readCount; i++) _hadithData.push(_hadithBook[(startPtr + i) % total]);
+      document.getElementById('hadithDoneNote').style.display = 'block';
+      document.getElementById('hadithDayInfo').textContent = 'Sahih Bukhari \u00b7 Review';
+      document.getElementById('hadithLoading').style.display = 'none';
+      document.getElementById('hadithContent').style.display = 'block';
+      document.getElementById('hadithNav').style.display     = 'flex';
+      renderHadith(0, true);
+      return;
     }
-    _hadithSessionStart = startIdx;
-    _hadithAlreadyDone = alreadyDone; // lock flag
 
-    const firstNum = _hadithData[0]?.hadithnumber || dayStart+1;
-    const lastNum  = _hadithData[HADITHS_PER_DAY-1]?.hadithnumber || dayStart+HADITHS_PER_DAY;
+    document.getElementById('hadithDoneNote').style.display = 'none';
+
+    // First open today: record start pointer
+    if(cap === 0){
+      _hadithStartPtr = gptr % total;
+      const patch = { hadith_start_ptr: _hadithStartPtr, hadith_read_cap: 0 };
+      const d = Object.assign({}, getCached(_hadithDK), patch);
+      _cache[_hadithDK] = d;
+      await setStore(_hadithDK, d);
+    } else {
+      _hadithStartPtr = todayData.hadith_start_ptr ?? (gptr % total);
+    }
+
+    // Build slice from current pointer position
+    _hadithData = [_hadithBook[gptr % total]];
+
     document.getElementById('hadithDayInfo').textContent = 'Sahih Bukhari';
-
     document.getElementById('hadithLoading').style.display = 'none';
     document.getElementById('hadithContent').style.display = 'block';
     document.getElementById('hadithNav').style.display     = 'flex';
-    renderHadith(startIdx);
+
+    // Mark first hadith as read immediately on open
+    gptr = (gptr + 1) % total;
+    await setGptr('_gptr_hadith', gptr);
+    const newCap = cap + 1;
+    await _saveHadithProgress(newCap, newCap >= HADITHS_PER_DAY);
+
+    renderHadith(0, false);
   } catch(e){
     document.getElementById('hadithLoading').textContent = '\u26A0 Failed: ' + e.message;
   }
 }
 
-function renderHadith(idx){
+function renderHadith(idx, reviewMode){
   _hadithIdx = idx;
   const h = _hadithData[idx];
   if(!h) return;
-  const ordinals = ['First','Second','Third','Fourth','Fifth'];
-  document.getElementById('hadithNum').textContent = (ordinals[idx] || (idx+1)+'th') + ' Hadith of the Day';
-  document.getElementById('hadithCounter').textContent = (idx+1) + ' / ' + HADITHS_PER_DAY;
+  const total = _hadithData.length;
+  document.getElementById('hadithNum').textContent = 'Hadith ' + (idx+1) + (reviewMode ? ' of Today' : '');
+  document.getElementById('hadithCounter').textContent = (idx+1) + ' / ' + total;
   document.getElementById('hadithText').textContent    = h.text || 'Content unavailable.';
   const refEl = document.getElementById('hadithRef');
   if(refEl){
     if(h.book && h.hadith_in_book)
       refEl.textContent = 'Bukhari \u00B7 Book ' + h.book + ' \u00B7 Hadith ' + h.hadith_in_book;
-    else
-      refEl.textContent = '';
+    else refEl.textContent = '';
   }
-  document.getElementById('hadithPrevBtn').disabled    = idx === 0;
-  const isLast  = idx === HADITHS_PER_DAY - 1;
+  document.getElementById('hadithPrevBtn').disabled = idx === 0;
   const btn = document.getElementById('hadithNextBtn');
-  btn.textContent       = isLast ? '\u2713 Mark Done' : 'Next \u2192';
-  btn.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
-  btn.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
-  btn.style.color       = isLast ? '#fff'                : '#8a7840';
-  btn.classList.toggle('rdr-nav-done', isLast);
-  btn.disabled = false;
+  const isLast = idx === total - 1;
+  if(reviewMode){
+    btn.textContent       = isLast ? '\u2715 Close' : 'Next \u2192';
+    btn.style.background  = isLast ? '#1a1a10' : '#1e1a10';
+    btn.style.borderColor = isLast ? '#5a5030' : '#2a2010';
+    btn.style.color       = isLast ? '#8a7840' : '#8a7840';
+    btn.classList.remove('rdr-nav-done');
+    btn.disabled = false;
+  } else {
+    const capAfterThis = getCached(_hadithDK).hadith_read_cap || 0;
+    const capReached   = capAfterThis >= HADITHS_PER_DAY;
+    btn.textContent       = capReached ? '\u2713 Mark Done' : 'Next \u2192';
+    btn.style.background  = capReached ? 'var(--green)'        : '#1e1a10';
+    btn.style.borderColor = capReached ? 'var(--green-bright)' : '#2a2010';
+    btn.style.color       = capReached ? '#fff'                : '#8a7840';
+    btn.classList.toggle('rdr-nav-done', capReached);
+    btn.disabled = false;
+  }
 }
 
 async function hadithNavNext(){
-  if(_hadithIdx < HADITHS_PER_DAY - 1){
-    const next = _hadithIdx + 1;
-    await setReaderResume('_hadith_resume_' + _hadithDK, next);
-    await _saveHadithProgress(next + 1, false);
-    renderHadith(next);
-  } else {
-    await _saveHadithProgress(HADITHS_PER_DAY, true);
-    closeHadithReader();
+  if(_hadithReviewMode){
+    if(_hadithIdx < _hadithData.length - 1){ renderHadith(_hadithIdx + 1, true); }
+    else { closeHadithReader(); }
+    return;
   }
+  const todayData = getCached(_hadithDK);
+  const cap       = todayData.hadith_read_cap || 0;
+  if(cap >= HADITHS_PER_DAY){ closeHadithReader(); return; }
+
+  // Load next hadith from global pointer
+  const total = _hadithBook.length;
+  let gptr = await getGptr('_gptr_hadith');
+  const nextH = _hadithBook[gptr % total];
+  _hadithData.push(nextH);
+  gptr = (gptr + 1) % total;
+  await setGptr('_gptr_hadith', gptr);
+  const newCap = cap + 1;
+  await _saveHadithProgress(newCap, newCap >= HADITHS_PER_DAY);
+  renderHadith(_hadithData.length - 1, false);
 }
 
-async function _saveHadithProgress(read, done){
-  // If goal was already completed before this session, don't overwrite it
-  if(_hadithAlreadyDone) return;
-  const existing = getCached(_hadithDK);
-  const sessions = existing.hadith_sessions ? [...existing.hadith_sessions] : [];
-  const cappedRead = Math.min(read, HADITHS_PER_DAY);
-  const entry    = { start: _hadithSessionStart+1, end: cappedRead };
-  if(sessions.length && sessions[sessions.length-1].start === _hadithSessionStart+1)
-    sessions[sessions.length-1] = entry;
-  else sessions.push(entry);
-  const patch = { hadith_sessions: sessions, hadith_ratio: Math.min(cappedRead/HADITHS_PER_DAY,1) };
+async function _saveHadithProgress(cap, done){
+  const cappedCap = Math.min(cap, HADITHS_PER_DAY);
+  const patch = {
+    hadith_read_cap: cappedCap,
+    hadith_ratio: Math.min(cappedCap / HADITHS_PER_DAY, 1),
+    hadith_start_ptr: _hadithStartPtr
+  };
   if(done) patch.hadith = 'yes';
-  await saveReaderData(_hadithDK, patch);
+  const d = Object.assign({}, getCached(_hadithDK), patch);
+  _cache[_hadithDK] = d;
+  await setStore(_hadithDK, d);
+  refreshScores();
+  refreshReadTodayDisplays();
+  renderHadithBadge(_hadithDK);
+  renderTafsirBadge(_hadithDK);
 }
 
-function hadithNavPrev(){ if(_hadithIdx > 0) renderHadith(_hadithIdx - 1); }
+function hadithNavPrev(){
+  if(_hadithIdx > 0) renderHadith(_hadithIdx - 1, _hadithReviewMode);
+}
+
 function closeHadithReader(){
-  /* Always save current position on close so next session resumes from here */
-  if(_hadithDK && _hadithData.length > 0){
-    setReaderResume('_hadith_resume_' + _hadithDK, _hadithIdx);
-    if(_hadithIdx >= _hadithSessionStart)
-      _saveHadithProgress(_hadithIdx + 1, false);
+  const cap = getCached(_hadithDK).hadith_read_cap || 0;
+  if(cap >= HADITHS_PER_DAY && !_hadithReviewMode){
+    _saveHadithProgress(cap, true);
   }
   document.getElementById('hadithReaderOverlay').classList.remove('active');
 }
@@ -4082,22 +4215,13 @@ let _quranTranslit = null;
 let _tafsirSlice  = [];
 let _tafsirIdx    = 0;
 let _tafsirDK     = '';
-let _tafsirSessionStart = 0;
-let _tafsirAlreadyDone  = false;
+let _tafsirReviewMode  = false;
+let _tafsirStartPtr    = 0;
 
 async function openTafsirReader(){
   _tafsirDK = currentDateKey || todayKey();
   document.getElementById('tafsirReaderOverlay').classList.add('active');
   reThemeIfLight();
-
-  const di     = dayIdx(TAFSIR_START_DATE, _tafsirDK);
-  const startV = (di * VERSES_PER_DAY) % TOTAL_VERSES + 1;
-  const endV   = Math.min(startV + VERSES_PER_DAY - 1, TOTAL_VERSES);
-
-  const already = getCached(_tafsirDK).tafsir === 'yes';
-  document.getElementById('tafsirDoneNote').style.display = already ? 'block' : 'none';
-  document.getElementById('tafsirDayInfo').textContent =
-    'Saheeh International \u00B7 Day '+(di+1)+' \u00B7 Verses '+startV+'\u2013'+endV;
 
   document.getElementById('tafsirLoading').style.display = 'flex';
   document.getElementById('tafsirContent').style.display = 'none';
@@ -4135,94 +4259,156 @@ async function openTafsirReader(){
       } catch(e){ _quranTranslit = { _map: {} }; }
     }
 
-    _tafsirSlice = [];
-    for(let v = startV; v <= endV; v++){
-      const {surah, ayah} = globalVerseToSurahAyah(v);
+    const todayData   = getCached(_tafsirDK);
+    const cap         = todayData.tafsir_read_cap || 0;
+    const alreadyDone = todayData.tafsir === 'yes';
+    _tafsirReviewMode = alreadyDone || cap >= VERSES_PER_DAY;
+
+    let gptr = await getGptr('_gptr_tafsir');
+
+    function buildVerseObj(globalNum){
+      const n1 = ((globalNum - 1) % TOTAL_VERSES) + 1;
+      const {surah, ayah} = globalVerseToSurahAyah(n1);
       const key = surah+':'+ayah;
-      _tafsirSlice.push({ globalNum:v, surahNum:surah,
+      return { globalNum: n1, surahNum: surah,
         surahName: SURAH_NAMES[surah]||'Surah '+surah, ayah,
-        arabic:  _quranArabic._map[key]  || '',
+        arabic:   _quranArabic._map[key]  || '',
         translit: _quranTranslit._map ? (_quranTranslit._map[key] || '') : '',
-        meaning: _quranEnglish._map[key] || 'Translation unavailable.' });
+        meaning:  _quranEnglish._map[key] || 'Translation unavailable.' };
     }
 
-    const savedIdx = await getReaderResume('_tafsir_resume_' + _tafsirDK);
-    const alreadyDoneTafsir = getCached(_tafsirDK).tafsir === 'yes';
-    let startIdx;
-    if(alreadyDoneTafsir){
-      startIdx = (savedIdx !== null) ? Math.min(savedIdx, _tafsirSlice.length - 1) : _tafsirSlice.length - 1;
-    } else {
-      startIdx = (savedIdx !== null && savedIdx + 1 < _tafsirSlice.length) ? savedIdx + 1 : 0;
+    if(_tafsirReviewMode){
+      const startPtr = todayData.tafsir_start_ptr ?? 0;
+      _tafsirStartPtr = startPtr;
+      _tafsirSlice = [];
+      const readCount = Math.min(cap, VERSES_PER_DAY);
+      for(let i = 0; i < readCount; i++) _tafsirSlice.push(buildVerseObj(startPtr + i + 1));
+      document.getElementById('tafsirDoneNote').style.display = 'block';
+      document.getElementById('tafsirDayInfo').textContent = 'Saheeh International \u00b7 Review';
+      document.getElementById('tafsirLoading').style.display = 'none';
+      document.getElementById('tafsirContent').style.display = 'block';
+      document.getElementById('tafsirNav').style.display     = 'flex';
+      renderTafsirVerse(0, true);
+      return;
     }
-    _tafsirAlreadyDone  = alreadyDoneTafsir;
-    _tafsirSessionStart = startIdx;
+
+    document.getElementById('tafsirDoneNote').style.display = 'none';
+
+    if(cap === 0){
+      _tafsirStartPtr = gptr % TOTAL_VERSES;
+      const patch = { tafsir_start_ptr: _tafsirStartPtr, tafsir_read_cap: 0 };
+      const d = Object.assign({}, getCached(_tafsirDK), patch);
+      _cache[_tafsirDK] = d;
+      await setStore(_tafsirDK, d);
+    } else {
+      _tafsirStartPtr = todayData.tafsir_start_ptr ?? (gptr % TOTAL_VERSES);
+    }
+
+    // Build first verse from current pointer
+    _tafsirSlice = [buildVerseObj(gptr + 1)];
+
+    // Advance pointer and mark first verse read immediately
+    gptr = (gptr + 1) % TOTAL_VERSES;
+    await setGptr('_gptr_tafsir', gptr);
+    const newCap = cap + 1;
+    await _saveTafsirProgress(newCap, newCap >= VERSES_PER_DAY);
+
+    const v = _tafsirSlice[0];
+    document.getElementById('tafsirDayInfo').textContent = 'Saheeh International \u00b7 ' + v.surahName;
 
     document.getElementById('tafsirLoading').style.display = 'none';
     document.getElementById('tafsirContent').style.display = 'block';
     document.getElementById('tafsirNav').style.display     = 'flex';
-    renderTafsirVerse(startIdx);
+    renderTafsirVerse(0, false);
   } catch(e){
     document.getElementById('tafsirLoading').textContent = '\u26A0 Failed: ' + e.message;
   }
 }
 
-function renderTafsirVerse(idx){
+function renderTafsirVerse(idx, reviewMode){
   _tafsirIdx = idx;
   const v = _tafsirSlice[idx];
   if(!v) return;
   const total = _tafsirSlice.length;
-  document.getElementById('tafsirVerseRef').textContent = v.surahName+' \u00B7 '+v.surahNum+':'+v.ayah;
-  document.getElementById('tafsirCounter').textContent  = (idx+1)+' / '+total;
+  document.getElementById('tafsirVerseRef').textContent = v.surahName + ' \u00B7 ' + v.surahNum + ':' + v.ayah;
+  document.getElementById('tafsirCounter').textContent  = (idx+1) + ' / ' + total;
   document.getElementById('tafsirArabic').textContent   = v.arabic;
   const translitEl = document.getElementById('tafsirTranslit');
   if(translitEl){ translitEl.textContent = v.translit || ''; translitEl.parentElement.style.display = v.translit ? 'block' : 'none'; }
   document.getElementById('tafsirText').textContent     = v.meaning;
   document.getElementById('tafsirPrevBtn').disabled     = idx === 0;
-  const isLast = idx === total - 1;
   const btn = document.getElementById('tafsirNextBtn');
-  btn.textContent       = isLast ? '\u2713 Mark Done' : 'Next \u2192';
-  btn.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
-  btn.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
-  btn.style.color       = isLast ? '#fff'                : '#8a7840';
-  btn.classList.toggle('rdr-nav-done', isLast);
-  btn.disabled = false;
-}
-
-async function tafsirNavNext(){
-  const total = _tafsirSlice.length;
-  if(_tafsirIdx < total - 1){
-    const next = _tafsirIdx + 1;
-    await setReaderResume('_tafsir_resume_' + _tafsirDK, next);
-    await _saveTafsirProgress(next+1, false);
-    renderTafsirVerse(next);
+  const isLast = idx === total - 1;
+  if(reviewMode){
+    btn.textContent       = isLast ? '\u2715 Close' : 'Next \u2192';
+    btn.style.background  = '#1e1a10';
+    btn.style.borderColor = '#2a2010';
+    btn.style.color       = '#8a7840';
+    btn.classList.remove('rdr-nav-done');
+    btn.disabled = false;
   } else {
-    await _saveTafsirProgress(total, true);
-    closeTafsirReader();
+    const capNow     = getCached(_tafsirDK).tafsir_read_cap || 0;
+    const capReached = capNow >= VERSES_PER_DAY;
+    btn.textContent       = capReached ? '\u2713 Mark Done' : 'Next \u2192';
+    btn.style.background  = capReached ? 'var(--green)'        : '#1e1a10';
+    btn.style.borderColor = capReached ? 'var(--green-bright)' : '#2a2010';
+    btn.style.color       = capReached ? '#fff'                : '#8a7840';
+    btn.classList.toggle('rdr-nav-done', capReached);
+    btn.disabled = false;
   }
 }
 
-async function _saveTafsirProgress(read, done){
-  if(_tafsirAlreadyDone) return;
-  const total    = _tafsirSlice.length;
-  const existing = getCached(_tafsirDK);
-  const sessions = existing.tafsir_sessions ? [...existing.tafsir_sessions] : [];
-  const cappedRead = Math.min(read, total);
-  const entry    = { start: _tafsirSessionStart+1, end: cappedRead };
-  if(sessions.length && sessions[sessions.length-1].start === _tafsirSessionStart+1)
-    sessions[sessions.length-1] = entry;
-  else sessions.push(entry);
-  const patch = { tafsir_sessions: sessions, tafsir_ratio: Math.min(cappedRead/total,1) };
-  if(done) patch.tafsir = 'yes';
-  await saveReaderData(_tafsirDK, patch);
+async function tafsirNavNext(){
+  if(_tafsirReviewMode){
+    if(_tafsirIdx < _tafsirSlice.length - 1){ renderTafsirVerse(_tafsirIdx + 1, true); }
+    else { closeTafsirReader(); }
+    return;
+  }
+  const todayData = getCached(_tafsirDK);
+  const cap       = todayData.tafsir_read_cap || 0;
+  if(cap >= VERSES_PER_DAY){ closeTafsirReader(); return; }
+
+  let gptr = await getGptr('_gptr_tafsir');
+  function buildVerseObj(globalNum){
+    const n1 = ((globalNum - 1) % TOTAL_VERSES) + 1;
+    const {surah, ayah} = globalVerseToSurahAyah(n1);
+    const key = surah+':'+ayah;
+    return { globalNum: n1, surahNum: surah,
+      surahName: SURAH_NAMES[surah]||'Surah '+surah, ayah,
+      arabic:   _quranArabic._map[key]  || '',
+      translit: _quranTranslit._map ? (_quranTranslit._map[key] || '') : '',
+      meaning:  _quranEnglish._map[key] || 'Translation unavailable.' };
+  }
+  _tafsirSlice.push(buildVerseObj(gptr + 1));
+  gptr = (gptr + 1) % TOTAL_VERSES;
+  await setGptr('_gptr_tafsir', gptr);
+  const newCap = cap + 1;
+  await _saveTafsirProgress(newCap, newCap >= VERSES_PER_DAY);
+  renderTafsirVerse(_tafsirSlice.length - 1, false);
 }
 
-function tafsirNavPrev(){ if(_tafsirIdx > 0) renderTafsirVerse(_tafsirIdx - 1); }
+async function _saveTafsirProgress(cap, done){
+  const cappedCap = Math.min(cap, VERSES_PER_DAY);
+  const patch = {
+    tafsir_read_cap: cappedCap,
+    tafsir_ratio: Math.min(cappedCap / VERSES_PER_DAY, 1),
+    tafsir_start_ptr: _tafsirStartPtr
+  };
+  if(done) patch.tafsir = 'yes';
+  const d = Object.assign({}, getCached(_tafsirDK), patch);
+  _cache[_tafsirDK] = d;
+  await setStore(_tafsirDK, d);
+  refreshScores();
+  refreshReadTodayDisplays();
+  renderHadithBadge(_tafsirDK);
+  renderTafsirBadge(_tafsirDK);
+}
+
+function tafsirNavPrev(){ if(_tafsirIdx > 0) renderTafsirVerse(_tafsirIdx - 1, _tafsirReviewMode); }
 function closeTafsirReader(){
-  /* Always save current position on close so next session resumes from here */
-  if(_tafsirDK && _tafsirSlice.length > 0){
-    setReaderResume('_tafsir_resume_' + _tafsirDK, _tafsirIdx);
-    if(_tafsirIdx >= _tafsirSessionStart)
-      _saveTafsirProgress(_tafsirIdx + 1, false);
+  const cap = getCached(_tafsirDK).tafsir_read_cap || 0;
+  if(cap >= VERSES_PER_DAY && !_tafsirReviewMode){
+    _saveTafsirProgress(cap, true);
   }
   document.getElementById('tafsirReaderOverlay').classList.remove('active');
 }
@@ -4503,8 +4689,9 @@ loadDayData = function(dk){
 <script>
 /* ════════════════════════════════════════════════════
    BOOK READER  —  pulls from Book.json (GitHub Pages)
-   One book per day based on day-of-year (1–365).
-   Lessons revealed one by one. Marks books=yes on complete.
+   Global pointer _gptr_book = total books completed ever.
+   Current book = _gptr_book % 365. Pointer advances on full completion.
+   Partial progress = same book next day (pointer unchanged).
    ════════════════════════════════════════════════════ */
 
 let _bookData          = null;
@@ -4512,12 +4699,7 @@ let _bookCurrentLesson = -1;  // -1 = intro slide, 0..N-1 = lesson slides
 let _bookTotalLessons  = 0;
 let _bookDK            = '';
 let _bookAlreadyDone   = false;
-
-function _bookDayOfYear(dateStr) {
-  const d     = new Date(dateStr);
-  const start = new Date(d.getFullYear(), 0, 0);
-  return Math.min(Math.floor((d - start) / 86400000), 365);
-}
+let _bookReadOnly      = false; // review mode
 
 const BOOK_BADGE_COLORS = {
   must_not_skip:'#ef4444', islamic:'#10b981', leadership:'#8b5cf6',
@@ -4535,24 +4717,27 @@ async function openBookReader() {
   document.getElementById('bookReaderOverlay').classList.add('active');
   reThemeIfLight();
 
-  const dayNum = _bookDayOfYear(_bookDK);
-  document.getElementById('bookDayPill').textContent = 'Book.json · Day ' + dayNum + ' of 365';
-
   document.getElementById('bookLoading').style.display = 'flex';
   document.getElementById('bookContent').style.display = 'none';
   document.getElementById('bookNav').style.display     = 'none';
 
   _bookAlreadyDone = getCached(_bookDK).books === 'yes';
-  document.getElementById('bookDoneNote').style.display = _bookAlreadyDone ? 'block' : 'none';
+  _bookReadOnly    = _bookAlreadyDone;
 
   try {
     if (!_bookData) {
-      document.getElementById('bookLoading').textContent = 'Loading Book.json…';
+      document.getElementById('bookLoading').textContent = 'Loading Book.json\u2026';
       const res  = await fetch(BASE_URL + 'Book.json');
       if (!res.ok) throw new Error('Book.json HTTP ' + res.status);
       const json = await res.json();
       _bookData  = json.books || [];
     }
+
+    const gptr   = await getGptr('_gptr_book');
+    const dayNum = (gptr % 365) + 1;
+
+    document.getElementById('bookDayPill').textContent = 'Book \u00b7 Day ' + dayNum + ' of 365';
+    document.getElementById('bookDoneNote').style.display = _bookAlreadyDone ? 'block' : 'none';
 
     const book = _bookData.find(b => b.day === dayNum) || _bookData[0];
     if (!book) throw new Error('No book for day ' + dayNum);
@@ -4560,8 +4745,6 @@ async function openBookReader() {
     _bookTotalLessons = (book.lessons || []).length;
 
     const saved = await getReaderResume('_book_lesson_' + _bookDK);
-    // Resume at last-read lesson regardless of completion status.
-    // Only show intro if there's truly no saved position.
     _bookCurrentLesson = (saved !== null) ? saved : -1;
 
     document.getElementById('bookCategory').textContent = book.category || '';
@@ -4587,7 +4770,7 @@ async function openBookReader() {
 
     _renderBookSlide(book);
   } catch(e) {
-    document.getElementById('bookLoading').textContent = '⚠ Failed: ' + e.message;
+    document.getElementById('bookLoading').textContent = '\u26A0 Failed: ' + e.message;
   }
 }
 
@@ -4606,7 +4789,7 @@ function _renderBookSlide(book) {
     lessonSlide.style.display = 'none';
     prevBtn.disabled    = true;
     prevBtn.style.opacity = '0.3';
-    nextBtn.textContent = 'Lesson 1 \u2192';
+    nextBtn.textContent = _bookReadOnly ? 'Review Lessons \u2192' : 'Lesson 1 \u2192';
     nextBtn.style.background  = '#1e1a10';
     nextBtn.style.borderColor = '#2a2010';
     nextBtn.style.color       = '#8a7840';
@@ -4620,11 +4803,19 @@ function _renderBookSlide(book) {
     prevBtn.disabled    = false;
     prevBtn.style.opacity = '1';
     const isLast = cur >= total - 1;
-    nextBtn.textContent       = isLast ? '\u2713 Mark Done' : 'Lesson ' + (cur+2) + ' \u2192';
-    nextBtn.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
-    nextBtn.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
-    nextBtn.style.color       = isLast ? '#fff'                : '#8a7840';
-    nextBtn.classList.toggle('rdr-nav-done', isLast);
+    if(_bookReadOnly){
+      nextBtn.textContent       = isLast ? '\u2715 Close' : 'Lesson ' + (cur+2) + ' \u2192';
+      nextBtn.style.background  = '#1e1a10';
+      nextBtn.style.borderColor = '#2a2010';
+      nextBtn.style.color       = '#8a7840';
+      nextBtn.classList.remove('rdr-nav-done');
+    } else {
+      nextBtn.textContent       = isLast ? '\u2713 Mark Done' : 'Lesson ' + (cur+2) + ' \u2192';
+      nextBtn.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
+      nextBtn.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
+      nextBtn.style.color       = isLast ? '#fff'                : '#8a7840';
+      nextBtn.classList.toggle('rdr-nav-done', isLast);
+    }
     nextBtn.disabled    = false;
     pill.textContent    = (cur+1) + ' / ' + total;
   }
@@ -4632,25 +4823,38 @@ function _renderBookSlide(book) {
 
 async function bookNavNext() {
   if (!_bookData) return;
-  const dayNum = _bookDayOfYear(_bookDK);
+  const gptr   = await getGptr('_gptr_book');
+  const dayNum = (gptr % 365) + 1;
   const book   = _bookData.find(b => b.day === dayNum) || _bookData[0];
   const total  = (book && book.lessons) ? book.lessons.length : 0;
 
+  if(_bookReadOnly){
+    if(_bookCurrentLesson < total - 1){
+      _bookCurrentLesson++;
+      _renderBookSlide(book);
+    } else {
+      closeBookReader();
+    }
+    return;
+  }
+
   if (_bookCurrentLesson < total - 1) {
     _bookCurrentLesson++;
-    // Save current (just advanced to) — on re-open this is where we show
     await setReaderResume('_book_lesson_' + _bookDK, _bookCurrentLesson);
-    if (!_bookAlreadyDone) await _saveBookProgress(book, false);
+    await _saveBookProgress(book, false);
     _renderBookSlide(book);
   } else {
-    if (!_bookAlreadyDone) await _saveBookProgress(book, true);
+    await _saveBookProgress(book, true);
+    const newGptr = gptr + 1;
+    await setGptr('_gptr_book', newGptr);
     closeBookReader();
   }
 }
 
 async function bookNavPrev() {
-  if (!_bookData || _bookCurrentLesson <= -1) return;
-  const dayNum = _bookDayOfYear(_bookDK);
+  if (!_bookData) return;
+  const gptr   = await getGptr('_gptr_book');
+  const dayNum = (gptr % 365) + 1;
   const book   = _bookData.find(b => b.day === dayNum) || _bookData[0];
   _bookCurrentLesson = Math.max(-1, _bookCurrentLesson - 1);
   _renderBookSlide(book);
@@ -4658,10 +4862,9 @@ async function bookNavPrev() {
 
 async function _saveBookProgress(book, done) {
   const total  = (book && book.lessons) ? book.lessons.length : 1;
-  const cur    = _bookCurrentLesson; // -1 = intro, 0..N-1 = lessons
-  // Count intro as step 1, lessons as steps 2..N+1 out of total+1 steps
+  const cur    = _bookCurrentLesson;
   const steps  = total + 1;
-  const doneSteps = cur === -1 ? 1 : (cur + 2); // intro=1, lesson0=2, lesson1=3 ...
+  const doneSteps = cur === -1 ? 1 : (cur + 2);
   const ratio  = done ? 1 : Math.min(doneSteps / steps, 1);
   const data   = {...getCached(_bookDK)};
   data['book_lesson'] = cur;
@@ -4674,13 +4877,12 @@ async function _saveBookProgress(book, done) {
   renderBookBadge(_bookDK);
 }
 
-function closeBookReader() {
-  if (_bookDK && _bookData) {
-    const dayNum = _bookDayOfYear(_bookDK);
+async function closeBookReader() {
+  if (_bookDK && _bookData && !_bookReadOnly) {
+    const gptr   = await getGptr('_gptr_book');
+    const dayNum = (gptr % 365) + 1;
     const book   = _bookData.find(b => b.day === dayNum) || _bookData[0];
     const total  = (book && book.lessons) ? book.lessons.length : 0;
-    // Save the NEXT lesson index so re-open advances past what was just read
-    // Cap at total-1 so we never go out of bounds
     const nextPos = Math.min(_bookCurrentLesson + 1, total - 1);
     setReaderResume('_book_lesson_' + _bookDK, nextPos);
     if (!_bookAlreadyDone && book) _saveBookProgress(book, false);
@@ -7168,18 +7370,36 @@ function lrStudiedKey(lang, type) {
   const dk = currentDateKey || lrTodayKey();
   return 'lr_studied_' + dk + '_' + lang + '_' + type;
 }
+// Synchronous cache for language pointers loaded this session
+const _lrPtrCache = {};
+async function lrGetPtr(lang, type) {
+  const k = '_gptr_lang_' + lang + '_' + type;
+  if(_lrPtrCache[k] !== undefined) return _lrPtrCache[k];
+  const v = await getGptr(k);
+  _lrPtrCache[k] = v;
+  return v;
+}
+async function lrAdvancePtr(lang, type) {
+  const k = '_gptr_lang_' + lang + '_' + type;
+  const data = LR_DATA[lang];
+  const total = data ? data.filter(e => e.type === type).length : 365;
+  const cur = await lrGetPtr(lang, type);
+  const next = (cur + 1) % total;
+  _lrPtrCache[k] = next;
+  await setGptr(k, next);
+  return next;
+}
 function lrGetTodayEntry(type) {
   const data = LR_DATA[_lrLang];
   if (!data || !data.length) return null;
-  // Use the selected calendar date (currentDateKey = "YYYY-MM-DD")
-  // Falls back to today if no day is selected
-  const dk = currentDateKey || lrTodayKey();
-  const [y, m, d] = dk.split('-').map(Number);
-  const selected = new Date(y, m - 1, d);
-  const jan1    = new Date(y, 0, 1);
-  const day     = Math.floor((selected - jan1) / 86400000) + 1; // Jan 1 = 1
-  const entry   = data.find(e => e.type === type && e.day === day);
-  return entry ? { entry, idx: day - 1 } : null;
+  // Use global pointer for this language+type slot
+  const k = '_gptr_lang_' + _lrLang + '_' + type;
+  const ptr = _lrPtrCache[k] !== undefined ? _lrPtrCache[k] : 0;
+  const entries = data.filter(e => e.type === type);
+  if (!entries.length) return null;
+  const idx = ptr % entries.length;
+  const entry = entries[idx];
+  return entry ? { entry, idx } : null;
 }
 
 // ── Sync button highlights ────────────────────────────────────────────────
@@ -7640,9 +7860,14 @@ function lrMarkStudied() {
   const key = lrStudiedKey(_lrLang, _lrType);
   const done = localStorage.getItem(key) === '1';
   if (done) {
+    // Undo: remove the studied flag but do NOT reverse the global pointer
     localStorage.removeItem(key);
   } else {
     localStorage.setItem(key, '1');
+    // Advance global pointer for this slot
+    lrAdvancePtr(_lrLang, _lrType).then(() => {
+      // Pointer advanced — re-render will show next word next time
+    });
   }
   lrRenderMarkBtn();
   lrUpdateGoalBadge();
@@ -7779,6 +8004,11 @@ async function openLanguageReader() {
   reThemeIfLight();
   const _lrDK = currentDateKey || todayKey();
   document.getElementById('lrDoneNote').style.display = (getCached(_lrDK).language === 'yes') ? 'block' : 'none';
+
+  // Preload all global pointers into cache so lrGetTodayEntry can read synchronously
+  await Promise.all(LR_LANGS.flatMap(lang =>
+    ['word','verb'].map(type => lrGetPtr(lang, type))
+  ));
   if (!LR_LOADED['en'] && !LR_ERROR['en']) {
     document.getElementById('lrNoData').style.display = 'block';
     document.getElementById('lrNoData').textContent = 'Loading…';

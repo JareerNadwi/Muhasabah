@@ -3962,14 +3962,25 @@ function renderHadithBadge(dk){
   const startPtr     = data.hadith_start_ptr ?? 0;
   const sessions     = data.hadith_sessions || [];
   const sessionCount = sessions.length || 1;
-  const rangeLabel   = _buildHadithRangeLabel(startPtr, cap, data._hadithTotal || 7563);
-  const statusTxt    = done
-    ? `Completed \u2713 \u2014 ${HADITHS_PER_DAY} Hadiths`
-    : `${cap} / ${HADITHS_PER_DAY} Hadiths (${pct}%)`;
+  const total        = data._hadithTotal || 7563;
+
+  // Total range: startPtr+1 → startPtr+cap (with wrap)
+  const totalLabel = _buildHadithRangeLabel(startPtr, cap, total);
+  // Last session range
+  const last = sessions[sessions.length - 1];
+  const lastCount = last ? (last.end - last.start + 1) : cap;
+  const lastSessionStart = last ? (last.start - 1) : startPtr;
+  const lastLabel = last ? _buildHadithRangeLabel(lastSessionStart, lastCount, total) : totalLabel;
+
+  const statusTxt = done
+    ? `Completed \u2713 \u2014 ${cap} Hadiths Read`
+    : `${cap} Hadiths Read (${pct}%)`;
+
   badge.style.display = 'block';
   badge.innerHTML =
-    `<span style="color:${done?'var(--green-bright)':'var(--gold)'};">\uD83D\uDCDA ${sessionCount} Session${sessionCount!==1?'s':''} \u00b7 ${statusTxt}</span>`
-    +`<br><span style="font-size:9px;color:#a89060;">${rangeLabel}</span>`;
+    `<span style="color:${done?'var(--green-bright)':'var(--gold)'};">\uD83D\uDCDA Today: ${sessionCount} Session${sessionCount!==1?'s':''} \u00b7 ${statusTxt}</span>`
+    +`<br><span style="font-size:9px;color:#a89060;">Total: ${totalLabel} (${cap} Hadiths Today)</span>`
+    +`<br><span style="font-size:9px;color:#a89060;">Last: ${lastLabel} (${lastCount} Hadith${lastCount!==1?'s':''})</span>`;
 }
 
 function _buildHadithRangeLabel(startPtr, count, total){
@@ -4025,14 +4036,22 @@ function renderTafsirBadge(dk){
   const startPtr     = data.tafsir_start_ptr ?? 0;
   const sessions     = data.tafsir_sessions || [];
   const sessionCount = sessions.length || 1;
-  const rangeLabel   = _buildTafsirRangeLabel(startPtr, cap, TOTAL_VERSES);
-  const statusTxt    = done
-    ? `Completed \u2713 \u2014 ${VERSES_PER_DAY} Verses`
-    : `${cap} / ${VERSES_PER_DAY} Verses (${pct}%)`;
+
+  const totalLabel = _buildTafsirRangeLabel(startPtr, cap, TOTAL_VERSES);
+  const last = sessions[sessions.length - 1];
+  const lastCount = last ? (last.end - last.start + 1) : cap;
+  const lastSessionStart = last ? (last.start - 1) : startPtr;
+  const lastLabel = last ? _buildTafsirRangeLabel(lastSessionStart, lastCount, TOTAL_VERSES) : totalLabel;
+
+  const statusTxt = done
+    ? `Completed \u2713 \u2014 ${cap} Verses Read`
+    : `${cap} Verses Read (${pct}%)`;
+
   badge.style.display = 'block';
   badge.innerHTML =
-    `<span style="color:${done?'var(--green-bright)':'var(--gold)'};">\uD83D\uDD0D ${sessionCount} Session${sessionCount!==1?'s':''} \u00b7 ${statusTxt}</span>`
-    +`<br><span style="font-size:9px;color:#a89060;">${rangeLabel}</span>`;
+    `<span style="color:${done?'var(--green-bright)':'var(--gold)'};">\uD83D\uDD0D Today: ${sessionCount} Session${sessionCount!==1?'s':''} \u00b7 ${statusTxt}</span>`
+    +`<br><span style="font-size:9px;color:#a89060;">Total: ${totalLabel} (${cap} Verses Today)</span>`
+    +`<br><span style="font-size:9px;color:#a89060;">Last: ${lastLabel} (${lastCount} Verse${lastCount!==1?'s':''})</span>`;
 }
 
 /* Scoring updates */
@@ -4046,6 +4065,7 @@ let _hadithIdx  = 0;   // index within _hadithData
 let _hadithDK   = '';
 let _hadithReviewMode = false;
 let _hadithStartPtr   = 0; // global ptr at session open (for badge)
+let _hadithSessionIdx = 0; // index in _hadithData where this session started
 
 async function openHadithReader(){
   _hadithDK = currentDateKey || todayKey();
@@ -4092,32 +4112,45 @@ async function openHadithReader(){
 
     document.getElementById('hadithDoneNote').style.display = 'none';
 
-    // First open today: record start pointer
+    // Rebuild _hadithData from what's already been read today
     if(cap === 0){
+      // First open today: record start pointer
       _hadithStartPtr = gptr % total;
       const patch = { hadith_start_ptr: _hadithStartPtr, hadith_read_cap: 0 };
       const d = Object.assign({}, getCached(_hadithDK), patch);
       _cache[_hadithDK] = d;
       await setStore(_hadithDK, d);
+      _hadithData = [];
     } else {
+      // Resume: rebuild already-read hadiths so counter shows correctly
       _hadithStartPtr = todayData.hadith_start_ptr ?? (gptr % total);
+      _hadithData = [];
+      for(let i = 0; i < cap; i++) _hadithData.push(_hadithBook[(_hadithStartPtr + i) % total]);
     }
 
-    // Build slice from current pointer position
-    _hadithData = [_hadithBook[gptr % total]];
+    // This session's start index (cap before this open)
+    const _thisSessionStart = cap;
+
+    // Add next unread hadith and mark it read immediately
+    _hadithData.push(_hadithBook[gptr % total]);
+    gptr = (gptr + 1) % total;
+    await setGptr('_gptr_hadith', gptr);
+    const newCap = cap + 1;
+
+    // Record this session in the sessions array
+    const sessions = (getCached(_hadithDK).hadith_sessions || []).slice();
+    sessions.push({ start: _hadithStartPtr + _thisSessionStart + 1, end: _hadithStartPtr + newCap, sessionIdx: _thisSessionStart });
+    _hadithSessionIdx = _thisSessionStart; // track this session's start for nav
+
+    await _saveHadithProgress(newCap, newCap >= HADITHS_PER_DAY, sessions);
 
     document.getElementById('hadithDayInfo').textContent = 'Sahih Bukhari';
     document.getElementById('hadithLoading').style.display = 'none';
     document.getElementById('hadithContent').style.display = 'block';
     document.getElementById('hadithNav').style.display     = 'flex';
 
-    // Mark first hadith as read immediately on open
-    gptr = (gptr + 1) % total;
-    await setGptr('_gptr_hadith', gptr);
-    const newCap = cap + 1;
-    await _saveHadithProgress(newCap, newCap >= HADITHS_PER_DAY);
-
-    renderHadith(0, false);
+    // Start at first hadith of this session (not first overall)
+    renderHadith(_thisSessionStart, false);
   } catch(e){
     document.getElementById('hadithLoading').textContent = '\u26A0 Failed: ' + e.message;
   }
@@ -4169,34 +4202,30 @@ async function hadithNavNext(){
   const cap       = todayData.hadith_read_cap || 0;
   if(cap >= HADITHS_PER_DAY){ closeHadithReader(); return; }
 
-  // Load next hadith from global pointer
   const total = _hadithBook.length;
   let gptr = await getGptr('_gptr_hadith');
-  const nextH = _hadithBook[gptr % total];
-  _hadithData.push(nextH);
+  _hadithData.push(_hadithBook[gptr % total]);
   gptr = (gptr + 1) % total;
   await setGptr('_gptr_hadith', gptr);
   const newCap = cap + 1;
-  await _saveHadithProgress(newCap, newCap >= HADITHS_PER_DAY);
+
+  // Update last session entry to extend its end
+  const sessions = (getCached(_hadithDK).hadith_sessions || []).slice();
+  if(sessions.length){
+    sessions[sessions.length-1].end = _hadithStartPtr + newCap;
+  }
+  await _saveHadithProgress(newCap, newCap >= HADITHS_PER_DAY, sessions);
   renderHadith(_hadithData.length - 1, false);
 }
 
-async function _saveHadithProgress(cap, done){
-  const cappedCap  = Math.min(cap, HADITHS_PER_DAY);
-  const existing   = getCached(_hadithDK);
-  const sessions   = existing.hadith_sessions ? [...existing.hadith_sessions] : [];
-  // Each open is one session — track the range read this session
-  const sessionStart = (_hadithStartPtr % (_hadithBook ? _hadithBook.length : 7563)) + 1;
-  const sessionEnd   = sessionStart + cappedCap - 1;
-  const entry = { start: sessionStart, end: sessionEnd };
-  if(sessions.length && sessions[sessions.length-1].start === sessionStart)
-    sessions[sessions.length-1] = entry;
-  else sessions.push(entry);
+async function _saveHadithProgress(cap, done, sessions){
+  const cappedCap = Math.min(cap, HADITHS_PER_DAY);
+  const existing  = getCached(_hadithDK);
   const patch = {
-    hadith_read_cap: cappedCap,
-    hadith_ratio: Math.min(cappedCap / HADITHS_PER_DAY, 1),
+    hadith_read_cap:  cappedCap,
+    hadith_ratio:     Math.min(cappedCap / HADITHS_PER_DAY, 1),
     hadith_start_ptr: _hadithStartPtr,
-    hadith_sessions: sessions
+    hadith_sessions:  sessions || existing.hadith_sessions || []
   };
   if(done) patch.hadith = 'yes';
   const d = Object.assign({}, existing, patch);
@@ -4213,9 +4242,10 @@ function hadithNavPrev(){
 }
 
 function closeHadithReader(){
-  const cap = getCached(_hadithDK).hadith_read_cap || 0;
+  const todayData = getCached(_hadithDK);
+  const cap = todayData.hadith_read_cap || 0;
   if(cap >= HADITHS_PER_DAY && !_hadithReviewMode){
-    _saveHadithProgress(cap, true);
+    _saveHadithProgress(cap, true, todayData.hadith_sessions);
   }
   document.getElementById('hadithReaderOverlay').classList.remove('active');
 }
@@ -4229,6 +4259,7 @@ let _tafsirIdx    = 0;
 let _tafsirDK     = '';
 let _tafsirReviewMode  = false;
 let _tafsirStartPtr    = 0;
+let _tafsirSessionIdx  = 0;
 
 async function openTafsirReader(){
   _tafsirDK = currentDateKey || todayKey();
@@ -4306,32 +4337,42 @@ async function openTafsirReader(){
 
     document.getElementById('tafsirDoneNote').style.display = 'none';
 
+    // Rebuild _tafsirSlice from what's already been read today
     if(cap === 0){
       _tafsirStartPtr = gptr % TOTAL_VERSES;
       const patch = { tafsir_start_ptr: _tafsirStartPtr, tafsir_read_cap: 0 };
       const d = Object.assign({}, getCached(_tafsirDK), patch);
       _cache[_tafsirDK] = d;
       await setStore(_tafsirDK, d);
+      _tafsirSlice = [];
     } else {
       _tafsirStartPtr = todayData.tafsir_start_ptr ?? (gptr % TOTAL_VERSES);
+      _tafsirSlice = [];
+      for(let i = 0; i < cap; i++) _tafsirSlice.push(buildVerseObj(_tafsirStartPtr + i + 1));
     }
 
-    // Build first verse from current pointer
-    _tafsirSlice = [buildVerseObj(gptr + 1)];
+    const _thisSessionStart = cap;
 
-    // Advance pointer and mark first verse read immediately
+    // Add next unread verse and mark it read immediately
+    _tafsirSlice.push(buildVerseObj(gptr + 1));
     gptr = (gptr + 1) % TOTAL_VERSES;
     await setGptr('_gptr_tafsir', gptr);
     const newCap = cap + 1;
-    await _saveTafsirProgress(newCap, newCap >= VERSES_PER_DAY);
 
-    const v = _tafsirSlice[0];
-    document.getElementById('tafsirDayInfo').textContent = 'Saheeh International \u00b7 ' + v.surahName;
+    // Record this session
+    const sessions = (getCached(_tafsirDK).tafsir_sessions || []).slice();
+    sessions.push({ start: _tafsirStartPtr + _thisSessionStart + 1, end: _tafsirStartPtr + newCap, sessionIdx: _thisSessionStart });
+    _tafsirSessionIdx = _thisSessionStart;
+
+    await _saveTafsirProgress(newCap, newCap >= VERSES_PER_DAY, sessions);
+
+    const v = _tafsirSlice[_thisSessionStart];
+    document.getElementById('tafsirDayInfo').textContent = 'Saheeh International \u00b7 ' + (v ? v.surahName : '');
 
     document.getElementById('tafsirLoading').style.display = 'none';
     document.getElementById('tafsirContent').style.display = 'block';
     document.getElementById('tafsirNav').style.display     = 'flex';
-    renderTafsirVerse(0, false);
+    renderTafsirVerse(_thisSessionStart, false);
   } catch(e){
     document.getElementById('tafsirLoading').textContent = '\u26A0 Failed: ' + e.message;
   }
@@ -4395,25 +4436,22 @@ async function tafsirNavNext(){
   gptr = (gptr + 1) % TOTAL_VERSES;
   await setGptr('_gptr_tafsir', gptr);
   const newCap = cap + 1;
-  await _saveTafsirProgress(newCap, newCap >= VERSES_PER_DAY);
+
+  // Update last session end
+  const sessions = (getCached(_tafsirDK).tafsir_sessions || []).slice();
+  if(sessions.length) sessions[sessions.length-1].end = _tafsirStartPtr + newCap;
+  await _saveTafsirProgress(newCap, newCap >= VERSES_PER_DAY, sessions);
   renderTafsirVerse(_tafsirSlice.length - 1, false);
 }
 
-async function _saveTafsirProgress(cap, done){
-  const cappedCap  = Math.min(cap, VERSES_PER_DAY);
-  const existing   = getCached(_tafsirDK);
-  const sessions   = existing.tafsir_sessions ? [...existing.tafsir_sessions] : [];
-  const sessionStart = (_tafsirStartPtr % TOTAL_VERSES) + 1;
-  const sessionEnd   = sessionStart + cappedCap - 1;
-  const entry = { start: sessionStart, end: sessionEnd };
-  if(sessions.length && sessions[sessions.length-1].start === sessionStart)
-    sessions[sessions.length-1] = entry;
-  else sessions.push(entry);
+async function _saveTafsirProgress(cap, done, sessions){
+  const cappedCap = Math.min(cap, VERSES_PER_DAY);
+  const existing  = getCached(_tafsirDK);
   const patch = {
-    tafsir_read_cap: cappedCap,
-    tafsir_ratio: Math.min(cappedCap / VERSES_PER_DAY, 1),
+    tafsir_read_cap:  cappedCap,
+    tafsir_ratio:     Math.min(cappedCap / VERSES_PER_DAY, 1),
     tafsir_start_ptr: _tafsirStartPtr,
-    tafsir_sessions: sessions
+    tafsir_sessions:  sessions || existing.tafsir_sessions || []
   };
   if(done) patch.tafsir = 'yes';
   const d = Object.assign({}, existing, patch);
@@ -4427,9 +4465,10 @@ async function _saveTafsirProgress(cap, done){
 
 function tafsirNavPrev(){ if(_tafsirIdx > 0) renderTafsirVerse(_tafsirIdx - 1, _tafsirReviewMode); }
 function closeTafsirReader(){
-  const cap = getCached(_tafsirDK).tafsir_read_cap || 0;
+  const todayData = getCached(_tafsirDK);
+  const cap = todayData.tafsir_read_cap || 0;
   if(cap >= VERSES_PER_DAY && !_tafsirReviewMode){
-    _saveTafsirProgress(cap, true);
+    _saveTafsirProgress(cap, true, todayData.tafsir_sessions);
   }
   document.getElementById('tafsirReaderOverlay').classList.remove('active');
 }

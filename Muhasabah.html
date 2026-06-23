@@ -3990,18 +3990,18 @@ async function openHadithReader(){
         _hadithData.push(_hadithBook[indices[_hadithData.length] % total]);
       _hadithIdx = _hadithData.length - 1;
     } else {
-      // Active mode: load the next single hadith from global pointer
-      const globalPtr = await gptrGet('hadith');
-      const jsonIdx   = globalPtr % total;
-      _hadithData     = [_hadithBook[jsonIdx]];
-      _hadithIdx      = 0;
-      // Mark as read immediately: store index, advance pointer, save cap
+      // Active mode: load all hadiths read today + the next one
+      const globalPtr  = await gptrGet('hadith');
+      const jsonIdx    = globalPtr % total;
       const newIndices = [...indices, jsonIdx];
       const newCap     = capRead + 1;
       const done       = newCap >= HADITHS_PER_DAY;
       await gptrSet('hadith', globalPtr + 1);
       await _saveHadithProgress(newCap, newIndices, done);
       if(done) _hadithAlreadyDone = true;
+      // Load full history so Prev can navigate back
+      _hadithData = newIndices.map(i => _hadithBook[i % total]).filter(Boolean);
+      _hadithIdx  = _hadithData.length - 1; // start at the newly read one
     }
 
     document.getElementById('hadithLoading').style.display = 'none';
@@ -4032,31 +4032,32 @@ function renderHadith(idx){
   }
   // In active mode only 1 hadith loaded per open — no prev/next within session
   // In review mode allow full navigation
-  document.getElementById('hadithPrevBtn').disabled = _hadithAlreadyDone ? idx === 0 : true;
-  const dayData2 = getCached(_hadithDK);
-  const capNow   = dayData2.hadith_read_cap || 0;
-  const isLast   = _hadithAlreadyDone ? idx === _hadithData.length - 1 : capNow >= HADITHS_PER_DAY;
+  document.getElementById('hadithPrevBtn').disabled = idx === 0;
+  const isLast = _hadithAlreadyDone
+    ? idx === _hadithData.length - 1
+    : false; // in active mode, Next always available until cap hit after save
   const btn = document.getElementById('hadithNextBtn');
-  btn.textContent       = isLast ? (_hadithAlreadyDone ? '\u2715 Close' : '\u2713 Done') : 'Next \u2192';
-  btn.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
-  btn.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
-  btn.style.color       = isLast ? '#fff'                : '#8a7840';
-  btn.classList.toggle('rdr-nav-done', isLast);
+  btn.textContent       = _hadithAlreadyDone && isLast ? '\u2715 Close'
+                        : _hadithAlreadyDone ? 'Next \u2192'
+                        : _hadithData.length >= HADITHS_PER_DAY ? '\u2713 Mark Done'
+                        : 'Next \u2192';
+  const greenNow = _hadithAlreadyDone ? isLast : _hadithData.length >= HADITHS_PER_DAY;
+  btn.style.background  = greenNow ? 'var(--green)'        : '#1e1a10';
+  btn.style.borderColor = greenNow ? 'var(--green-bright)' : '#2a2010';
+  btn.style.color       = greenNow ? '#fff'                : '#8a7840';
+  btn.classList.toggle('rdr-nav-done', greenNow);
   btn.disabled = false;
 }
 
 async function hadithNavNext(){
   if(_hadithAlreadyDone){
-    // Review navigation
     if(_hadithIdx < _hadithData.length - 1) renderHadith(_hadithIdx + 1);
     else closeHadithReader();
     return;
   }
-  // Active mode: load and mark next hadith read
   const dayData  = getCached(_hadithDK);
   const capRead  = dayData.hadith_read_cap || 0;
   if(capRead >= HADITHS_PER_DAY){
-    // Just hit the cap mid-session
     _hadithAlreadyDone = true;
     closeHadithReader();
     return;
@@ -4073,7 +4074,7 @@ async function hadithNavNext(){
   await _saveHadithProgress(newCap, newIndices, done);
   if(done) _hadithAlreadyDone = true;
   _hadithIdx = _hadithData.length - 1;
-  renderHadith(_hadithIdx);
+  renderHadith(_hadithIdx); // re-render: if done, shows ✓ Mark Done button
 }
 
 async function _saveHadithProgress(newCap, newIndices, done){
@@ -4092,7 +4093,7 @@ async function _saveHadithProgress(newCap, newIndices, done){
 }
 
 function hadithNavPrev(){
-  if(_hadithAlreadyDone && _hadithIdx > 0) renderHadith(_hadithIdx - 1);
+  if(_hadithIdx > 0) renderHadith(_hadithIdx - 1);
 }
 function closeHadithReader(){
   document.getElementById('hadithReaderOverlay').classList.remove('active');
@@ -4176,21 +4177,23 @@ async function openTafsirReader(){
       document.getElementById('tafsirDayInfo').textContent =
         'Saheeh International \u00B7 Verses ' + first + '\u2013' + last;
     } else {
-      // Active mode: load the next single verse from global pointer
+      // Active mode: load next verse, mark read, load full history so Prev works
       const globalPtr    = await gptrGet('tafsir');
-      const verseNum     = (globalPtr % TOTAL_VERSES) + 1; // 1-based
+      const verseNum     = (globalPtr % TOTAL_VERSES) + 1;
       _tafsirIsLastBatch = verseNum === TOTAL_VERSES;
-      _tafsirSlice       = [buildVerseObj(verseNum)];
-      _tafsirIdx         = 0;
-      document.getElementById('tafsirDayInfo').textContent =
-        'Saheeh International \u00B7 Verse ' + verseNum;
-      // Mark as read immediately
       const newVerseNums = [...verseNums, verseNum];
       const newCap       = capRead + 1;
       const done         = newCap >= VERSES_PER_DAY;
       await gptrSet('tafsir', globalPtr + 1);
       await _saveTafsirProgress(newCap, newVerseNums, done);
       if(done) _tafsirAlreadyDone = true;
+      // Load full history so Prev can navigate back
+      _tafsirSlice = newVerseNums.map(buildVerseObj);
+      _tafsirIdx   = _tafsirSlice.length - 1;
+      const first  = newVerseNums[0] || verseNum;
+      const last   = verseNum;
+      document.getElementById('tafsirDayInfo').textContent =
+        'Saheeh International \u00B7 Verses ' + first + '\u2013' + last;
     }
 
     document.getElementById('tafsirLoading').style.display = 'none';
@@ -4215,16 +4218,20 @@ function renderTafsirVerse(idx){
   const translitEl = document.getElementById('tafsirTranslit');
   if(translitEl){ translitEl.textContent = v.translit || ''; translitEl.parentElement.style.display = v.translit ? 'block' : 'none'; }
   document.getElementById('tafsirText').textContent     = v.meaning;
-  document.getElementById('tafsirPrevBtn').disabled     = _tafsirAlreadyDone ? idx === 0 : true;
-  const dayData2 = getCached(_tafsirDK);
-  const capNow   = dayData2.tafsir_read_cap || 0;
-  const isLast   = _tafsirAlreadyDone ? idx === _tafsirSlice.length - 1 : capNow >= VERSES_PER_DAY;
+  document.getElementById('tafsirPrevBtn').disabled     = idx === 0;
+  const isLast = _tafsirAlreadyDone
+    ? idx === _tafsirSlice.length - 1
+    : false;
   const btn = document.getElementById('tafsirNextBtn');
-  btn.textContent       = isLast ? (_tafsirAlreadyDone ? '\u2715 Close' : '\u2713 Done') : 'Next \u2192';
-  btn.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
-  btn.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
-  btn.style.color       = isLast ? '#fff'                : '#8a7840';
-  btn.classList.toggle('rdr-nav-done', isLast);
+  btn.textContent       = _tafsirAlreadyDone && isLast ? '\u2715 Close'
+                        : _tafsirAlreadyDone ? 'Next \u2192'
+                        : _tafsirSlice.length >= VERSES_PER_DAY ? '\u2713 Mark Done'
+                        : 'Next \u2192';
+  const greenNow = _tafsirAlreadyDone ? isLast : _tafsirSlice.length >= VERSES_PER_DAY;
+  btn.style.background  = greenNow ? 'var(--green)'        : '#1e1a10';
+  btn.style.borderColor = greenNow ? 'var(--green-bright)' : '#2a2010';
+  btn.style.color       = greenNow ? '#fff'                : '#8a7840';
+  btn.classList.toggle('rdr-nav-done', greenNow);
   btn.disabled = false;
 }
 
@@ -4234,7 +4241,6 @@ async function tafsirNavNext(){
     else closeTafsirReader();
     return;
   }
-  // Active mode: load and mark next verse read
   const dayData  = getCached(_tafsirDK);
   const capRead  = dayData.tafsir_read_cap || 0;
   if(capRead >= VERSES_PER_DAY){
@@ -4259,7 +4265,7 @@ async function tafsirNavNext(){
   await _saveTafsirProgress(newCap, newVerseNums, done);
   if(done) _tafsirAlreadyDone = true;
   _tafsirIdx = _tafsirSlice.length - 1;
-  renderTafsirVerse(_tafsirIdx);
+  renderTafsirVerse(_tafsirIdx); // re-render: if done, shows ✓ Mark Done
 }
 
 async function _saveTafsirProgress(newCap, newVerseNums, done){
@@ -4278,7 +4284,7 @@ async function _saveTafsirProgress(newCap, newVerseNums, done){
 }
 
 function tafsirNavPrev(){
-  if(_tafsirAlreadyDone && _tafsirIdx > 0) renderTafsirVerse(_tafsirIdx - 1);
+  if(_tafsirIdx > 0) renderTafsirVerse(_tafsirIdx - 1);
 }
 function closeTafsirReader(){
   document.getElementById('tafsirReaderOverlay').classList.remove('active');

@@ -2802,6 +2802,11 @@ function updateStats(bestScore,bestDayKey){
 }
 
 /* ── Daily View ── */
+function yesterdayKey(){
+  const t=new Date();t.setDate(t.getDate()-1);
+  return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+}
+
 function openDay(dk){
   currentDateKey=dk;
   const [y,m,d]=dk.split('-').map(Number);
@@ -2811,12 +2816,28 @@ function openDay(dk){
   document.getElementById('calendarView').classList.remove('active');
   document.getElementById('dailyView').classList.add('active');
   document.getElementById('calendarSubheader').classList.add('hidden');
-  // Lock past days — today and future stay unlocked
-  if(dk < todayKey()){
+
+  const today     = todayKey();
+  const yesterday = yesterdayKey();
+
+  // Tapping today locks yesterday for this session
+  if(dk === today){
+    try { sessionStorage.setItem('_muh_today_entered','1'); } catch(e) {}
+  }
+
+  // Lock rules:
+  // - anything older than yesterday: always locked
+  // - yesterday: locked only once today has been entered this session
+  // - today: never locked
+  const todayEntered = (()=>{ try{ return sessionStorage.getItem('_muh_today_entered')==='1'; }catch(e){return false;} })();
+  const shouldLock = dk < yesterday || (dk === yesterday && todayEntered);
+
+  if(shouldLock){
     document.body.classList.add('past-day-locked');
   } else {
     document.body.classList.remove('past-day-locked');
   }
+
   buildSalahGrid();
   buildQuranSelector();
   loadDayData(dk);

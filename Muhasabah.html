@@ -4521,8 +4521,8 @@ async function openBookReader() {
   document.getElementById('bookReaderOverlay').classList.add('active');
   reThemeIfLight();
 
-  const rec    = await rDayLoad('book');
-  const dayNum = rec.day;
+  const ptr    = await gptrGet('book');          // total books completed ever
+  const dayNum = (ptr % 365) + 1;               // 1–365, wraps after 365
   _bookDayNum  = dayNum;
   document.getElementById('bookDayPill').textContent = 'Book · Day ' + dayNum + ' of 365';
 
@@ -4631,7 +4631,8 @@ async function bookNavNext() {
     _renderBookSlide(book);
   } else {
     if (!_bookAlreadyDone) await _saveBookProgress(book, true);
-    await rDayAdvance('book');
+    const ptr = await gptrGet('book');
+    await gptrSet('book', ptr + 1);
     closeBookReader();
   }
 }
@@ -7169,14 +7170,13 @@ async function lrLoadPtrs() {
 function lrGetTodayEntry(type) {
   const data = LR_DATA[_lrLang];
   if (!data || !data.length) return null;
-  const k      = _lrLang + '_' + type;
-  const ptr    = _lrPtrs[k] || 0;
-  const total  = data.filter(e => e.type === type).length;
+  const k     = _lrLang + '_' + type;
+  const ptr   = _lrPtrs[k] || 0;
+  const total = data.filter(e => e.type === type).length;
   if (total === 0) return null;
-  if (ptr >= total) return { entry: null, exhausted: true, total };
-  const day    = (ptr % total) + 1; // 1-based day index into dataset
-  const entry  = data.find(e => e.type === type && e.day === day);
-  return entry ? { entry, idx: ptr, exhausted: false } : null;
+  const day   = (ptr % total) + 1; // wraps after all entries exhausted
+  const entry = data.find(e => e.type === type && e.day === day);
+  return entry ? { entry, idx: ptr } : null;
 }
 
 // ── Sync button highlights ────────────────────────────────────────────────
@@ -7317,7 +7317,7 @@ function lrRender() {
   lrSyncBtns();
   const result = lrGetTodayEntry(_lrType);
 
-  if (!result || result.exhausted) {
+  if (!result) {
     document.getElementById('lrHero').style.display = 'none';
     document.getElementById('lrConjPanel').style.display = 'none';
     document.getElementById('lrSynAntPanel').style.display = 'none';
@@ -7326,13 +7326,7 @@ function lrRender() {
     document.getElementById('lrChallengePanel').style.display = 'none';
     document.getElementById('lrMarkWrap').style.display = 'none';
     document.getElementById('lrNoData').style.display = 'block';
-    if (result && result.exhausted) {
-      const ui = lrGetUI();
-      const typeLabel = _lrType === 'verb' ? (ui.verbBtn.label + ' ' + (_lrLang === 'ar' || _lrLang === 'ur' ? 'أفعال' : 'Verbs')) : (ui.wordBtn.label + ' Words');
-      document.getElementById('lrNoData').textContent = '✓ All ' + typeLabel + ' completed — رَبِّ زِدْنِي عِلْمًا 🕌';
-    } else {
-      document.getElementById('lrNoData').textContent = "Today\'s word is not yet available. New words are added regularly — wait patiently. 🕌";
-    }
+    document.getElementById('lrNoData').textContent = "Today\'s word is not yet available. New words are added regularly — wait patiently. 🕌";
     return;
   }
 

@@ -3964,13 +3964,19 @@ async function openHadithReader(){
     document.getElementById('hadithDoneNote').style.display = alreadyDone ? 'block' : 'none';
 
     // Build batch: only the remaining slots for this date (capLeft), not always 5
-    const batchSize = alreadyDone ? capRead : capLeft;
     _hadithData = [];
     for(let i = 0; i < (alreadyDone ? capRead : capLeft); i++)
       _hadithData.push(_hadithBook[(globalPtr + i) % total]);
 
-    const startIdx = alreadyDone ? _hadithData.length - 1 : 0;
-    _hadithSessionStart = 0;
+    // Restore resume position within the current batch
+    const savedPos = await getReaderResume('_hadith_resume_' + _hadithDK);
+    let startIdx;
+    if(alreadyDone){
+      startIdx = _hadithData.length - 1;
+    } else {
+      startIdx = (savedPos !== null && savedPos < _hadithData.length) ? savedPos : 0;
+    }
+    _hadithSessionStart = startIdx;
     _hadithAlreadyDone  = alreadyDone;
 
     document.getElementById('hadithDayInfo').textContent = 'Sahih Bukhari';
@@ -4013,9 +4019,11 @@ async function hadithNavNext(){
   if(_hadithAlreadyDone) return;
   const next = _hadithIdx + 1;
   if(next < _hadithData.length){
+    await setReaderResume('_hadith_resume_' + _hadithDK, next);
     await _saveHadithProgress(next, false);
     renderHadith(next);
   } else {
+    await setReaderResume('_hadith_resume_' + _hadithDK, null);
     await _saveHadithProgress(_hadithData.length, true);
     closeHadithReader();
   }
@@ -4133,9 +4141,16 @@ async function openTafsirReader(){
         meaning:  _quranEnglish._map[key] || 'Translation unavailable.' });
     }
 
-    const startIdx = alreadyDone ? _tafsirSlice.length - 1 : 0;
+    // Restore resume position within the current batch
+    const savedPos = await getReaderResume('_tafsir_resume_' + _tafsirDK);
+    let startIdx;
+    if(alreadyDone){
+      startIdx = _tafsirSlice.length - 1;
+    } else {
+      startIdx = (savedPos !== null && savedPos < _tafsirSlice.length) ? savedPos : 0;
+    }
     _tafsirAlreadyDone  = alreadyDone;
-    _tafsirSessionStart = 0;
+    _tafsirSessionStart = startIdx;
 
     document.getElementById('tafsirLoading').style.display = 'none';
     document.getElementById('tafsirContent').style.display = 'block';
@@ -4173,9 +4188,11 @@ async function tafsirNavNext(){
   const total = _tafsirSlice.length;
   const next  = _tafsirIdx + 1;
   if(next < total){
+    await setReaderResume('_tafsir_resume_' + _tafsirDK, next);
     await _saveTafsirProgress(next, false);
     renderTafsirVerse(next);
   } else {
+    await setReaderResume('_tafsir_resume_' + _tafsirDK, null);
     await _saveTafsirProgress(total, true);
     closeTafsirReader();
   }

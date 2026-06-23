@@ -4106,7 +4106,7 @@ async function openHadithReader(){
       document.getElementById('hadithLoading').style.display = 'none';
       document.getElementById('hadithContent').style.display = 'block';
       document.getElementById('hadithNav').style.display     = 'flex';
-      renderHadith(0, true);
+      renderHadith(_hadithData.length - 1, true);
       return;
     }
 
@@ -4331,7 +4331,7 @@ async function openTafsirReader(){
       document.getElementById('tafsirLoading').style.display = 'none';
       document.getElementById('tafsirContent').style.display = 'block';
       document.getElementById('tafsirNav').style.display     = 'flex';
-      renderTafsirVerse(0, true);
+      renderTafsirVerse(_tafsirSlice.length - 1, true);
       return;
     }
 
@@ -4915,6 +4915,7 @@ async function bookNavNext() {
     await _saveBookProgress(book, false);
     _renderBookSlide(book);
   } else {
+    await setReaderResume('_book_lesson_' + _bookDK, total - 1);
     await _saveBookProgress(book, true);
     const newGptr = gptr + 1;
     await setGptr('_gptr_book', newGptr);

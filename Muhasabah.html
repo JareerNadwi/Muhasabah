@@ -6643,8 +6643,6 @@ async function openZikrBookReader() {
 
   // Global resume from IDB
   const savedIdx = await getPdfLastPage(ZIKR_BOOK_IDX_KEY);
-  // data.zikrBook gets set to 'yes' once all 123 duas have been read (see
-  // _zbSaveProgress) — same per-day completion flag the other readers use.
   _zbCompleted = getCached(_zbDK).zikrBook === 'yes';
 
   // Resume from saved position (global, persists across days)
@@ -6652,7 +6650,7 @@ async function openZikrBookReader() {
   _zbStartSlide = _zbSlide;
 
   _zbRender();
-  await _zbSaveProgress(false);
+  // Don't call _zbSaveProgress on open — nothing has been read yet
 }
 
 /* ── Nav ── */
@@ -6683,16 +6681,19 @@ async function _zbSaveProgress(reachedEnd) {
   const data = Object.assign({}, getCached(_zbDK));
   if (!data['zikrBook_sessions']) data['zikrBook_sessions'] = [];
 
-  // Update/add session entry
-  const lastSess = data['zikrBook_sessions'];
-  const entry = { start: _zbStartSlide + 1, end: _zbSlide + 1, duas: _zbSlide - _zbStartSlide + 1 };
-  if (lastSess.length && lastSess[lastSess.length - 1].start === _zbStartSlide + 1) {
-    lastSess[lastSess.length - 1] = entry;
-  } else if (_zbSlide >= _zbStartSlide || reachedEnd) {
-    lastSess.push(entry);
+  // Only record a session entry if something was actually read this session
+  const sessPages = _zbSlide - _zbStartSlide + 1;
+  if (sessPages > 0) {
+    const lastSess = data['zikrBook_sessions'];
+    const entry = { start: _zbStartSlide + 1, end: _zbSlide + 1, duas: sessPages };
+    if (lastSess.length && lastSess[lastSess.length - 1].start === _zbStartSlide + 1) {
+      lastSess[lastSess.length - 1] = entry;
+    } else {
+      lastSess.push(entry);
+    }
   }
 
-  const totalDuasToday = lastSess.reduce((s, x) => s + x.duas, 0);
+  const totalDuasToday = (data['zikrBook_sessions'] || []).reduce((s, x) => s + x.duas, 0);
   data['zikrBook_pagesToday'] = totalDuasToday;
   // Once the book is finished today, a later restart shouldn't drag the
   // bonus back down — only let the ratio increase within the same day.
@@ -6701,8 +6702,9 @@ async function _zbSaveProgress(reachedEnd) {
   data['zikrBook_readerPage'] = _zbSlide + 1;
 
   // Auto-flip to "Yes" once all 123 duas have been reached
-  if (ratio >= 1) {
+  if (reachedEnd) {
     data['zikrBook'] = 'yes';
+    _zbCompleted = true;
   }
 
   _cache[_zbDK] = data;
@@ -6713,13 +6715,13 @@ async function _zbSaveProgress(reachedEnd) {
   if (inp) inp.value = duasRead;
 
   // Reflect auto-completion on the Yes/No buttons
-  if (ratio >= 1) {
+  if (reachedEnd) {
     document.querySelectorAll('.yn-opt[data-key="zikrBook"]').forEach(btn =>
       btn.classList.toggle('active', btn.dataset.val === 'yes')
     );
   }
 
-  // If reached end, reset global position to start
+  // If reached end, reset global position to start for next cycle
   if (reachedEnd) {
     await setPdfLastPage(ZIKR_BOOK_IDX_KEY, 0);
   }
@@ -6733,17 +6735,18 @@ async function _zbSaveProgress(reachedEnd) {
 async function closeZikrBookReader() {
   document.getElementById('zikrBookReaderOverlay').classList.remove('active');
   if (!_zbDK) return;
-  // Save current progress first
-  await _zbSaveProgress(false);
-  // Once the book is finished, always start from the first page next time —
-  // otherwise resume from the dua after this one, as usual.
-  const justCompleted = getCached(_zbDK).zikrBook === 'yes';
-  if (justCompleted) {
-    await setPdfLastPage(ZIKR_BOOK_IDX_KEY, 0);
-  } else {
+  // Save current progress only if something was actually read this session
+  if (_zbSlide > _zbStartSlide) {
+    await _zbSaveProgress(false);
+  }
+  // Only reset position to 0 if we just finished (reachedEnd handled in navNext→_zbSaveProgress).
+  // If mid-read (not at end), save the next position to resume from.
+  const atEnd = _zbSlide >= ZIKR_BOOK_TOTAL - 1 && getCached(_zbDK).zikrBook === 'yes';
+  if (!atEnd) {
     const nextSlide = Math.min(_zbSlide + 1, ZIKR_BOOK_TOTAL - 1);
     await setPdfLastPage(ZIKR_BOOK_IDX_KEY, nextSlide);
   }
+  // If atEnd, position was already reset to 0 by _zbSaveProgress(true) in navNext
 }
 
 /* ── Badge ── */

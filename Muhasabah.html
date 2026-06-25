@@ -6601,19 +6601,11 @@ function _zbRender() {
   pb.style.opacity = _zbSlide === 0 ? '0.3' : '1';
 
   const nb = document.getElementById('zikrBookNextBtn');
-  if(_zbCompleted && isLast){
-    nb.textContent = '\u2715 Close';
-    nb.style.background  = '#1e1a10';
-    nb.style.borderColor = '#2a2010';
-    nb.style.color       = '#8a7840';
-    nb.classList.remove('rdr-nav-done');
-  } else {
-    nb.textContent = isLast ? '✓ Mark Done' : 'Next →';
-    nb.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
-    nb.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
-    nb.style.color       = isLast ? '#fff'                : '#8a7840';
-    nb.classList.toggle('rdr-nav-done', isLast);
-  }
+  nb.textContent = isLast ? '✓ Mark Done' : 'Next →';
+  nb.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
+  nb.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
+  nb.style.color       = isLast ? '#fff'                : '#8a7840';
+  nb.classList.toggle('rdr-nav-done', isLast);
 
   const sourceTag = dua.source
     ? '<div style="font-size:0.72rem;color:#7a6a40;margin-top:10px;text-align:right;font-family:\'DM Mono\',monospace;">' + dua.source + '</div>'
@@ -6656,10 +6648,7 @@ async function openZikrBookReader() {
   _zbCompleted = getCached(_zbDK).zikrBook === 'yes';
 
   // Resume from saved position (global, persists across days)
-  // Review: open at last slide when completed
-  _zbSlide = _zbCompleted
-    ? ZIKR_BOOK_TOTAL - 1
-    : (savedIdx !== null && savedIdx >= 0) ? Math.min(savedIdx, ZIKR_BOOK_TOTAL - 1) : 0;
+  _zbSlide = (savedIdx !== null && savedIdx >= 0) ? Math.min(savedIdx, ZIKR_BOOK_TOTAL - 1) : 0;
   _zbStartSlide = _zbSlide;
 
   _zbRender();
@@ -6668,7 +6657,6 @@ async function openZikrBookReader() {
 
 /* ── Nav ── */
 async function zikrBookNavNext() {
-  if (_zbCompleted && _zbSlide >= ZIKR_BOOK_TOTAL - 1) { closeZikrBookReader(); return; }
   if (_zbSlide < ZIKR_BOOK_TOTAL - 1) {
     _zbSlide++;
     await setPdfLastPage(ZIKR_BOOK_IDX_KEY, _zbSlide);

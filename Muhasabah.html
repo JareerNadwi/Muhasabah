@@ -3979,7 +3979,7 @@ function renderHadithBadge(dk){
   const lastLabel = last ? _buildHadithRangeLabel(lastSessionStart, lastCount, total) : totalLabel;
 
   const statusTxt = done
-    ? `Completed \u2713 \u2014 ${cap} Hadiths Read`
+    ? `${cap} Hadiths Read (100% ✓ Completed)`
     : `${cap} Hadiths Read (${pct}%)`;
 
   badge.style.display = 'block';
@@ -4050,7 +4050,7 @@ function renderTafsirBadge(dk){
   const lastLabel = last ? _buildTafsirRangeLabel(lastSessionStart, lastCount, TOTAL_VERSES) : totalLabel;
 
   const statusTxt = done
-    ? `Completed \u2713 \u2014 ${cap} Verses Read`
+    ? `${cap} Verses Read (100% ✓ Completed)`
     : `${cap} Verses Read (${pct}%)`;
 
   badge.style.display = 'block';
@@ -6218,18 +6218,24 @@ function renderAsmaulBadge(dk){
   const badge = document.getElementById("asmaulSessionBadge");
   if(!badge) return;
   const data = getCached(dk);
-  if(data["asmaul"] === "yes" && !data["asmaul_sessions"]){
-    badge.style.display = "block";
-    badge.innerHTML = "<span style=\"color:var(--green-bright)\">🌿 All 99 Names Completed — Goal Achieved ✓</span>";
-    return;
-  }
   const sessions = data["asmaul_sessions"];
   const idx      = data["asmaul_slideIdx"];
+  const done     = data["asmaul"] === "yes";
   if(!sessions || sessions.length === 0){
-    if(idx !== undefined && idx >= 0){
+    if(done){
+      // Completed but no session array (legacy or completed in one shot)
+      badge.style.display = "block";
+      badge.innerHTML =
+        "<span style=\"color:var(--green-bright)\">🌿 Today: 1 Session &nbsp;·&nbsp; 33 Pages Read (100% ✓ Completed)</span>" +
+        "<br><span style=\"font-size:9px;color:#a89060\">Total: Page 1–33 (33 Pages Today)</span>" +
+        "<br><span style=\"font-size:9px;color:#a89060\">Last Session: Pages 1–33 (33 Pages)</span>";
+    } else if(idx !== undefined && idx >= 0){
       const pct = Math.round((idx + 1) / ASMAUL_TOTAL_SLIDES * 100);
       badge.style.display = "block";
-      badge.innerHTML = "<span style=\"color:var(--gold)\">🌿 Page " + (idx+1) + " of 33 — " + pct + "% complete</span>";
+      badge.innerHTML =
+        "<span style=\"color:var(--gold)\">🌿 Today: 1 Session &nbsp;·&nbsp; " + (idx+1) + " Page" + (idx+1!==1?"s":"") + " Read (" + pct + "%)</span>" +
+        "<br><span style=\"font-size:9px;color:#a89060\">Total: Page 1–" + (idx+1) + " (" + (idx+1) + " Page" + (idx+1!==1?"s":"") + " Today)</span>" +
+        "<br><span style=\"font-size:9px;color:#a89060\">Last Session: Pages 1–" + (idx+1) + " (" + (idx+1) + " Page" + (idx+1!==1?"s":"") + ")</span>";
     } else {
       badge.style.display = "none";
     }
@@ -6419,7 +6425,9 @@ function renderZikrBadge(dk,mode){
   var icon=mode==="morning"?"☀️":"🌆";
   if(data[gk]==="yes"&&(!sessions||sessions.length===0)){
     badge.style.display="block";
-    badge.innerHTML="<span style=\"color:var(--green-bright)\">"+icon+" All 77 Duas Completed — Goal Achieved</span>";
+    badge.innerHTML="<span style=\"color:var(--green-bright)\">"+icon+" Today: 1 Session &nbsp;&#183;&nbsp; 77 Duas Read (100% ✓ Completed)</span>"+
+      "<br><span style=\"font-size:9px;color:#a89060\">Total: Dua 1–77 (77 Duas Today)</span>"+
+      "<br><span style=\"font-size:9px;color:#a89060\">Last Session: Duas 1–77 (77 Duas)</span>";
     return;
   }
   if(!sessions||sessions.length===0){
@@ -6730,8 +6738,6 @@ function _zbRenderBadge() {
   if (_cycle.length) cycles.push(_cycle);
   const restartedToday = cycles.length > 1;
   const rangeText = cycles.map(c => `${c[0].start}\u2013${c[c.length-1].end}`).join(', ');
-  const sessionsLine = 'Total: Dua ' + rangeText + ' (' + totalDuas + ' Dua' + (totalDuas !== 1 ? 's' : '') + ' Today)'
-    + (restartedToday ? ' \u2014 Book Completed &amp; Restarted Today' : '');
 
   const done = data['zikrBook'] === 'yes';
   const color = done ? 'var(--green-bright)' : 'var(--gold)';

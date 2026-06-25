@@ -6647,10 +6647,12 @@ async function openZikrBookReader() {
 
   // Resume from saved position (global, persists across days)
   _zbSlide = (savedIdx !== null && savedIdx >= 0) ? Math.min(savedIdx, ZIKR_BOOK_TOTAL - 1) : 0;
-  _zbStartSlide = _zbSlide;
+  // _zbStartSlide is one before current so the opening slide counts as read (mirrors morning/evening zikr)
+  _zbStartSlide = Math.max(_zbSlide - 1, -1);
 
   _zbRender();
-  // Don't call _zbSaveProgress on open — nothing has been read yet
+  // Save immediately — current slide is read the moment it's shown
+  if (!_zbCompleted) await _zbSaveProgress(false);
 }
 
 /* ── Nav ── */
@@ -6682,11 +6684,11 @@ async function _zbSaveProgress(reachedEnd) {
   const data = Object.assign({}, getCached(_zbDK));
   if (!data['zikrBook_sessions']) data['zikrBook_sessions'] = [];
 
-  // Only record a session entry if something was actually read this session
+  // Record session entry — current slide counts as read (inclusive)
   const sessPages = _zbSlide - _zbStartSlide;
   if (sessPages > 0) {
     const lastSess = data['zikrBook_sessions'];
-    const entry = { start: _zbStartSlide + 1, end: _zbSlide + 1, duas: sessPages };
+    const entry = { start: _zbStartSlide + 2, end: _zbSlide + 1, duas: sessPages };
     if (lastSess.length && lastSess[lastSess.length - 1].start === _zbStartSlide + 1) {
       lastSess[lastSess.length - 1] = entry;
     } else {
@@ -6736,16 +6738,12 @@ async function _zbSaveProgress(reachedEnd) {
 async function closeZikrBookReader() {
   document.getElementById('zikrBookReaderOverlay').classList.remove('active');
   if (!_zbDK) return;
-  // Save only if something was read this session (slide advanced past start)
-  if (_zbSlide > _zbStartSlide) {
+  if (!_zbCompleted) {
     await _zbSaveProgress(false);
-  }
-  // Position was already reset to 0 by _zbSaveProgress(true) in navNext if completed.
-  // If closing mid-read, save resume position as next slide.
-  const alreadyReset = getCached(_zbDK).zikrBook === 'yes' && _zbSlide >= ZIKR_BOOK_TOTAL - 1;
-  if (!alreadyReset) {
+    // Save next slide as resume position
     await setPdfLastPage(ZIKR_BOOK_IDX_KEY, Math.min(_zbSlide + 1, ZIKR_BOOK_TOTAL - 1));
   }
+  // If completed, position was already reset to 0 by _zbSaveProgress(true) in navNext
 }
 
 /* ── Badge ── */

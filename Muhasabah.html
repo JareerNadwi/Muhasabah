@@ -6602,7 +6602,7 @@ async function _zbLoadDuas() {
     return true;
   } catch(e) {
     document.getElementById('zikrBookContent').innerHTML =
-      '<div style="color:#c05050;padding:20px;font-family:\'DM Mono\',monospace;font-size:12px;">⚠ Failed: ' + e.message + '</div>';
+      '<div style="color:#c05050;padding:20px;font-family:\'DM Mono\',monospace;font-size:12px;text-align:center;">⚠ Failed: ' + e.message + '</div>';
     return false;
   }
 }

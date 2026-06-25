@@ -6635,8 +6635,9 @@ async function openZikrBookReader() {
   _zbDK = currentDateKey || todayKey();
   document.getElementById('zikrBookReaderOverlay').classList.add('active');
   document.getElementById('zikrBookDayPill').textContent = '123 Duas';
+  // Clear content immediately so previous slide doesn't flash before new render
   document.getElementById('zikrBookContent').innerHTML =
-    '<div style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:\'DM Mono\',monospace;">Loading Zikr From Book.json…</div>';
+    '<div style="display:flex;align-items:center;justify-content:center;padding:60px 20px;font-size:12px;color:#8a7840;font-family:\'DM Mono\',monospace;">Loading\u2026</div>';
 
   const ok = await _zbLoadDuas();
   if (!ok) return;
@@ -6644,8 +6645,10 @@ async function openZikrBookReader() {
   const savedIdx = await getPdfLastPage(ZIKR_BOOK_IDX_KEY);
   _zbCompleted = getCached(_zbDK).zikrBook === 'yes';
 
+  // After completion IDB is reset to 0, so next open starts at dua 1.
+  // Mid-read IDB holds next-slide index, so we resume exactly where left off.
   _zbSlide = (savedIdx !== null && savedIdx >= 0) ? Math.min(savedIdx, ZIKR_BOOK_TOTAL - 1) : 0;
-  _zbStartSlide = _zbSlide;
+  _zbStartSlide = _zbSlide; // opening slide counts as read
 
   _zbRender();
 }
@@ -6654,10 +6657,12 @@ async function openZikrBookReader() {
 async function zikrBookNavNext() {
   if (_zbSlide < ZIKR_BOOK_TOTAL - 1) {
     _zbSlide++;
-    await _zbSaveProgress(false);
+    await _zbSaveRatio(false);
     _zbRender();
   } else {
-    await _zbSaveProgress(true);
+    // Last slide: write session then mark complete. Do NOT call closeZikrBookReader.
+    await _zbWriteSession();
+    await _zbSaveRatio(true);
     document.getElementById('zikrBookReaderOverlay').classList.remove('active');
   }
 }
@@ -6669,62 +6674,64 @@ async function zikrBookNavPrev() {
   }
 }
 
-/* ── Save progress (ratio + position only, no session tracking) ── */
-async function _zbSaveProgress(reachedEnd) {
+/* ── Write one session entry (called on close and on completion) ── */
+async function _zbWriteSession() {
+  if (!_zbDK) return;
+  const sr = _zbSlide - _zbStartSlide + 1; // inclusive: opening slide = already read
+  if (sr <= 0) return;
+  const sd = Object.assign({}, getCached(_zbDK));
+  if (!sd['zikrBook_sessions']) sd['zikrBook_sessions'] = [];
+  const sess = sd['zikrBook_sessions'];
+  const entry = { start: _zbStartSlide + 1, end: _zbSlide + 1, duas: sr };
+  // Replace last entry if same start (guard against double-write)
+  if (sess.length && sess[sess.length - 1].start === entry.start) {
+    sess[sess.length - 1] = entry;
+  } else {
+    sess.push(entry);
+  }
+  sd['zikrBook_pagesToday'] = sess.reduce((a, x) => a + x.duas, 0);
+  _cache[_zbDK] = sd;
+  await setStore(_zbDK, sd);
+}
+
+/* ── Save ratio + completion flag only (no session tracking here) ── */
+async function _zbSaveRatio(reachedEnd) {
   const ratio = reachedEnd ? 1 : Math.min((_zbSlide + 1) / ZIKR_BOOK_TOTAL, 1);
   const data = Object.assign({}, getCached(_zbDK));
-
   const prevRatio = parseFloat(data['zikrBook_bonusRatio']) || 0;
   data['zikrBook_bonusRatio'] = Math.max(ratio, prevRatio);
   data['zikrBook_readerPage'] = _zbSlide + 1;
-
   if (reachedEnd) {
     data['zikrBook'] = 'yes';
     _zbCompleted = true;
     document.querySelectorAll('.yn-opt[data-key="zikrBook"]').forEach(btn =>
       btn.classList.toggle('active', btn.dataset.val === 'yes')
     );
-    await setPdfLastPage(ZIKR_BOOK_IDX_KEY, 0);
+    await setPdfLastPage(ZIKR_BOOK_IDX_KEY, 0); // reset so next open starts at dua 1
   }
-
   _cache[_zbDK] = data;
   await setStore(_zbDK, data);
-
   const inp = document.getElementById('zikrBookPages');
   if (inp) inp.value = _zbSlide + 1;
-
   refreshScores();
   refreshReadTodayDisplays();
   _zbRenderBadge();
 }
 
-/* ── Close ── */
+/* ── Close (X button only — navNext on last slide does NOT call this) ── */
 async function closeZikrBookReader() {
-  const dk = _zbDK;
-  if (dk) {
-    const sd = Object.assign({}, getCached(dk));
-    if (!sd['zikrBook_sessions']) sd['zikrBook_sessions'] = [];
-    const sr = _zbSlide - _zbStartSlide + 1;
-    if (sr > 0) {
-      const sess = sd['zikrBook_sessions'];
-      if (sess.length && sess[sess.length - 1].start === _zbStartSlide + 1) {
-        sess[sess.length - 1] = { start: _zbStartSlide + 1, end: _zbSlide + 1, duas: sr };
-      } else {
-        sess.push({ start: _zbStartSlide + 1, end: _zbSlide + 1, duas: sr });
-      }
-      const totalDuasToday = sess.reduce((s, x) => s + x.duas, 0);
-      sd['zikrBook_pagesToday'] = totalDuasToday;
-      _cache[dk] = sd;
-      await setStore(dk, sd);
-    }
-  }
-  if (!_zbCompleted) {
-    await _zbSaveProgress(false);
+  if (!_zbDK) return;
+  await _zbWriteSession();
+  await _zbSaveRatio(false);
+  // Save resume position as next slide, unless completion already reset IDB to 0
+  const atEnd = _zbSlide >= ZIKR_BOOK_TOTAL - 1 && _zbCompleted;
+  if (!atEnd) {
     await setPdfLastPage(ZIKR_BOOK_IDX_KEY, Math.min(_zbSlide + 1, ZIKR_BOOK_TOTAL - 1));
   }
   document.getElementById('zikrBookReaderOverlay').classList.remove('active');
   _zbRenderBadge();
 }
+
 /* ── Badge ── */
 function _zbRenderBadge() {
   const badge = document.getElementById('zikrBookReaderBadge');

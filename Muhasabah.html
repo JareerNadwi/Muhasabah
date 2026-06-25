@@ -2160,10 +2160,7 @@ async function openQuranReader(){
         loadTimeout
       ]);
     }catch(e){
-      const msg = e.message === 'timeout'
-        ? '⚠ Quran PDF took too long to load — check your connection or try again.'
-        : '⚠ Could Not Load Quran PDF — check your internet connection and try again.';
-      document.getElementById('qrLoading').innerHTML = '<span style="color:#c05050;">' + msg + '</span>';
+      document.getElementById('qrLoading').innerHTML = '<span style="color:#c05050;">⚠ Failed: ' + e.message + '</span>';
       return;
     }
   }
@@ -2298,6 +2295,7 @@ async function closeQuranReader(){
   const zl = document.getElementById('qrZoomLabel'); if(zl) zl.textContent='100%';
 
   if(!qrStartPage || !currentDateKey) return;
+  if(!qrPdfDoc) return; // PDF never loaded — nothing was read
 
   const pagesRead = Math.max(0, qrCurPage - qrStartPage + 1);
   if(pagesRead === 0) return;
@@ -5768,7 +5766,7 @@ async function _loadZikrDuas(){
     _zikrDuasCache = await res.json();
     _renderZikrDuas(_zikrDuasCache);
   } catch(e){
-    container.innerHTML = `<div style="padding:40px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#c05050;">⚠ Could not load Zikr.json — ${e.message}</div>`;
+    container.innerHTML = `<div style="padding:40px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#c05050;">⚠ Failed: ${e.message}</div>`;
   }
 }
 
@@ -6183,7 +6181,7 @@ async function openAsmaulReader(){
     const slides = await _loadAsmaulHusna();
     ASMAUL_TOTAL_SLIDES = slides.length;
   } catch(e) {
-    document.getElementById("asmaulContent").innerHTML = `<div style="padding:40px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#c05050;">⚠ Could not load Asmaul Husna.json — ${e.message}</div>`;
+    document.getElementById("asmaulContent").innerHTML = `<div style="padding:40px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#c05050;">⚠ Failed: ${e.message}</div>`;
     return;
   }
 
@@ -6421,7 +6419,7 @@ function _zikrRender(){
 async function openZikrReader(mode){
   _zikrMode=mode;_zikrDK=currentDateKey||todayKey();
   try { await _loadZikrMorningEvening(mode); } catch(e) {
-    document.getElementById("zikrReaderContent").innerHTML = `<div style="padding:40px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#c05050;">⚠ Could not load Zikr ${mode}.json — ${e.message}</div>`;
+    document.getElementById("zikrReaderContent").innerHTML = `<div style="padding:40px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:#c05050;">⚠ Failed: ${e.message}</div>`;
     document.getElementById("zikrReaderOverlay").classList.add("active");
     return;
   }
@@ -6604,7 +6602,7 @@ async function _zbLoadDuas() {
     return true;
   } catch(e) {
     document.getElementById('zikrBookContent').innerHTML =
-      '<div style="color:#c05050;padding:20px;font-family:\'DM Mono\',monospace;font-size:12px;">⚠ Could not load <b>Zikr From Book.json</b> — make sure it is in the same folder as the HTML file on GitHub Pages.<br><br>' + e.message + '</div>';
+      '<div style="color:#c05050;padding:20px;font-family:\'DM Mono\',monospace;font-size:12px;">⚠ Failed: ' + e.message + '</div>';
     return false;
   }
 }
@@ -7736,7 +7734,7 @@ function lrRender() {
     document.getElementById('lrMarkWrap').style.display = 'none';
     document.getElementById('lrNoData').style.display = 'block';
     if (LR_ERROR[_lrLang]) {
-      document.getElementById('lrNoData').innerHTML = '<span style="color:#c05050;">⚠ Could not load ' + LR_LANG_NAMES[_lrLang] + ' data — ' + LR_ERROR[_lrLang] + '</span>';
+      document.getElementById('lrNoData').innerHTML = '<span style="color:#c05050;">⚠ Failed: ' + LR_ERROR[_lrLang] + '</span>';
     } else {
       document.getElementById('lrNoData').textContent = "Today\'s word is not yet available. New words are added regularly — wait patiently. \uD83D\uDD4C";
     }
@@ -8156,7 +8154,7 @@ async function lrSetLang(lang) {
   }
   if (LR_ERROR[lang]) {
     document.getElementById('lrNoData').style.display = 'block';
-    document.getElementById('lrNoData').innerHTML = '<span style="color:#c05050;">⚠ Could not load ' + LR_LANG_NAMES[lang] + ' data — ' + LR_ERROR[lang] + '</span>';
+    document.getElementById('lrNoData').innerHTML = '<span style="color:#c05050;">⚠ Failed: ' + LR_ERROR[lang] + '</span>';
     document.getElementById('lrHero').style.display = 'none';
     document.getElementById('lrConjPanel').style.display = 'none';
     document.getElementById('lrSynAntPanel').style.display = 'none';
@@ -8213,7 +8211,7 @@ async function openLanguageReader() {
   }
   if (LR_ERROR['en']) {
     document.getElementById('lrNoData').style.display = 'block';
-    document.getElementById('lrNoData').innerHTML = '<span style="color:#c05050;">⚠ Could not load English data — ' + LR_ERROR['en'] + '</span>';
+    document.getElementById('lrNoData').innerHTML = '<span style="color:#c05050;">⚠ Failed: ' + LR_ERROR['en'] + '</span>';
     document.getElementById('lrHero').style.display = 'none';
     // Still preload others in background even if EN failed
     lrPreloadAll();

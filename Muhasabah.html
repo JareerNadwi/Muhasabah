@@ -6661,8 +6661,9 @@ async function zikrBookNavNext() {
     await _zbSaveProgress(false);
     _zbRender();
   } else {
+    // Last slide — mark done, reset position, close without re-rendering last slide
     await _zbSaveProgress(true);
-    closeZikrBookReader();
+    document.getElementById('zikrBookReaderOverlay').classList.remove('active');
   }
 }
 
@@ -6682,7 +6683,7 @@ async function _zbSaveProgress(reachedEnd) {
   if (!data['zikrBook_sessions']) data['zikrBook_sessions'] = [];
 
   // Only record a session entry if something was actually read this session
-  const sessPages = _zbSlide - _zbStartSlide + 1;
+  const sessPages = _zbSlide - _zbStartSlide;
   if (sessPages > 0) {
     const lastSess = data['zikrBook_sessions'];
     const entry = { start: _zbStartSlide + 1, end: _zbSlide + 1, duas: sessPages };
@@ -6735,18 +6736,16 @@ async function _zbSaveProgress(reachedEnd) {
 async function closeZikrBookReader() {
   document.getElementById('zikrBookReaderOverlay').classList.remove('active');
   if (!_zbDK) return;
-  // Save current progress only if something was actually read this session
+  // Save only if something was read this session (slide advanced past start)
   if (_zbSlide > _zbStartSlide) {
     await _zbSaveProgress(false);
   }
-  // Only reset position to 0 if we just finished (reachedEnd handled in navNext→_zbSaveProgress).
-  // If mid-read (not at end), save the next position to resume from.
-  const atEnd = _zbSlide >= ZIKR_BOOK_TOTAL - 1 && getCached(_zbDK).zikrBook === 'yes';
-  if (!atEnd) {
-    const nextSlide = Math.min(_zbSlide + 1, ZIKR_BOOK_TOTAL - 1);
-    await setPdfLastPage(ZIKR_BOOK_IDX_KEY, nextSlide);
+  // Position was already reset to 0 by _zbSaveProgress(true) in navNext if completed.
+  // If closing mid-read, save resume position as next slide.
+  const alreadyReset = getCached(_zbDK).zikrBook === 'yes' && _zbSlide >= ZIKR_BOOK_TOTAL - 1;
+  if (!alreadyReset) {
+    await setPdfLastPage(ZIKR_BOOK_IDX_KEY, Math.min(_zbSlide + 1, ZIKR_BOOK_TOTAL - 1));
   }
-  // If atEnd, position was already reset to 0 by _zbSaveProgress(true) in navNext
 }
 
 /* ── Badge ── */

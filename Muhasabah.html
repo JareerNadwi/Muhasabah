@@ -6641,29 +6641,22 @@ async function openZikrBookReader() {
   const ok = await _zbLoadDuas();
   if (!ok) return;
 
-  // Global resume from IDB
   const savedIdx = await getPdfLastPage(ZIKR_BOOK_IDX_KEY);
   _zbCompleted = getCached(_zbDK).zikrBook === 'yes';
 
-  // Resume from saved position (global, persists across days)
   _zbSlide = (savedIdx !== null && savedIdx >= 0) ? Math.min(savedIdx, ZIKR_BOOK_TOTAL - 1) : 0;
-  // _zbStartSlide is one before current so the opening slide counts as read (mirrors morning/evening zikr)
-  _zbStartSlide = Math.max(_zbSlide - 1, -1);
+  _zbStartSlide = _zbSlide;
 
   _zbRender();
-  // Save immediately — current slide is read the moment it's shown
-  if (!_zbCompleted) await _zbSaveProgress(false);
 }
 
 /* ── Nav ── */
 async function zikrBookNavNext() {
   if (_zbSlide < ZIKR_BOOK_TOTAL - 1) {
     _zbSlide++;
-    await setPdfLastPage(ZIKR_BOOK_IDX_KEY, _zbSlide);
     await _zbSaveProgress(false);
     _zbRender();
   } else {
-    // Last slide — mark done, reset position, close without re-rendering last slide
     await _zbSaveProgress(true);
     document.getElementById('zikrBookReaderOverlay').classList.remove('active');
   }
@@ -6676,58 +6669,29 @@ async function zikrBookNavPrev() {
   }
 }
 
-/* ── Save progress ── */
+/* ── Save progress (ratio + position only, no session tracking) ── */
 async function _zbSaveProgress(reachedEnd) {
-  const duasRead = _zbSlide + 1; // 1-based count of how far we've gotten
-  const ratio = Math.min(duasRead / ZIKR_BOOK_TOTAL, 1);
-
+  const ratio = reachedEnd ? 1 : Math.min((_zbSlide + 1) / ZIKR_BOOK_TOTAL, 1);
   const data = Object.assign({}, getCached(_zbDK));
-  if (!data['zikrBook_sessions']) data['zikrBook_sessions'] = [];
 
-  // Record session entry — current slide counts as read (inclusive)
-  const sessPages = _zbSlide - _zbStartSlide;
-  if (sessPages > 0) {
-    const lastSess = data['zikrBook_sessions'];
-    const entry = { start: _zbStartSlide + 2, end: _zbSlide + 1, duas: sessPages };
-    if (lastSess.length && lastSess[lastSess.length - 1].start === _zbStartSlide + 1) {
-      lastSess[lastSess.length - 1] = entry;
-    } else {
-      lastSess.push(entry);
-    }
-  }
-
-  const totalDuasToday = (data['zikrBook_sessions'] || []).reduce((s, x) => s + x.duas, 0);
-  data['zikrBook_pagesToday'] = totalDuasToday;
-  // Once the book is finished today, a later restart shouldn't drag the
-  // bonus back down — only let the ratio increase within the same day.
-  const prevRatio = parseFloat(getCached(_zbDK)['zikrBook_bonusRatio']) || 0;
+  const prevRatio = parseFloat(data['zikrBook_bonusRatio']) || 0;
   data['zikrBook_bonusRatio'] = Math.max(ratio, prevRatio);
   data['zikrBook_readerPage'] = _zbSlide + 1;
 
-  // Auto-flip to "Yes" once all 123 duas have been reached
   if (reachedEnd) {
     data['zikrBook'] = 'yes';
     _zbCompleted = true;
+    document.querySelectorAll('.yn-opt[data-key="zikrBook"]').forEach(btn =>
+      btn.classList.toggle('active', btn.dataset.val === 'yes')
+    );
+    await setPdfLastPage(ZIKR_BOOK_IDX_KEY, 0);
   }
 
   _cache[_zbDK] = data;
   await setStore(_zbDK, data);
 
-  // Auto-fill the hidden duas counter (internal tracking only)
   const inp = document.getElementById('zikrBookPages');
-  if (inp) inp.value = duasRead;
-
-  // Reflect auto-completion on the Yes/No buttons
-  if (reachedEnd) {
-    document.querySelectorAll('.yn-opt[data-key="zikrBook"]').forEach(btn =>
-      btn.classList.toggle('active', btn.dataset.val === 'yes')
-    );
-  }
-
-  // If reached end, reset global position to start for next cycle
-  if (reachedEnd) {
-    await setPdfLastPage(ZIKR_BOOK_IDX_KEY, 0);
-  }
+  if (inp) inp.value = _zbSlide + 1;
 
   refreshScores();
   refreshReadTodayDisplays();
@@ -6736,16 +6700,31 @@ async function _zbSaveProgress(reachedEnd) {
 
 /* ── Close ── */
 async function closeZikrBookReader() {
-  document.getElementById('zikrBookReaderOverlay').classList.remove('active');
-  if (!_zbDK) return;
+  const dk = _zbDK;
+  if (dk) {
+    const sd = Object.assign({}, getCached(dk));
+    if (!sd['zikrBook_sessions']) sd['zikrBook_sessions'] = [];
+    const sr = _zbSlide - _zbStartSlide + 1;
+    if (sr > 0) {
+      const sess = sd['zikrBook_sessions'];
+      if (sess.length && sess[sess.length - 1].start === _zbStartSlide + 1) {
+        sess[sess.length - 1] = { start: _zbStartSlide + 1, end: _zbSlide + 1, duas: sr };
+      } else {
+        sess.push({ start: _zbStartSlide + 1, end: _zbSlide + 1, duas: sr });
+      }
+      const totalDuasToday = sess.reduce((s, x) => s + x.duas, 0);
+      sd['zikrBook_pagesToday'] = totalDuasToday;
+      _cache[dk] = sd;
+      await setStore(dk, sd);
+    }
+  }
   if (!_zbCompleted) {
     await _zbSaveProgress(false);
-    // Save next slide as resume position
     await setPdfLastPage(ZIKR_BOOK_IDX_KEY, Math.min(_zbSlide + 1, ZIKR_BOOK_TOTAL - 1));
   }
-  // If completed, position was already reset to 0 by _zbSaveProgress(true) in navNext
+  document.getElementById('zikrBookReaderOverlay').classList.remove('active');
+  _zbRenderBadge();
 }
-
 /* ── Badge ── */
 function _zbRenderBadge() {
   const badge = document.getElementById('zikrBookReaderBadge');

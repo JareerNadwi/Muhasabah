@@ -4112,7 +4112,7 @@ async function openHadithReader(){
       document.getElementById('hadithLoading').style.display = 'none';
       document.getElementById('hadithContent').style.display = 'block';
       document.getElementById('hadithNav').style.display     = 'flex';
-      renderHadith(0, true);
+      renderHadith(_hadithData.length - 1, true);
       return;
     }
 
@@ -4343,7 +4343,7 @@ async function openTafsirReader(){
       document.getElementById('tafsirLoading').style.display = 'none';
       document.getElementById('tafsirContent').style.display = 'block';
       document.getElementById('tafsirNav').style.display     = 'flex';
-      renderTafsirVerse(0, true);
+      renderTafsirVerse(_tafsirSlice.length - 1, true);
       return;
     }
 
@@ -4563,8 +4563,10 @@ async function openSurahVerseReader(surahNum, title, goalKey){
     const _svIdxKey = _svGoalKey + '_readerIdx';
     const _svSaved  = getCached(_svDK)[_svIdxKey];
     const total     = _svSlice.length;
-    const _svResume = (_svSaved !== undefined && _svSaved >= 0)
-      ? Math.min(_svSaved, total - 1) : 0;
+    _svCompleted    = getCached(_svDK)[goalKey] === 'yes';
+    const _svResume = _svCompleted
+      ? total - 1  // review: always open at last slide
+      : (_svSaved !== undefined && _svSaved >= 0) ? Math.min(_svSaved, total - 1) : 0;
     // If saved index is at or past end (done sentinel), start session counter past end so 0 new verses counted
     _svStartIdx = (_svSaved !== undefined && _svSaved >= total) ? total : _svResume;
     _svIdx      = _svResume;
@@ -4589,18 +4591,28 @@ function renderSurahVerse(idx){
   document.getElementById('svPrevBtn').disabled = idx === 0;
   const isLast = idx === total - 1;
   const btn = document.getElementById('svNextBtn');
-  btn.textContent       = isLast ? '✓ Mark Done' : 'Next →';
-  btn.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
-  btn.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
-  btn.style.color       = isLast ? '#fff'                : '#8a7840';
-  btn.classList.toggle('rdr-nav-done', isLast);
+  if(_svCompleted && isLast){
+    btn.textContent       = '\u2715 Close';
+    btn.style.background  = '#1e1a10';
+    btn.style.borderColor = '#2a2010';
+    btn.style.color       = '#8a7840';
+    btn.classList.remove('rdr-nav-done');
+  } else {
+    btn.textContent       = isLast ? '✓ Mark Done' : 'Next →';
+    btn.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
+    btn.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
+    btn.style.color       = isLast ? '#fff'                : '#8a7840';
+    btn.classList.toggle('rdr-nav-done', isLast);
+  }
   btn.disabled = false;
 }
 
 let _svStartIdx = 0;  // verse index this session started on (0-based)
+let _svCompleted = false; // already done today
 
 async function svNavNext(){
   const total = _svSlice.length;
+  if(_svCompleted && _svIdx >= total - 1){ closeSurahVerseReader(); return; }
   await _saveSvProgress(_svIdx + 1, false);  // save progress up to current verse
   if(_svIdx < total - 1){
     _svIdx++;
@@ -4837,7 +4849,9 @@ async function openBookReader() {
     _bookTotalLessons = (book.lessons || []).length;
 
     const saved = await getReaderResume('_book_lesson_' + _bookDK);
-    _bookCurrentLesson = (saved !== null) ? saved : -1;
+    _bookCurrentLesson = _bookAlreadyDone
+      ? _bookTotalLessons - 1  // review: open at last lesson
+      : (saved !== null) ? saved : -1;
     _bookSessionStart  = _bookCurrentLesson;
 
     document.getElementById('bookCategory').textContent = book.category || '';
@@ -6105,11 +6119,19 @@ function _asmaulRenderSlide(){
 
   prevBtn.disabled      = _asmaulSlide === 0;
   prevBtn.style.opacity = _asmaulSlide === 0 ? "0.3" : "1";
-  nextBtn.textContent       = isLast ? "✓ Mark Done" : "Next →";
-  nextBtn.style.background  = isLast ? "var(--green)"        : "#1e1a10";
-  nextBtn.style.borderColor = isLast ? "var(--green-bright)" : "#2a2010";
-  nextBtn.style.color       = isLast ? "#fff"                : "#8a7840";
-  nextBtn.classList.toggle('rdr-nav-done', isLast);
+  if(_asmaulCompleted && isLast){
+    nextBtn.textContent       = "\u2715 Close";
+    nextBtn.style.background  = "#1e1a10";
+    nextBtn.style.borderColor = "#2a2010";
+    nextBtn.style.color       = "#8a7840";
+    nextBtn.classList.remove("rdr-nav-done");
+  } else {
+    nextBtn.textContent       = isLast ? "✓ Mark Done" : "Next →";
+    nextBtn.style.background  = isLast ? "var(--green)"        : "#1e1a10";
+    nextBtn.style.borderColor = isLast ? "var(--green-bright)" : "#2a2010";
+    nextBtn.style.color       = isLast ? "#fff"                : "#8a7840";
+    nextBtn.classList.toggle("rdr-nav-done", isLast);
+  }
 
   let html = "";
   slide.forEach(function(name, i){
@@ -6147,7 +6169,9 @@ async function openAsmaulReader(){
 
   const dayData = getCached(_asmaulDK);
   const saved   = dayData["asmaul_slideIdx"];
-  _asmaulSlide  = (saved !== undefined && saved >= 0) ? Math.min(saved, ASMAUL_TOTAL_SLIDES - 1) : 0;
+  _asmaulSlide  = _asmaulCompleted
+    ? ASMAUL_TOTAL_SLIDES - 1  // review: open at last slide
+    : (saved !== undefined && saved >= 0) ? Math.min(saved, ASMAUL_TOTAL_SLIDES - 1) : 0;
 
   _asmaulStartSlide = _asmaulSlide;
   _asmaulRenderSlide();
@@ -6155,6 +6179,7 @@ async function openAsmaulReader(){
 }
 
 async function asmaulNavNext(){
+  if(_asmaulCompleted && _asmaulSlide >= ASMAUL_TOTAL_SLIDES - 1){ closeAsmaulReader(); return; }
   if(_asmaulSlide < ASMAUL_TOTAL_SLIDES - 1){
     _asmaulSlide++;
     await setReaderResume(ASMAUL_RESUME_KEY, _asmaulSlide);
@@ -6247,7 +6272,6 @@ function renderAsmaulBadge(dk){
   const totalSlides = sessions.reduce(function(s,x){ return s + x.slides; }, 0);
   const totalPct    = Math.round((last.end) / ASMAUL_TOTAL_SLIDES * 100);
   const lastSlides  = last.slides;
-  const done        = data["asmaul"] === "yes";
   const color       = done ? "var(--green-bright)" : "var(--gold)";
   const statusTxt   = done
     ? totalSlides + " Page" + (totalSlides !== 1 ? "s" : "") + " Read (100% ✓ Completed)"
@@ -6337,11 +6361,19 @@ function _zikrRender(){
   var pb=document.getElementById("zikrReaderPrevBtn");
   pb.disabled=_zikrSlide===0;pb.style.opacity=_zikrSlide===0?"0.3":"1";
   var nb=document.getElementById("zikrReaderNextBtn");
-  nb.textContent=isLast?"✓ Mark Done":"Next";
-  nb.style.background=isLast?"var(--green)":"#1e1a10";
-  nb.style.borderColor=isLast?"var(--green-bright)":"#2a2010";
-  nb.style.color=isLast?"#fff":"#8a7840";
-  nb.classList.toggle('rdr-nav-done', isLast);
+  if(_zikrDone&&isLast){
+    nb.textContent="\u2715 Close";
+    nb.style.background="#1e1a10";
+    nb.style.borderColor="#2a2010";
+    nb.style.color="#8a7840";
+    nb.classList.remove("rdr-nav-done");
+  } else {
+    nb.textContent=isLast?"✓ Mark Done":"Next";
+    nb.style.background=isLast?"var(--green)":"#1e1a10";
+    nb.style.borderColor=isLast?"var(--green-bright)":"#2a2010";
+    nb.style.color=isLast?"#fff":"#8a7840";
+    nb.classList.toggle('rdr-nav-done', isLast);
+  }
   var ns=num<10?"0"+num:""+num;
   var _zlm=document.body.classList.contains('light-mode');
   var _zcard=_zlm?'#f5f0e0':'#1a1610';
@@ -6374,13 +6406,14 @@ async function openZikrReader(mode){
   document.getElementById("zikrReaderDoneNote").style.display=_zikrDone?"block":"none";
   var dayData=getCached(_zikrDK);
   var saved=dayData[_zikrIdxKey()];
-  // Resume from saved position (already points to NEXT slide after last close)
-  _zikrSlide=(saved!==undefined&&saved>=0)?Math.min(saved,ZIKR_TOTAL-1):0;
+  // Review: open at last slide. Otherwise resume from saved position.
+  _zikrSlide=_zikrDone?(ZIKR_TOTAL-1):((saved!==undefined&&saved>=0)?Math.min(saved,ZIKR_TOTAL-1):0);
   _zikrStartSlide=_zikrSlide;
   _zikrRender();
   // Don't call _saveZikrProgress here — let user navigate first
 }
 async function zikrNavNext(){
+  if(_zikrDone&&_zikrSlide>=ZIKR_TOTAL-1){closeZikrReader();return;}
   if(_zikrSlide<ZIKR_TOTAL-1){_zikrSlide++;await _saveZikrProgress(false);_zikrRender();}
   else{await _saveZikrProgress(true);closeZikrReader();}
 }
@@ -6568,11 +6601,19 @@ function _zbRender() {
   pb.style.opacity = _zbSlide === 0 ? '0.3' : '1';
 
   const nb = document.getElementById('zikrBookNextBtn');
-  nb.textContent = isLast ? '✓ Mark Done' : 'Next →';
-  nb.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
-  nb.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
-  nb.style.color       = isLast ? '#fff'                : '#8a7840';
-  nb.classList.toggle('rdr-nav-done', isLast);
+  if(_zbCompleted && isLast){
+    nb.textContent = '\u2715 Close';
+    nb.style.background  = '#1e1a10';
+    nb.style.borderColor = '#2a2010';
+    nb.style.color       = '#8a7840';
+    nb.classList.remove('rdr-nav-done');
+  } else {
+    nb.textContent = isLast ? '✓ Mark Done' : 'Next →';
+    nb.style.background  = isLast ? 'var(--green)'        : '#1e1a10';
+    nb.style.borderColor = isLast ? 'var(--green-bright)' : '#2a2010';
+    nb.style.color       = isLast ? '#fff'                : '#8a7840';
+    nb.classList.toggle('rdr-nav-done', isLast);
+  }
 
   const sourceTag = dua.source
     ? '<div style="font-size:0.72rem;color:#7a6a40;margin-top:10px;text-align:right;font-family:\'DM Mono\',monospace;">' + dua.source + '</div>'
@@ -6615,7 +6656,10 @@ async function openZikrBookReader() {
   _zbCompleted = getCached(_zbDK).zikrBook === 'yes';
 
   // Resume from saved position (global, persists across days)
-  _zbSlide = (savedIdx !== null && savedIdx >= 0) ? Math.min(savedIdx, ZIKR_BOOK_TOTAL - 1) : 0;
+  // Review: open at last slide when completed
+  _zbSlide = _zbCompleted
+    ? ZIKR_BOOK_TOTAL - 1
+    : (savedIdx !== null && savedIdx >= 0) ? Math.min(savedIdx, ZIKR_BOOK_TOTAL - 1) : 0;
   _zbStartSlide = _zbSlide;
 
   _zbRender();
@@ -6624,6 +6668,7 @@ async function openZikrBookReader() {
 
 /* ── Nav ── */
 async function zikrBookNavNext() {
+  if (_zbCompleted && _zbSlide >= ZIKR_BOOK_TOTAL - 1) { closeZikrBookReader(); return; }
   if (_zbSlide < ZIKR_BOOK_TOTAL - 1) {
     _zbSlide++;
     await setPdfLastPage(ZIKR_BOOK_IDX_KEY, _zbSlide);

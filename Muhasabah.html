@@ -414,6 +414,8 @@ body.light-mode .nh-btn-cancel{background:#e8e2d6!important;border-color:#d4cfc5
 body.light-mode .nh-btn-cancel:hover{border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-btn-del{background:#f5dede!important;border-color:var(--red)!important;color:var(--red)!important;}
 body.light-mode .nh-btn-del:hover{background:#fdecec!important;}
+body.light-mode #nhPromptInput{background:#f0ede6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
+body.light-mode #nhPromptInput:focus{border-color:#9a7228!important;}
 body.light-mode .nh-note-entry{background:#e8e2d6!important;border-color:#d4cfc5!important;}
 body.light-mode .nh-note-date{color:#9a9590!important;}
 body.light-mode .nh-note-text{color:#5a5750!important;}
@@ -8381,7 +8383,7 @@ async function nhWsSwitch(wsId){
 }
 
 async function nhWsNew(){
-  const name=prompt('Workspace name:','');
+  const name=await nhPrompt('New workspace name','');
   if(!name||!name.trim())return;
   const ws={id:'ws_'+Date.now(),name:name.trim(),createdAt:new Date().toISOString()};
   _nhWorkspaces.push(ws);
@@ -8396,7 +8398,7 @@ async function nhWsNew(){
 async function nhWsRenamePrompt(){
   const ws=_nhWorkspaces.find(w=>w.id===_nhActiveWs);
   if(!ws)return;
-  const name=prompt('Rename workspace:',ws.name);
+  const name=await nhPrompt('Rename workspace',ws.name);
   if(!name||!name.trim()||name.trim()===ws.name)return;
   ws.name=name.trim();
   await nhSet('_nh_workspaces',_nhWorkspaces);
@@ -8440,6 +8442,27 @@ function nhId(){return '_'+Date.now()+Math.random().toString(36).slice(2,6);}
 function nhToday(){return new Date().toISOString().slice(0,10);}
 
 /* ── Custom confirm dialog (replaces native confirm()) ── */
+let _nhPromptResolver=null;
+function nhPrompt(title,defaultVal){
+  return new Promise(resolve=>{
+    _nhPromptResolver=resolve;
+    document.getElementById('nhPromptTitle').textContent=title||'Enter value';
+    const inp=document.getElementById('nhPromptInput');
+    inp.value=defaultVal||'';
+    document.getElementById('nhPromptBg').classList.add('open');
+    setTimeout(()=>{inp.focus();inp.select();},80);
+  });
+}
+function nhPromptResolve(confirmed){
+  const val=document.getElementById('nhPromptInput').value.trim();
+  document.getElementById('nhPromptBg').classList.remove('open');
+  if(_nhPromptResolver){_nhPromptResolver(confirmed?val:null);_nhPromptResolver=null;}
+}
+function nhPromptKeydown(e){
+  if(e.key==='Enter'){e.preventDefault();nhPromptResolve(true);}
+  else if(e.key==='Escape'){e.preventDefault();nhPromptResolve(false);}
+}
+
 let _nhConfirmResolver=null;
 function nhConfirm(message,title,okLabel){
   return new Promise(resolve=>{
@@ -9974,6 +9997,19 @@ async function nhSmDone(){
     <div class="nh-modal-actions">
       <button class="nh-btn-cancel" onclick="nhConfirmResolve(false)">Cancel</button>
       <button class="nh-btn-del" id="nhConfirmOkBtn" onclick="nhConfirmResolve(true)">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="nh-modal-bg" id="nhPromptBg" style="z-index:4600;">
+  <div class="nh-modal" style="max-width:380px;">
+    <div class="nh-modal-title" id="nhPromptTitle">Enter value</div>
+    <input id="nhPromptInput" type="text" onkeydown="nhPromptKeydown(event)"
+      style="width:100%;box-sizing:border-box;background:#141008;border:1px solid #3a3020;border-radius:6px;padding:8px 12px;color:#e8d5a0;font-family:'DM Mono',monospace;font-size:13px;outline:none;transition:border-color .15s;"
+      onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#3a3020'">
+    <div class="nh-modal-actions">
+      <button class="nh-btn-cancel" onclick="nhPromptResolve(false)">Cancel</button>
+      <button class="nh-btn-save" onclick="nhPromptResolve(true)">OK</button>
     </div>
   </div>
 </div>

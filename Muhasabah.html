@@ -8488,7 +8488,17 @@ async function nhHandleImportFile(e){
       for(const row of rows){
         const name=mapField(row,fieldMap.name);
         if(!name){skipped++;continue;}
-        const existing=_nhContacts.find(c=>(c.name||'').toLowerCase()===name.toLowerCase());
+        const rowEmail=mapField(row,fieldMap.email).toLowerCase();
+        const rowLinkedin=mapField(row,fieldMap.linkedin).toLowerCase();
+        const rowFacebook=mapField(row,fieldMap.facebook).toLowerCase();
+        const rowPhone=mapPhone(row,fieldMap.phone).replace(/\s+/g,'');
+        const existing=_nhContacts.find(c=>{
+          if(rowEmail&&c.email&&c.email.toLowerCase()===rowEmail)return true;
+          if(rowLinkedin&&c.linkedin&&c.linkedin.toLowerCase()===rowLinkedin)return true;
+          if(rowFacebook&&c.facebook&&c.facebook.toLowerCase()===rowFacebook)return true;
+          if(rowPhone&&c.phone&&c.phone.replace(/\s+/g,'')===rowPhone)return true;
+          return false;
+        });
         if(existing){skipped++;continue;}
         const tagsRaw=mapField(row,fieldMap.tags);
         const tags=tagsRaw?tagsRaw.split(/[,;|]+/).map(t=>t.trim()).filter(Boolean):[];
@@ -8787,8 +8797,27 @@ async function nhCbSave(){
   const g=id=>document.getElementById(id)?.value.trim()||'';
   const name=g('nhCbFName');
   if(!name){alert('Name is required.');return;}
-  const duplicate=_nhContacts.find(c=>c.id!==(_nhCbEditId||'')&&(c.name||'').toLowerCase()===name.toLowerCase());
-  if(duplicate){alert(`⚠️ A contact named "${duplicate.name}" already exists.\n\nPlease use a different name or edit the existing contact.`);return;}
+  const email=g('nhCbFEmail');
+  const linkedin=g('nhCbFLinkedin');
+  const facebook=g('nhCbFFacebook');
+  const phone=g('nhCbFPhone');
+  const dupMatch=_nhContacts.find(c=>{
+    if(c.id===(_nhCbEditId||''))return false;
+    if(email&&c.email&&c.email.toLowerCase()===email.toLowerCase())return true;
+    if(linkedin&&c.linkedin&&c.linkedin.toLowerCase()===linkedin.toLowerCase())return true;
+    if(facebook&&c.facebook&&c.facebook.toLowerCase()===facebook.toLowerCase())return true;
+    if(phone&&c.phone&&c.phone.replace(/\s+/g,'')===phone.replace(/\s+/g,''))return true;
+    return false;
+  });
+  if(dupMatch){
+    const reasons=[];
+    if(email&&dupMatch.email&&dupMatch.email.toLowerCase()===email.toLowerCase())reasons.push(`Email: ${email}`);
+    if(linkedin&&dupMatch.linkedin&&dupMatch.linkedin.toLowerCase()===linkedin.toLowerCase())reasons.push(`LinkedIn: ${linkedin}`);
+    if(facebook&&dupMatch.facebook&&dupMatch.facebook.toLowerCase()===facebook.toLowerCase())reasons.push(`Facebook: ${facebook}`);
+    if(phone&&dupMatch.phone&&dupMatch.phone.replace(/\s+/g,'')===phone.replace(/\s+/g,''))reasons.push(`Phone: ${phone}`);
+    alert(`⚠️ This contact looks like a duplicate of "${dupMatch.name}".\n\nMatching field${reasons.length>1?'s':''}:\n${reasons.join('\n')}\n\nEdit the existing contact instead.`);
+    return;
+  }
   const contact={
     id:_nhCbEditId||nhId(),name,
     role:g('nhCbFRole'),company:g('nhCbFCompany'),country:g('nhCbFCountry'),

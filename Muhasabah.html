@@ -8339,14 +8339,14 @@ function nhWsRenderBar(){
   if(!bar)return;
   const opts=_nhWorkspaces.map(w=>`<option value="${w.id}"${w.id===_nhActiveWs?' selected':''}>${w.name}</option>`).join('');
   bar.innerHTML=`
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-      <span style="font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:#c9a84c;white-space:nowrap;">Workspace</span>
-      <select id="nhWsSelect" style="background:#1a1610;color:#e8d5a0;border:1px solid #3a3020;border-radius:6px;padding:4px 8px;font-size:0.82rem;cursor:pointer;" onchange="nhWsSwitch(this.value)">
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;">
+      <span style="font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:#c9a84c;white-space:nowrap;">WS</span>
+      <select id="nhWsSelect" style="background:#1a1610;color:#e8d5a0;border:1px solid #3a3020;border-radius:6px;padding:3px 6px;font-size:0.78rem;cursor:pointer;max-width:130px;" onchange="nhWsSwitch(this.value)">
         ${opts}
       </select>
-      <button onclick="nhWsRenamePrompt()" title="Rename workspace" style="background:none;border:1px solid #3a3020;color:#c9a84c;border-radius:6px;padding:4px 8px;font-size:0.78rem;cursor:pointer;">✏ Rename</button>
-      <button onclick="nhWsNew()" title="New workspace" style="background:none;border:1px solid #3a3020;color:#a0c8a0;border-radius:6px;padding:4px 8px;font-size:0.78rem;cursor:pointer;">＋ New</button>
-      <button onclick="nhWsDelete()" title="Delete workspace" style="background:none;border:1px solid #3a3020;color:#c07070;border-radius:6px;padding:4px 8px;font-size:0.78rem;cursor:pointer;" id="nhWsDeleteBtn">🗑 Delete</button>
+      <button onclick="nhWsRenamePrompt()" title="Rename workspace" style="background:none;border:1px solid #3a3020;color:#c9a84c;border-radius:6px;padding:3px 7px;font-size:0.74rem;cursor:pointer;white-space:nowrap;">✏ Rename</button>
+      <button onclick="nhWsNew()" title="New workspace" style="background:none;border:1px solid #3a3020;color:#a0c8a0;border-radius:6px;padding:3px 7px;font-size:0.74rem;cursor:pointer;white-space:nowrap;">＋ New</button>
+      <button onclick="nhWsDelete()" title="Delete workspace" style="background:none;border:1px solid #3a3020;color:#c07070;border-radius:6px;padding:3px 7px;font-size:0.74rem;cursor:pointer;white-space:nowrap;" id="nhWsDeleteBtn">🗑 Delete</button>
     </div>`;
   document.getElementById('nhWsDeleteBtn').style.display=_nhWorkspaces.length<=1?'none':'';
 }

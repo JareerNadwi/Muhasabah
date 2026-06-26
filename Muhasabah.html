@@ -8294,6 +8294,111 @@ let _nhCbTags=[];
 let _nhCbExtraFields=[];
 let _nhCalOpenDates=new Set();
 
+/* ── Workspace state ── */
+let _nhWorkspaces=[];   // [{id, name, createdAt}]
+let _nhActiveWs='default';
+
+function nhWsKey(base){ return `_nh_ws_${_nhActiveWs}_${base}`; }
+
+async function nhWsSave(){
+  await Promise.all([
+    nhSet(nhWsKey('contacts'),_nhContacts),
+    nhSet(nhWsKey('deals'),_nhDeals),
+    nhSet(nhWsKey('stages'),_nhStages),
+    nhSet(nhWsKey('notes'),_nhNotes),
+    nhSet(nhWsKey('dismissed_tags'),_nhDismissedTags),
+  ]);
+}
+async function nhWsLoad(wsId){
+  _nhActiveWs=wsId;
+  await nhSet('_nh_active_ws',wsId);
+  [_nhContacts,_nhDeals,_nhStages,_nhNotes,_nhDismissedTags]=await Promise.all([
+    nhGet(nhWsKey('contacts')).then(v=>v||[]),
+    nhGet(nhWsKey('deals')).then(v=>v||[]),
+    nhGet(nhWsKey('stages')).then(v=>{
+      if(!v||!v.length) return JSON.parse(JSON.stringify(NH_DEFAULT_STAGES));
+      if(!v.find(s=>s.id==='stage_contacts')) v.unshift(JSON.parse(JSON.stringify(NH_FIXED_STAGE)));
+      let closed=v.find(s=>s.id===NH_CLOSED_STAGE.id);
+      if(!closed){closed=JSON.parse(JSON.stringify(NH_CLOSED_STAGE));v.push(closed);}
+      else closed.fixed=true;
+      let lost=v.find(s=>s.id===NH_LOST_STAGE.id);
+      if(!lost){lost=JSON.parse(JSON.stringify(NH_LOST_STAGE));v.push(lost);}
+      else lost.fixed=true;
+      v=v.filter(s=>s.id!==NH_CLOSED_STAGE.id&&s.id!==NH_LOST_STAGE.id);
+      v.push(closed,lost);
+      return v;
+    }),
+    nhGet(nhWsKey('notes')).then(v=>v||[]),
+    nhGet(nhWsKey('dismissed_tags')).then(v=>v||[]),
+  ]);
+  await nhSet(nhWsKey('stages'),_nhStages);
+}
+
+function nhWsRenderBar(){
+  const bar=document.getElementById('nhWsBar');
+  if(!bar)return;
+  const opts=_nhWorkspaces.map(w=>`<option value="${w.id}"${w.id===_nhActiveWs?' selected':''}>${w.name}</option>`).join('');
+  bar.innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:#c9a84c;white-space:nowrap;">Workspace</span>
+      <select id="nhWsSelect" style="background:#1a1610;color:#e8d5a0;border:1px solid #3a3020;border-radius:6px;padding:4px 8px;font-size:0.82rem;cursor:pointer;" onchange="nhWsSwitch(this.value)">
+        ${opts}
+      </select>
+      <button onclick="nhWsRenamePrompt()" title="Rename workspace" style="background:none;border:1px solid #3a3020;color:#c9a84c;border-radius:6px;padding:4px 8px;font-size:0.78rem;cursor:pointer;">✏ Rename</button>
+      <button onclick="nhWsNew()" title="New workspace" style="background:none;border:1px solid #3a3020;color:#a0c8a0;border-radius:6px;padding:4px 8px;font-size:0.78rem;cursor:pointer;">＋ New</button>
+      <button onclick="nhWsDelete()" title="Delete workspace" style="background:none;border:1px solid #3a3020;color:#c07070;border-radius:6px;padding:4px 8px;font-size:0.78rem;cursor:pointer;" id="nhWsDeleteBtn">🗑 Delete</button>
+    </div>`;
+  document.getElementById('nhWsDeleteBtn').style.display=_nhWorkspaces.length<=1?'none':'';
+}
+
+async function nhWsSwitch(wsId){
+  if(wsId===_nhActiveWs)return;
+  await nhWsSave();
+  await nhWsLoad(wsId);
+  nhWsRenderBar();
+  nhShowTab(_nhTab);
+  nhRenderToday();
+}
+
+async function nhWsNew(){
+  const name=prompt('Workspace name:','');
+  if(!name||!name.trim())return;
+  const ws={id:'ws_'+Date.now(),name:name.trim(),createdAt:new Date().toISOString()};
+  _nhWorkspaces.push(ws);
+  await nhSet('_nh_workspaces',_nhWorkspaces);
+  await nhWsSave();
+  await nhWsLoad(ws.id);
+  nhWsRenderBar();
+  nhShowTab(_nhTab);
+  nhRenderToday();
+}
+
+async function nhWsRenamePrompt(){
+  const ws=_nhWorkspaces.find(w=>w.id===_nhActiveWs);
+  if(!ws)return;
+  const name=prompt('Rename workspace:',ws.name);
+  if(!name||!name.trim()||name.trim()===ws.name)return;
+  ws.name=name.trim();
+  await nhSet('_nh_workspaces',_nhWorkspaces);
+  nhWsRenderBar();
+}
+
+async function nhWsDelete(){
+  if(_nhWorkspaces.length<=1){alert('You need at least one workspace.');return;}
+  const ws=_nhWorkspaces.find(w=>w.id===_nhActiveWs);
+  const ok=await nhConfirm(`Delete workspace "${ws.name}"? All contacts, deals and notes in it will be permanently removed.`,'Delete Workspace','Delete');
+  if(!ok)return;
+  // Remove all keys for this workspace
+  const keys=['contacts','deals','stages','notes','dismissed_tags'];
+  for(const k of keys) await nhSet(nhWsKey(k),null);
+  _nhWorkspaces=_nhWorkspaces.filter(w=>w.id!==_nhActiveWs);
+  await nhSet('_nh_workspaces',_nhWorkspaces);
+  await nhWsLoad(_nhWorkspaces[0].id);
+  nhWsRenderBar();
+  nhShowTab(_nhTab);
+  nhRenderToday();
+}
+
 const NH_FIXED_STAGE={id:'stage_contacts',name:'Contacts',color:'#6a7080',fixed:true};
 const NH_CLOSED_STAGE={id:'s7',name:'Closed',color:'#4a7c59',fixed:true};
 const NH_LOST_STAGE={id:'s8',name:'Lost',color:'#7a5a5a',fixed:true};
@@ -8401,38 +8506,38 @@ function nhLinkBtns(obj){
 
 /* ── Open / Close ── */
 async function openContactBook(){
-  [_nhContacts,_nhDeals,_nhStages,_nhNotes,_nhDismissedTags]=await Promise.all([
-    nhGet('_nh_contacts').then(v=>v||[]),
-    nhGet('_nh_deals').then(v=>v||[]),
-    nhGet('_nh_stages').then(v=>{
-      if(!v||!v.length) return JSON.parse(JSON.stringify(NH_DEFAULT_STAGES));
-      // Ensure fixed Contacts stage always present at the start
-      if(!v.find(s=>s.id==='stage_contacts')) v.unshift(JSON.parse(JSON.stringify(NH_FIXED_STAGE)));
-      // Ensure Closed exists and is fixed
-      let closed=v.find(s=>s.id===NH_CLOSED_STAGE.id);
-      if(!closed){closed=JSON.parse(JSON.stringify(NH_CLOSED_STAGE));v.push(closed);}
-      else closed.fixed=true;
-      // Ensure Lost exists and is fixed
-      let lost=v.find(s=>s.id===NH_LOST_STAGE.id);
-      if(!lost){lost=JSON.parse(JSON.stringify(NH_LOST_STAGE));v.push(lost);}
-      else lost.fixed=true;
-      // Pin Closed and Lost to the bottom, in that order
-      v=v.filter(s=>s.id!==NH_CLOSED_STAGE.id&&s.id!==NH_LOST_STAGE.id);
-      v.push(closed,lost);
-      return v;
-    }),
-    nhGet('_nh_notes').then(v=>v||[]),
-    nhGet('_nh_dismissed_tags').then(v=>v||[]),
-  ]);
-  await nhSet('_nh_stages',_nhStages);
+  // Load workspaces list; migrate legacy flat data into default workspace if needed
+  _nhWorkspaces = await nhGet('_nh_workspaces').then(v=>v||[]);
+  if(!_nhWorkspaces.length){
+    _nhWorkspaces=[{id:'default',name:'General',createdAt:new Date().toISOString()}];
+    // Migrate any existing flat data into the default workspace
+    const legacyContacts=await nhGet('_nh_contacts').then(v=>v||[]);
+    const legacyDeals=await nhGet('_nh_deals').then(v=>v||[]);
+    const legacyStages=await nhGet('_nh_stages').then(v=>v||[]);
+    const legacyNotes=await nhGet('_nh_notes').then(v=>v||[]);
+    const legacyDismissed=await nhGet('_nh_dismissed_tags').then(v=>v||[]);
+    if(legacyContacts.length||legacyDeals.length){
+      await nhSet('_nh_ws_default_contacts',legacyContacts);
+      await nhSet('_nh_ws_default_deals',legacyDeals);
+      await nhSet('_nh_ws_default_stages',legacyStages);
+      await nhSet('_nh_ws_default_notes',legacyNotes);
+      await nhSet('_nh_ws_default_dismissed_tags',legacyDismissed);
+    }
+    await nhSet('_nh_workspaces',_nhWorkspaces);
+  }
+  _nhActiveWs = await nhGet('_nh_active_ws').then(v=>v||_nhWorkspaces[0].id);
+  if(!_nhWorkspaces.find(w=>w.id===_nhActiveWs)) _nhActiveWs=_nhWorkspaces[0].id;
+  await nhWsLoad(_nhActiveWs);
   _nhTab = 'contacts';
   document.getElementById('netHubOverlay').classList.add('active');
   document.body.classList.add('overlay-open');
   reThemeIfLight();
+  nhWsRenderBar();
   nhShowTab(_nhTab);
   nhRenderToday();
 }
 function closeContactBook(){
+  nhWsSave();
   document.getElementById('netHubOverlay').classList.remove('active');
   document.body.classList.remove('overlay-open');
 }
@@ -8530,8 +8635,8 @@ async function nhHandleImportFile(e){
         }
         added++;
       }
-      await nhSet('_nh_deals',_nhDeals);
-      await nhSet('_nh_contacts',_nhContacts);
+      await nhSet(nhWsKey('deals'),_nhDeals);
+      await nhSet(nhWsKey('contacts'),_nhContacts);
       nhRenderContacts();
       alert(`✅ Import complete.\n\nAdded: ${added} contacts\nSkipped (duplicate or no name): ${skipped}`);
     }catch(err){
@@ -8564,7 +8669,7 @@ function nhExportExcel(){
     var url=URL.createObjectURL(blob);
     var a=document.createElement('a');
     var date=new Date().toISOString().slice(0,10);
-    a.href=url;a.download='Muhasabah_Contacts_'+date+'.csv';
+    const wsName=(_nhWorkspaces.find(w=>w.id===_nhActiveWs)||{name:'Contacts'}).name.replace(/[^a-zA-Z0-9]/g,'_');a.href=url;a.download='Muhasabah_'+wsName+'_'+date+'.csv';
     document.body.appendChild(a);a.click();
     setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
   }catch(err){
@@ -8764,7 +8869,7 @@ function nhRenderTagInput(){
 async function nhDismissSuggestedTag(tag){
   if(!_nhDismissedTags.some(t=>t.toLowerCase()===tag.toLowerCase())){
     _nhDismissedTags.push(tag);
-    await nhSet('_nh_dismissed_tags',_nhDismissedTags);
+    await nhSet(nhWsKey('dismissed_tags'),_nhDismissedTags);
   }
   nhRenderTagInput();
 }
@@ -8774,7 +8879,7 @@ function nhAddTag(tag){
   if(!_nhCbTags.some(t=>t.toLowerCase()===tag.toLowerCase())) _nhCbTags.push(tag);
   if(_nhDismissedTags.some(t=>t.toLowerCase()===tag.toLowerCase())){
     _nhDismissedTags=_nhDismissedTags.filter(t=>t.toLowerCase()!==tag.toLowerCase());
-    nhSet('_nh_dismissed_tags',_nhDismissedTags);
+    nhSet(nhWsKey('dismissed_tags'),_nhDismissedTags);
   }
   const input=document.getElementById('nhCbTagInput');
   if(input)input.value='';
@@ -8850,10 +8955,10 @@ async function nhCbSave(){
         phone:contact.phone||'',email:contact.email||'',
         createdAt:nhToday(),
       });
-      await nhSet('_nh_deals',_nhDeals);
+      await nhSet(nhWsKey('deals'),_nhDeals);
     }
   }
-  await nhSet('_nh_contacts',_nhContacts);
+  await nhSet(nhWsKey('contacts'),_nhContacts);
   nhCbCloseModal();nhRenderContacts();nhRenderToday();
 }
 async function nhCbDelete(id,evt){
@@ -8866,9 +8971,9 @@ async function nhCbDelete(id,evt){
   _nhNotes=_nhNotes.filter(n=>n.entityId!==id);
   _nhContacts=_nhContacts.filter(x=>x.id!==id);
   await Promise.all([
-    nhSet('_nh_contacts',_nhContacts),
-    nhSet('_nh_deals',_nhDeals),
-    nhSet('_nh_notes',_nhNotes),
+    nhSet(nhWsKey('contacts'),_nhContacts),
+    nhSet(nhWsKey('deals'),_nhDeals),
+    nhSet(nhWsKey('notes'),_nhNotes),
   ]);
   nhRenderContacts();nhRenderToday();
 }
@@ -9241,7 +9346,7 @@ async function nhCrmSave(){
   const nextActionVal=g('nhCrmFNextAction');
   deal.nextAction=nextActionVal;
   deal.nextActionNote=nextActionVal?g('nhCrmFNextActionNote'):'';
-  await nhSet('_nh_deals',_nhDeals);
+  await nhSet(nhWsKey('deals'),_nhDeals);
   nhCrmCloseModal();nhRenderCrm();nhRenderToday();
 }
 async function nhCrmDelete(id){
@@ -9257,9 +9362,9 @@ async function nhCrmDelete(id){
   _nhNotes=_nhNotes.filter(n=>n.entityId!==id);
   _nhDeals=_nhDeals.filter(x=>x.id!==id);
   await Promise.all([
-    nhSet('_nh_deals',_nhDeals),
-    nhSet('_nh_contacts',_nhContacts),
-    nhSet('_nh_notes',_nhNotes),
+    nhSet(nhWsKey('deals'),_nhDeals),
+    nhSet(nhWsKey('contacts'),_nhContacts),
+    nhSet(nhWsKey('notes'),_nhNotes),
   ]);
   nhRenderCrm();nhRenderToday();
   if(_nhTab==='contacts') nhRenderContacts();
@@ -9306,7 +9411,7 @@ function nhRenderNotesList(){
 async function nhDeleteNote(nid){
   if(!await nhConfirm('Delete this note? This cannot be undone.','Delete Note'))return;
   _nhNotes=_nhNotes.filter(n=>n.id!==nid);
-  await nhSet('_nh_notes',_nhNotes);
+  await nhSet(nhWsKey('notes'),_nhNotes);
   nhRenderNotesList();
   // Refresh note previews in the background
   if(_nhTab==='contacts') nhRenderContacts();
@@ -9330,7 +9435,7 @@ async function nhSaveNoteEdit(nid){
   const note=_nhNotes.find(n=>n.id===nid);
   if(!note)return;
   note.text=text;
-  await nhSet('_nh_notes',_nhNotes);
+  await nhSet(nhWsKey('notes'),_nhNotes);
   nhRenderNotesList();
 }
 async function nhAddNote(){
@@ -9338,7 +9443,7 @@ async function nhAddNote(){
   const text=ta?.value.trim();
   if(!text||!_nhNotesEntityId)return;
   _nhNotes.push({id:nhId(),entityId:_nhNotesEntityId,date:nhToday(),text});
-  await nhSet('_nh_notes',_nhNotes);
+  await nhSet(nhWsKey('notes'),_nhNotes);
   ta.value='';
   nhRenderNotesList();
   // Refresh note counts in the background
@@ -9386,7 +9491,7 @@ async function nhMarkDoneSubmitNote(){
   // Save note
   const entityId=deal.contactId||deal.id;
   _nhNotes.push({id:nhId(),entityId,date:nhToday(),text});
-  await nhSet('_nh_notes',_nhNotes);
+  await nhSet(nhWsKey('notes'),_nhNotes);
   document.getElementById('nhMarkDoneNote').disabled=true;
   document.getElementById('nhMarkDoneNoteBtn').disabled=true;
   if(_nhMarkDoneMode==='assign'){
@@ -9396,7 +9501,7 @@ async function nhMarkDoneSubmitNote(){
     // Plain "Mark Done" — clear any existing next action, deal moves to No Action
     deal.nextAction='';
     deal.nextActionNote='';
-    await nhSet('_nh_deals',_nhDeals);
+    await nhSet(nhWsKey('deals'),_nhDeals);
     nhCloseMarkDone();
     nhRenderCrm();
     nhRenderToday();
@@ -9410,7 +9515,7 @@ async function nhMarkDoneConfirm(){
   if(!deal)return;
   deal.nextAction=dateVal;
   deal.nextActionNote=noteVal;
-  await nhSet('_nh_deals',_nhDeals);
+  await nhSet(nhWsKey('deals'),_nhDeals);
   nhCloseMarkDone();
   nhRenderCrm();
   nhRenderToday();
@@ -9448,7 +9553,7 @@ async function nhRenameStage(id,newName){
   }
   if(trimmed===s.name)return;
   s.name=trimmed;
-  await nhSet('_nh_stages',_nhStages);
+  await nhSet(nhWsKey('stages'),_nhStages);
   nhRenderCrmFilters();
 }
 
@@ -9481,7 +9586,7 @@ async function nhDrop(e,targetId){
   const ti=_nhStages.indexOf(tgt);
   _nhStages.splice(si,1);
   _nhStages.splice(ti,0,src);
-  await nhSet('_nh_stages',_nhStages);
+  await nhSet(nhWsKey('stages'),_nhStages);
   nhRenderSmList();
 }
 function nhDragEnd(){
@@ -9495,7 +9600,7 @@ async function nhAddStage(){
   if(!name)return;
   const COLORS=['#c8a96e','#6aab7a','#9a6abf','#5a9abf','#bf9a5a','#e05555','#4a7c59','#bf5a9a','#7a5abf','#5abfbf'];
   _nhStages.push({id:nhId(),name,color:COLORS[(_nhStages.length-1)%COLORS.length]});
-  await nhSet('_nh_stages',_nhStages);
+  await nhSet(nhWsKey('stages'),_nhStages);
   input.value='';
   nhRenderSmList();
 }
@@ -9507,7 +9612,7 @@ async function nhDelStage(id){
   if(hasDeal&&!await nhConfirm(`This stage has deals. Delete stage? Deals will move to "${fallbackName}" stage.`,'Delete Stage'))return;
   _nhDeals.forEach(d=>{if(d.stageId===id)d.stageId='stage_contacts';});
   _nhStages=_nhStages.filter(s=>s.id!==id);
-  await Promise.all([nhSet('_nh_stages',_nhStages),nhSet('_nh_deals',_nhDeals)]);
+  await Promise.all([nhSet(nhWsKey('stages'),_nhStages),nhSet(nhWsKey('deals'),_nhDeals)]);
   nhRenderSmList();
   nhRenderCrmFilters();
 }
@@ -9581,7 +9686,7 @@ async function nhDealPointerUp(e){
   if(!deal||deal.stageId===stageId)return;
   deal.stageId=stageId;
   _nhOpenCols.add(stageId);
-  await nhSet('_nh_deals',_nhDeals);
+  await nhSet(nhWsKey('deals'),_nhDeals);
   nhRenderCrm();
   nhRenderToday();
   setTimeout(()=>{
@@ -9604,7 +9709,7 @@ function nhDealDragCleanup(){
 }
 
 async function nhSmDone(){
-  await nhSet('_nh_stages',_nhStages);
+  await nhSet(nhWsKey('stages'),_nhStages);
   nhCloseSmBg();
   nhRenderCrm();
 }
@@ -9629,6 +9734,8 @@ async function nhSmDone(){
       </div>
       <input type="file" id="nhImportFileInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="nhHandleImportFile(event)">
     </div>
+    <!-- Workspace bar -->
+    <div id="nhWsBar" style="padding:8px 0 4px 0;border-bottom:1px solid #2a2010;margin-bottom:6px;"></div>
 
     <!-- Today's action dashboard -->
     <div class="nh-today" id="nhToday">

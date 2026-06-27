@@ -149,6 +149,10 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-cb-card:hover{border-color:var(--gold-dim);}
 .nh-cb-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px;}
 .nh-cb-name{font-family:'Instrument Serif',serif;font-size:16px;color:#f0e4c0;}
+.nh-cb-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-right:10px;}
+.nh-cb-avatar.person{background:#1e1a14;border:1px solid #3a3020;}
+.nh-cb-avatar.company{background:#1a2014;border:1px solid #2a4020;}
+.nh-cb-card-info{flex:1;min-width:0;}
 .nh-cb-sub{font-size:11px;color:#c5b98a;margin-top:2px;}
 .nh-cb-actions{display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;}
 
@@ -400,6 +404,8 @@ body.light-mode .nh-deal.ov{background:#fdf0f0!important;border-color:var(--red)
 body.light-mode .nh-ov-tag{background:#fdf0f0!important;border-color:var(--red)!important;color:var(--red)!important;}
 body.light-mode .nh-next-date.urg{color:var(--red)!important;}
 body.light-mode .nh-cb-name{color:#1a1a18!important;}
+body.light-mode .nh-cb-avatar.person{background:#eee9de!important;border-color:#ccc5b5!important;}
+body.light-mode .nh-cb-avatar.company{background:#e8eed8!important;border-color:#b5c8a0!important;}
 body.light-mode .nh-cb-sub{color:#7a756c!important;}
 body.light-mode .nh-col-title{color:#1a1a18!important;}
 body.light-mode .nh-deal-name{color:#1a1a18!important;}
@@ -8846,8 +8852,13 @@ function nhCalDateLabel(ds,diff){
 function nhStageName(id){return(_nhStages.find(s=>s.id===id)||{name:'—'}).name;}
 function nhStageColor(id){return(_nhStages.find(s=>s.id===id)||{color:'#6a7080'}).color;}
 
-function nhLinkBtns(obj){
+function nhLinkBtns(obj,contactRef){
   let h='';
+  const isCompany=(contactRef?.type||obj?.type)==='company';
+  const _ws=obj.website||contactRef?.website||'';
+  if(isCompany&&_ws){
+    h+=`<a class="nh-link" href="${_ws}" target="_blank" rel="noreferrer">🌐 Website</a>`;
+  }
   const linkedin=(obj.linkedin||'').trim();
   const facebook=(obj.facebook||'').trim();
   const phone=(obj.phone||'').trim();
@@ -8931,6 +8942,8 @@ async function nhHandleImportFile(e){
       const fieldMap={
         'name':['name','full name','fullname','contact name'],
         'role':['role / title','role/title','role','title','job title','position'],
+        'type':['type','entity type','contact type'],
+        'website':['website','site','url','web','homepage'],
         'company':['company','organization','org','employer'],
         'country':['country','location','region'],
         'linkedin':['linkedin','linkedin url','linkedin profile'],
@@ -8981,6 +8994,8 @@ async function nhHandleImportFile(e){
           id:'nh_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
           name,
           role:mapField(row,fieldMap.role),
+          type:mapField(row,fieldMap.type)||'person',
+          website:mapField(row,fieldMap.website)||'',
           company:mapField(row,fieldMap.company),
           country:mapField(row,fieldMap.country),
           linkedin:mapField(row,fieldMap.linkedin),
@@ -9026,12 +9041,12 @@ function nhExportExcel(){
       if(typeof v==='object')return '';
       return String(v);
     }
-    var headers=['Name','Role / Title','Company','Country','Phone','Email','LinkedIn','Facebook','Tags','Notes','Added On'];
+    var headers=['Type','Name','Role / Title','Company','Country','Website','Phone','Email','LinkedIn','Facebook','Tags','Notes','Added On'];
     var csvRows=[headers.map(function(h){return '"'+h+'"';}).join(',')];
     _nhContacts.forEach(function(c){
       var tags=Array.isArray(c.tags)?c.tags.join('; '):cv(c.tags);
       var added=c.createdAt?new Date(c.createdAt).toLocaleDateString():'';
-      var row=[cv(c.name),cv(c.role),cv(c.company),cv(c.country),cv(c.phone),cv(c.email),cv(c.linkedin),cv(c.facebook),tags,cv(c.notes),added];
+      var row=[cv(c.type||'person'),cv(c.name),cv(c.role),cv(c.company),cv(c.country),cv(c.website),cv(c.phone),cv(c.email),cv(c.linkedin),cv(c.facebook),tags,cv(c.notes),added];
       csvRows.push(row.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(','));
     });
     var csv='\uFEFF'+csvRows.join('\r\n');
@@ -9090,7 +9105,9 @@ function nhShowTab(tab){
 function nhRenderContacts(){
   const q=(document.getElementById('nhCbSearch')?.value||'').toLowerCase();
   const scope=document.getElementById('nhCbSearchScope')?.value||'all';
+  const typeFilter=document.getElementById('nhCbTypeFilter')?.value||'all';
   let list=[..._nhContacts].sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  if(typeFilter!=='all') list=list.filter(c=>(c.type||'person')===typeFilter);
   if(q){
     list=list.filter(c=>{
       const tags=(c.tags||[]).join(' ');
@@ -9111,18 +9128,20 @@ function nhRenderContacts(){
   }
   const el=document.getElementById('nhCbList');
   if(!el)return;
-  if(!list.length){el.innerHTML='<div class="nh-empty">No contacts yet. Add your first connection.</div>';return;}
+  if(!list.length){el.innerHTML='<div class="nh-empty">No contacts here. Add a person or company to get started.</div>';return;}
   el.innerHTML=list.map(c=>{
-    const links=nhLinkBtns(c);
+    const links=nhLinkBtns(c,c);
     const tags=(c.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
     const deal=_nhDeals.find(d=>d.contactId===c.id);
     const stageBadge=deal?`<span class="nh-stage-badge" style="border-color:${nhStageColor(deal.stageId)};color:${nhStageColor(deal.stageId)}"><span class="nh-col-dot" style="background:${nhStageColor(deal.stageId)}"></span>${nhStageName(deal.stageId)}</span>`:'';
     return `<div class="nh-cb-card">
       <div class="nh-cb-card-top">
-        <div>
-          <div class="nh-cb-name">${c.name||'—'}</div>
-          <div class="nh-cb-sub">${[c.role,c.company,c.country].filter(Boolean).join(' · ')||'&nbsp;'}</div>
-        </div>
+        <div style="display:flex;align-items:flex-start;flex:1;min-width:0;">
+          <div class="nh-cb-avatar ${c.type==='company'?'company':'person'}">${c.type==='company'?'🏢':'👤'}</div>
+          <div class="nh-cb-card-info">
+            <div class="nh-cb-name">${c.name||'—'}</div>
+            <div class="nh-cb-sub">${c.type==='company'?[c.country,c.website].filter(Boolean).join(' · ')||'&nbsp;':[c.role,c.company,c.country].filter(Boolean).join(' · ')||'&nbsp;'}</div>
+          </div>
         <div class="nh-cb-actions">
           <button class="nh-sm-btn" onclick="nhOpenNotes('${c.id}','${(c.name||'').replace(/'/g,"\\'")}')">📝 Notes</button>
           <button class="nh-sm-btn" onclick="nhCbEdit('${c.id}')">Edit</button>
@@ -9149,11 +9168,24 @@ function nhOpenModalTop(bgId){
   });
 }
 
-function nhCbEdit(id){
+function nhCbToggleTypeFields(type){
+  const isCompany=type==='company';
+  document.getElementById('nhCbFType').value=type;
+  document.getElementById('nhCbFNameLabel').textContent=isCompany?'Company Name *':'Full Name *';
+  document.getElementById('nhCbRoleField').style.display=isCompany?'none':'';
+  document.getElementById('nhCbFCompanyLabel').textContent=isCompany?'Industry / Sector':'Company';
+  document.getElementById('nhCbFLinkedinLabel').textContent=isCompany?'LinkedIn Company Page':'LinkedIn URL';
+  document.getElementById('nhCbWebsiteField').style.display=isCompany?'':'none';
+  document.getElementById('nhCbModalTitle').textContent=document.getElementById('nhCbModalTitle').textContent.replace(/Add (Contact|Person|Company)|Edit (Contact|Person|Company)/,
+    m=>m.startsWith('Add')?(isCompany?'Add Company':'Add Person'):(isCompany?'Edit Company':'Edit Person'));
+}
+function nhCbEdit(id,forceType){
   _nhCbEditId=id||null;
   const c=id?_nhContacts.find(x=>x.id===id):null;
-  document.getElementById('nhCbModalTitle').textContent=id?'Edit Contact':'Add Contact';
-  ['Name','Role','Company','Country','Linkedin','Facebook','Phone','Email'].forEach(f=>{
+  const type=c?.type||(forceType||'person');
+  const isCompany=type==='company';
+  document.getElementById('nhCbModalTitle').textContent=id?(isCompany?'Edit Company':'Edit Person'):(isCompany?'Add Company':'Add Person');
+  ['Name','Role','Company','Country','Linkedin','Facebook','Phone','Email','Website'].forEach(f=>{
     const el=document.getElementById('nhCbF'+f);
     if(!el)return;
     if(f==='Phone') el.value=c?.phone||c?.whatsapp||'';
@@ -9163,6 +9195,7 @@ function nhCbEdit(id){
   nhRenderTagInput();
   _nhCbExtraFields=(c?.extraFields||[]).map(f=>({type:f.type,value:f.value}));
   nhRenderExtraFields();
+  nhCbToggleTypeFields(type);
   const stageField=document.getElementById('nhCbStageField');
   const stageSel=document.getElementById('nhCbFStage');
   if(!id){
@@ -9293,9 +9326,11 @@ async function nhCbSave(){
     alert(`⚠️ This contact looks like a duplicate of "${dupMatch.name}".\n\nMatching field${reasons.length>1?'s':''}:\n${reasons.join('\n')}\n\nEdit the existing contact instead.`);
     return;
   }
+  const type=document.getElementById('nhCbFType')?.value||'person';
   const contact={
-    id:_nhCbEditId||nhId(),name,
-    role:g('nhCbFRole'),company:g('nhCbFCompany'),country:g('nhCbFCountry'),
+    id:_nhCbEditId||nhId(),name,type,
+    role:type==='company'?'':g('nhCbFRole'),company:type==='company'?'':g('nhCbFCompany'),country:g('nhCbFCountry'),
+    website:type==='company'?g('nhCbFWebsite'):'',
     linkedin:g('nhCbFLinkedin'),facebook:g('nhCbFFacebook'),
     phone:g('nhCbFPhone'),email:g('nhCbFEmail'),
     tags:[..._nhCbTags],
@@ -9320,7 +9355,7 @@ async function nhCbSave(){
       const chosenStage=document.getElementById('nhCbFStage')?.value||'stage_contacts';
       _nhDeals.push({
         id:nhId(),contactId:contact.id,contactName:contact.name,
-        company:contact.company||'',stageId:chosenStage,
+        company:contact.company||'',website:contact.website||'',stageId:chosenStage,
         nextAction:'',nextActionNote:'',linkedin:contact.linkedin||'',facebook:contact.facebook||'',
         phone:contact.phone||'',email:contact.email||'',
         createdAt:nhToday(),
@@ -9517,9 +9552,9 @@ function nhDealHTML(d,showStage){
     else if(diff<=-2&&diff>=-7) dateLabel=`<span class="nh-next-date soon">In ${-diff}d</span>`;
     else dateLabel=`<span class="nh-next-date">${d.nextAction}</span>`;
   }
-  const links=nhLinkBtns(d);
   const contact=_nhContacts.find(x=>x.id===d.contactId);
-  const subLine=[contact?.role,contact?.company||d.company,contact?.country].filter(Boolean).join(' · ');
+  const links=nhLinkBtns(d,contact);
+  const subLine=contact?.type==='company'?[contact?.country,contact?.website].filter(Boolean).join(' · '):[contact?.role,contact?.company||d.company,contact?.country].filter(Boolean).join(' · ');
   const tags=(contact?.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
   const noteList=_nhNotes.filter(n=>n.entityId===(d.contactId||d.id));
   const lastNote=noteList.length?noteList[noteList.length-1]:null;
@@ -9528,7 +9563,7 @@ function nhDealHTML(d,showStage){
     onpointerdown="nhDealPointerDown(event,'${d.id}')">
     <div class="nh-deal-top">
       <div>
-        <div class="nh-deal-name">${d.contactName||'—'}</div>
+        <div class="nh-deal-name"><span style="font-size:11px;opacity:.7;margin-right:4px;">${contact?.type==='company'?'🏢':'👤'}</span>${d.contactName||'—'}</div>
         <div class="nh-deal-co">${subLine}</div>
       </div>
       <div class="nh-deal-right">
@@ -9579,8 +9614,10 @@ function nhCrmOpenModal(id,defaultStageId){
   document.getElementById('nhCrmModalTitle').textContent = name;
   // Populate read-only view fields
   const setV=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val||'—';};
-  const role = c?.role || '';
-  setV('nhCrmVName',name); setV('nhCrmVRole',role); setV('nhCrmVCompany',company);
+  const role = c?.type==='company'?'':(c?.role || '');
+  const roleLabel=document.querySelector('#nhCrmModalBg .nh-view-label');
+  const companyLabel=document.querySelectorAll('#nhCrmModalBg .nh-view-label')[1];
+  setV('nhCrmVName',(c?.type==='company'?'🏢 ':'')+name); setV('nhCrmVRole',role); setV('nhCrmVCompany',c?.type==='company'?(c?.website||'—'):company);
   // Build clickable link buttons
   const linksEl=document.getElementById('nhCrmVLinks');
   if(linksEl){
@@ -10179,7 +10216,13 @@ async function nhSmDone(){
           <option value="tags">Tags</option>
         </select>
         <input class="nh-search" id="nhCbSearch" type="text" placeholder="" oninput="nhRenderContacts()">
-        <button class="nh-add-btn" onclick="nhCbEdit(null)">＋ Add Contact</button>
+        <select class="nh-search-scope" id="nhCbTypeFilter" onchange="nhRenderContacts()" style="min-width:90px;">
+          <option value="all">All</option>
+          <option value="person">👤 People</option>
+          <option value="company">🏢 Companies</option>
+        </select>
+        <button class="nh-add-btn" onclick="nhCbEdit(null,'person')">＋ Person</button>
+        <button class="nh-add-btn" onclick="nhCbEdit(null,'company')" style="background:#2a3020;border-color:#4a6030;color:#8aba60;">＋ Company</button>
       </div>
       <div class="nh-cb-list" id="nhCbList"></div>
     </div>
@@ -10209,11 +10252,13 @@ async function nhSmDone(){
 <div class="nh-modal-bg" id="nhCbModalBg">
   <div class="nh-modal">
     <div class="nh-modal-title" id="nhCbModalTitle">Add Contact</div>
-    <div class="nh-field"><label>Full Name *</label><input id="nhCbFName" type="text" placeholder=""></div>
-    <div class="nh-field"><label>Role / Title</label><input id="nhCbFRole" type="text" placeholder=""></div>
-    <div class="nh-field"><label>Company</label><input id="nhCbFCompany" type="text" placeholder=""></div>
+    <input type="hidden" id="nhCbFType" value="person">
+    <div class="nh-field"><label id="nhCbFNameLabel">Full Name *</label><input id="nhCbFName" type="text" placeholder=""></div>
+    <div class="nh-field" id="nhCbRoleField"><label>Role / Title</label><input id="nhCbFRole" type="text" placeholder=""></div>
+    <div class="nh-field" id="nhCbCompanyField"><label id="nhCbFCompanyLabel">Company</label><input id="nhCbFCompany" type="text" placeholder=""></div>
     <div class="nh-field"><label>Country</label><input id="nhCbFCountry" type="text" placeholder=""></div>
-    <div class="nh-field"><label>LinkedIn URL</label><input id="nhCbFLinkedin" type="url" placeholder=""></div>
+    <div class="nh-field" id="nhCbWebsiteField" style="display:none;"><label>Website</label><input id="nhCbFWebsite" type="url" placeholder=""></div>
+    <div class="nh-field"><label id="nhCbFLinkedinLabel">LinkedIn URL</label><input id="nhCbFLinkedin" type="url" placeholder=""></div>
     <div class="nh-field"><label>Facebook URL</label><input id="nhCbFFacebook" type="url" placeholder=""></div>
     <div class="nh-field"><label>Phone (Country Code + Number)</label><input id="nhCbFPhone" type="tel" placeholder=""></div>
     <div class="nh-field"><label>Email</label><input id="nhCbFEmail" type="email" placeholder=""></div>
@@ -10249,7 +10294,7 @@ async function nhSmDone(){
     <div class="nh-crm-section-head">Contact Info (edit in Contact Book)</div>
     <div class="nh-field"><span class="nh-view-label">Name</span><div class="nh-view-field" id="nhCrmVName">—</div></div>
     <div class="nh-field"><span class="nh-view-label">Role / Title</span><div class="nh-view-field" id="nhCrmVRole">—</div></div>
-    <div class="nh-field"><span class="nh-view-label">Company</span><div class="nh-view-field" id="nhCrmVCompany">—</div></div>
+    <div class="nh-field"><span class="nh-view-label" id="nhCrmVCompanyLabel">Company / Website</span><div class="nh-view-field" id="nhCrmVCompany">—</div></div>
     <div class="nh-field"><span class="nh-view-label">Contact Links</span><div class="nh-links" id="nhCrmVLinks" style="margin:4px 0 0;"></div></div>
 
     <!-- Pipeline controls — editable -->

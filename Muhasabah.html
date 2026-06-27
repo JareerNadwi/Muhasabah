@@ -3470,7 +3470,7 @@ async function saveAndRefresh(){
   refreshScores();
 }
 
-/* Called by Save Day button — saves + auto-exports JSON backup */
+/* Called by Save Day button — saves to IndexedDB only */
 async function saveDayAndExport(){
   if(!currentDateKey) return;
   const data=collectData();
@@ -3478,7 +3478,6 @@ async function saveDayAndExport(){
   await setStore(currentDateKey,data);
   refreshScores();
   markFirstSave();
-  await autoExport();
   showSavedToast();
   checkSupportPrompt();
 }

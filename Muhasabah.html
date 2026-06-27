@@ -9345,7 +9345,7 @@ async function nhCbSave(){
   const type=document.getElementById('nhCbFType')?.value||'person';
   const contact={
     id:_nhCbEditId||nhId(),name,type,
-    role:type==='company'?'':g('nhCbFRole'),company:type==='company'?'':g('nhCbFCompany'),country:g('nhCbFCountry'),
+    role:type==='company'?'':g('nhCbFRole'),company:g('nhCbFCompany'),country:g('nhCbFCountry'),
     website:type==='company'?g('nhCbFWebsite'):'',
     linkedin:g('nhCbFLinkedin'),facebook:g('nhCbFFacebook'),
     phone:g('nhCbFPhone'),email:g('nhCbFEmail'),

@@ -8872,24 +8872,25 @@ function nhLinkBtns(obj,contactRef){
   if(facebook) h+=`<a class="nh-link fb" href="${facebook}" target="_blank" rel="noopener">👤 Facebook</a>`;
   if(phone)    h+=`<a class="nh-link ph" href="#" onclick="event.preventDefault();nhOpenPhonePicker('${phone.replace(/'/g,"\\'")}')">📱 Phone</a>`;
   if(email)    h+=`<a class="nh-link em" href="mailto:${email}">✉ Email</a>`;
-  // Extra contact fields (up to 3 per type — Phone, Email)
-  const extraCounts={phone:1,email:1};
+  // Extra contact fields — unlimited
+  const extraCounts2={phone:1,email:1};
   (obj.extraFields||[]).forEach(f=>{
     const val=(f?.value||'').trim();
     if(!val||!f?.type)return;
-    if(extraCounts[f.type]===undefined)return;
-    if(extraCounts[f.type]>=4)return; // primary(1) + up to 3 extras
-    extraCounts[f.type]+=1;
-    const n=extraCounts[f.type];
     if(f.type==='phone'){
-      h+=`<a class="nh-link ph" href="#" onclick="event.preventDefault();nhOpenPhonePicker('${val.replace(/'/g,"\\'")}')">📱 Phone ${n}</a>`;
+      extraCounts2.phone+=1;
+      h+=`<a class="nh-link ph" href="#" onclick="event.preventDefault();nhOpenPhonePicker('${val.replace(/'/g,"\\'")}')">📱 Phone ${extraCounts2.phone}</a>`;
     }else if(f.type==='email'){
-      h+=`<a class="nh-link em" href="mailto:${val}">✉ Email ${n}</a>`;
+      extraCounts2.email+=1;
+      h+=`<a class="nh-link em" href="mailto:${val}">✉ Email ${extraCounts2.email}</a>`;
+    }else if(f.type==='custom'){
+      const lbl=(f.label||'').trim()||'Link';
+      const href=val.startsWith('http')?val:'https://'+val;
+      h+=`<a class="nh-link" href="${href}" target="_blank" rel="noopener">🔗 ${lbl}</a>`;
     }
   });
   return h;
 }
-
 /* ── Open / Close ── */
 async function openContactBook(){
   // Load workspaces list; migrate legacy flat data into default workspace if needed
@@ -9180,7 +9181,7 @@ function nhCbToggleTypeFields(type){
   document.getElementById('nhCbFNameLabel').textContent=isCompany?'Company Name *':'Full Name *';
   document.getElementById('nhCbRoleField').style.display=isCompany?'none':'';
   document.getElementById('nhCbFCompanyLabel').textContent=isCompany?'Industry / Sector':'Company';
-  document.getElementById('nhCbFLinkedinLabel').textContent=isCompany?'LinkedIn Company Page':'LinkedIn URL';
+  document.getElementById('nhCbFLinkedinLabel').textContent='LinkedIn URL';
   document.getElementById('nhCbWebsiteField').style.display=isCompany?'':'none';
   document.getElementById('nhCbModalTitle').textContent=document.getElementById('nhCbModalTitle').textContent.replace(/Add (Contact|Person|Company)|Edit (Contact|Person|Company)/,
     m=>m.startsWith('Add')?(isCompany?'Add Company':'Add Person'):(isCompany?'Edit Company':'Edit Person'));
@@ -9215,28 +9216,26 @@ function nhCbEdit(id,forceType){
 }
 function nhCbCloseModal(){document.getElementById('nhCbModalBg').classList.remove('open');_nhCbEditId=null;_nhCbTags=[];_nhCbExtraFields=[];}
 
-/* ── Extra contact fields widget (up to 3 per type — Phone, Email) ── */
+/* ── Extra contact fields widget — unlimited, supports custom links ── */
 function nhRenderExtraFields(){
   const wrap=document.getElementById('nhCbExtraFields');
   if(!wrap)return;
-  wrap.innerHTML=_nhCbExtraFields.map((f,i)=>`<div class="nh-extra-field-row">
-    <select onchange="nhExtraFieldChanged(${i},'type',this.value)">
-      <option value="phone"${f.type==='phone'?' selected':''}>Phone</option>
-      <option value="email"${f.type==='email'?' selected':''}>Email</option>
-    </select>
-    <input type="text" placeholder="Value" value="${(f.value||'').replace(/"/g,'&quot;')}" onchange="nhExtraFieldChanged(${i},'value',this.value)">
-    <span class="nh-extra-field-x" onclick="nhRemoveExtraField(${i})">✕</span>
-  </div>`).join('');
-  const phoneCnt=_nhCbExtraFields.filter(f=>f.type==='phone').length;
-  const emailCnt=_nhCbExtraFields.filter(f=>f.type==='email').length;
-  const addBtn=document.getElementById('nhCbAddExtraBtn');
-  if(addBtn) addBtn.style.display=(phoneCnt>=3&&emailCnt>=3)?'none':'';
+  wrap.innerHTML=_nhCbExtraFields.map((f,i)=>{
+    const isCustom=f.type==='custom';
+    return `<div class="nh-extra-field-row" style="flex-wrap:wrap;gap:5px;">
+      <select onchange="nhExtraFieldChanged(${i},'type',this.value)" style="flex:0 0 90px;">
+        <option value="phone"${f.type==='phone'?' selected':''}>Phone</option>
+        <option value="email"${f.type==='email'?' selected':''}>Email</option>
+        <option value="custom"${f.type==='custom'?' selected':''}>Custom</option>
+      </select>
+      ${isCustom?`<input type="text" placeholder="Label (e.g. Twitter)" value="${(f.label||'').replace(/"/g,'&quot;')}" onchange="nhExtraFieldChanged(${i},'label',this.value)" style="flex:0 0 110px;">`:'' }
+      <input type="text" placeholder="${isCustom?'URL or link':'Value'}" value="${(f.value||'').replace(/"/g,'&quot;')}" onchange="nhExtraFieldChanged(${i},'value',this.value)" style="flex:1;min-width:80px;">
+      <span class="nh-extra-field-x" onclick="nhRemoveExtraField(${i})">✕</span>
+    </div>`;
+  }).join('');
 }
 function nhAddExtraField(){
-  const phoneCnt=_nhCbExtraFields.filter(f=>f.type==='phone').length;
-  const emailCnt=_nhCbExtraFields.filter(f=>f.type==='email').length;
-  const defaultType=phoneCnt<3?'phone':'email';
-  _nhCbExtraFields.push({type:defaultType,value:''});
+  _nhCbExtraFields.push({type:'phone',value:'',label:''});
   nhRenderExtraFields();
 }
 function nhRemoveExtraField(i){
@@ -9341,15 +9340,9 @@ async function nhCbSave(){
     phone:g('nhCbFPhone'),email:g('nhCbFEmail'),
     tags:[..._nhCbTags],
     extraFields:(()=>{
-      const valid=_nhCbExtraFields.filter(f=>(f.value||'').trim()&&(f.type==='phone'||f.type==='email'));
-      const perType={phone:0,email:0};
-      const out=[];
-      for(const f of valid){
-        if(perType[f.type]>=3)continue;
-        perType[f.type]++;
-        out.push({type:f.type,value:f.value.trim()});
-      }
-      return out;
+      return _nhCbExtraFields
+        .filter(f=>(f.value||'').trim())
+        .map(f=>({type:f.type,value:f.value.trim(),label:(f.label||'').trim()}));
     })(),
   };
   if(_nhCbEditId){const i=_nhContacts.findIndex(x=>x.id===_nhCbEditId);if(i>-1)_nhContacts[i]=contact;}
@@ -10278,7 +10271,7 @@ async function nhSmDone(){
     <div class="nh-field"><label>Phone (Country Code + Number)</label><input id="nhCbFPhone" type="tel" placeholder=""></div>
     <div class="nh-field"><label>Email</label><input id="nhCbFEmail" type="email" placeholder=""></div>
     <div class="nh-field">
-      <label>Extra Contact Fields <span style="font-size:9px;color:#a89060;font-style:italic;">(up to 3 Phone + up to 3 Email)</span></label>
+      <label>Extra Contact Fields</label>
       <div id="nhCbExtraFields"></div>
       <button type="button" class="nh-cal-trigger" id="nhCbAddExtraBtn" onclick="nhAddExtraField()" style="margin-top:6px;text-align:center;">＋ Add Contact Field</button>
     </div>

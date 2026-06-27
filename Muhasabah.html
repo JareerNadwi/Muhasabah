@@ -108,7 +108,9 @@ body.light-mode .nh-search-scope:hover{border-color:#9a7228!important;}
 .nh-field input,.nh-field select,.nh-field textarea{width:100%;background:#1a1610!important;border:1px solid #2a2010!important;color:#f0e4c0!important;padding:8px 11px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;-webkit-appearance:none;appearance:none;box-sizing:border-box;}
 .nh-field input:focus,.nh-field select:focus,.nh-field textarea:focus{border-color:var(--gold-dim);}
 .nh-extra-field-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
-.nh-extra-field-row select{flex:0 0 110px;width:auto;}
+.nh-extra-field-row select,.nh-extra-label-input{flex:0 0 110px!important;width:110px!important;min-width:0;box-sizing:border-box;}
+.nh-field .nh-extra-field-row select{background:#1a1610!important;border:1px solid #c9a84c!important;color:#c9a84c!important;font-weight:600!important;background-image:none!important;cursor:pointer;}
+body.light-mode .nh-field .nh-extra-field-row select{background:#fdf5dc!important;border:2px solid #9a7228!important;color:#7a5010!important;font-weight:700!important;background-image:none!important;}
 .nh-extra-field-row input{flex:1;min-width:0;}
 .nh-extra-field-x{cursor:pointer;font-size:13px;color:#a89060;flex-shrink:0;padding:0 2px;}
 .nh-extra-field-x:hover{color:var(--red);}
@@ -9229,8 +9231,8 @@ function nhRenderExtraFields(){
   wrap.innerHTML=_nhCbExtraFields.map((f,i)=>{
     const isCustom=f.type==='custom';
     const typeControl=isCustom
-      ? `<input type="text" placeholder="Label (e.g. Twitter)" value="${(f.label||'').replace(/"/g,'&quot;')}" oninput="nhExtraFieldChanged(${i},'label',this.value)" style="flex:0 0 100px;" class="nh-extra-label-input">`
-      : `<select onchange="nhExtraFieldChanged(${i},'type',this.value)" style="flex:0 0 90px;">
+      ? `<input type="text" placeholder="Label (e.g. Twitter)" value="${(f.label||'').replace(/"/g,'&quot;')}" oninput="nhExtraFieldChanged(${i},'label',this.value)" class="nh-extra-label-input">`
+      : `<select onchange="nhExtraFieldChanged(${i},'type',this.value)">
           <option value="phone"${f.type==='phone'?' selected':''}>Phone</option>
           <option value="email"${f.type==='email'?' selected':''}>Email</option>
           <option value="custom">Custom</option>

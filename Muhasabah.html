@@ -9142,6 +9142,7 @@ function nhRenderContacts(){
             <div class="nh-cb-name">${c.name||'—'}</div>
             <div class="nh-cb-sub">${c.type==='company'?[c.country,c.website].filter(Boolean).join(' · ')||'&nbsp;':[c.role,c.company,c.country].filter(Boolean).join(' · ')||'&nbsp;'}</div>
           </div>
+        </div>
         <div class="nh-cb-actions">
           <button class="nh-sm-btn" onclick="nhOpenNotes('${c.id}','${(c.name||'').replace(/'/g,"\\'")}')">📝 Notes</button>
           <button class="nh-sm-btn" onclick="nhCbEdit('${c.id}')">Edit</button>
@@ -10222,7 +10223,7 @@ async function nhSmDone(){
           <option value="company">🏢 Companies</option>
         </select>
         <button class="nh-add-btn" onclick="nhCbEdit(null,'person')">＋ Person</button>
-        <button class="nh-add-btn" onclick="nhCbEdit(null,'company')" style="background:#2a3020;border-color:#4a6030;color:#8aba60;">＋ Company</button>
+        <button class="nh-add-btn" onclick="nhCbEdit(null,'company')">＋ Company</button>
       </div>
       <div class="nh-cb-list" id="nhCbList"></div>
     </div>

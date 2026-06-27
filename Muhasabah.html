@@ -1195,6 +1195,77 @@ body.light-mode [onclick="pwSaveKey()"]:hover{border-color:#9a7228!important;col
   50%{box-shadow:0 0 16px rgba(154,106,191,.7),0 0 28px rgba(154,106,191,.25);text-shadow:0 0 16px rgba(154,106,191,.9),0 0 28px rgba(154,106,191,.3);}
 }
 
+
+/* ══════════════════════════════════════════════════════════
+   OVERVIEW OVERLAY
+══════════════════════════════════════════════════════════ */
+#overviewOverlay{background:#0d0f0e;}
+body.light-mode #overviewOverlay{background:#f5f0e8!important;}
+.ov-wrap{max-width:720px;margin:0 auto;padding:0 0 80px;}
+.ov-topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:16px;gap:10px;flex-wrap:wrap;}
+.ov-title{font-family:'Amiri',serif;font-size:20px;color:var(--gold);}
+.ov-subtitle{font-size:10px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.ov-close{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
+.ov-close:hover{border-color:var(--gold-dim);color:var(--text);}
+.ov-tabs{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;}
+.ov-tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--text-dim);background:var(--surface);transition:all .15s;border:none;outline:none;}
+.ov-tab:not(:last-child){border-right:1px solid var(--border);}
+.ov-tab.on{background:var(--surface2);color:var(--gold);border-bottom:2px solid var(--gold);}
+.ov-tab:hover:not(.on){color:var(--text);background:var(--surface2);}
+.ov-panel{display:none;}.ov-panel.on{display:block;}
+
+/* Day picker row */
+.ov-day-row{display:flex;align-items:center;gap:8px;margin-bottom:20px;}
+.ov-day-nav{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);width:34px;height:34px;border-radius:var(--radius);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ov-day-nav:hover{border-color:var(--gold-dim);color:var(--gold);}
+.ov-day-nav:disabled{opacity:.3;cursor:not-allowed;}
+.ov-day-label{flex:1;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);letter-spacing:.5px;}
+
+/* Score hero */
+.ov-score-hero{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;}
+.ov-score-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center;}
+.ov-score-card.main{border-color:var(--gold-dim);background:var(--surface2);}
+.ov-score-num{font-family:'DM Mono',monospace;font-size:26px;font-weight:500;color:var(--gold);}
+.ov-score-num.green{color:var(--green-bright);}
+.ov-score-num.purple{color:var(--purple-bright);}
+.ov-score-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-top:4px;}
+
+/* Progress bar inside overview */
+.ov-bar-wrap{margin-bottom:6px;}
+.ov-bar-label{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);margin-bottom:4px;}
+.ov-bar-label span:last-child{color:var(--gold);}
+.ov-bar{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+.ov-bar-fill{height:100%;border-radius:3px;background:var(--green);transition:width .4s ease;}
+.ov-bar-fill.bonus{background:var(--purple);}
+.ov-bar-fill.low{background:var(--red);}
+.ov-bar-fill.mid{background:var(--gold-dim);}
+
+/* Section headers */
+.ov-section{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+
+/* Habit grid */
+.ov-habits{display:flex;flex-direction:column;gap:8px;}
+.ov-habit-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;}
+.ov-habit-icon{width:22px;text-align:center;font-size:14px;flex-shrink:0;}
+.ov-habit-name{flex:1;font-family:'Literata',serif;font-size:13px;color:var(--text);}
+.ov-habit-pct{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);width:38px;text-align:right;flex-shrink:0;}
+.ov-habit-bar{width:80px;height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;flex-shrink:0;}
+.ov-habit-bar-fill{height:100%;border-radius:3px;background:var(--green);}
+
+/* Month/year selector */
+.ov-period-row{display:flex;align-items:center;gap:8px;margin-bottom:20px;}
+.ov-period-nav{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);width:34px;height:34px;border-radius:var(--radius);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ov-period-nav:hover{border-color:var(--gold-dim);color:var(--gold);}
+.ov-period-nav:disabled{opacity:.3;cursor:not-allowed;}
+.ov-period-label{flex:1;text-align:center;font-family:'DM Mono',monospace;font-size:13px;color:var(--text);letter-spacing:.5px;}
+.ov-no-data{text-align:center;padding:40px 20px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);}
+
+/* Days logged stat */
+.ov-meta-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.ov-meta-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;text-align:center;}
+.ov-meta-num{font-family:'DM Mono',monospace;font-size:20px;color:var(--text);}
+.ov-meta-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-top:3px;}
+
 /* ── Body scroll lock when any overlay is active ── */
 body.overlay-open{overflow:hidden;}
 </style>
@@ -1222,6 +1293,7 @@ body.overlay-open{overflow:hidden;}
     <button class="export-btn" onclick="openReadMe()" style="border-color:var(--purple);color:var(--purple-bright);animation:readMeGlow 2.5s ease-in-out infinite;">&#x1F4D6; Read Me</button>
     <button class="export-btn" onclick="exportData()">&#x2191; Export</button>
     <button class="import-btn" onclick="openImportModal()">&#x2193; Import</button>
+    <button class="export-btn" onclick="openOverview()" style="border-color:var(--gold-dim);color:var(--gold);">📊 Overview</button>
     <button class="reset-btn" onclick="openResetModal()">Reset All Data</button>
   </div>
 </div>
@@ -4814,6 +4886,259 @@ loadDayData = function(dk){
   renderTafsirBadge(dk);
   renderBookBadge(dk);
 };
+
+
+/* ══════════════════════════════════════════════════════════
+   OVERVIEW
+══════════════════════════════════════════════════════════ */
+const OV_CORE_HABITS = [
+  { key:'salah',       icon:'🕌', label:'Salah',            weight:10 },
+  { key:'quran',       icon:'📖', label:'Quran',            weight:10 },
+  { key:'tahajjud',    icon:'🌙', label:'Tahajjud',         weight:10 },
+  { key:'zikr',        icon:'📿', label:'Zikr',             weight:5  },
+  { key:'hadith',      icon:'📚', label:'Hadith',           weight:5  },
+  { key:'tafsir',      icon:'🔍', label:'Quran Meaning',    weight:5  },
+  { key:'asmaul',      icon:'✨', label:'Asmaul Husna',     weight:5  },
+  { key:'zikrMorning', icon:'🌅', label:'Morning Zikr',     weight:5  },
+  { key:'zikrEvening', icon:'🌆', label:'Evening Zikr',     weight:5  },
+  { key:'surahWaqiah', icon:'📜', label:'Surah Waqiah',     weight:5  },
+  { key:'surahMulk',   icon:'📜', label:'Surah Mulk',       weight:5  },
+  { key:'books',       icon:'📕', label:'Book Reading',     weight:5  },
+  { key:'exercise',    icon:'🏃', label:'Exercise',         weight:5  },
+  { key:'language',    icon:'🗣', label:'Language',         weight:5  },
+  { key:'writing',     icon:'✍️', label:'Writing',          weight:5  },
+  { key:'networking',  icon:'🤝', label:'Networking',       weight:5  },
+  { key:'tafakkur',    icon:'🤲', label:'Tafakkur',         weight:5  },
+];
+const OV_BONUS_HABITS = [
+  { key:'sawm',        icon:'🌙', label:'Sawm',             weight:10 },
+  { key:'sunnahSalah', icon:'🕌', label:'Sunnah Salah',     weight:10 },
+  { key:'naflSalah',   icon:'🕌', label:'Nafl Salah',       weight:10 },
+  { key:'zikrBook',    icon:'📗', label:'Zikr From Book',   weight:10 },
+  { key:'surahKahf',   icon:'📜', label:'Surah Kahf',       weight:10 },
+  { key:'sadaqah',     icon:'💛', label:'Sadaqah',          weight:10 },
+];
+
+let _ovCurrentDK  = null;
+let _ovCurrentMonth = null; // 0-indexed
+let _ovActiveTab  = 'daily';
+
+function openOverview(){
+  _ovCurrentDK    = todayKey();
+  _ovCurrentMonth = new Date().getMonth();
+  document.getElementById('overviewOverlay').classList.add('active');
+  document.body.classList.add('overlay-open');
+  ovSwitchTab('daily');
+}
+function closeOverview(){
+  document.getElementById('overviewOverlay').classList.remove('active');
+  document.body.classList.remove('overlay-open');
+}
+
+function ovSwitchTab(tab){
+  _ovActiveTab = tab;
+  ['daily','monthly','yearly'].forEach(t=>{
+    document.getElementById('ovTab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('on', t===tab);
+    document.getElementById('ovPanel' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('on', t===tab);
+  });
+  if(tab==='daily')   ovRenderDaily();
+  if(tab==='monthly') ovRenderMonthly();
+  if(tab==='yearly')  ovRenderYearly();
+}
+
+/* ── Helpers ── */
+function ovBarColor(pct){
+  if(pct >= 80) return 'var(--green)';
+  if(pct >= 50) return 'var(--gold-dim)';
+  return 'var(--red)';
+}
+function ovHabitRows(habits, dataFn){
+  return habits.map(h=>{
+    const pct = dataFn(h.key);
+    const color = ovBarColor(pct);
+    return `<div class="ov-habit-row">
+      <div class="ov-habit-icon">${h.icon}</div>
+      <div class="ov-habit-name">${h.label}</div>
+      <div class="ov-habit-bar"><div class="ov-habit-bar-fill" style="width:${pct}%;background:${color};"></div></div>
+      <div class="ov-habit-pct" style="color:${color};">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── DAILY ── */
+function ovDayShift(dir){
+  const keys = all2026Keys(false);
+  const idx  = keys.indexOf(_ovCurrentDK);
+  const next = keys[idx + dir];
+  if(next){ _ovCurrentDK = next; ovRenderDaily(); }
+}
+function ovRenderDaily(){
+  const keys = all2026Keys(false);
+  const idx  = keys.indexOf(_ovCurrentDK);
+  document.getElementById('ovDayPrev').disabled = idx <= 0;
+  document.getElementById('ovDayNext').disabled = idx >= keys.length - 1;
+  const [y,m,d] = _ovCurrentDK.split('-').map(Number);
+  document.getElementById('ovDayLabel').textContent =
+    new Date(y,m-1,d).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  const data = getCached(_ovCurrentDK);
+  const hasData = Object.keys(data).length > 0;
+  const sc = hasData ? scoreDay(data) : {core:0,bonus:0,total:0};
+
+  const el = document.getElementById('ovDailyContent');
+  if(!hasData){
+    el.innerHTML = '<div class="ov-no-data">No data logged for this day.</div>';
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="ov-score-hero">
+      <div class="ov-score-card main">
+        <div class="ov-score-num">${sc.core}%</div>
+        <div class="ov-score-lbl">Core Score</div>
+      </div>
+      <div class="ov-score-card">
+        <div class="ov-score-num green">+${sc.bonus}%</div>
+        <div class="ov-score-lbl">Bonus</div>
+      </div>
+      <div class="ov-score-card">
+        <div class="ov-score-num purple">${sc.total}%</div>
+        <div class="ov-score-lbl">Total</div>
+      </div>
+    </div>
+    <div class="ov-section">Core Habits</div>
+    <div class="ov-habits">${ovHabitRows(OV_CORE_HABITS, k => goalScore(data, k))}</div>
+    <div class="ov-section">Bonus Habits</div>
+    <div class="ov-habits">${ovHabitRows(OV_BONUS_HABITS, k => {
+      const raw = bonusScore(data, k);
+      const max = OV_BONUS_HABITS.find(h=>h.key===k)?.weight || 10;
+      return Math.round((raw/max)*100);
+    })}</div>
+  `;
+}
+
+/* ── MONTHLY ── */
+function ovMonthShift(dir){
+  _ovCurrentMonth = Math.max(0, Math.min(11, _ovCurrentMonth + dir));
+  ovRenderMonthly();
+}
+function ovRenderMonthly(){
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('ovMonthLabel').textContent = MONTHS[_ovCurrentMonth] + ' 2026';
+  document.getElementById('ovMonthPrev').disabled = _ovCurrentMonth <= 0;
+  document.getElementById('ovMonthNext').disabled = _ovCurrentMonth >= 11;
+
+  const keys = all2026Keys(false).filter(dk => parseInt(dk.split('-')[1])-1 === _ovCurrentMonth);
+  const logged = keys.filter(dk => Object.keys(getCached(dk)).length > 0);
+
+  const el = document.getElementById('ovMonthlyContent');
+  if(logged.length === 0){
+    el.innerHTML = '<div class="ov-no-data">No days logged this month.</div>';
+    return;
+  }
+
+  // Averages
+  const scores = logged.map(dk => scoreDay(getCached(dk)));
+  const avgCore  = Math.round(scores.reduce((a,s)=>a+s.core,0)  / scores.length * 10) / 10;
+  const avgBonus = Math.round(scores.reduce((a,s)=>a+s.bonus,0) / scores.length * 10) / 10;
+  const avgTotal = Math.round(scores.reduce((a,s)=>a+s.total,0) / scores.length * 10) / 10;
+
+  // Per-habit averages
+  const coreAvg = k => Math.round(logged.reduce((a,dk)=>a+goalScore(getCached(dk),k),0)/logged.length);
+  const bonusAvg = k => {
+    const max = OV_BONUS_HABITS.find(h=>h.key===k)?.weight || 10;
+    return Math.round(logged.reduce((a,dk)=>a+(bonusScore(getCached(dk),k)/max)*100,0)/logged.length);
+  };
+
+  el.innerHTML = `
+    <div class="ov-meta-row">
+      <div class="ov-meta-card">
+        <div class="ov-meta-num">${logged.length}</div>
+        <div class="ov-meta-lbl">Days Logged</div>
+      </div>
+      <div class="ov-meta-card">
+        <div class="ov-meta-num">${keys.length - logged.length}</div>
+        <div class="ov-meta-lbl">Days Missed</div>
+      </div>
+    </div>
+    <div class="ov-score-hero">
+      <div class="ov-score-card main">
+        <div class="ov-score-num">${avgCore}%</div>
+        <div class="ov-score-lbl">Avg Core</div>
+      </div>
+      <div class="ov-score-card">
+        <div class="ov-score-num green">+${avgBonus}%</div>
+        <div class="ov-score-lbl">Avg Bonus</div>
+      </div>
+      <div class="ov-score-card">
+        <div class="ov-score-num purple">${avgTotal}%</div>
+        <div class="ov-score-lbl">Avg Total</div>
+      </div>
+    </div>
+    <div class="ov-section">Avg Core Habits</div>
+    <div class="ov-habits">${ovHabitRows(OV_CORE_HABITS, coreAvg)}</div>
+    <div class="ov-section">Avg Bonus Habits</div>
+    <div class="ov-habits">${ovHabitRows(OV_BONUS_HABITS, bonusAvg)}</div>
+  `;
+}
+
+/* ── YEARLY ── */
+function ovRenderYearly(){
+  const keys   = all2026Keys(false);
+  const logged = keys.filter(dk => Object.keys(getCached(dk)).length > 0);
+
+  const el = document.getElementById('ovYearlyContent');
+  if(logged.length === 0){
+    el.innerHTML = '<div class="ov-no-data">No data logged yet this year.</div>';
+    return;
+  }
+
+  const scores  = logged.map(dk => scoreDay(getCached(dk)));
+  const avgCore  = Math.round(scores.reduce((a,s)=>a+s.core,0)  / scores.length * 10) / 10;
+  const avgBonus = Math.round(scores.reduce((a,s)=>a+s.bonus,0) / scores.length * 10) / 10;
+  const avgTotal = Math.round(scores.reduce((a,s)=>a+s.total,0) / scores.length * 10) / 10;
+  const bestDay  = logged.reduce((best,dk)=>scoreDay(getCached(dk)).total > scoreDay(getCached(best)).total ? dk : best, logged[0]);
+  const bestSc   = scoreDay(getCached(bestDay));
+  const [by,bm,bd] = bestDay.split('-').map(Number);
+  const bestLabel = new Date(by,bm-1,bd).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+
+  const coreAvg  = k => Math.round(logged.reduce((a,dk)=>a+goalScore(getCached(dk),k),0)/logged.length);
+  const bonusAvg = k => {
+    const max = OV_BONUS_HABITS.find(h=>h.key===k)?.weight || 10;
+    return Math.round(logged.reduce((a,dk)=>a+(bonusScore(getCached(dk),k)/max)*100,0)/logged.length);
+  };
+
+  el.innerHTML = `
+    <div class="ov-meta-row">
+      <div class="ov-meta-card">
+        <div class="ov-meta-num">${logged.length}</div>
+        <div class="ov-meta-lbl">Days Logged</div>
+      </div>
+      <div class="ov-meta-card">
+        <div class="ov-meta-num">${bestLabel} · ${bestSc.total}%</div>
+        <div class="ov-meta-lbl">🏆 Best Day</div>
+      </div>
+    </div>
+    <div class="ov-score-hero">
+      <div class="ov-score-card main">
+        <div class="ov-score-num">${avgCore}%</div>
+        <div class="ov-score-lbl">Avg Core</div>
+      </div>
+      <div class="ov-score-card">
+        <div class="ov-score-num green">+${avgBonus}%</div>
+        <div class="ov-score-lbl">Avg Bonus</div>
+      </div>
+      <div class="ov-score-card">
+        <div class="ov-score-num purple">${avgTotal}%</div>
+        <div class="ov-score-lbl">Avg Total</div>
+      </div>
+    </div>
+    <div class="ov-section">Avg Core Habits — Full Year</div>
+    <div class="ov-habits">${ovHabitRows(OV_CORE_HABITS, coreAvg)}</div>
+    <div class="ov-section">Avg Bonus Habits — Full Year</div>
+    <div class="ov-habits">${ovHabitRows(OV_BONUS_HABITS, bonusAvg)}</div>
+  `;
+}
 
 /* ── Scroll lock: prevent background scroll when any overlay is open ── */
 (function(){
@@ -9765,6 +10090,53 @@ async function nhSmDone(){
 }
 
 </script>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     OVERVIEW OVERLAY
+══════════════════════════════════════════════════════════ -->
+<div class="lr-overlay" id="overviewOverlay">
+  <div class="ov-wrap">
+    <div class="ov-topbar">
+      <div>
+        <div class="ov-title">📊 Overview</div>
+        <div class="ov-subtitle">Daily · Monthly · Yearly</div>
+      </div>
+      <button class="ov-close" onclick="closeOverview()">✕ Close</button>
+    </div>
+
+    <div class="ov-tabs">
+      <button class="ov-tab on" id="ovTabDaily" onclick="ovSwitchTab('daily')">Daily</button>
+      <button class="ov-tab" id="ovTabMonthly" onclick="ovSwitchTab('monthly')">Monthly</button>
+      <button class="ov-tab" id="ovTabYearly" onclick="ovSwitchTab('yearly')">Yearly</button>
+    </div>
+
+    <!-- DAILY PANEL -->
+    <div class="ov-panel on" id="ovPanelDaily">
+      <div class="ov-day-row">
+        <button class="ov-day-nav" id="ovDayPrev" onclick="ovDayShift(-1)">←</button>
+        <div class="ov-day-label" id="ovDayLabel">—</div>
+        <button class="ov-day-nav" id="ovDayNext" onclick="ovDayShift(1)">→</button>
+      </div>
+      <div id="ovDailyContent"></div>
+    </div>
+
+    <!-- MONTHLY PANEL -->
+    <div class="ov-panel" id="ovPanelMonthly">
+      <div class="ov-period-row">
+        <button class="ov-period-nav" id="ovMonthPrev" onclick="ovMonthShift(-1)">←</button>
+        <div class="ov-period-label" id="ovMonthLabel">—</div>
+        <button class="ov-period-nav" id="ovMonthNext" onclick="ovMonthShift(1)">→</button>
+      </div>
+      <div id="ovMonthlyContent"></div>
+    </div>
+
+    <!-- YEARLY PANEL -->
+    <div class="ov-panel" id="ovPanelYearly">
+      <div id="ovYearlyContent"></div>
+    </div>
+  </div>
+</div>
 
 </body>
 

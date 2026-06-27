@@ -2861,7 +2861,7 @@ function openDay(dk){
 
   // Tapping today locks yesterday for this session
   if(dk === today){
-    try { sessionStorage.setItem('_muh_today_entered','1'); } catch(e) {}
+    try { localStorage.setItem('_muh_today_entered', todayKey()); } catch(e) {}
   }
 
   // Lock rules:
@@ -2870,7 +2870,7 @@ function openDay(dk){
   // - today: never locked
   // Lock rules — bypassed entirely in dev mode
   const devMode = document.body.classList.contains('dev-mode');
-  const todayEntered = (()=>{ try{ return sessionStorage.getItem('_muh_today_entered')==='1'; }catch(e){return false;} })();
+  const todayEntered = (()=>{ try{ return localStorage.getItem('_muh_today_entered')===todayKey(); }catch(e){return false;} })();
   const shouldLock = !devMode && (dk < yesterday || (dk === yesterday && todayEntered));
 
   if(shouldLock){

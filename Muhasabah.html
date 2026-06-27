@@ -1381,100 +1381,95 @@ body.overlay-open{overflow:hidden;}
       <button class="qr-close" onclick="closeReadMe()" style="flex-shrink:0;padding:3px 10px;font-size:9px;">✕ Close</button>
     </div>
     <div style="padding:20px 18px 24px;">
-
     <div style="color:var(--text-dim);font-size:11px;line-height:1.9;">
 
-      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">⚠ IMPORTANT — HOLD TO CONFIRM</p>
-      <p style="margin-bottom:16px;">Every button requires a <strong style="color:var(--text);">long press (hold)</strong> to register — Yes / No buttons, Salah options (Jamā'ah, Munfarid, Qadhā, Missed), and all +/− stepper buttons. Tap and hold until the button fills, then release. This prevents accidental taps from corrupting your data.</p>
+      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">⚠ HOLD TO CONFIRM</p>
+      <p style="margin-bottom:16px;">All interactive buttons — Yes/No, Salah options, and +/− steppers — require a <strong style="color:var(--text);">long press</strong>. Hold until the button fills, then release. This stops accidental taps from overwriting your data.</p>
 
-      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">📅 NAVIGATION</p>
-      <p style="margin-bottom:16px;">Use the calendar at the top to switch between days. Tap any date to load that day's data. You can log past days at any time — data is stored locally on your device via IndexedDB and persists between sessions.</p>
+      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">📅 NAVIGATION & DATA</p>
+      <p style="margin-bottom:16px;">Tap any date on the calendar to open that day. Past days can be edited freely until you open today — once you enter the current date, yesterday locks permanently. Data is stored on your device via IndexedDB. Export regularly as a backup; Import to restore or move to another device.</p>
 
-      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">📊 SCORING SYSTEM</p>
-      <p style="margin-bottom:8px;"><strong style="color:var(--text);">Core Score</strong> is capped at 100%. Every goal below (except Bonus) contributes to it. <strong style="color:var(--text);">Bonus Score</strong> is capped at 50% and sits on top of core — your total can reach 150%.</p>
-      <p style="margin-bottom:16px;">A <strong style="color:var(--text);">Perfect Day</strong> (100% core) is marked on the calendar in green. Scores update live as you log.</p>
+      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">📊 SCORING</p>
+      <p style="margin-bottom:8px;"><strong style="color:var(--text);">Core Score</strong> is capped at 100%. <strong style="color:var(--text);">Bonus Score</strong> is capped at 50% and stacks on top — your total can reach 150%. A Perfect Day (100% core) appears in green on the calendar. All scores update live.</p>
+      <p style="margin-bottom:16px;">The <strong style="color:var(--text);">📊 Overview</strong> button in the header gives you a daily summary, monthly averages, and a full-year breakdown — with per-habit progress for every period.</p>
 
-      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:10px;">🕌 CORE GOALS (100% MAX)</p>
+      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:10px;">🕌 CORE GOALS — 100% MAX</p>
 
       <p style="margin-bottom:4px;color:var(--text);">🕌 Salah — 10%</p>
-      <p style="margin-bottom:12px;">Each of the 5 daily prayers contributes 2%. Log each prayer individually: Jamā'ah (congregation) = 2%, Munfarid (alone) = 1.5%, Qadhā (make-up) = 0.5%, Missed = 0%. All 5 at Jamā'ah = full 10%. Use the Open Salah Article button to read about the importance and rulings of Salah.</p>
+      <p style="margin-bottom:12px;">Five prayers, 2% each. Jamā'ah = 2%, Munfarid = 1.5%, Qadhā = 0.5%, Missed = 0%. All five at Jamā'ah = full 10%. Open the Salah Article for rulings and background.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">📖 Quran — 10%</p>
-      <p style="margin-bottom:12px;">Goal is 1 Juzz per day. Use the built-in Quran PDF reader (Imdadia Hafezi edition) — it tracks your pages automatically and calculates Juzz read. Reading more than 1 Juzz in a day earns bonus points (+5% per extra Juzz). Hold Yes/No to log manually if not using the reader.</p>
+      <p style="margin-bottom:12px;">Goal is 1 Juzz per day. Use the built-in PDF reader (Imdadia Hafezi) — it tracks pages and calculates Juzz automatically. Every Juzz beyond the first earns +5% bonus. Manual Yes/No available if not using the reader.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">🌙 Tahajjud — 10%</p>
-      <p style="margin-bottom:12px;">Goal is 4 rakat. Hold and release the +/− buttons to log how many rakat you prayed. Proportional scoring: 2 rakat = 5%, 4 rakat = 10%. Extra rakat above 4 earn bonus points (+5% per additional 4 rakat).</p>
+      <p style="margin-bottom:12px;">Goal is 4 rakat. Proportional: 2 rakat = 5%, 4 rakat = 10%. Each additional 4 rakat above the goal earns +5% bonus.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">📿 Zikr — 5%</p>
-      <p style="margin-bottom:12px;">Goal is 1,500 counts. Hold and release the +/− buttons to log your count. Proportional scoring up to 1,500. Every additional 1,500 above the goal earns +2.5% bonus.</p>
+      <p style="margin-bottom:12px;">Goal is 1,500 counts. Proportional up to 1,500. Every additional 1,500 above the goal earns +2.5% bonus.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">📚 Hadith — 5%</p>
-      <p style="margin-bottom:12px;">Goal is 5 hadiths per day. Use the built-in Bukhari reader — it tracks your progress automatically. Proportional scoring up to 5.</p>
+      <p style="margin-bottom:12px;">Goal is 5 hadiths per day from the built-in Sahih Bukhari reader. Each hadith shows the full Arabic text with harakah alongside the English narration. The reader picks up where you left off across sessions.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">🔍 Quran Meaning — 5%</p>
-      <p style="margin-bottom:12px;">Goal is 17 verses per day using the Tafsir reader (Saheeh International). The reader assigns a daily batch and tracks progress verse by verse. Proportional scoring up to 17.</p>
+      <p style="margin-bottom:12px;">17 verses per day from the Tafsir reader (Saheeh International). Daily batch is assigned automatically. Arabic and English shown together, verse by verse.</p>
 
-      <p style="margin-bottom:4px;color:var(--text);">🌿 Asmaul Husna — 5%</p>
-      <p style="margin-bottom:12px;">Read and reflect on the 99 Names of Allah using the built-in slide reader. Proportional scoring based on how many names you complete. Full completion = 5%.</p>
+      <p style="margin-bottom:4px;color:var(--text);">✨ Asmaul Husna — 5%</p>
+      <p style="margin-bottom:12px;">The 99 Names of Allah via the built-in slide reader. Proportional — complete all 99 for full 5%.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">☀️ Morning Zikr — 5%</p>
-      <p style="margin-bottom:12px;">Complete the morning adhkar using the built-in slide reader. Proportional scoring.</p>
+      <p style="margin-bottom:12px;">Morning adhkar via the slide reader. Proportional scoring based on how many you complete.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">🌆 Evening Zikr — 5%</p>
-      <p style="margin-bottom:12px;">Complete the evening adhkar using the built-in slide reader. Proportional scoring.</p>
+      <p style="margin-bottom:12px;">Evening adhkar via the slide reader. Proportional scoring.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">📜 Surah Al-Waqiah — 5%</p>
-      <p style="margin-bottom:12px;">Read all 96 verses using the built-in verse reader (Arabic + transliteration + meaning). Proportional scoring per verse read. Known to be a protection against poverty — daily recitation is a prophetic recommendation.</p>
+      <p style="margin-bottom:12px;">96 verses via the built-in reader (Arabic + transliteration + meaning). Proportional per verse. Daily recitation is a prophetic recommendation for protection against poverty.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">📜 Surah Al-Mulk — 5%</p>
-      <p style="margin-bottom:12px;">Read all 30 verses using the built-in verse reader. Proportional scoring. Intercedes for the reader on the Day of Judgement — reciting it nightly is a confirmed Sunnah.</p>
-
-      <p style="margin-bottom:4px;color:var(--text);">🏃 Exercise — 5%</p>
-      <p style="margin-bottom:12px;">Hold Yes when you have completed your exercise for the day. Binary — either done (5%) or not (0%). Use the Exercise Article button to read about the Islamic perspective on physical health and a basic BMI calculator.</p>
+      <p style="margin-bottom:12px;">30 verses via the built-in reader. Proportional. Reciting nightly is a confirmed Sunnah — it intercedes for its reader on the Day of Judgement.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">📕 Book — 5%</p>
-      <p style="margin-bottom:12px;">A 365-day curated reading plan covering 15 categories. Open the Book reader — each day has an assigned book with bite-sized lessons. Proportional scoring per lesson completed. Full day = 5%.</p>
+      <p style="margin-bottom:12px;">A 365-day curated reading plan across 15 categories. Each day has an assigned book and a bite-sized lesson. Open the Book reader — it knows which day you are on. Proportional scoring.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">🗣 Language — 5%</p>
-      <p style="margin-bottom:12px;">Daily vocabulary learning across Arabic, English, Bengali, Urdu, and Hindi. Open the Language Learner and select your language. Each day has a new word with full breakdown — collocations, conjugations, story, and speaking challenge. Proportional scoring.</p>
+      <p style="margin-bottom:12px;">Daily vocabulary across Arabic, Bengali, Urdu, and Hindi. Each day introduces a new word with collocations, conjugations, a short story, and a speaking challenge. Proportional scoring.</p>
 
-      <p style="margin-bottom:4px;color:var(--text);">🌿 Tafakkur — 5%</p>
-      <p style="margin-bottom:12px;">Contemplation and reflection on the signs of Allah. Hold Yes when you have spent intentional time in tafakkur — reflecting on creation, your purpose, or the names of Allah. Binary scoring.</p>
+      <p style="margin-bottom:4px;color:var(--text);">🏃 Exercise — 5%</p>
+      <p style="margin-bottom:12px;">Binary — hold Yes when done for the day. Open the Exercise Article for the Islamic perspective on physical health and a BMI calculator.</p>
+
+      <p style="margin-bottom:4px;color:var(--text);">🤲 Tafakkur — 5%</p>
+      <p style="margin-bottom:12px;">Intentional reflection on the signs of Allah — creation, purpose, His names. Hold Yes when done. Binary scoring.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">✍️ Writing — 5%</p>
-      <p style="margin-bottom:12px;">Split into two sub-goals of 2.5% each: LinkedIn Post and Facebook Post. Hold Yes on each when published. Use the AI Post Writer tool to draft posts with Gemini.</p>
+      <p style="margin-bottom:12px;">Two sub-goals of 2.5% each: LinkedIn Post and Facebook Post. Hold Yes on each when published. Use the AI Post Writer (powered by Gemini) to draft content directly inside the app.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">🤝 Networking — 5%</p>
-      <p style="margin-bottom:12px;">Split into two sub-goals of 2.5% each: Connected with 5+ people and Built rapport with 5+ people (commented, messaged, followed up). Hold Yes on each when done. Use the Networking Hub to manage contacts and your CRM pipeline.</p>
+      <p style="margin-bottom:12px;">Two sub-goals of 2.5% each: connected with 5+ people and built rapport with 5+ people (commented, messaged, followed up). Use the Networking Hub to manage contacts and track your CRM pipeline.</p>
 
-      <p style="color:var(--purple-bright);font-size:10px;letter-spacing:1px;margin-bottom:10px;margin-top:4px;">✨ BONUS GOALS (50% MAX)</p>
+      <p style="color:var(--purple-bright);font-size:10px;letter-spacing:1px;margin-bottom:10px;margin-top:4px;">✨ BONUS GOALS — 50% MAX</p>
 
       <p style="margin-bottom:4px;color:var(--text);">🌙 Sawm — +10%</p>
-      <p style="margin-bottom:12px;">Fasting. Hold Yes on any day you fasted — Ramadan, Monday/Thursday, Ayyam al-Bid, or voluntary. Flat +10% bonus.</p>
+      <p style="margin-bottom:12px;">Hold Yes on any day you fasted — Ramadan, Monday/Thursday, Ayyam al-Bid, or voluntary. Flat +10%.</p>
 
-      <p style="margin-bottom:4px;color:var(--text);">🌿 Sunnah Salah — up to +10%</p>
-      <p style="margin-bottom:12px;">Hold and release the +/− buttons to log your Sunnah rakat. Goal is 17 rakat (full Sunnah set). Proportional up to +10%. Every rakat counts.</p>
+      <p style="margin-bottom:4px;color:var(--text);">🕌 Sunnah Salah — up to +10%</p>
+      <p style="margin-bottom:12px;">Goal is 17 rakat (the full Sunnah set). Proportional up to +10%. Log with the +/− buttons.</p>
 
-      <p style="margin-bottom:4px;color:var(--text);">✨ Nafl Salah — up to +10%</p>
-      <p style="margin-bottom:12px;">Hold and release the +/− buttons to log voluntary prayers beyond Sunnah. Each rakat = +0.2%, capped at +10% (50 rakat).</p>
+      <p style="margin-bottom:4px;color:var(--text);">🕌 Nafl Salah — up to +10%</p>
+      <p style="margin-bottom:12px;">Voluntary prayers beyond Sunnah. Each rakat = +0.2%, capped at +10% (50 rakat).</p>
 
-      <p style="margin-bottom:4px;color:var(--text);">📖 Zikr From Book — up to +10%</p>
-      <p style="margin-bottom:12px;">123 duas sourced from the book الدعاء من الكتاب والسنة — with full Arabic (harakah), transliteration, and meaning. Read through them using the slide reader. Proportional scoring up to +10%.</p>
+      <p style="margin-bottom:4px;color:var(--text);">📗 Zikr From Book — up to +10%</p>
+      <p style="margin-bottom:12px;">123 duas from الدعاء من الكتاب والسنة — full Arabic with harakah, transliteration, and meaning. Read through the slide reader. Proportional up to +10%.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">📜 Surah Al-Kahf — up to +10%</p>
-      <p style="margin-bottom:12px;">Read all 110 verses using the built-in verse reader. Proportional per verse. Reciting on Fridays is a confirmed Sunnah with immense reward. Full completion = +10% bonus.</p>
+      <p style="margin-bottom:12px;">110 verses via the built-in reader. Proportional per verse. Reciting on Fridays is a confirmed Sunnah. Full completion = +10%.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">💛 Sadaqah — up to +10%</p>
-      <p style="margin-bottom:12px;">Hold and release the +/− buttons to log how much you donated. Goal is 50,000 units (your local currency). Proportional up to +10%. Any amount counts — even small sadaqah is never insignificant.</p>
-
-      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">💾 DATA & BACKUP</p>
-      <p style="margin-bottom:16px;">Your data lives on your device. Use the <strong style="color:var(--text);">Export</strong> button regularly to download a JSON backup. Use <strong style="color:var(--text);">Import</strong> to restore from a backup or transfer to another device. Do not clear your browser storage without exporting first.</p>
+      <p style="margin-bottom:12px;">Log your donation amount with the +/− buttons. Goal is 50,000 units (your local currency). Proportional up to +10%. No amount is too small.</p>
 
       <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">🌙 / ☀️ THEME</p>
-      <p style="margin-bottom:0;">Toggle between dark mode and light/warm mode using the moon/sun button at the top right.</p>
+      <p style="margin-bottom:0;">Toggle between dark and light/warm mode with the moon/sun button in the header.</p>
 
     </div>
-
     </div>
   </div>
 </div>

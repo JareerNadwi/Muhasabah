@@ -9153,7 +9153,7 @@ function nhRenderContacts(){
           <div class="nh-cb-avatar ${c.type==='company'?'company':'person'}">${c.type==='company'?'🏢':'👤'}</div>
           <div class="nh-cb-card-info">
             <div class="nh-cb-name">${c.name||'—'}</div>
-            <div class="nh-cb-sub">${c.type==='company'?[c.country,c.website].filter(Boolean).join(' · ')||'&nbsp;':[c.role,c.company,c.country].filter(Boolean).join(' · ')||'&nbsp;'}</div>
+            <div class="nh-cb-sub">${c.type==='company'?[c.company,c.country].filter(Boolean).join(' · ')||'&nbsp;':[c.role,c.company,c.country].filter(Boolean).join(' · ')||'&nbsp;'}</div>
           </div>
         </div>
         <div class="nh-cb-actions">
@@ -9564,7 +9564,7 @@ function nhDealHTML(d,showStage){
   }
   const contact=_nhContacts.find(x=>x.id===d.contactId);
   const links=nhLinkBtns(d,contact);
-  const subLine=contact?.type==='company'?[contact?.country,contact?.website].filter(Boolean).join(' · '):[contact?.role,contact?.company||d.company,contact?.country].filter(Boolean).join(' · ');
+  const subLine=contact?.type==='company'?[contact?.company,contact?.country].filter(Boolean).join(' · '):[contact?.role,contact?.company||d.company,contact?.country].filter(Boolean).join(' · ');
   const tags=(contact?.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
   const noteList=_nhNotes.filter(n=>n.entityId===(d.contactId||d.id));
   const lastNote=noteList.length?noteList[noteList.length-1]:null;

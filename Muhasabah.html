@@ -8957,7 +8957,8 @@ async function nhHandleImportFile(e){
         'phone':['phone','mobile','phone number','tel','telephone'],
         'email':['email','email address','e-mail'],
         'tags':['tags','tag','labels','category'],
-        'notes':['notes','note','remarks','comment']
+        'notes':['notes','note','remarks','comment'],
+        'extraFields':['extra fields (json)','extra fields','extrafields','extras']
       };
       function mapField(row,targets){
         for(const k of Object.keys(row)){
@@ -9010,7 +9011,11 @@ async function nhHandleImportFile(e){
           email:mapField(row,fieldMap.email),
           tags,
           notes:mapField(row,fieldMap.notes),
-          extraFields:[],
+          extraFields:(()=>{
+            const raw=mapField(row,fieldMap.extraFields);
+            if(raw){try{const p=JSON.parse(raw);if(Array.isArray(p))return p;}catch(e){}}
+            return [];
+          })(),
           createdAt:new Date().toISOString()
         };
         _nhContacts.push(contact);
@@ -9047,12 +9052,13 @@ function nhExportExcel(){
       if(typeof v==='object')return '';
       return String(v);
     }
-    var headers=['Type','Name','Role / Title','Company','Country','Website','Phone','Email','LinkedIn','Facebook','Tags','Notes','Added On'];
+    var headers=['Type','Name','Role / Title','Company','Country','Website','Phone','Email','LinkedIn','Facebook','Tags','Notes','Extra Fields (JSON)','Added On'];
     var csvRows=[headers.map(function(h){return '"'+h+'"';}).join(',')];
     _nhContacts.forEach(function(c){
       var tags=Array.isArray(c.tags)?c.tags.join('; '):cv(c.tags);
       var added=c.createdAt?new Date(c.createdAt).toLocaleDateString():'';
-      var row=[cv(c.type||'person'),cv(c.name),cv(c.role),cv(c.company),cv(c.country),cv(c.website),cv(c.phone),cv(c.email),cv(c.linkedin),cv(c.facebook),tags,cv(c.notes),added];
+      var extraJson=(c.extraFields&&c.extraFields.length)?JSON.stringify(c.extraFields):'';
+      var row=[cv(c.type||'person'),cv(c.name),cv(c.role),cv(c.company),cv(c.country),cv(c.website),cv(c.phone),cv(c.email),cv(c.linkedin),cv(c.facebook),tags,cv(c.notes),extraJson,added];
       csvRows.push(row.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(','));
     });
     var csv='\uFEFF'+csvRows.join('\r\n');
@@ -9200,7 +9206,7 @@ function nhCbEdit(id,forceType){
   });
   _nhCbTags=[...(c?.tags||[])];
   nhRenderTagInput();
-  _nhCbExtraFields=(c?.extraFields||[]).map(f=>({type:f.type,value:f.value}));
+  _nhCbExtraFields=(c?.extraFields||[]).map(f=>({type:f.type||'phone',value:f.value||'',label:f.label||''}));
   nhRenderExtraFields();
   nhCbToggleTypeFields(type);
   const stageField=document.getElementById('nhCbStageField');
@@ -9222,14 +9228,16 @@ function nhRenderExtraFields(){
   if(!wrap)return;
   wrap.innerHTML=_nhCbExtraFields.map((f,i)=>{
     const isCustom=f.type==='custom';
-    return `<div class="nh-extra-field-row" style="flex-wrap:wrap;gap:5px;">
-      <select onchange="nhExtraFieldChanged(${i},'type',this.value)" style="flex:0 0 90px;">
-        <option value="phone"${f.type==='phone'?' selected':''}>Phone</option>
-        <option value="email"${f.type==='email'?' selected':''}>Email</option>
-        <option value="custom"${f.type==='custom'?' selected':''}>Custom</option>
-      </select>
-      ${isCustom?`<input type="text" placeholder="Label (e.g. Twitter)" value="${(f.label||'').replace(/"/g,'&quot;')}" onchange="nhExtraFieldChanged(${i},'label',this.value)" style="flex:0 0 110px;">`:'' }
-      <input type="text" placeholder="${isCustom?'URL or link':'Value'}" value="${(f.value||'').replace(/"/g,'&quot;')}" onchange="nhExtraFieldChanged(${i},'value',this.value)" style="flex:1;min-width:80px;">
+    const typeControl=isCustom
+      ? `<input type="text" placeholder="Label (e.g. Twitter)" value="${(f.label||'').replace(/"/g,'&quot;')}" oninput="nhExtraFieldChanged(${i},'label',this.value)" style="flex:0 0 100px;" class="nh-extra-label-input">`
+      : `<select onchange="nhExtraFieldChanged(${i},'type',this.value)" style="flex:0 0 90px;">
+          <option value="phone"${f.type==='phone'?' selected':''}>Phone</option>
+          <option value="email"${f.type==='email'?' selected':''}>Email</option>
+          <option value="custom">Custom</option>
+        </select>`;
+    return `<div class="nh-extra-field-row" style="flex-wrap:nowrap;gap:5px;align-items:center;">
+      ${typeControl}
+      <input type="text" placeholder="${isCustom?'URL or link':'Value'}" value="${(f.value||'').replace(/"/g,'&quot;')}" oninput="nhExtraFieldChanged(${i},'value',this.value)" style="flex:1;min-width:80px;">
       <span class="nh-extra-field-x" onclick="nhRemoveExtraField(${i})">✕</span>
     </div>`;
   }).join('');
@@ -9245,6 +9253,8 @@ function nhRemoveExtraField(i){
 function nhExtraFieldChanged(i,key,val){
   if(!_nhCbExtraFields[i])return;
   _nhCbExtraFields[i][key]=val;
+  // When select changes to 'custom', re-render so select becomes label input
+  if(key==='type') nhRenderExtraFields();
 }
 
 /* ── Tag input widget ── */

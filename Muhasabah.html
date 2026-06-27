@@ -118,6 +118,11 @@ body.light-mode .nh-search-scope:hover{border-color:#9a7228!important;}
 #nhCrmFStage:hover,#nhCbFStage:hover{border-color:var(--gold-dim)!important;background:#211b10!important;cursor:pointer;}
 body.light-mode #nhCrmFStage:hover,body.light-mode #nhCbFStage:hover{border-color:#9a7228!important;background:#fdf5dc!important;}
 .nh-field textarea{resize:vertical;min-height:60px;font-size:11px;line-height:1.5;}
+.nh-quick-days{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.nh-qd-btn{background:#1e1a10;border:1px solid #2a2010;color:#a89060;font-family:'DM Mono',monospace;font-size:10px;padding:4px 8px;border-radius:12px;cursor:pointer;letter-spacing:.5px;}
+.nh-qd-btn:hover{border-color:var(--gold-dim);color:var(--gold);}
+body.light-mode .nh-qd-btn{background:#f0ede6!important;border-color:#ccc5b5!important;color:#7a756c!important;}
+body.light-mode .nh-qd-btn:hover{border-color:#9a7228!important;color:#9a7228!important;}
 .nh-modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end;flex-wrap:wrap;}
 .nh-confirm-msg{font-family:'DM Mono',monospace;font-size:12px;line-height:1.6;color:#e0d4b0;}
 body.light-mode .nh-confirm-msg{color:#3a3630!important;}
@@ -9674,6 +9679,15 @@ function nhCalTriggerLabel(dateStr){
   const d=new Date(dateStr);
   return d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
 }
+function nhAddDaysFromToday(inputId, days){
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  const val = d.toISOString().slice(0,10);
+  const el = document.getElementById(inputId);
+  if(el){ el.value = val; el.dispatchEvent(new Event('change')); }
+  nhUpdateCalTrigger(inputId);
+  if(inputId==='nhCrmFNextAction') nhCrmNextActionDateChanged();
+}
 function nhUpdateCalTrigger(inputId){
   const input=document.getElementById(inputId);
   const btn=document.getElementById(inputId+'Btn');
@@ -10307,6 +10321,13 @@ async function nhSmDone(){
     <div class="nh-field">
       <label>Next Action Date</label>
       <input id="nhCrmFNextAction" type="hidden" onchange="nhCrmNextActionDateChanged()">
+      <div class="nh-quick-days">
+        <button type="button" class="nh-qd-btn" onclick="nhAddDaysFromToday('nhCrmFNextAction',1)">+1d</button>
+        <button type="button" class="nh-qd-btn" onclick="nhAddDaysFromToday('nhCrmFNextAction',3)">+3d</button>
+        <button type="button" class="nh-qd-btn" onclick="nhAddDaysFromToday('nhCrmFNextAction',7)">+7d</button>
+        <button type="button" class="nh-qd-btn" onclick="nhAddDaysFromToday('nhCrmFNextAction',15)">+15d</button>
+        <button type="button" class="nh-qd-btn" onclick="nhAddDaysFromToday('nhCrmFNextAction',30)">+30d</button>
+      </div>
       <button type="button" class="nh-cal-trigger" id="nhCrmFNextActionBtn" onclick="nhOpenCalPicker('nhCrmFNextAction')">Pick a date</button>
     </div>
     <div class="nh-field">
@@ -10366,6 +10387,13 @@ async function nhSmDone(){
     <div class="nh-markdone-next" id="nhMarkDoneNext">
       <label>Next Action Date</label>
       <input type="hidden" id="nhMarkDoneNextDate">
+      <div class="nh-quick-days">
+        <button type="button" class="nh-qd-btn" onclick="nhAddDaysFromToday('nhMarkDoneNextDate',1)">+1d</button>
+        <button type="button" class="nh-qd-btn" onclick="nhAddDaysFromToday('nhMarkDoneNextDate',3)">+3d</button>
+        <button type="button" class="nh-qd-btn" onclick="nhAddDaysFromToday('nhMarkDoneNextDate',7)">+7d</button>
+        <button type="button" class="nh-qd-btn" onclick="nhAddDaysFromToday('nhMarkDoneNextDate',15)">+15d</button>
+        <button type="button" class="nh-qd-btn" onclick="nhAddDaysFromToday('nhMarkDoneNextDate',30)">+30d</button>
+      </div>
       <button type="button" class="nh-cal-trigger" id="nhMarkDoneNextDateBtn" onclick="nhOpenCalPicker('nhMarkDoneNextDate')">Pick a date</button>
       <label style="margin-top:8px;">Next Action — What To Do</label>
       <input type="text" id="nhMarkDoneNextActionNote" placeholder="e.g. Call to discuss proposal">

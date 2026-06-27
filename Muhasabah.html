@@ -123,8 +123,8 @@ body.light-mode #nhCrmFStage:hover,body.light-mode #nhCbFStage:hover{border-colo
 body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-btn-save{background:#1a1610;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 20px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
 .nh-btn-save:hover{border-color:var(--gold);background:#141008;}
-.nh-btn-cancel{background:#1a1610;border:1px solid #2a2010;color:#c5b98a;padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;transition:border-color .15s,color .15s;}
-.nh-btn-cancel:hover{border-color:#c5b98a;color:#f0e4c0;}
+.nh-btn-cancel{background:#1a1610;border:1px solid #2a2010;color:#c5b98a;padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;transition:border-color .15s,color .15s,background .15s;}
+.nh-btn-cancel:hover{border-color:var(--gold-dim);color:var(--gold);background:#211b10;}
 .nh-btn-del{background:#1a1610;border:1px solid var(--red);color:var(--red);padding:8px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;}
 .nh-btn-del:hover{border-color:var(--red);background:#2a1515;}
 
@@ -411,7 +411,7 @@ body.light-mode .nh-next-action-note{color:#5a4a28!important;background:#fdf5dc!
 body.light-mode .nh-btn-save{background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .nh-btn-save:hover{background:linear-gradient(135deg,#f5e8b0,#edd898)!important;}
 body.light-mode .nh-btn-cancel{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
-body.light-mode .nh-btn-cancel:hover{border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-btn-cancel:hover{border-color:#9a7228!important;color:#9a7228!important;background:linear-gradient(135deg,#fdf5dc,#f5e8b0)!important;}
 body.light-mode .nh-btn-del{background:#f5dede!important;border-color:var(--red)!important;color:var(--red)!important;}
 body.light-mode .nh-btn-del:hover{background:#fdecec!important;}
 body.light-mode #nhPromptInput{background:#f0ede6!important;border-color:#d4cfc5!important;color:#1a1a18!important;}
@@ -1293,7 +1293,7 @@ body.overlay-open{overflow:hidden;}
     <button class="export-btn" onclick="openReadMe()" style="border-color:var(--purple);color:var(--purple-bright);animation:readMeGlow 2.5s ease-in-out infinite;">&#x1F4D6; Read Me</button>
     <button class="export-btn" onclick="exportData()">&#x2191; Export</button>
     <button class="import-btn" onclick="openImportModal()">&#x2193; Import</button>
-    <button class="export-btn" onclick="openOverview()" style="border-color:var(--gold-dim);color:var(--gold);">📊 Overview</button>
+    <button class="export-btn ov-nav-btn" onclick="openOverview()">📊 Overview</button>
     <button class="reset-btn" onclick="openResetModal()">Reset All Data</button>
   </div>
 </div>

@@ -1160,6 +1160,7 @@ body.light-mode #gkmCtaBtn:hover{background:linear-gradient(135deg,#f5e8b0,#edd8
 body.light-mode #gkmFooter{color:#9a9590!important;border-top-color:#d4cfc5!important;}
 [onclick="openGetKeyModal()"]:hover{background:linear-gradient(135deg,#2a2000,#342c10)!important;}
 /* Hadith text colors */
+body.light-mode #hadithArabic{color:#1a1a18!important;}
 body.light-mode #hadithText{color:#1a1a18!important;}
 body.light-mode #hadithRef{color:#5a5750!important;}
 body.light-mode #hadithNum{color:#9a7228!important;}
@@ -2890,7 +2891,7 @@ function applyReaderTheme(isLight){
   // These elements have display: toggled by JS — skip them to avoid conflicts
   const SKIP_IDS=new Set([
     // Hadith reader
-    'hadithLoading','hadithContent','hadithNav','hadithDoneNote','hadithPrevBtn','hadithNextBtn','hadithNum','hadithText','hadithRef','hadithDayInfo',
+    'hadithLoading','hadithContent','hadithNav','hadithDoneNote','hadithPrevBtn','hadithNextBtn','hadithNum','hadithArabic','hadithText','hadithRef','hadithDayInfo',
     // Tafsir reader
     'tafsirLoading','tafsirContent','tafsirNav','tafsirDoneNote','tafsirPrevBtn','tafsirNextBtn','tafsirTranslit',
     // Book reader
@@ -4215,6 +4216,8 @@ function renderHadith(idx, reviewMode){
   const displayTotal = reviewMode ? _hadithData.length : HADITHS_PER_DAY;
   document.getElementById('hadithNum').textContent = 'Hadith ' + (idx+1) + (reviewMode ? ' of Today' : '');
   document.getElementById('hadithCounter').textContent = (idx+1) + ' / ' + displayTotal;
+  const arEl = document.getElementById('hadithArabic');
+  if(arEl){ arEl.textContent = h.arabic || ''; arEl.style.display = h.arabic ? 'block' : 'none'; }
   document.getElementById('hadithText').textContent    = h.text || 'Content unavailable.';
   const refEl = document.getElementById('hadithRef');
   if(refEl){
@@ -5166,6 +5169,7 @@ function renderBookBadge(dk) {
     <div id="hadithContent" style="display:none;flex:1;overflow-y:auto;padding:28px 24px;background:#0d0b08;">
       <div id="hadithNum" style="font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;font-family:'DM Mono',monospace;"></div>
       <div style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:22px 26px;">
+        <div id="hadithArabic" style="font-family:'Amiri',serif;font-size:1.5rem;line-height:2.1;direction:rtl;text-align:right;color:#f0e4c0;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid #2a2010;"></div>
         <div id="hadithText" style="color:#c5b98a;font-size:1.05rem;line-height:1.85;font-family:'Amiri',serif;white-space:pre-wrap;"></div>
         <div id="hadithRef" style="margin-top:14px;font-size:0.7rem;letter-spacing:0.15em;color:#8a7840;font-family:'DM Mono',monospace;text-align:right;"></div>
       </div>

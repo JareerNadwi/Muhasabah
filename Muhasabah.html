@@ -3262,14 +3262,17 @@ function _checkNewDayNotification(){
   if(document.body.classList.contains('dev-mode')) return;
   try {
     const today = todayKey();
-    const lastSeen = sessionStorage.getItem(_ND_KEY);
+    // Yesterday already locked — user has entered today, no point reminding
+    const alreadyLocked = localStorage.getItem('_muh_today_entered') === today;
+    if(alreadyLocked) return;
+    const lastSeen = localStorage.getItem(_ND_KEY);
     if(lastSeen !== today){
       document.getElementById('newDayModal').classList.add('active');
     }
   } catch(e) {}
 }
 function dismissNewDayModal(){
-  try { sessionStorage.setItem(_ND_KEY, todayKey()); } catch(e) {}
+  try { localStorage.setItem(_ND_KEY, todayKey()); } catch(e) {}
   document.getElementById('newDayModal').classList.remove('active');
 }
 

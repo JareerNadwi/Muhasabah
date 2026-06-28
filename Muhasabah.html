@@ -251,9 +251,12 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-next-date.urg{color:#e05555;}
 .nh-next-date.soon{color:var(--gold);}
 .nh-next-action-note{font-family:'DM Mono',monospace;font-size:10px;color:#e0d4b0;background:rgba(200,169,110,.06);border:1px solid #2a2010;border-radius:var(--radius);padding:5px 9px;margin:6px 0 0;}
-.nh-deal-bottom{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.nh-deal-preview{font-size:10px;color:#a89060;font-style:italic;flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
-.nh-deal-btns{display:flex;gap:5px;flex-shrink:0;}
+.nh-deal-bottom{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+.nh-deal-notes-stack{display:flex;flex-direction:column;gap:3px;}
+.nh-deal-note-row{font-size:11px;color:#a89060;font-style:italic;line-height:1.4;word-break:break-word;}
+.nh-deal-note-row .nh-note-date{font-style:normal;color:#7a6a40;font-size:10px;margin-right:4px;white-space:nowrap;}
+.nh-deal-note-empty{font-size:10px;color:#5a4e30;font-style:italic;}
+.nh-deal-btns{display:flex;gap:5px;flex-wrap:wrap;}
 
 /* Notes panel (shared Contact Book + CRM) */
 .nh-notes-panel{margin-top:8px;border-top:1px solid #2a2010;padding-top:10px;display:none;}
@@ -429,7 +432,9 @@ body.light-mode .nh-cb-sub{color:#7a756c!important;}
 body.light-mode .nh-col-title{color:#1a1a18!important;}
 body.light-mode .nh-deal-name{color:#1a1a18!important;}
 body.light-mode .nh-deal-co{color:#7a756c!important;}
-body.light-mode .nh-deal-preview{color:#7a756c!important;}
+body.light-mode .nh-deal-note-row{color:#7a756c!important;}
+body.light-mode .nh-deal-note-row .nh-note-date{color:#a09880!important;}
+body.light-mode .nh-deal-note-empty{color:#b0a898!important;}
 body.light-mode .nh-empty{color:#9a9590!important;}
 body.light-mode .nh-next-date.soon{color:#9a7228!important;}
 body.light-mode .nh-next-action-note{color:#5a4a28!important;background:#fdf5dc!important;border-color:#e8d8b0!important;}
@@ -9631,6 +9636,7 @@ function nhDealHTML(d,showStage){
   const tags=(contact?.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
   const noteList=_nhNotes.filter(n=>n.entityId===(d.contactId||d.id));
   const lastNote=noteList.length?noteList[noteList.length-1]:null;
+  const recentNotes=noteList.slice(-5);
   const stageBadge=showStage?`<span class="nh-stage-badge" style="border-color:${nhStageColor(d.stageId)};color:${nhStageColor(d.stageId)}"><span class="nh-col-dot" style="background:${nhStageColor(d.stageId)}"></span>${nhStageName(d.stageId)}</span>`:'';
   return `<div class="nh-deal${ov?' ov':''}" id="nhd-${d.id}"
     onpointerdown="nhDealPointerDown(event,'${d.id}')">
@@ -9649,7 +9655,9 @@ function nhDealHTML(d,showStage){
     ${links?`<div class="nh-links">${links}</div>`:''}
     ${tags?`<div class="nh-tags">${tags}</div>`:''}
     <div class="nh-deal-bottom">
-      <div class="nh-deal-preview">${lastNote?lastNote.date+' — '+lastNote.text:'No notes yet'}</div>
+      <div class="nh-deal-notes-stack">
+        ${recentNotes.length?recentNotes.map(n=>`<div class="nh-deal-note-row"><span class="nh-note-date">${n.date}</span>${n.text}</div>`).join(''):'<div class="nh-deal-note-empty">No notes yet</div>'}
+      </div>
       <div class="nh-deal-btns">
         ${ov?`<button class="nh-sm-btn done" onclick="nhOpenMarkDone('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}','done')" >✓ Mark Done</button>`:''}
         ${ov?`<button class="nh-sm-btn done" onclick="nhOpenMarkDone('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}','assign')" >✓ Mark Done &amp; Assign Next</button>`:''}

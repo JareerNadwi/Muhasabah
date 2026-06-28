@@ -9357,16 +9357,29 @@ async function nhCbSave(){
   const g=id=>document.getElementById(id)?.value.trim()||'';
   const name=g('nhCbFName');
   if(!name){mhsbToast('Name is required.','warn');return;}
+  const type=document.getElementById('nhCbFType')?.value||'person';
   const email=g('nhCbFEmail');
   const linkedin=g('nhCbFLinkedin');
   const facebook=g('nhCbFFacebook');
   const phone=g('nhCbFPhone');
+  const website=type==='company'?g('nhCbFWebsite'):'';
+  const currentExtraFields=_nhCbExtraFields.filter(f=>(f.value||'').trim()).map(f=>({type:f.type,value:f.value.trim(),label:(f.label||'').trim()}));
+
   const dupMatch=_nhContacts.find(c=>{
     if(c.id===(_nhCbEditId||''))return false;
     if(email&&c.email&&c.email.toLowerCase()===email.toLowerCase())return true;
     if(linkedin&&c.linkedin&&c.linkedin.toLowerCase()===linkedin.toLowerCase())return true;
     if(facebook&&c.facebook&&c.facebook.toLowerCase()===facebook.toLowerCase())return true;
     if(phone&&c.phone&&c.phone.replace(/\s+/g,'')===phone.replace(/\s+/g,''))return true;
+    // Company-only checks
+    if(type==='company'&&c.type==='company'){
+      if(website&&c.website&&c.website.toLowerCase()===website.toLowerCase())return true;
+      if(currentExtraFields.length&&c.extraFields&&c.extraFields.length){
+        for(const ef of currentExtraFields){
+          if(c.extraFields.some(cf=>cf.value&&ef.value&&cf.value.trim().toLowerCase()===ef.value.toLowerCase()&&(cf.label||'').toLowerCase()===(ef.label||'').toLowerCase()))return true;
+        }
+      }
+    }
     return false;
   });
   if(dupMatch){
@@ -9375,10 +9388,16 @@ async function nhCbSave(){
     if(linkedin&&dupMatch.linkedin&&dupMatch.linkedin.toLowerCase()===linkedin.toLowerCase())reasons.push(`LinkedIn: ${linkedin}`);
     if(facebook&&dupMatch.facebook&&dupMatch.facebook.toLowerCase()===facebook.toLowerCase())reasons.push(`Facebook: ${facebook}`);
     if(phone&&dupMatch.phone&&dupMatch.phone.replace(/\s+/g,'')===phone.replace(/\s+/g,''))reasons.push(`Phone: ${phone}`);
+    if(type==='company'&&dupMatch.type==='company'){
+      if(website&&dupMatch.website&&dupMatch.website.toLowerCase()===website.toLowerCase())reasons.push(`Website: ${website}`);
+      for(const ef of currentExtraFields){
+        const cf=dupMatch.extraFields?.find(cf=>cf.value&&cf.value.trim().toLowerCase()===ef.value.toLowerCase()&&(cf.label||'').toLowerCase()===(ef.label||'').toLowerCase());
+        if(cf)reasons.push(`${ef.label||'Custom field'}: ${ef.value}`);
+      }
+    }
     mhsbToast(`⚠️ Duplicate of "${dupMatch.name}" — matching: ${reasons.join(', ')}\nEdit the existing contact instead.`,'warn',6000);
     return;
   }
-  const type=document.getElementById('nhCbFType')?.value||'person';
   const contact={
     id:_nhCbEditId||nhId(),name,type,
     role:type==='company'?'':g('nhCbFRole'),company:g('nhCbFCompany'),country:g('nhCbFCountry'),

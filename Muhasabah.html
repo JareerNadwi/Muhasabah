@@ -9086,7 +9086,13 @@ async function nhHandleImportFile(e){
           notes:mapField(row,fieldMap.notes),
           extraFields:(()=>{
             const raw=mapField(row,fieldMap.extraFields);
-            if(raw){try{const p=JSON.parse(raw);if(Array.isArray(p))return p;}catch(e){}}
+            if(raw){try{const p=JSON.parse(raw);if(Array.isArray(p)){
+              const labelToType={'whatsapp':'whatsapp','telegram':'telegram','botim':'botim','imo':'imo','viber':'viber','wechat':'wechat','signal':'signal','line':'line','linkedin':'linkedin','facebook':'facebook','instagram':'instagram','x':'x','x (twitter)':'x','twitter':'x','tiktok':'tiktok','youtube':'youtube','pinterest':'pinterest','snapchat':'snapchat','reddit':'reddit','threads':'threads','linktree':'linktree','gmb':'gmb','google my business':'gmb','website':'website','rating':'rating','reviews':'reviews','followers':'followers'};
+              return p.map(f=>{
+                if(f.type==='custom'&&f.label){const mapped=labelToType[(f.label||'').toLowerCase().trim()];if(mapped)return{...f,type:mapped};}
+                return f;
+              });
+            }}catch(e){}}
             return [];
           })(),
           createdAt:new Date().toISOString()

@@ -8921,8 +8921,14 @@ function nhLinkBtns(obj,contactRef){
       h+=`<a class="nh-link em" href="mailto:${val}">✉ Email ${extraCounts2.email}</a>`;
     }else if(f.type==='custom'){
       const lbl=(f.label||'').trim()||'Link';
-      const href=val.startsWith('http')?val:'https://'+val;
-      h+=`<a class="nh-link" href="${href}" target="_blank" rel="noopener">🔗 ${lbl}</a>`;
+      const isRating=/rating|review/i.test(lbl);
+      if(isRating){
+        const isReview=/review/i.test(lbl);
+        h+=`<span class="nh-link" style="cursor:default;pointer-events:none;">${isReview?'💬':'⭐'} ${val}</span>`;
+      }else{
+        const href=val.startsWith('http')?val:'https://'+val;
+        h+=`<a class="nh-link" href="${href}" target="_blank" rel="noopener">🔗 ${lbl}</a>`;
+      }
     }
   });
   return h;

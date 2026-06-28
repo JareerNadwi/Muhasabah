@@ -9382,6 +9382,7 @@ async function nhCbSave(){
       if(website&&c.website&&c.website.toLowerCase()===website.toLowerCase())return true;
       if(currentExtraFields.length&&c.extraFields&&c.extraFields.length){
         for(const ef of currentExtraFields){
+          if(/rating|review/i.test(ef.label||''))continue;
           if(c.extraFields.some(cf=>cf.value&&ef.value&&cf.value.trim().toLowerCase()===ef.value.toLowerCase()&&(cf.label||'').toLowerCase()===(ef.label||'').toLowerCase()))return true;
         }
       }
@@ -9397,6 +9398,7 @@ async function nhCbSave(){
     if(type==='company'&&dupMatch.type==='company'){
       if(website&&dupMatch.website&&dupMatch.website.toLowerCase()===website.toLowerCase())reasons.push(`Website: ${website}`);
       for(const ef of currentExtraFields){
+        if(/rating|review/i.test(ef.label||''))continue;
         const cf=dupMatch.extraFields?.find(cf=>cf.value&&cf.value.trim().toLowerCase()===ef.value.toLowerCase()&&(cf.label||'').toLowerCase()===(ef.label||'').toLowerCase());
         if(cf)reasons.push(`${ef.label||'Custom field'}: ${ef.value}`);
       }

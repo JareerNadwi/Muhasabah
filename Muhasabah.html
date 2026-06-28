@@ -8872,7 +8872,7 @@ function nhPhonePickerGo(action){
   const number=_nhPhonePickerNumber;
   if(!number)return;
   const digits=number.replace(/\D/g,'');
-  const actions={
+  const map={
     wa:()=>window.open(`https://wa.me/${digits}`,'_blank','noopener'),
     tg:()=>window.open(`https://t.me/+${digits}`,'_blank','noopener'),
     botim:()=>window.open(`botim://call?number=${digits}`,'_blank','noopener'),
@@ -8883,7 +8883,7 @@ function nhPhonePickerGo(action){
     line:()=>window.open(`https://line.me/R/ti/p/${number}`,'_blank','noopener'),
     call:()=>{window.location.href='tel:'+number;}
   };
-  if(actions[action])actions[action]();
+  if(map[action])map[action]();
   nhClosePhonePicker();
 }
 function nhDaysDiff(ds){
@@ -8910,29 +8910,29 @@ function nhLinkBtns(obj,contactRef){
   const isCompany=(contactRef?.type||obj?.type)==='company';
   const _ws=obj.website||contactRef?.website||'';
   if(isCompany&&_ws){
-    h+=`<a class="nh-link" href="${_ws}" target="_blank" rel="noreferrer">🌐 Website</a>`;
+    h+=`<a class="nh-link" href="${_ws}" target="_blank" rel="noreferrer" style="display:inline-flex;align-items:center;gap:4px;"><img src="https://www.google.com/s2/favicons?domain=${(()=>{try{return new URL(_ws).hostname}catch(e){return''}})()+'&sz=16'}" width="13" height="13" style="vertical-align:middle;border-radius:2px;" onerror="this.style.display='none'"> Website</a>`;
   }
   const linkedin=(obj.linkedin||'').trim();
   const facebook=(obj.facebook||'').trim();
   const phone=(obj.phone||'').trim();
   const email=(obj.email||'').trim();
-  if(linkedin) h+=`<a class="nh-link lk" href="${linkedin}" target="_blank" rel="noopener">🔗 LinkedIn</a>`;
-  if(facebook) h+=`<a class="nh-link fb" href="${facebook}" target="_blank" rel="noopener">👤 Facebook</a>`;
+  if(linkedin) h+=`<a class="nh-link lk" href="${linkedin}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;">${nhFavImg('https://www.linkedin.com/favicon.ico')} LinkedIn</a>`;
+  if(facebook) h+=`<a class="nh-link fb" href="${facebook}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;">${nhFavImg('https://www.facebook.com/favicon.ico')} Facebook</a>`;
   if(phone)    h+=`<a class="nh-link ph" href="#" onclick="event.preventDefault();nhOpenPhonePicker('${phone.replace(/'/g,"\\'")}')">📱 Phone</a>`;
-  if(email)    h+=`<a class="nh-link em" href="mailto:${email}">✉ Email</a>`;
-  // Extra contact fields — unlimited
+  if(email)    h+=`<a class="nh-link em" href="mailto:${email}" style="display:inline-flex;align-items:center;gap:4px;"><img src="https://www.google.com/s2/favicons?domain=gmail.com&sz=16" width="13" height="13" style="vertical-align:middle;border-radius:2px;" onerror="this.style.display='none'"> Email</a>`;
+  // Extra information fields — unlimited
   const extraCounts2={phone:1,email:1};
   (obj.extraFields||[]).forEach(f=>{
     const val=(f?.value||'').trim();
     if(!val||!f?.type)return;
+    const p=nhPresetByType(f.type);
     if(f.type==='phone'){
       extraCounts2.phone+=1;
       h+=`<a class="nh-link ph" href="#" onclick="event.preventDefault();nhOpenPhonePicker('${val.replace(/'/g,"\\'")}')">📱 Phone${extraCounts2.phone>1?' '+extraCounts2.phone:''}</a>`;
     }else if(f.type==='email'){
       extraCounts2.email+=1;
-      h+=`<a class="nh-link em" href="mailto:${val}">✉ Email${extraCounts2.email>1?' '+extraCounts2.email:''}</a>`;
+      h+=`<a class="nh-link em" href="mailto:${val}" style="display:inline-flex;align-items:center;gap:4px;"><img src="https://www.google.com/s2/favicons?domain=gmail.com&sz=16" width="13" height="13" style="vertical-align:middle;border-radius:2px;" onerror="this.style.display='none'"> Email${extraCounts2.email>1?' '+extraCounts2.email:''}</a>`;
     }else if(['whatsapp','telegram','botim','imo','viber','wechat','signal','line'].includes(f.type)){
-      const p=nhPresetByType(f.type);
       const digits=val.replace(/\D/g,'');
       const deepLinks={
         whatsapp:`https://wa.me/${digits}`,
@@ -8944,29 +8944,22 @@ function nhLinkBtns(obj,contactRef){
         signal:`https://signal.me/#p/%2B${digits}`,
         line:`https://line.me/R/ti/p/${val}`
       };
-      const href=deepLinks[f.type]||'#';
-      const ico=p.favicon?`<img src="${p.favicon}" width="13" height="13" style="vertical-align:middle;border-radius:2px;margin-right:2px;" onerror="this.style.display='none'">`:'' ;
-      h+=`<a class="nh-link" href="${href}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:3px;">${ico}${p.label}</a>`;
+      h+=`<a class="nh-link" href="${deepLinks[f.type]||'#'}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;">${nhFavImg(p.fav)}${p.label}</a>`;
     }else if(f.type==='rating'||f.type==='reviews'||/rating|review/i.test(f.label||'')){
-      const isReview=f.type==='reviews'||/review/i.test(f.label||'');
-      h+=`<span class="nh-link" style="cursor:default;pointer-events:none;">${isReview?'💬':'⭐'} ${val}</span>`;
+      h+=`<span class="nh-link" style="cursor:default;pointer-events:none;">${(f.type==='reviews'||/review/i.test(f.label||''))?'💬':'⭐'} ${val}</span>`;
     }else if(f.type==='followers'){
       h+=`<span class="nh-link" style="cursor:default;pointer-events:none;">👥 ${val}</span>`;
     }else if(f.type==='custom'){
       const lbl=(f.label||'').trim()||'Link';
-      const isRating=/rating|review/i.test(lbl);
-      if(isRating){
-        const isReview=/review/i.test(lbl);
-        h+=`<span class="nh-link" style="cursor:default;pointer-events:none;">${isReview?'💬':'⭐'} ${val}</span>`;
+      if(/rating|review/i.test(lbl)){
+        h+=`<span class="nh-link" style="cursor:default;pointer-events:none;">${/review/i.test(lbl)?'💬':'⭐'} ${val}</span>`;
       }else{
         const href=val.startsWith('http')?val:'https://'+val;
         h+=`<a class="nh-link" href="${href}" target="_blank" rel="noopener">🔗 ${lbl}</a>`;
       }
     }else{
-      const p=nhPresetByType(f.type);
       const href=val.startsWith('http')?val:'https://'+val;
-      const ico=p.favicon?`<img src="${p.favicon}" width="13" height="13" style="vertical-align:middle;border-radius:2px;margin-right:2px;" onerror="this.style.display='none'">`:'' ;
-      h+=`<a class="nh-link" href="${href}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:3px;">${ico}${p.label}</a>`;
+      h+=`<a class="nh-link" href="${href}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;">${nhFavImg(p.fav)}${p.label}</a>`;
     }
   });
   return h;
@@ -9303,55 +9296,50 @@ function nhCbEdit(id,forceType){
 }
 function nhCbCloseModal(){document.getElementById('nhCbModalBg').classList.remove('open');_nhCbEditId=null;_nhCbTags=[];_nhCbExtraFields=[];}
 
-/* ── Preset field definitions ── */
+/* ── Extra contact fields widget — unlimited, supports custom links ── */
 const NH_PRESET_FIELDS=[
-  {type:'phone',     label:'Phone',     favicon:'',                           placeholder:'Number with country code'},
-  {type:'email',     label:'Email',     favicon:'',                           placeholder:'Email address'},
-  {type:'whatsapp',  label:'WhatsApp',  favicon:'https://www.whatsapp.com/favicon.ico',   placeholder:'Number with country code'},
-  {type:'telegram',  label:'Telegram',  favicon:'https://telegram.org/favicon.ico',       placeholder:'Username or number'},
-  {type:'botim',     label:'Botim',     favicon:'https://www.botim.me/favicon.ico',       placeholder:'Number with country code'},
-  {type:'imo',       label:'IMO',       favicon:'https://imo.im/favicon.ico',             placeholder:'Number with country code'},
-  {type:'viber',     label:'Viber',     favicon:'https://www.viber.com/favicon.ico',      placeholder:'Number with country code'},
-  {type:'wechat',    label:'WeChat',    favicon:'https://www.wechat.com/favicon.ico',     placeholder:'WeChat ID'},
-  {type:'signal',    label:'Signal',    favicon:'https://signal.org/favicon.ico',         placeholder:'Number with country code'},
-  {type:'line',      label:'Line',      favicon:'https://line.me/favicon.ico',            placeholder:'Line ID'},
-  {type:'linkedin',  label:'LinkedIn',  favicon:'https://www.linkedin.com/favicon.ico',   placeholder:'Profile URL'},
-  {type:'facebook',  label:'Facebook',  favicon:'https://www.facebook.com/favicon.ico',   placeholder:'Profile URL'},
-  {type:'instagram', label:'Instagram', favicon:'https://www.instagram.com/favicon.ico',  placeholder:'Profile URL'},
-  {type:'x',         label:'X (Twitter)',favicon:'https://x.com/favicon.ico',             placeholder:'Profile URL'},
-  {type:'tiktok',    label:'TikTok',    favicon:'https://www.tiktok.com/favicon.ico',     placeholder:'Profile URL'},
-  {type:'youtube',   label:'YouTube',   favicon:'https://www.youtube.com/favicon.ico',    placeholder:'Channel URL'},
-  {type:'pinterest', label:'Pinterest', favicon:'https://www.pinterest.com/favicon.ico',  placeholder:'Profile URL'},
-  {type:'snapchat',  label:'Snapchat',  favicon:'https://www.snapchat.com/favicon.ico',   placeholder:'Username'},
-  {type:'reddit',    label:'Reddit',    favicon:'https://www.reddit.com/favicon.ico',     placeholder:'Profile URL'},
-  {type:'threads',   label:'Threads',   favicon:'https://www.threads.net/favicon.ico',    placeholder:'Profile URL'},
-  {type:'linktree',  label:'Linktree',  favicon:'https://linktr.ee/favicon.ico',          placeholder:'Linktree URL'},
-  {type:'website',   label:'Website',   favicon:'https://www.google.com/s2/favicons?domain=google.com&sz=16', placeholder:'https://'},
-  {type:'rating',    label:'Rating',    favicon:'',                           placeholder:'e.g. 4.5'},
-  {type:'reviews',   label:'Reviews',   favicon:'',                           placeholder:'e.g. 230'},
-  {type:'followers', label:'Followers', favicon:'',                           placeholder:'e.g. 15000'},
-  {type:'custom',    label:'Custom',    favicon:'',                           placeholder:''},
+  {type:'phone',     label:'Phone',      fav:'',                                                    ph:'Number with country code'},
+  {type:'email',     label:'Email',      fav:'',                                                    ph:'Email address'},
+  {type:'whatsapp',  label:'WhatsApp',   fav:'https://www.whatsapp.com/favicon.ico',                ph:'Number with country code'},
+  {type:'telegram',  label:'Telegram',   fav:'https://telegram.org/favicon.ico',                    ph:'Username or number'},
+  {type:'botim',     label:'Botim',      fav:'https://www.botim.me/favicon.ico',                    ph:'Number with country code'},
+  {type:'imo',       label:'IMO',        fav:'https://imo.im/favicon.ico',                          ph:'Number with country code'},
+  {type:'viber',     label:'Viber',      fav:'https://www.viber.com/favicon.ico',                   ph:'Number with country code'},
+  {type:'wechat',    label:'WeChat',     fav:'https://www.wechat.com/favicon.ico',                  ph:'WeChat ID'},
+  {type:'signal',    label:'Signal',     fav:'https://signal.org/favicon.ico',                      ph:'Number with country code'},
+  {type:'line',      label:'Line',       fav:'https://line.me/favicon.ico',                         ph:'Line ID'},
+  {type:'linkedin',  label:'LinkedIn',   fav:'https://www.linkedin.com/favicon.ico',                ph:'Profile URL'},
+  {type:'facebook',  label:'Facebook',   fav:'https://www.facebook.com/favicon.ico',                ph:'Profile URL'},
+  {type:'instagram', label:'Instagram',  fav:'https://www.instagram.com/favicon.ico',               ph:'Profile URL'},
+  {type:'x',         label:'X (Twitter)',fav:'https://x.com/favicon.ico',                           ph:'Profile URL'},
+  {type:'tiktok',    label:'TikTok',     fav:'https://www.tiktok.com/favicon.ico',                  ph:'Profile URL'},
+  {type:'youtube',   label:'YouTube',    fav:'https://www.youtube.com/favicon.ico',                  ph:'Channel URL'},
+  {type:'pinterest', label:'Pinterest',  fav:'https://www.pinterest.com/favicon.ico',               ph:'Profile URL'},
+  {type:'snapchat',  label:'Snapchat',   fav:'https://www.snapchat.com/favicon.ico',                ph:'Username'},
+  {type:'reddit',    label:'Reddit',     fav:'https://www.reddit.com/favicon.ico',                  ph:'Profile URL'},
+  {type:'threads',   label:'Threads',    fav:'https://www.threads.net/favicon.ico',                 ph:'Profile URL'},
+  {type:'linktree',  label:'Linktree',   fav:'https://linktr.ee/favicon.ico',                       ph:'Linktree URL'},
+  {type:'gmb',       label:'GMB',        fav:'https://www.google.com/favicon.ico',                  ph:'Google Business URL'},
+  {type:'website',   label:'Website',    fav:'https://www.google.com/s2/favicons?domain=google.com',ph:'https://'},
+  {type:'rating',    label:'Rating',     fav:'',                                                    ph:'e.g. 4.5'},
+  {type:'reviews',   label:'Reviews',    fav:'',                                                    ph:'e.g. 230'},
+  {type:'followers', label:'Followers',  fav:'',                                                    ph:'e.g. 15000'},
+  {type:'custom',    label:'Custom',     fav:'',                                                    ph:''},
 ];
 function nhPresetByType(t){return NH_PRESET_FIELDS.find(p=>p.type===t)||NH_PRESET_FIELDS[NH_PRESET_FIELDS.length-1];}
+function nhFavImg(fav){return fav?`<img src="${fav}" width="13" height="13" style="vertical-align:middle;border-radius:2px;flex-shrink:0;" onerror="this.style.display='none'">`:''}
 
-/* ── Extra contact fields widget — unlimited, supports custom links ── */
 function nhRenderExtraFields(){
   const wrap=document.getElementById('nhCbExtraFields');
   if(!wrap)return;
   wrap.innerHTML=_nhCbExtraFields.map((f,i)=>{
     const isCustom=f.type==='custom';
-    const preset=nhPresetByType(f.type);
-    const faviconHtml=preset.favicon
-      ? `<img src="${preset.favicon}" width="14" height="14" style="vertical-align:middle;margin-right:3px;border-radius:2px;" onerror="this.style.display='none'">`
-      : '';
-    const selectOpts=NH_PRESET_FIELDS.map(p=>{
-      const ico=p.favicon?`🔹 `:'';
-      return `<option value="${p.type}"${f.type===p.type?' selected':''}>${p.label}</option>`;
-    }).join('');
+    const p=nhPresetByType(f.type);
+    const selectOpts=NH_PRESET_FIELDS.map(pr=>`<option value="${pr.type}"${f.type===pr.type?' selected':''}>${pr.label}</option>`).join('');
     const typeControl=isCustom
       ? `<input type="text" placeholder="Label" value="${(f.label||'').replace(/"/g,'&quot;')}" oninput="nhExtraFieldChanged(${i},'label',this.value)" class="nh-extra-label-input" style="flex:0 0 110px;width:110px;">`
       : `<select onchange="nhExtraFieldChanged(${i},'type',this.value)" style="flex:0 0 110px;width:110px;">${selectOpts}</select>`;
-    const ph=isCustom?'URL or value':(preset.placeholder||'Value');
+    const ph=isCustom?'URL or value':(p.ph||'Value');
     return `<div class="nh-extra-field-row" style="flex-wrap:nowrap;gap:5px;align-items:center;">
       ${typeControl}
       <input type="text" placeholder="${ph}" value="${(f.value||'').replace(/"/g,'&quot;')}" oninput="nhExtraFieldChanged(${i},'value',this.value)" style="flex:1;min-width:80px;">
@@ -10426,7 +10414,7 @@ async function nhSmDone(){
     <div class="nh-field">
       <label>Extra Information Fields</label>
       <div id="nhCbExtraFields"></div>
-      <button type="button" class="nh-cal-trigger" id="nhCbAddExtraBtn" onclick="nhAddExtraField()" style="margin-top:6px;text-align:center;">＋ Add Contact Field</button>
+      <button type="button" class="nh-cal-trigger" id="nhCbAddExtraBtn" onclick="nhAddExtraField()" style="margin-top:6px;text-align:center;">＋ Add Extra Field</button>
     </div>
     <div class="nh-field" id="nhCbStageField">
       <label>Initial Pipeline Stage</label>
@@ -10574,21 +10562,21 @@ async function nhSmDone(){
   </div>
 </div>
 
-<!-- Phone Picker (messaging apps / call) -->
+<!-- Phone Picker -->
 <div class="nh-modal-bg" id="nhPhonePickerBg" style="z-index:4600;">
   <div class="nh-modal" style="max-width:340px;">
-    <div class="nh-modal-title">📱 Open With</div>
+    <div class="nh-modal-title">Open With</div>
     <div class="nh-confirm-msg" id="nhPhonePickerNumber" style="margin-bottom:14px;"></div>
     <div class="nh-modal-actions" style="flex-direction:column;align-items:stretch;">
-      <button class="nh-btn-save" onclick="nhPhonePickerGo('wa')" style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://www.whatsapp.com/favicon.ico" width="15" height="15" onerror="this.style.display='none'"> WhatsApp</button>
-      <button class="nh-btn-save" onclick="nhPhonePickerGo('tg')" style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://telegram.org/favicon.ico" width="15" height="15" onerror="this.style.display='none'"> Telegram</button>
-      <button class="nh-btn-save" onclick="nhPhonePickerGo('botim')" style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://www.botim.me/favicon.ico" width="15" height="15" onerror="this.style.display='none'"> Botim</button>
-      <button class="nh-btn-save" onclick="nhPhonePickerGo('imo')" style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://imo.im/favicon.ico" width="15" height="15" onerror="this.style.display='none'"> IMO</button>
-      <button class="nh-btn-save" onclick="nhPhonePickerGo('viber')" style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://www.viber.com/favicon.ico" width="15" height="15" onerror="this.style.display='none'"> Viber</button>
-      <button class="nh-btn-save" onclick="nhPhonePickerGo('wechat')" style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://www.wechat.com/favicon.ico" width="15" height="15" onerror="this.style.display='none'"> WeChat</button>
-      <button class="nh-btn-save" onclick="nhPhonePickerGo('signal')" style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://signal.org/favicon.ico" width="15" height="15" onerror="this.style.display='none'"> Signal</button>
-      <button class="nh-btn-save" onclick="nhPhonePickerGo('line')" style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://line.me/favicon.ico" width="15" height="15" onerror="this.style.display='none'"> Line</button>
-      <button class="nh-btn-save" onclick="nhPhonePickerGo('call')" style="margin-bottom:8px;">📞 Call</button>
+      <button class="nh-btn-save" onclick="nhPhonePickerGo('wa')"     style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://www.whatsapp.com/favicon.ico"  width="15" height="15" onerror="this.style.display='none'"> WhatsApp</button>
+      <button class="nh-btn-save" onclick="nhPhonePickerGo('tg')"     style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://telegram.org/favicon.ico"        width="15" height="15" onerror="this.style.display='none'"> Telegram</button>
+      <button class="nh-btn-save" onclick="nhPhonePickerGo('botim')"  style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://www.botim.me/favicon.ico"         width="15" height="15" onerror="this.style.display='none'"> Botim</button>
+      <button class="nh-btn-save" onclick="nhPhonePickerGo('imo')"    style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://imo.im/favicon.ico"               width="15" height="15" onerror="this.style.display='none'"> IMO</button>
+      <button class="nh-btn-save" onclick="nhPhonePickerGo('viber')"  style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://www.viber.com/favicon.ico"        width="15" height="15" onerror="this.style.display='none'"> Viber</button>
+      <button class="nh-btn-save" onclick="nhPhonePickerGo('wechat')" style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://www.wechat.com/favicon.ico"       width="15" height="15" onerror="this.style.display='none'"> WeChat</button>
+      <button class="nh-btn-save" onclick="nhPhonePickerGo('signal')" style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://signal.org/favicon.ico"           width="15" height="15" onerror="this.style.display='none'"> Signal</button>
+      <button class="nh-btn-save" onclick="nhPhonePickerGo('line')"   style="margin-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="https://line.me/favicon.ico"              width="15" height="15" onerror="this.style.display='none'"> Line</button>
+      <button class="nh-btn-save" onclick="nhPhonePickerGo('call')"   style="margin-bottom:8px;display:flex;align-items:center;gap:8px;justify-content:center;">📞 Call</button>
       <button class="nh-btn-cancel" onclick="nhClosePhonePicker()">Cancel</button>
     </div>
   </div>

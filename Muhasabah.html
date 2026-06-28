@@ -9642,7 +9642,7 @@ function nhDealHTML(d,showStage){
     onpointerdown="nhDealPointerDown(event,'${d.id}')">
     <div class="nh-deal-top">
       <div>
-        <div class="nh-deal-name"><span style="font-size:11px;opacity:.7;margin-right:4px;">${contact?.type==='company'?'🏢':'👤'}</span>${d.contactName||'—'}</div>
+        <div class="nh-deal-name"><div class="nh-cb-avatar ${contact?.type==='company'?'company':'person'}" style="display:inline-flex;margin-right:8px;vertical-align:middle;">${contact?.type==='company'?'🏢':'👤'}</div>${d.contactName||'—'}</div>
         <div class="nh-deal-co">${subLine}</div>
       </div>
       <div class="nh-deal-right">

@@ -10143,6 +10143,10 @@ function nhOpenMarkDone(dealId,name,mode){
   document.getElementById('nhMarkDoneNextDate').value='';
   document.getElementById('nhMarkDoneNextActionNote').value='';
   nhUpdateCalTrigger('nhMarkDoneNextDate');
+  // Populate stage selector
+  const deal=_nhDeals.find(d=>d.id===dealId);
+  const stageSel=document.getElementById('nhMarkDoneStage');
+  stageSel.innerHTML=_nhStages.map(s=>`<option value="${s.id}"${s.id===(deal&&deal.stageId)?'  selected':''}>${s.name}</option>`).join('');
   if(_nhMarkDoneMode==='assign_only'){
     // No "what did you do" step — go straight to next action inputs
     document.getElementById('nhMarkDoneNoteField').style.display='none';
@@ -10182,6 +10186,8 @@ async function nhMarkDoneSubmitNote(){
     // Plain "Mark Done" — clear any existing next action, deal moves to No Action
     deal.nextAction='';
     deal.nextActionNote='';
+    const chosenStage=document.getElementById('nhMarkDoneStage').value;
+    if(chosenStage)deal.stageId=chosenStage;
     await nhSet(nhWsKey('deals'),_nhDeals);
     nhCloseMarkDone();
     nhRenderCrm();
@@ -10194,6 +10200,8 @@ async function nhMarkDoneConfirm(){
   const noteVal=document.getElementById('nhMarkDoneNextActionNote').value.trim();
   const deal=_nhDeals.find(d=>d.id===_nhMarkDoneId);
   if(!deal)return;
+  const chosenStage=document.getElementById('nhMarkDoneStage').value;
+  if(chosenStage)deal.stageId=chosenStage;
   deal.nextAction=dateVal;
   deal.nextActionNote=noteVal;
   await nhSet(nhWsKey('deals'),_nhDeals);
@@ -10640,6 +10648,10 @@ async function nhSmDone(){
 <div class="nh-modal-bg" id="nhMarkDoneBg" style="z-index:4000;">
   <div class="nh-modal" style="max-width:480px;">
     <div class="nh-modal-title" id="nhMarkDoneName">✓ Mark Done</div>
+    <div class="nh-field" style="margin-bottom:10px;">
+      <label>Move to Stage</label>
+      <select id="nhMarkDoneStage" style="width:100%;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:7px 10px;font-family:inherit;font-size:13px;"></select>
+    </div>
     <div class="nh-field" id="nhMarkDoneNoteField">
       <label>What did you do?</label>
       <textarea class="nh-note-textarea" id="nhMarkDoneNote" style="min-height:100px;pointer-events:auto;touch-action:auto;"></textarea>

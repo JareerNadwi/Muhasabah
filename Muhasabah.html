@@ -9076,7 +9076,10 @@ async function nhHandleImportFile(e){
         const cid=dr['contact id']||dr['contact_id']||'';
         const stageId=dr['stage id']||dr['stage_id']||'stage_contacts';
         const resolvedStage=_nhStages.find(s=>s.id===stageId)?stageId:'stage_contacts';
-        if(cid)dealMap[cid]={stageId:resolvedStage,nextAction:dr['next action date']||'',nextActionNote:dr['next action note']||'',dealId:dr['deal id']||dr['deal_id']||'',createdAt:dr['created at']||''};
+        const extraRaw=dr['extra fields (json)']||dr['extra fields']||dr['extrafields']||'';
+        let extraFields=[];
+        if(extraRaw){try{const p=JSON.parse(extraRaw);if(Array.isArray(p))extraFields=p;}catch(e){}}
+        if(cid)dealMap[cid]={stageId:resolvedStage,nextAction:dr['next action date']||'',nextActionNote:dr['next action note']||'',dealId:dr['deal id']||dr['deal_id']||'',createdAt:dr['created at']||'',contactType:dr['contact type']||dr['contacttype']||'',country:dr['country']||'',role:dr['role']||'',website:dr['website']||'',phone:dr['phone']||'',email:dr['email']||'',linkedin:dr['linkedin']||'',facebook:dr['facebook']||'',extraFields};
       });
       const fieldMap={
         'name':['name','full name','fullname','contact name'],
@@ -9166,11 +9169,18 @@ async function nhHandleImportFile(e){
           _nhDeals.push({
             id:(dm?.dealId&&!_nhDeals.find(d=>d.id===dm.dealId))?dm.dealId:nhId(),
             contactId:contact.id,contactName:contact.name,
+            contactType:contact.type||dm?.contactType||'person',
             company:contact.company||'',
+            country:contact.country||dm?.country||'',
+            role:contact.role||dm?.role||'',
+            website:contact.website||dm?.website||'',
+            linkedin:contact.linkedin||dm?.linkedin||'',
+            facebook:contact.facebook||dm?.facebook||'',
+            phone:contact.phone||dm?.phone||'',
+            email:contact.email||dm?.email||'',
+            extraFields:contact.extraFields?.length?contact.extraFields:(dm?.extraFields||[]),
             stageId:dm?.stageId||'stage_contacts',
             nextAction:dm?.nextAction||'',nextActionNote:dm?.nextActionNote||'',
-            linkedin:contact.linkedin||'',facebook:contact.facebook||'',
-            phone:contact.phone||'',email:contact.email||'',
             createdAt:dm?.createdAt||new Date().toISOString().slice(0,10),
           });
         }
@@ -9217,9 +9227,10 @@ function nhExportExcel(){
     // Deals
     csvRows.push('');
     csvRows.push('"## DEALS ##"');
-    csvRows.push(['"Deal ID"','"Contact ID"','"Contact Name"','"Company"','"Stage ID"','"Next Action Date"','"Next Action Note"','"Created At"'].join(','));
+    csvRows.push(['"Deal ID"','"Contact ID"','"Contact Name"','"Contact Type"','"Company"','"Country"','"Role"','"Website"','"Phone"','"Email"','"LinkedIn"','"Facebook"','"Extra Fields (JSON)"','"Stage ID"','"Next Action Date"','"Next Action Note"','"Created At"'].join(','));
     _nhDeals.forEach(function(d){
-      var row=[cv(d.id),cv(d.contactId),cv(d.contactName),cv(d.company),cv(d.stageId),cv(d.nextAction),cv(d.nextActionNote),cv(d.createdAt)];
+      var extraJson=(d.extraFields&&d.extraFields.length)?JSON.stringify(d.extraFields):'';
+      var row=[cv(d.id),cv(d.contactId),cv(d.contactName),cv(d.contactType||'person'),cv(d.company),cv(d.country),cv(d.role),cv(d.website),cv(d.phone),cv(d.email),cv(d.linkedin),cv(d.facebook),extraJson,cv(d.stageId),cv(d.nextAction),cv(d.nextActionNote),cv(d.createdAt)];
       csvRows.push(row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(','));
     });
     var csv='\uFEFF'+csvRows.join('\r\n');

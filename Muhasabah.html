@@ -9089,10 +9089,10 @@ async function nhHandleImportFile(e){
       });
       const fieldMap={
         'name':['name','full name','fullname','contact name'],
-        'role':['role / title','role/title','role','title','job title','position'],
+        'role':['designation','role','title','job title','position'],
         'type':['type','entity type','contact type'],
         'website':['website','site','url','web','homepage'],
-        'company':['company','organization','org','employer'],
+        'company':['company','industry','industry / sector','sector','organization','org','employer'],
         'country':['country','location','region'],
         'linkedin':['linkedin','linkedin url','linkedin profile'],
         'facebook':['facebook','facebook url','facebook profile'],
@@ -9214,7 +9214,7 @@ function nhExportExcel(){
       return String(v);
     }
     // Contacts
-    var headers=['Type','Name','Role / Title','Company','Country','Website','Phone','Email','LinkedIn','Facebook','Tags','Notes','Extra Fields (JSON)','Added On'];
+    var headers=['Type','Name','Designation','Company','Country','Website','Phone','Email','LinkedIn','Facebook','Tags','Notes','Extra Fields (JSON)','Added On'];
     var csvRows=[headers.map(function(h){return '"'+h+'"';}).join(',')];
     _nhContacts.forEach(function(c){
       var tags=Array.isArray(c.tags)?c.tags.join('; '):cv(c.tags);
@@ -9387,7 +9387,7 @@ function nhCbToggleTypeFields(type){
   document.getElementById('nhCbFType').value=type;
   document.getElementById('nhCbFNameLabel').textContent=isCompany?'Company Name *':'Full Name *';
   document.getElementById('nhCbRoleField').style.display=isCompany?'none':'';
-  document.getElementById('nhCbFCompanyLabel').textContent=isCompany?'Industry / Sector':'Company';
+  document.getElementById('nhCbFCompanyLabel').textContent=isCompany?'Industry':'Company';
   document.getElementById('nhCbFLinkedinLabel').textContent='LinkedIn URL';
   document.getElementById('nhCbWebsiteField').style.display=isCompany?'':'none';
   document.getElementById('nhCbModalTitle').textContent=document.getElementById('nhCbModalTitle').textContent.replace(/Add (Contact|Person|Company)|Edit (Contact|Person|Company)/,
@@ -10558,8 +10558,8 @@ async function nhSmDone(){
         <select class="nh-search-scope" id="nhCbSearchScope" onchange="nhRenderContacts()">
           <option value="all">All Fields</option>
           <option value="name">Name</option>
-          <option value="role">Role / Title</option>
-          <option value="company">Company / Industry</option>
+          <option value="role">Designation</option>
+          <option value="company">Industry</option>
           <option value="country">Country</option>
           <option value="contact">Contact Info</option>
           <option value="tags">Tags</option>
@@ -10582,8 +10582,8 @@ async function nhSmDone(){
         <select class="nh-search-scope" id="nhCrmSearchScope" onchange="nhRenderCrm()">
           <option value="all">All Fields</option>
           <option value="name">Name</option>
-          <option value="role">Role / Title</option>
-          <option value="company">Company / Industry</option>
+          <option value="role">Designation</option>
+          <option value="company">Industry</option>
           <option value="country">Country</option>
           <option value="contact">Contact Info</option>
           <option value="tags">Tags</option>
@@ -10603,7 +10603,7 @@ async function nhSmDone(){
     <div class="nh-modal-title" id="nhCbModalTitle">Add Contact</div>
     <input type="hidden" id="nhCbFType" value="person">
     <div class="nh-field"><label id="nhCbFNameLabel">Full Name *</label><input id="nhCbFName" type="text" placeholder=""></div>
-    <div class="nh-field" id="nhCbRoleField"><label>Role / Title</label><input id="nhCbFRole" type="text" placeholder=""></div>
+    <div class="nh-field" id="nhCbRoleField"><label>Designation</label><input id="nhCbFRole" type="text" placeholder=""></div>
     <div class="nh-field" id="nhCbCompanyField"><label id="nhCbFCompanyLabel">Company</label><input id="nhCbFCompany" type="text" placeholder=""></div>
     <div class="nh-field"><label>Country</label><input id="nhCbFCountry" type="text" placeholder=""></div>
     <div class="nh-field" id="nhCbWebsiteField" style="display:none;"><label>Website</label><input id="nhCbFWebsite" type="text" placeholder=""></div>
@@ -10642,9 +10642,9 @@ async function nhSmDone(){
     <!-- Contact info — read only -->
     <div class="nh-crm-section-head" style="display:flex;align-items:center;justify-content:space-between;">Contact Info <button type="button" class="nh-sm-btn" style="font-size:10px;padding:2px 8px;margin:0;" onclick="nhCrmEditLinkedContact()">✏️ Edit Contact</button></div>
     <div class="nh-field"><span class="nh-view-label" id="nhCrmVNameLabel">Name</span><div class="nh-view-field" id="nhCrmVName">—</div></div>
-    <div class="nh-field" id="nhCrmVRoleRow"><span class="nh-view-label" id="nhCrmVRoleLabel">Role / Title</span><div class="nh-view-field" id="nhCrmVRole">—</div></div>
+    <div class="nh-field" id="nhCrmVRoleRow"><span class="nh-view-label" id="nhCrmVRoleLabel">Designation</span><div class="nh-view-field" id="nhCrmVRole">—</div></div>
     <div class="nh-field" id="nhCrmVCompanyRow"><span class="nh-view-label" id="nhCrmVCompanyLabel">Company</span><div class="nh-view-field" id="nhCrmVCompany">—</div></div>
-    <div class="nh-field" id="nhCrmVIndustryRow" style="display:none;"><span class="nh-view-label">Industry / Sector</span><div class="nh-view-field" id="nhCrmVIndustry">—</div></div>
+    <div class="nh-field" id="nhCrmVIndustryRow" style="display:none;"><span class="nh-view-label">Industry</span><div class="nh-view-field" id="nhCrmVIndustry">—</div></div>
     <div class="nh-field" id="nhCrmVCountryRow"><span class="nh-view-label">Country</span><div class="nh-view-field" id="nhCrmVCountry">—</div></div>
     <div class="nh-field"><span class="nh-view-label">Contact Links</span><div class="nh-links" id="nhCrmVLinks" style="margin:4px 0 0;"></div></div>
 

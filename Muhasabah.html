@@ -8743,7 +8743,7 @@ async function nhSyncDealsFromContacts(){
     if(!d.contactId)return;
     const c=_nhContacts.find(x=>x.id===d.contactId);
     if(!c)return;
-    const fields={contactName:c.name,company:c.company||'',linkedin:c.linkedin||'',facebook:c.facebook||'',phone:c.phone||'',email:c.email||'',website:c.website||''};
+    const fields={contactName:c.name,contactType:c.type||'person',company:c.company||'',country:c.country||'',role:c.role||'',linkedin:c.linkedin||'',facebook:c.facebook||'',phone:c.phone||'',email:c.email||'',website:c.website||''};
     Object.entries(fields).forEach(([k,v])=>{if(d[k]!==v){d[k]=v;dirty=true;}});
   });
   if(dirty)await nhSet(nhWsKey('deals'),_nhDeals);

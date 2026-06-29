@@ -8743,7 +8743,7 @@ async function nhSyncDealsFromContacts(){
     if(!d.contactId)return;
     const c=_nhContacts.find(x=>x.id===d.contactId);
     if(!c)return;
-    const fields={contactName:c.name,contactType:c.type||'person',company:c.company||'',country:c.country||'',role:c.role||'',linkedin:c.linkedin||'',facebook:c.facebook||'',phone:c.phone||'',email:c.email||'',website:c.website||''};
+    const fields={contactName:c.name,contactType:c.type||'person',company:c.company||'',country:c.country||'',role:c.role||'',linkedin:c.linkedin||'',facebook:c.facebook||'',phone:c.phone||'',email:c.email||'',website:c.website||'',extraFields:c.extraFields||[]};
     Object.entries(fields).forEach(([k,v])=>{if(d[k]!==v){d[k]=v;dirty=true;}});
   });
   if(dirty)await nhSet(nhWsKey('deals'),_nhDeals);
@@ -9596,6 +9596,7 @@ async function nhCbSave(){
       linkedDeal.phone=contact.phone||'';
       linkedDeal.email=contact.email||'';
       linkedDeal.website=contact.website||'';
+      linkedDeal.extraFields=contact.extraFields||[];
       await nhSet(nhWsKey('deals'),_nhDeals);
     }
   }
@@ -9611,7 +9612,7 @@ async function nhCbSave(){
         company:contact.company||'',country:contact.country||'',role:contact.role||'',
         website:contact.website||'',stageId:chosenStage,
         nextAction:'',nextActionNote:'',linkedin:contact.linkedin||'',facebook:contact.facebook||'',
-        phone:contact.phone||'',email:contact.email||'',
+        phone:contact.phone||'',email:contact.email||'',extraFields:contact.extraFields||[],
         createdAt:nhToday(),
       });
       await nhSet(nhWsKey('deals'),_nhDeals);
@@ -9906,7 +9907,7 @@ function nhCrmOpenModal(id,defaultStageId){
       facebook:(facebook&&facebook!=='—')?facebook:'',
       phone:(phone&&phone!=='—')?phone:'',
       email:(email&&email!=='—')?email:'',
-      extraFields:c?.extraFields||[],
+      extraFields:c?.extraFields||d?.extraFields||[],
     };
     const lh=nhLinkBtns(linkObj,c||linkObj);
     linksEl.innerHTML=lh||'<span style="font-size:11px;color:#a89060">No contact links saved</span>';

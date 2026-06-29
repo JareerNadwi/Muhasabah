@@ -8688,6 +8688,9 @@ let _nhContacts=[], _nhDeals=[], _nhStages=[], _nhNotes=[];
 let _nhDismissedTags=[];
 let _nhTab='contacts';
 let _nhCbEditId=null, _nhCrmEditId=null;
+let _nhSearchTimer=null;
+function nhDebouncedRenderContacts(){clearTimeout(_nhSearchTimer);_nhSearchTimer=setTimeout(()=>nhRenderContacts(true),120);}
+function nhDebouncedRenderCrm(){clearTimeout(_nhSearchTimer);_nhSearchTimer=setTimeout(nhRenderCrm,120);}
 let _nhCrmFil='all';
 let _nhOpenCols=new Set();
 let _nhSharedQ='';
@@ -8743,8 +8746,11 @@ async function nhSyncDealsFromContacts(){
     if(!d.contactId)return;
     const c=_nhContacts.find(x=>x.id===d.contactId);
     if(!c)return;
-    const fields={contactName:c.name,contactType:c.type||'person',company:c.company||'',country:c.country||'',role:c.role||'',linkedin:c.linkedin||'',facebook:c.facebook||'',phone:c.phone||'',email:c.email||'',website:c.website||'',extraFields:c.extraFields||[]};
-    Object.entries(fields).forEach(([k,v])=>{if(d[k]!==v){d[k]=v;dirty=true;}});
+    const scalar={contactName:c.name,contactType:c.type||'person',company:c.company||'',country:c.country||'',role:c.role||'',linkedin:c.linkedin||'',facebook:c.facebook||'',phone:c.phone||'',email:c.email||'',website:c.website||''};
+    Object.entries(scalar).forEach(([k,v])=>{if(d[k]!==v){d[k]=v;dirty=true;}});
+    const newExtra=c.extraFields||[];
+    const curExtra=d.extraFields||[];
+    if(JSON.stringify(curExtra)!==JSON.stringify(newExtra)){d.extraFields=newExtra;dirty=true;}
   });
   if(dirty)await nhSet(nhWsKey('deals'),_nhDeals);
 }
@@ -9295,7 +9301,10 @@ function nhShowTab(tab){
 }
 
 /* ══ CONTACT BOOK ══ */
-function nhRenderContacts(){
+let _nhCbPage=0;
+const _nhCbPageSize=50;
+function nhRenderContacts(resetPage){
+  if(resetPage||resetPage===undefined)_nhCbPage=0;
   const searchEl=document.getElementById('nhCbSearch');
   if(searchEl&&searchEl.value!==_nhSharedQ)_nhSharedQ=searchEl.value;
   const q=_nhSharedQ.toLowerCase();
@@ -9324,7 +9333,11 @@ function nhRenderContacts(){
   const el=document.getElementById('nhCbList');
   if(!el)return;
   if(!list.length){el.innerHTML='<div class="nh-empty">No contacts here. Add a person or company to get started.</div>';return;}
-  el.innerHTML=list.map(c=>{
+  const total=list.length;
+  const end=(_nhCbPage+1)*_nhCbPageSize;
+  const visible=list.slice(0,end);
+  const hasMore=end<total;
+  const renderCard=c=>{
     const links=nhLinkBtns(c,c);
     const tags=(c.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
     const deal=_nhDeals.find(d=>d.contactId===c.id);
@@ -9352,7 +9365,8 @@ function nhRenderContacts(){
       ${tags?`<div class="nh-tags">${tags}</div>`:''}
       <div class="nh-deal-bottom">${notesHtml}</div>
     </div>`;
-  }).join('');
+  };
+  el.innerHTML=visible.map(renderCard).join('')+(hasMore?`<div style="text-align:center;padding:16px 0;"><button class="nh-add-btn" onclick="_nhCbPage++;nhRenderContacts(false)">Load more (${total-end} remaining)</button></div>`:'');
 }
 
 /* ── Shared modal helper: open + reset scroll to top ── */
@@ -9802,7 +9816,7 @@ function nhRenderKanban(){
         </div>
       </div>
       <div class="nh-col-body">
-        ${sDeals.map(d=>nhDealHTML(d)).join('')}
+        ${isOpen?sDeals.map(d=>nhDealHTML(d)).join(''):''}
       </div>
     </div>`;
   });
@@ -9865,7 +9879,21 @@ function nhDealHTML(d,showStage){
 function nhToggleCol(id){
   if(_nhOpenCols.has(id))_nhOpenCols.delete(id);else _nhOpenCols.add(id);
   const col=document.getElementById('nhcol-'+id);
-  if(col)col.classList.toggle('open',_nhOpenCols.has(id));
+  if(!col)return;
+  const isOpen=_nhOpenCols.has(id);
+  col.classList.toggle('open',isOpen);
+  const body=col.querySelector('.nh-col-body');
+  if(body){
+    if(isOpen){
+      const deals=_nhDeals.filter(d=>d.stageId===id).sort((a,b)=>{
+        const ao=nhIsOverdue(a)?0:1,bo=nhIsOverdue(b)?0:1;
+        return ao-bo||(a.contactName||'').localeCompare(b.contactName||'');
+      });
+      body.innerHTML=deals.map(d=>nhDealHTML(d)).join('');
+    } else {
+      body.innerHTML='';
+    }
+  }
 }
 function nhToggleCalDate(ds){
   if(_nhCalOpenDates.has(ds))_nhCalOpenDates.delete(ds);else _nhCalOpenDates.add(ds);
@@ -10536,7 +10564,7 @@ async function nhSmDone(){
           <option value="contact">Contact Info</option>
           <option value="tags">Tags</option>
         </select>
-        <input class="nh-search" id="nhCbSearch" type="text" placeholder="" oninput="nhRenderContacts()">
+        <input class="nh-search" id="nhCbSearch" type="text" placeholder="" oninput="nhDebouncedRenderContacts()">
         <select class="nh-search-scope" id="nhCbTypeFilter" onchange="nhRenderContacts()" style="min-width:90px;">
           <option value="all">All</option>
           <option value="person">👤 People</option>
@@ -10560,7 +10588,7 @@ async function nhSmDone(){
           <option value="contact">Contact Info</option>
           <option value="tags">Tags</option>
         </select>
-        <input class="nh-search" id="nhCrmSearch" type="text" placeholder="" oninput="nhRenderCrm()">
+        <input class="nh-search" id="nhCrmSearch" type="text" placeholder="" oninput="nhDebouncedRenderCrm()">
       </div>
       <div class="nh-crm-filters" id="nhCrmFil"></div>
       <div class="nh-kanban" id="nhKanban"></div>

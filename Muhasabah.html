@@ -8733,6 +8733,19 @@ async function nhWsLoad(wsId){
     nhGet(nhWsKey('dismissed_tags')).then(v=>v||[]),
   ]);
   await nhSet(nhWsKey('stages'),_nhStages);
+  await nhSyncDealsFromContacts();
+}
+
+async function nhSyncDealsFromContacts(){
+  let dirty=false;
+  _nhDeals.forEach(d=>{
+    if(!d.contactId)return;
+    const c=_nhContacts.find(x=>x.id===d.contactId);
+    if(!c)return;
+    const fields={contactName:c.name,company:c.company||'',linkedin:c.linkedin||'',facebook:c.facebook||'',phone:c.phone||'',email:c.email||'',website:c.website||''};
+    Object.entries(fields).forEach(([k,v])=>{if(d[k]!==v){d[k]=v;dirty=true;}});
+  });
+  if(dirty)await nhSet(nhWsKey('deals'),_nhDeals);
 }
 
 function nhWsRenderBar(){
@@ -9484,7 +9497,22 @@ async function nhCbSave(){
         .map(f=>({type:f.type,value:f.value.trim(),label:(f.label||'').trim()}));
     })(),
   };
-  if(_nhCbEditId){const i=_nhContacts.findIndex(x=>x.id===_nhCbEditId);if(i>-1)_nhContacts[i]=contact;}
+  if(_nhCbEditId){
+    const i=_nhContacts.findIndex(x=>x.id===_nhCbEditId);
+    if(i>-1)_nhContacts[i]=contact;
+    // Sync denormalized fields on the linked deal so CRM pipeline stays in step
+    const linkedDeal=_nhDeals.find(d=>d.contactId===contact.id);
+    if(linkedDeal){
+      linkedDeal.contactName=contact.name;
+      linkedDeal.company=contact.company||'';
+      linkedDeal.linkedin=contact.linkedin||'';
+      linkedDeal.facebook=contact.facebook||'';
+      linkedDeal.phone=contact.phone||'';
+      linkedDeal.email=contact.email||'';
+      linkedDeal.website=contact.website||'';
+      await nhSet(nhWsKey('deals'),_nhDeals);
+    }
+  }
   else _nhContacts.push(contact);
   // Auto-create CRM deal in chosen stage if new contact
   if(!_nhCbEditId){
@@ -9783,6 +9811,15 @@ function nhCrmOpenModal(id,defaultStageId){
   nhOpenModalTop('nhCrmModalBg');
 }
 function nhCrmCloseModal(){document.getElementById('nhCrmModalBg').classList.remove('open');_nhCrmEditId=null;}
+function nhCrmEditLinkedContact(){
+  const deal=_nhDeals.find(d=>d.id===_nhCrmEditId);
+  if(!deal?.contactId){mhsbToast('No linked contact found.','warn');return;}
+  nhCrmCloseModal();
+  // Switch to contacts tab then open the edit modal
+  _nhTab='contacts';
+  nhRenderContacts();
+  nhCbEdit(deal.contactId);
+}
 function nhCrmNextActionDateChanged(){
   const dateVal=document.getElementById('nhCrmFNextAction')?.value;
   const noteEl=document.getElementById('nhCrmFNextActionNote');
@@ -10443,7 +10480,7 @@ async function nhSmDone(){
     <div class="nh-modal-title" id="nhCrmModalTitle">Deal</div>
 
     <!-- Contact info — read only -->
-    <div class="nh-crm-section-head">Contact Info (edit in Contact Book)</div>
+    <div class="nh-crm-section-head" style="display:flex;align-items:center;justify-content:space-between;">Contact Info <button type="button" class="nh-sm-btn" style="font-size:10px;padding:2px 8px;margin:0;" onclick="nhCrmEditLinkedContact()">✏️ Edit Contact</button></div>
     <div class="nh-field"><span class="nh-view-label">Name</span><div class="nh-view-field" id="nhCrmVName">—</div></div>
     <div class="nh-field"><span class="nh-view-label">Role / Title</span><div class="nh-view-field" id="nhCrmVRole">—</div></div>
     <div class="nh-field"><span class="nh-view-label" id="nhCrmVCompanyLabel">Company / Website</span><div class="nh-view-field" id="nhCrmVCompany">—</div></div>

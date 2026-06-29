@@ -9697,18 +9697,19 @@ function nhRenderKanban(){
     const sResults=[..._nhDeals].filter(d=>{
       const c=_nhContacts.find(x=>x.id===d.contactId);
       const name=(d.contactName||'').toLowerCase();
-      const role=(c?.role||'').toLowerCase();
-      const company=(d.company||c?.company||'').toLowerCase();
-      const country=(c?.country||'').toLowerCase();
+      const role=(c?.role||d.role||'').toLowerCase();
+      const company=(c?.company||d.company||'').toLowerCase();
+      const country=(c?.country||d.country||'').toLowerCase();
       const tags=(c?.tags||[]).join(' ').toLowerCase();
-      const contact_info=(c?.phone||'').toLowerCase()+(c?.email||'').toLowerCase()+(c?.linkedin||'').toLowerCase();
+      const extraVals=(c?.extraFields||d.extraFields||[]).map(f=>f.value).filter(Boolean).join(' ').toLowerCase();
+      const contact_info=[(c?.phone||d.phone||''),(c?.email||d.email||''),(c?.linkedin||d.linkedin||''),extraVals].join(' ').toLowerCase();
       if(_crmScope==='name') return name.includes(_crmQ);
       if(_crmScope==='role') return role.includes(_crmQ);
       if(_crmScope==='company') return company.includes(_crmQ);
       if(_crmScope==='country') return country.includes(_crmQ);
       if(_crmScope==='contact') return contact_info.includes(_crmQ);
       if(_crmScope==='tags') return tags.includes(_crmQ);
-      return name.includes(_crmQ)||role.includes(_crmQ)||company.includes(_crmQ)||country.includes(_crmQ)||tags.includes(_crmQ);
+      return name.includes(_crmQ)||role.includes(_crmQ)||company.includes(_crmQ)||country.includes(_crmQ)||tags.includes(_crmQ)||extraVals.includes(_crmQ);
     }).sort((a,b)=>(a.contactName||'').localeCompare(b.contactName||''));
     el.innerHTML=sResults.length?sResults.map(d=>nhDealHTML(d,true)).join(''):'<div class="nh-empty">No results found.</div>';
     return;
@@ -10530,7 +10531,7 @@ async function nhSmDone(){
           <option value="all">All Fields</option>
           <option value="name">Name</option>
           <option value="role">Role / Title</option>
-          <option value="company">Company</option>
+          <option value="company">Company / Industry</option>
           <option value="country">Country</option>
           <option value="contact">Contact Info</option>
           <option value="tags">Tags</option>
@@ -10554,7 +10555,7 @@ async function nhSmDone(){
           <option value="all">All Fields</option>
           <option value="name">Name</option>
           <option value="role">Role / Title</option>
-          <option value="company">Company</option>
+          <option value="company">Company / Industry</option>
           <option value="country">Country</option>
           <option value="contact">Contact Info</option>
           <option value="tags">Tags</option>

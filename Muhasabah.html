@@ -8690,6 +8690,7 @@ let _nhTab='contacts';
 let _nhCbEditId=null, _nhCrmEditId=null;
 let _nhCrmFil='all';
 let _nhOpenCols=new Set();
+let _nhSharedQ='';
 let _nhDragSrc=null;
 let _nhCbTags=[];
 let _nhCbExtraFields=[];
@@ -9002,6 +9003,9 @@ async function openContactBook(){
   if(!_nhWorkspaces.find(w=>w.id===_nhActiveWs)) _nhActiveWs=_nhWorkspaces[0].id;
   await nhWsLoad(_nhActiveWs);
   _nhTab = 'contacts';
+  _nhSharedQ='';
+  const cbS=document.getElementById('nhCbSearch');if(cbS)cbS.value='';
+  const crmS=document.getElementById('nhCrmSearch');if(crmS)crmS.value='';
   document.getElementById('netHubOverlay').classList.add('active');
   document.body.classList.add('overlay-open');
   reThemeIfLight();
@@ -9011,6 +9015,7 @@ async function openContactBook(){
 }
 function closeContactBook(){
   nhWsSave();
+  _nhSharedQ='';
   document.getElementById('netHubOverlay').classList.remove('active');
   document.body.classList.remove('overlay-open');
 }
@@ -9029,8 +9034,50 @@ async function nhHandleImportFile(e){
       const data=new Uint8Array(ev.target.result);
       const wb=XLSX.read(data,{type:'array'});
       const ws=wb.Sheets[wb.SheetNames[0]];
-      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
-      if(!rows.length){mhsbToast('No data found in the file.','warn');return;}
+      const allRows=XLSX.utils.sheet_to_json(ws,{defval:'',header:1});
+      // Split raw rows into sections: contacts / stages / deals
+      function splitSections(rawRows){
+        const sections={contacts:[],stages:[],deals:[]};
+        let cur='contacts';let header=null;
+        for(const row of rawRows){
+          const first=String(row[0]||'').trim();
+          if(first==='## STAGES ##'){cur='stages';header=null;continue;}
+          if(first==='## DEALS ##'){cur='deals';header=null;continue;}
+          if(!header){header=row.map(c=>String(c||'').trim().toLowerCase());continue;}
+          if(row.every(c=>c===''||c===undefined||c===null))continue;
+          const obj={};header.forEach((k,i)=>obj[k]=String(row[i]||'').trim());
+          sections[cur].push(obj);
+        }
+        return sections;
+      }
+      const sections=splitSections(allRows);
+      // Restore custom stages from export (skip fixed ones, they are always added by nhWsLoad)
+      if(sections.stages.length){
+        const fixedIds=new Set(['stage_contacts',_nhStages.find(s=>s.id&&s.name==='Closed')?.id,'stage_closed','stage_lost'].filter(Boolean));
+        const existingIds=new Set(_nhStages.map(s=>s.id));
+        // Insert custom stages before the terminal fixed ones at the end
+        const terminalIds=new Set(['stage_closed','stage_lost']);
+        const terminalStages=_nhStages.filter(s=>terminalIds.has(s.id));
+        const activeStages=_nhStages.filter(s=>!terminalIds.has(s.id));
+        sections.stages.forEach(sr=>{
+          const sid=sr['stage id']||sr['stage_id']||'';
+          if(!sid||existingIds.has(sid)||terminalIds.has(sid))return;
+          activeStages.push({id:sid,name:sr['stage name']||sr['stage_name']||sid,color:sr['color']||'#6a7080',fixed:false});
+          existingIds.add(sid);
+        });
+        _nhStages=[...activeStages,...terminalStages];
+        await nhSet(nhWsKey('stages'),_nhStages);
+      }
+      const rows=sections.contacts;
+      if(!rows.length&&!sections.deals.length){mhsbToast('No data found in the file.','warn');return;}
+      // Restore deal pipeline state if present (keyed by contact name for matching)
+      const dealMap={};
+      sections.deals.forEach(dr=>{
+        const cid=dr['contact id']||dr['contact_id']||'';
+        const stageId=dr['stage id']||dr['stage_id']||'stage_contacts';
+        const resolvedStage=_nhStages.find(s=>s.id===stageId)?stageId:'stage_contacts';
+        if(cid)dealMap[cid]={stageId:resolvedStage,nextAction:dr['next action date']||'',nextActionNote:dr['next action note']||'',dealId:dr['deal id']||dr['deal_id']||'',createdAt:dr['created at']||''};
+      });
       const fieldMap={
         'name':['name','full name','fullname','contact name'],
         'role':['role / title','role/title','role','title','job title','position'],
@@ -9113,12 +9160,18 @@ async function nhHandleImportFile(e){
         _nhContacts.push(contact);
         const existsDeal=_nhDeals.some(d=>d.contactId===contact.id);
         if(!existsDeal){
+          // Try to match deal data from export using original contact ID (stored in extraFields or by name match)
+          const origId=contact._importId||contact.id;
+          const dm=dealMap[origId]||null;
           _nhDeals.push({
-            id:nhId(),contactId:contact.id,contactName:contact.name,
-            company:contact.company||'',stageId:'stage_contacts',
-            nextAction:'',nextActionNote:'',linkedin:contact.linkedin||'',
-            facebook:contact.facebook||'',phone:contact.phone||'',email:contact.email||'',
-            createdAt:new Date().toISOString().slice(0,10),
+            id:(dm?.dealId&&!_nhDeals.find(d=>d.id===dm.dealId))?dm.dealId:nhId(),
+            contactId:contact.id,contactName:contact.name,
+            company:contact.company||'',
+            stageId:dm?.stageId||'stage_contacts',
+            nextAction:dm?.nextAction||'',nextActionNote:dm?.nextActionNote||'',
+            linkedin:contact.linkedin||'',facebook:contact.facebook||'',
+            phone:contact.phone||'',email:contact.email||'',
+            createdAt:dm?.createdAt||new Date().toISOString().slice(0,10),
           });
         }
         added++;
@@ -9137,13 +9190,14 @@ async function nhHandleImportFile(e){
 /* ── Export Contacts to Excel ── */
 function nhExportExcel(){
   try{
-    if(!_nhContacts.length){mhsbToast('No contacts to export.','warn');return;}
+    if(!_nhContacts.length&&!_nhDeals.length){mhsbToast('Nothing to export.','warn');return;}
     function cv(v){
       if(v===null||v===undefined)return '';
       if(Array.isArray(v))return v.join(', ');
       if(typeof v==='object')return '';
       return String(v);
     }
+    // Contacts
     var headers=['Type','Name','Role / Title','Company','Country','Website','Phone','Email','LinkedIn','Facebook','Tags','Notes','Extra Fields (JSON)','Added On'];
     var csvRows=[headers.map(function(h){return '"'+h+'"';}).join(',')];
     _nhContacts.forEach(function(c){
@@ -9153,15 +9207,31 @@ function nhExportExcel(){
       var row=[cv(c.type||'person'),cv(c.name),cv(c.role),cv(c.company),cv(c.country),cv(c.website),cv(c.phone),cv(c.email),cv(c.linkedin),cv(c.facebook),tags,cv(c.notes),extraJson,added];
       csvRows.push(row.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(','));
     });
+    // Stages
+    csvRows.push('');
+    csvRows.push('"## STAGES ##"');
+    csvRows.push(['"Stage ID"','"Stage Name"','"Color"','"Fixed"','"Order"'].join(','));
+    _nhStages.forEach(function(s,i){
+      csvRows.push([cv(s.id),cv(s.name),cv(s.color||''),cv(s.fixed?'true':'false'),cv(i)].map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(','));
+    });
+    // Deals
+    csvRows.push('');
+    csvRows.push('"## DEALS ##"');
+    csvRows.push(['"Deal ID"','"Contact ID"','"Contact Name"','"Company"','"Stage ID"','"Next Action Date"','"Next Action Note"','"Created At"'].join(','));
+    _nhDeals.forEach(function(d){
+      var row=[cv(d.id),cv(d.contactId),cv(d.contactName),cv(d.company),cv(d.stageId),cv(d.nextAction),cv(d.nextActionNote),cv(d.createdAt)];
+      csvRows.push(row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(','));
+    });
     var csv='\uFEFF'+csvRows.join('\r\n');
     var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
     var url=URL.createObjectURL(blob);
     var a=document.createElement('a');
     var date=new Date().toISOString().slice(0,10);
-    const wsName=(_nhWorkspaces.find(w=>w.id===_nhActiveWs)||{name:'Contacts'}).name.replace(/[^a-zA-Z0-9]/g,'_');a.href=url;a.download='Muhasabah_'+wsName+'_'+date+'.csv';
+    const wsName=(_nhWorkspaces.find(w=>w.id===_nhActiveWs)||{name:'Contacts'}).name.replace(/[^a-zA-Z0-9]/g,'_');
+    a.href=url;a.download='Muhasabah_'+wsName+'_'+date+'.csv';
     document.body.appendChild(a);a.click();
     setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
-    mhsbToast('✓ Contacts exported to Downloads','success');
+    mhsbToast('✓ Exported contacts, stages & deals','success');
   }catch(err){
     mhsbToast('Export failed: '+err.message,'error',5000);
   }
@@ -9202,13 +9272,22 @@ function nhShowTab(tab){
   _nhTab=tab;
   document.querySelectorAll('.nh-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
   document.querySelectorAll('.nh-section').forEach(s=>s.classList.toggle('on',s.dataset.sec===tab));
-  if(tab==='contacts') nhRenderContacts();
-  else { _nhCrmFil='all'; _nhOpenCols=new Set(); nhRenderCrm(); }
+  if(tab==='contacts'){
+    const el=document.getElementById('nhCbSearch');
+    if(el&&el.value!==_nhSharedQ)el.value=_nhSharedQ;
+    nhRenderContacts();
+  } else {
+    const el=document.getElementById('nhCrmSearch');
+    if(el&&el.value!==_nhSharedQ)el.value=_nhSharedQ;
+    _nhCrmFil='all'; _nhOpenCols=new Set(); nhRenderCrm();
+  }
 }
 
 /* ══ CONTACT BOOK ══ */
 function nhRenderContacts(){
-  const q=(document.getElementById('nhCbSearch')?.value||'').toLowerCase();
+  const searchEl=document.getElementById('nhCbSearch');
+  if(searchEl&&searchEl.value!==_nhSharedQ)_nhSharedQ=searchEl.value;
+  const q=_nhSharedQ.toLowerCase();
   const scope=document.getElementById('nhCbSearchScope')?.value||'all';
   const typeFilter=document.getElementById('nhCbTypeFilter')?.value||'all';
   let list=[..._nhContacts].sort((a,b)=>(a.name||'').localeCompare(b.name||''));
@@ -9239,6 +9318,9 @@ function nhRenderContacts(){
     const tags=(c.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
     const deal=_nhDeals.find(d=>d.contactId===c.id);
     const stageBadge=deal?`<span class="nh-stage-badge" style="border-color:${nhStageColor(deal.stageId)};color:${nhStageColor(deal.stageId)}"><span class="nh-col-dot" style="background:${nhStageColor(deal.stageId)}"></span>${nhStageName(deal.stageId)}</span>`:'';
+    const noteList=_nhNotes.filter(n=>n.entityId===c.id);
+    const recentNotes=noteList.slice(-5);
+    const notesHtml=`<div class="nh-deal-notes-stack">${recentNotes.length?recentNotes.map(n=>`<div class="nh-deal-note-row"><span class="nh-note-date">${n.date}</span>${n.text}</div>`).join(''):'<div class="nh-deal-note-empty">No notes yet</div>'}</div>`;
     return `<div class="nh-cb-card">
       <div class="nh-cb-card-top">
         <div style="display:flex;align-items:flex-start;flex:1;min-width:0;">
@@ -9257,6 +9339,7 @@ function nhRenderContacts(){
       ${stageBadge?`<div class="nh-tags">${stageBadge}</div>`:''}
       ${links?`<div class="nh-links">${links}</div>`:''}
       ${tags?`<div class="nh-tags">${tags}</div>`:''}
+      <div class="nh-deal-bottom">${notesHtml}</div>
     </div>`;
   }).join('');
 }
@@ -9585,7 +9668,9 @@ function nhSetFil(val){
 }
 
 function nhRenderKanban(){
-  const _crmQ=(document.getElementById('nhCrmSearch')?.value||'').toLowerCase().trim();
+  const searchEl=document.getElementById('nhCrmSearch');
+  if(searchEl&&searchEl.value!==_nhSharedQ)_nhSharedQ=searchEl.value;
+  const _crmQ=_nhSharedQ.toLowerCase().trim();
   const _crmScope=document.getElementById('nhCrmSearchScope')?.value||'all';
   const el=document.getElementById('nhKanban');
   if(!el)return;

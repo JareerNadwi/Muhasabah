@@ -9587,7 +9587,10 @@ async function nhCbSave(){
     const linkedDeal=_nhDeals.find(d=>d.contactId===contact.id);
     if(linkedDeal){
       linkedDeal.contactName=contact.name;
+      linkedDeal.contactType=contact.type||'person';
       linkedDeal.company=contact.company||'';
+      linkedDeal.country=contact.country||'';
+      linkedDeal.role=contact.role||'';
       linkedDeal.linkedin=contact.linkedin||'';
       linkedDeal.facebook=contact.facebook||'';
       linkedDeal.phone=contact.phone||'';
@@ -9604,7 +9607,9 @@ async function nhCbSave(){
       const chosenStage=document.getElementById('nhCbFStage')?.value||'stage_contacts';
       _nhDeals.push({
         id:nhId(),contactId:contact.id,contactName:contact.name,
-        company:contact.company||'',website:contact.website||'',stageId:chosenStage,
+        contactType:contact.type||'person',
+        company:contact.company||'',country:contact.country||'',role:contact.role||'',
+        website:contact.website||'',stageId:chosenStage,
         nextAction:'',nextActionNote:'',linkedin:contact.linkedin||'',facebook:contact.facebook||'',
         phone:contact.phone||'',email:contact.email||'',
         createdAt:nhToday(),
@@ -9804,8 +9809,9 @@ function nhDealHTML(d,showStage){
     else dateLabel=`<span class="nh-next-date">${d.nextAction}</span>`;
   }
   const contact=_nhContacts.find(x=>x.id===d.contactId);
-  const links=nhLinkBtns(d,contact);
-  const subLine=contact?.type==='company'?[contact?.company,contact?.country].filter(Boolean).join(' · '):[contact?.role,contact?.company||d.company,contact?.country].filter(Boolean).join(' · ');
+  const links=nhLinkBtns(d,contact||{type:d.contactType||'person'});
+  const contactType=contact?.type||d.contactType||'person';
+  const subLine=contactType==='company'?[contact?.company||d.company,contact?.country||d.country].filter(Boolean).join(' · '):[contact?.role||d.role,contact?.company||d.company,contact?.country||d.country].filter(Boolean).join(' · ');
   const tags=(contact?.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
   const noteList=_nhNotes.filter(n=>n.entityId===(d.contactId||d.id));
   const lastNote=noteList.length?noteList[noteList.length-1]:null;
@@ -9815,7 +9821,7 @@ function nhDealHTML(d,showStage){
     onpointerdown="nhDealPointerDown(event,'${d.id}')">
     <div class="nh-deal-top">
       <div>
-        <div class="nh-deal-name"><div class="nh-cb-avatar ${contact?.type==='company'?'company':'person'}" style="display:inline-flex;margin-right:8px;vertical-align:middle;">${contact?.type==='company'?'🏢':'👤'}</div>${d.contactName||'—'}</div>
+        <div class="nh-deal-name"><div class="nh-cb-avatar ${contactType==='company'?'company':'person'}" style="display:inline-flex;margin-right:8px;vertical-align:middle;">${contactType==='company'?'🏢':'👤'}</div>${d.contactName||'—'}</div>
         <div class="nh-deal-co">${subLine}</div>
       </div>
       <div class="nh-deal-right">
@@ -9868,21 +9874,41 @@ function nhCrmOpenModal(id,defaultStageId){
   document.getElementById('nhCrmModalTitle').textContent = name;
   // Populate read-only view fields
   const setV=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val||'—';};
-  const role = c?.type==='company'?'':(c?.role || '');
-  const roleLabel=document.querySelector('#nhCrmModalBg .nh-view-label');
-  const companyLabel=document.querySelectorAll('#nhCrmModalBg .nh-view-label')[1];
-  setV('nhCrmVName',(c?.type==='company'?'🏢 ':'')+name); setV('nhCrmVRole',role); setV('nhCrmVCompany',c?.type==='company'?(c?.website||'—'):company);
+  const isCompanyContact=(c?.type||d?.contactType||'person')==='company';
+  const country=c?.country||d?.country||'';
+  setV('nhCrmVName',name);
+  // Show/hide rows and populate per contact type
+  const roleRow=document.getElementById('nhCrmVRoleRow');
+  const companyRow=document.getElementById('nhCrmVCompanyRow');
+  const industryRow=document.getElementById('nhCrmVIndustryRow');
+  const countryRow=document.getElementById('nhCrmVCountryRow');
+  if(isCompanyContact){
+    if(roleRow) roleRow.style.display='none';
+    if(companyRow) companyRow.style.display='none';
+    if(industryRow) industryRow.style.display='';
+    setV('nhCrmVIndustry',c?.company||d?.company||'');
+  } else {
+    if(roleRow) roleRow.style.display='';
+    if(companyRow) companyRow.style.display='';
+    if(industryRow) industryRow.style.display='none';
+    setV('nhCrmVRole',c?.role||d?.role||'');
+    setV('nhCrmVCompany',company);
+  }
+  setV('nhCrmVCountry',country);
   // Build clickable link buttons
   const linksEl=document.getElementById('nhCrmVLinks');
   if(linksEl){
+    const website=c?.website||d?.website||'';
     const linkObj={
+      type:c?.type||d?.contactType||'person',
+      website,
       linkedin:(linkedin&&linkedin!=='—')?linkedin:'',
       facebook:(facebook&&facebook!=='—')?facebook:'',
       phone:(phone&&phone!=='—')?phone:'',
       email:(email&&email!=='—')?email:'',
       extraFields:c?.extraFields||[],
     };
-    const lh=nhLinkBtns(linkObj);
+    const lh=nhLinkBtns(linkObj,c||linkObj);
     linksEl.innerHTML=lh||'<span style="font-size:11px;color:#a89060">No contact links saved</span>';
   }
   // Populate editable pipeline fields
@@ -10574,9 +10600,11 @@ async function nhSmDone(){
 
     <!-- Contact info — read only -->
     <div class="nh-crm-section-head" style="display:flex;align-items:center;justify-content:space-between;">Contact Info <button type="button" class="nh-sm-btn" style="font-size:10px;padding:2px 8px;margin:0;" onclick="nhCrmEditLinkedContact()">✏️ Edit Contact</button></div>
-    <div class="nh-field"><span class="nh-view-label">Name</span><div class="nh-view-field" id="nhCrmVName">—</div></div>
-    <div class="nh-field"><span class="nh-view-label">Role / Title</span><div class="nh-view-field" id="nhCrmVRole">—</div></div>
-    <div class="nh-field"><span class="nh-view-label" id="nhCrmVCompanyLabel">Company / Website</span><div class="nh-view-field" id="nhCrmVCompany">—</div></div>
+    <div class="nh-field"><span class="nh-view-label" id="nhCrmVNameLabel">Name</span><div class="nh-view-field" id="nhCrmVName">—</div></div>
+    <div class="nh-field" id="nhCrmVRoleRow"><span class="nh-view-label" id="nhCrmVRoleLabel">Role / Title</span><div class="nh-view-field" id="nhCrmVRole">—</div></div>
+    <div class="nh-field" id="nhCrmVCompanyRow"><span class="nh-view-label" id="nhCrmVCompanyLabel">Company</span><div class="nh-view-field" id="nhCrmVCompany">—</div></div>
+    <div class="nh-field" id="nhCrmVIndustryRow" style="display:none;"><span class="nh-view-label">Industry / Sector</span><div class="nh-view-field" id="nhCrmVIndustry">—</div></div>
+    <div class="nh-field" id="nhCrmVCountryRow"><span class="nh-view-label">Country</span><div class="nh-view-field" id="nhCrmVCountry">—</div></div>
     <div class="nh-field"><span class="nh-view-label">Contact Links</span><div class="nh-links" id="nhCrmVLinks" style="margin:4px 0 0;"></div></div>
 
     <!-- Pipeline controls — editable -->

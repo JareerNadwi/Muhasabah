@@ -9038,9 +9038,31 @@ async function nhHandleImportFile(e){
   reader.onload=async function(ev){
     try{
       const data=new Uint8Array(ev.target.result);
-      const wb=XLSX.read(data,{type:'array'});
+      const wb=XLSX.read(data,{type:'array',cellDates:true});
       const ws=wb.Sheets[wb.SheetNames[0]];
-      const allRows=XLSX.utils.sheet_to_json(ws,{defval:'',header:1});
+      // Two passes, merged cell-by-cell — neither pass alone is safe:
+      // - rowsAsDates (raw:true, cellDates:true) correctly turns genuine date cells into real Date
+      //   objects, but coerces any other bare-numeric-looking text (a WhatsApp number, a local phone
+      //   format like "01712345678") into a JS number, silently stripping the leading zero or "+".
+      // - rowsAsText (raw:false) preserves that phone-style text exactly, but reformats real dates
+      //   into an ambiguous locale string ("7/15/26") instead of our ISO format.
+      // Using rowsAsDates' own type (instanceof Date) as the signal for "this cell is really a date"
+      // avoids guessing from string shape — SheetJS already did that detection during parsing.
+      const rowsAsDates=XLSX.utils.sheet_to_json(ws,{defval:'',header:1,raw:true});
+      const rowsAsText=XLSX.utils.sheet_to_json(ws,{defval:'',header:1,raw:false});
+      const allRows=rowsAsText.map((row,r)=>row.map((cell,c)=>{
+        const dv=rowsAsDates[r]&&rowsAsDates[r][c];
+        return (dv instanceof Date)?dv:cell;
+      }));
+      function nhCellToStr(v){
+        if(v instanceof Date){
+          // UTC getters, not local — SheetJS parses date-only cells as UTC midnight, and local
+          // getters here could shift the date by a day depending on the browser's timezone.
+          const y=v.getUTCFullYear(),m=String(v.getUTCMonth()+1).padStart(2,'0'),d=String(v.getUTCDate()).padStart(2,'0');
+          return `${y}-${m}-${d}`;
+        }
+        return String(v||'').trim();
+      }
       // Split raw rows into sections: contacts / stages / deals
       function splitSections(rawRows){
         const sections={contacts:[],stages:[],deals:[]};
@@ -9051,7 +9073,7 @@ async function nhHandleImportFile(e){
           if(first==='## DEALS ##'){cur='deals';header=null;continue;}
           if(!header){header=row.map(c=>String(c||'').trim().toLowerCase());continue;}
           if(row.every(c=>c===''||c===undefined||c===null))continue;
-          const obj={};header.forEach((k,i)=>obj[k]=String(row[i]||'').trim());
+          const obj={};header.forEach((k,i)=>obj[k]=nhCellToStr(row[i]));
           sections[cur].push(obj);
         }
         return sections;
@@ -9076,16 +9098,14 @@ async function nhHandleImportFile(e){
       }
       const rows=sections.contacts;
       if(!rows.length&&!sections.deals.length){mhsbToast('No data found in the file.','warn');return;}
-      // Restore deal pipeline state if present (keyed by contact name for matching)
+      // Restore deal pipeline state if present, keyed by Contact ID (matched against the Contacts
+      // section import below, which reuses that same ID when it's free).
       const dealMap={};
       sections.deals.forEach(dr=>{
         const cid=dr['contact id']||dr['contact_id']||'';
         const stageId=dr['stage id']||dr['stage_id']||'stage_contacts';
         const resolvedStage=_nhStages.find(s=>s.id===stageId)?stageId:'stage_contacts';
-        const extraRaw=dr['extra fields (json)']||dr['extra fields']||dr['extrafields']||'';
-        let extraFields=[];
-        if(extraRaw){try{const p=JSON.parse(extraRaw);if(Array.isArray(p))extraFields=p;}catch(e){}}
-        if(cid)dealMap[cid]={stageId:resolvedStage,nextAction:dr['next action date']||'',nextActionNote:dr['next action note']||'',dealId:dr['deal id']||dr['deal_id']||'',createdAt:dr['created at']||'',contactType:dr['contact type']||dr['contacttype']||'',country:dr['country']||'',role:dr['role']||'',website:dr['website']||'',phone:dr['phone']||'',email:dr['email']||'',linkedin:dr['linkedin']||'',facebook:dr['facebook']||'',extraFields};
+        if(cid)dealMap[cid]={stageId:resolvedStage,nextAction:dr['next action date']||'',nextActionNote:dr['next action note']||'',dealId:dr['deal id']||dr['deal_id']||'',createdAt:dr['created at']||''};
       });
       const fieldMap={
         'name':['name','full name','fullname','contact name'],
@@ -9100,8 +9120,64 @@ async function nhHandleImportFile(e){
         'email':['email','email address','e-mail'],
         'tags':['tags','tag','labels','category'],
         'notes':['notes','note','remarks','comment'],
-        'extraFields':['extra fields (json)','extra fields','extrafields','extras']
       };
+      // Rebuilds a contact's extraFields array from a row: one dedicated column per preset type
+      // (comma-separated if a type has multiple entries) plus the bundled "Custom Fields" column
+      // (format "Label: v1, v2; Label2: v3"). Falls back to the old single-JSON-column format
+      // for files exported before dedicated columns existed.
+      function nhParseExtraFieldsFromRow(row){
+        const legacyRaw=row['extra fields (json)']||row['extra fields']||row['extrafields']||row['extras']||'';
+        if(legacyRaw){
+          try{const p=JSON.parse(legacyRaw);if(Array.isArray(p)){
+            const labelToType={'whatsapp':'whatsapp','telegram':'telegram','botim':'botim','imo':'imo','viber':'viber','wechat':'wechat','signal':'signal','line':'line','linkedin':'linkedin','facebook':'facebook','instagram':'instagram','x':'x','x (twitter)':'x','twitter':'x','tiktok':'tiktok','youtube':'youtube','pinterest':'pinterest','snapchat':'snapchat','reddit':'reddit','threads':'threads','linktree':'linktree','gmb':'gmb','google my business':'gmb','website':'website','rating':'rating','reviews':'reviews','followers':'followers'};
+            return p.map(f=>{
+              if(f.type==='custom'&&f.label){const mapped=labelToType[(f.label||'').toLowerCase().trim()];if(mapped)return{...f,type:mapped};}
+              return f;
+            });
+          }}catch(e){}
+        }
+        const result=[];
+        nhExtraExportCols().forEach(col=>{
+          const cellVal=String(row[col.header.toLowerCase()]||'').trim();
+          if(cellVal)cellVal.split(',').map(v=>v.trim()).filter(Boolean).forEach(v=>result.push({type:col.type,value:v,label:''}));
+        });
+        const customCell=String(row['custom fields']||'').trim();
+        if(customCell){
+          customCell.split(';').map(s=>s.trim()).filter(Boolean).forEach(group=>{
+            const idx=group.indexOf(':');
+            if(idx===-1)return;
+            const label=group.slice(0,idx).trim();
+            const valsStr=group.slice(idx+1).trim();
+            valsStr.split(',').map(v=>v.trim()).filter(Boolean).forEach(v=>result.push({type:'custom',value:v,label}));
+          });
+        }
+        return result;
+      }
+      // Parses the real per-contact notes (the CRM sticky-notes system, not the old dead contact.notes field).
+      // Recognizes our own export bundle "YYYY-MM-DD: text; YYYY-MM-DD: text" by anchoring on date patterns
+      // rather than blindly splitting on ';', so semicolons inside note text don't corrupt the split.
+      // If the column doesn't match that shape (e.g. a plain notes column from someone else's spreadsheet),
+      // the whole cell becomes a single note dated today rather than being silently dropped.
+      function nhParseNotesFromRow(row){
+        let raw='';
+        for(const k of Object.keys(row)){
+          if(['notes','note','remarks','comment'].includes(k.toLowerCase().trim())){raw=String(row[k]||'').trim();break;}
+        }
+        if(!raw)return [];
+        const dateAnchor=/(\d{4}-\d{2}-\d{2}):\s*/g;
+        const matches=[...raw.matchAll(dateAnchor)];
+        if(matches.length){
+          const entries=[];
+          for(let i=0;i<matches.length;i++){
+            const start=matches[i].index+matches[i][0].length;
+            const end=i+1<matches.length?matches[i+1].index:raw.length;
+            const text=raw.slice(start,end).replace(/;\s*$/,'').trim();
+            if(text)entries.push({date:matches[i][1],text});
+          }
+          return entries;
+        }
+        return [{date:nhToday(),text:raw}];
+      }
       function mapField(row,targets){
         for(const k of Object.keys(row)){
           if(targets.includes(k.toLowerCase().trim()))return String(row[k]||'').trim();
@@ -9121,7 +9197,45 @@ async function nhHandleImportFile(e){
         }
         return '';
       }
-      let added=0,skipped=0;
+      let added=0,merged=0,skipped=0,notesAdded=0;
+      function nhAppendNotesFromRow(row,contactId){
+        let addedHere=0;
+        nhParseNotesFromRow(row).forEach(nt=>{
+          const dup=_nhNotes.some(n=>n.entityId===contactId&&n.date===nt.date&&n.text===nt.text);
+          if(!dup){_nhNotes.push({id:nhId(),entityId:contactId,date:nt.date,text:nt.text});notesAdded++;addedHere++;}
+        });
+        return addedHere;
+      }
+      // Fills in blanks on an existing contact from a matched import row — never overwrites a field
+      // that already has a value. Adds new tags and new (type/label/value) extra-field entries that
+      // aren't already present. Returns true if anything actually changed.
+      function nhMergeIntoExistingContact(row,existing){
+        let changed=false;
+        const fillIfEmpty=(key,val)=>{if(val&&!String(existing[key]||'').trim()){existing[key]=val;changed=true;}};
+        fillIfEmpty('role',mapField(row,fieldMap.role));
+        fillIfEmpty('company',mapField(row,fieldMap.company));
+        fillIfEmpty('country',mapField(row,fieldMap.country));
+        fillIfEmpty('website',mapField(row,fieldMap.website));
+        fillIfEmpty('phone',mapPhone(row,fieldMap.phone));
+        fillIfEmpty('email',mapField(row,fieldMap.email));
+        fillIfEmpty('linkedin',mapField(row,fieldMap.linkedin));
+        fillIfEmpty('facebook',mapField(row,fieldMap.facebook));
+        const tagsRaw=mapField(row,fieldMap.tags);
+        const importTags=tagsRaw?tagsRaw.split(/[,;|]+/).map(t=>t.trim()).filter(Boolean):[];
+        if(importTags.length){
+          existing.tags=existing.tags||[];
+          importTags.forEach(t=>{if(!existing.tags.some(et=>et.toLowerCase()===t.toLowerCase())){existing.tags.push(t);changed=true;}});
+        }
+        const importExtra=nhParseExtraFieldsFromRow(row);
+        if(importExtra.length){
+          existing.extraFields=existing.extraFields||[];
+          importExtra.forEach(f=>{
+            const dup=existing.extraFields.some(ef=>ef.type===f.type&&(ef.label||'')===(f.label||'')&&ef.value.trim().toLowerCase()===f.value.trim().toLowerCase());
+            if(!dup){existing.extraFields.push(f);changed=true;}
+          });
+        }
+        return changed;
+      }
       for(const row of rows){
         const name=mapField(row,fieldMap.name);
         if(!name){skipped++;continue;}
@@ -9136,11 +9250,41 @@ async function nhHandleImportFile(e){
           if(rowPhone&&c.phone&&c.phone.replace(/\s+/g,'')===rowPhone)return true;
           return false;
         });
-        if(existing){skipped++;continue;}
+        if(existing){
+          // Guard: only merge/append notes if the row's type actually matches the existing contact.
+          // The dedup match above doesn't check type, so a person and a company could in theory share
+          // a phone/email — merging across that mismatch would corrupt the wrong record.
+          const rowType=mapField(row,fieldMap.type)||'person';
+          if(existing.type!==rowType){skipped++;continue;}
+          const fieldsChanged=nhMergeIntoExistingContact(row,existing);
+          const rowNotesAdded=nhAppendNotesFromRow(row,existing.id);
+          if(fieldsChanged){
+            const linkedDeal=_nhDeals.find(d=>d.contactId===existing.id);
+            if(linkedDeal){
+              linkedDeal.contactName=existing.name;
+              linkedDeal.company=existing.company||'';
+              linkedDeal.country=existing.country||'';
+              linkedDeal.role=existing.role||'';
+              linkedDeal.linkedin=existing.linkedin||'';
+              linkedDeal.facebook=existing.facebook||'';
+              linkedDeal.phone=existing.phone||'';
+              linkedDeal.email=existing.email||'';
+              linkedDeal.website=existing.website||'';
+              linkedDeal.extraFields=existing.extraFields||[];
+            }
+          }
+          if(fieldsChanged||rowNotesAdded>0)merged++;else skipped++;
+          continue;
+        }
         const tagsRaw=mapField(row,fieldMap.tags);
         const tags=tagsRaw?tagsRaw.split(/[,;|]+/).map(t=>t.trim()).filter(Boolean):[];
+        // Reuse the file's own Contact ID if present and free — this is what lets the Deals section
+        // below find this contact's saved stage/next-action instead of falling back to defaults.
+        // Files without a Contact ID column (e.g. an external spreadsheet) just get a fresh one, same as before.
+        const fileContactId=row['contact id']||row['contact_id']||'';
+        const idFree=fileContactId&&!_nhContacts.some(c=>c.id===fileContactId);
         const contact={
-          id:'nh_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+          id:idFree?fileContactId:('nh_'+Date.now()+'_'+Math.random().toString(36).slice(2,7)),
           name,
           role:mapField(row,fieldMap.role),
           type:mapField(row,fieldMap.type)||'person',
@@ -9152,39 +9296,30 @@ async function nhHandleImportFile(e){
           phone:mapPhone(row,fieldMap.phone),
           email:mapField(row,fieldMap.email),
           tags,
-          notes:mapField(row,fieldMap.notes),
-          extraFields:(()=>{
-            const raw=mapField(row,fieldMap.extraFields);
-            if(raw){try{const p=JSON.parse(raw);if(Array.isArray(p)){
-              const labelToType={'whatsapp':'whatsapp','telegram':'telegram','botim':'botim','imo':'imo','viber':'viber','wechat':'wechat','signal':'signal','line':'line','linkedin':'linkedin','facebook':'facebook','instagram':'instagram','x':'x','x (twitter)':'x','twitter':'x','tiktok':'tiktok','youtube':'youtube','pinterest':'pinterest','snapchat':'snapchat','reddit':'reddit','threads':'threads','linktree':'linktree','gmb':'gmb','google my business':'gmb','website':'website','rating':'rating','reviews':'reviews','followers':'followers'};
-              return p.map(f=>{
-                if(f.type==='custom'&&f.label){const mapped=labelToType[(f.label||'').toLowerCase().trim()];if(mapped)return{...f,type:mapped};}
-                return f;
-              });
-            }}catch(e){}}
-            return [];
-          })(),
+          extraFields:nhParseExtraFieldsFromRow(row),
           createdAt:new Date().toISOString()
         };
         _nhContacts.push(contact);
+        nhAppendNotesFromRow(row,contact.id);
         const existsDeal=_nhDeals.some(d=>d.contactId===contact.id);
         if(!existsDeal){
-          // Try to match deal data from export using original contact ID (stored in extraFields or by name match)
-          const origId=contact._importId||contact.id;
-          const dm=dealMap[origId]||null;
+          // dealMap is keyed by the Contact ID from the Deals section of the same export — matches
+          // when we reused the file's own ID above, and simply misses (falls to defaults) for rows
+          // from files that never had one, which is the correct, safe outcome for those.
+          const dm=dealMap[contact.id]||null;
           _nhDeals.push({
             id:(dm?.dealId&&!_nhDeals.find(d=>d.id===dm.dealId))?dm.dealId:nhId(),
             contactId:contact.id,contactName:contact.name,
-            contactType:contact.type||dm?.contactType||'person',
+            contactType:contact.type||'person',
             company:contact.company||'',
-            country:contact.country||dm?.country||'',
-            role:contact.role||dm?.role||'',
-            website:contact.website||dm?.website||'',
-            linkedin:contact.linkedin||dm?.linkedin||'',
-            facebook:contact.facebook||dm?.facebook||'',
-            phone:contact.phone||dm?.phone||'',
-            email:contact.email||dm?.email||'',
-            extraFields:contact.extraFields?.length?contact.extraFields:(dm?.extraFields||[]),
+            country:contact.country||'',
+            role:contact.role||'',
+            website:contact.website||'',
+            linkedin:contact.linkedin||'',
+            facebook:contact.facebook||'',
+            phone:contact.phone||'',
+            email:contact.email||'',
+            extraFields:contact.extraFields||[],
             stageId:dm?.stageId||'stage_contacts',
             nextAction:dm?.nextAction||'',nextActionNote:dm?.nextActionNote||'',
             createdAt:dm?.createdAt||new Date().toISOString().slice(0,10),
@@ -9194,8 +9329,9 @@ async function nhHandleImportFile(e){
       }
       await nhSet(nhWsKey('deals'),_nhDeals);
       await nhSet(nhWsKey('contacts'),_nhContacts);
-      nhRenderContacts();
-      mhsbToast(`✓ Import complete — Added: ${added}  Skipped: ${skipped}`,'success',4500);
+      await nhSet(nhWsKey('notes'),_nhNotes);
+      nhRenderContacts();nhRenderCrm();
+      mhsbToast(`✓ Import complete — Added: ${added}  Updated: ${merged}  No changes: ${skipped}  Notes: ${notesAdded}`,'success',5000);
     }catch(err){
       mhsbToast('❌ Failed to read file. Make sure it is a valid .xlsx or .csv file.\n'+err.message,'error',6000);
     }
@@ -9214,13 +9350,30 @@ function nhExportExcel(){
       return String(v);
     }
     // Contacts
-    var headers=['Type','Name','Designation','Company','Country','Website','Phone','Email','LinkedIn','Facebook','Tags','Notes','Extra Fields (JSON)','Added On'];
+    var extraCols=nhExtraExportCols();
+    var headers=['Contact ID','Type','Name','Designation','Company','Country','Website','Phone','Email','LinkedIn','Facebook','Tags','Notes','Added On']
+      .concat(extraCols.map(function(c){return c.header;}))
+      .concat(['Custom Fields']);
     var csvRows=[headers.map(function(h){return '"'+h+'"';}).join(',')];
     _nhContacts.forEach(function(c){
       var tags=Array.isArray(c.tags)?c.tags.join('; '):cv(c.tags);
       var added=c.createdAt?new Date(c.createdAt).toLocaleDateString():'';
-      var extraJson=(c.extraFields&&c.extraFields.length)?JSON.stringify(c.extraFields):'';
-      var row=[cv(c.type||'person'),cv(c.name),cv(c.role),cv(c.company),cv(c.country),cv(c.website),cv(c.phone),cv(c.email),cv(c.linkedin),cv(c.facebook),tags,cv(c.notes),extraJson,added];
+      var ef=c.extraFields||[];
+      // One dedicated column per preset type — multiple entries of the same type join with ", " in that cell
+      var extraVals=extraCols.map(function(col){
+        var vals=ef.filter(function(f){return f.type===col.type&&(f.value||'').trim();}).map(function(f){return f.value.trim();});
+        return vals.join(', ');
+      });
+      // Custom (user-labeled) fields bundle into one column: "Label: v1, v2; Label2: v3"
+      var customByLabel={};
+      ef.filter(function(f){return f.type==='custom'&&(f.value||'').trim();}).forEach(function(f){
+        var lbl=(f.label||'Custom').trim()||'Custom';
+        (customByLabel[lbl]=customByLabel[lbl]||[]).push(f.value.trim());
+      });
+      var customStr=Object.keys(customByLabel).map(function(lbl){return lbl+': '+customByLabel[lbl].join(', ');}).join('; ');
+      var notesStr=nhNotesFor(c.id).map(function(n){return n.date+': '+n.text;}).join('; ');
+      var row=[cv(c.id),cv(c.type||'person'),cv(c.name),cv(c.role),cv(c.company),cv(c.country),cv(c.website),cv(c.phone),cv(c.email),cv(c.linkedin),cv(c.facebook),tags,notesStr,added]
+        .concat(extraVals).concat([customStr]);
       csvRows.push(row.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(','));
     });
     // Stages
@@ -9233,10 +9386,9 @@ function nhExportExcel(){
     // Deals
     csvRows.push('');
     csvRows.push('"## DEALS ##"');
-    csvRows.push(['"Deal ID"','"Contact ID"','"Contact Name"','"Contact Type"','"Company"','"Country"','"Role"','"Website"','"Phone"','"Email"','"LinkedIn"','"Facebook"','"Extra Fields (JSON)"','"Stage ID"','"Next Action Date"','"Next Action Note"','"Created At"'].join(','));
+    csvRows.push(['"Deal ID"','"Contact ID"','"Stage ID"','"Next Action Date"','"Next Action Note"','"Created At"'].join(','));
     _nhDeals.forEach(function(d){
-      var extraJson=(d.extraFields&&d.extraFields.length)?JSON.stringify(d.extraFields):'';
-      var row=[cv(d.id),cv(d.contactId),cv(d.contactName),cv(d.contactType||'person'),cv(d.company),cv(d.country),cv(d.role),cv(d.website),cv(d.phone),cv(d.email),cv(d.linkedin),cv(d.facebook),extraJson,cv(d.stageId),cv(d.nextAction),cv(d.nextActionNote),cv(d.createdAt)];
+      var row=[cv(d.id),cv(d.contactId),cv(d.stageId),cv(d.nextAction),cv(d.nextActionNote),cv(d.createdAt)];
       csvRows.push(row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(','));
     });
     var csv='\uFEFF'+csvRows.join('\r\n');
@@ -9342,7 +9494,7 @@ function nhRenderContacts(resetPage){
     const tags=(c.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
     const deal=_nhDeals.find(d=>d.contactId===c.id);
     const stageBadge=deal?`<span class="nh-stage-badge" style="border-color:${nhStageColor(deal.stageId)};color:${nhStageColor(deal.stageId)}"><span class="nh-col-dot" style="background:${nhStageColor(deal.stageId)}"></span>${nhStageName(deal.stageId)}</span>`:'';
-    const noteList=_nhNotes.filter(n=>n.entityId===c.id);
+    const noteList=nhNotesFor(c.id);
     const recentNotes=noteList.slice(-5);
     const notesHtml=`<div class="nh-deal-notes-stack">${recentNotes.length?recentNotes.map(n=>`<div class="nh-deal-note-row"><span class="nh-note-date">${n.date}</span>${n.text}</div>`).join(''):'<div class="nh-deal-note-empty">No notes yet</div>'}</div>`;
     return `<div class="nh-cb-card">
@@ -9454,6 +9606,9 @@ const NH_PRESET_FIELDS=[
   {type:'custom',    label:'Custom',     fav:'',                                              ph:''},
 ];
 function nhPresetByType(t){return NH_PRESET_FIELDS.find(p=>p.type===t)||NH_PRESET_FIELDS[NH_PRESET_FIELDS.length-1];}
+// Dedicated CSV columns for every preset extra-field type (all except 'custom', which is bundled separately).
+// Prefixed "Extra: " so they never collide with the core Phone/Email/LinkedIn/Facebook/Website columns.
+function nhExtraExportCols(){return NH_PRESET_FIELDS.filter(p=>p.type!=='custom').map(p=>({type:p.type,header:'Extra: '+p.label}));}
 function nhFavImg(fav){return fav?`<img src="${fav}" width="13" height="13" style="vertical-align:middle;border-radius:2px;flex-shrink:0;" onerror="this.style.display='none'">`:'';}
 
 function nhRenderExtraFields(){
@@ -9644,7 +9799,7 @@ async function nhCbSave(){
     }
   }
   await nhSet(nhWsKey('contacts'),_nhContacts);
-  nhCbCloseModal();nhRenderContacts();nhRenderToday();
+  nhCbCloseModal();nhRenderContacts();nhRenderToday();nhRenderCrm();
 }
 async function nhCbDelete(id,evt){
   if(!(evt&&evt.shiftKey)){
@@ -9660,7 +9815,7 @@ async function nhCbDelete(id,evt){
     nhSet(nhWsKey('deals'),_nhDeals),
     nhSet(nhWsKey('notes'),_nhNotes),
   ]);
-  nhRenderContacts();nhRenderToday();
+  nhRenderContacts();nhRenderToday();nhRenderCrm();
 }
 
 /* ══ CRM ══ */
@@ -9840,7 +9995,7 @@ function nhDealHTML(d,showStage){
   const contactType=contact?.type||d.contactType||'person';
   const subLine=contactType==='company'?[contact?.company||d.company,contact?.country||d.country].filter(Boolean).join(' · '):[contact?.role||d.role,contact?.company||d.company,contact?.country||d.country].filter(Boolean).join(' · ');
   const tags=(contact?.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
-  const noteList=_nhNotes.filter(n=>n.entityId===(d.contactId||d.id));
+  const noteList=nhNotesFor(d.contactId||d.id);
   const lastNote=noteList.length?noteList[noteList.length-1]:null;
   const recentNotes=noteList.slice(-5);
   const stageBadge=showStage?`<span class="nh-stage-badge" style="border-color:${nhStageColor(d.stageId)};color:${nhStageColor(d.stageId)}"><span class="nh-col-dot" style="background:${nhStageColor(d.stageId)}"></span>${nhStageName(d.stageId)}</span>`:'';
@@ -10118,6 +10273,10 @@ async function nhCrmDelete(id){
 
 /* ══ SHARED NOTES ══ */
 let _nhNotesEntityId=null;
+// Returns an entity's notes sorted oldest-to-newest by date. Sort is stable, so multiple notes on the
+// same date keep their original relative order. Used everywhere notes are displayed or exported so
+// imported notes (which can predate what's already there) don't show out of order.
+function nhNotesFor(entityId){return _nhNotes.filter(n=>n.entityId===entityId).sort((a,b)=>a.date.localeCompare(b.date));}
 function nhOpenNotes(entityId,entityName){
   _nhNotesEntityId=entityId;
   document.getElementById('nhNotesTitle').textContent='📝 Notes — '+entityName;
@@ -10137,7 +10296,7 @@ function nhCloseNotes(){document.getElementById('nhNotesBg').classList.remove('o
 function nhRenderNotesList(){
   const el=document.getElementById('nhNotesList');
   if(!el)return;
-  const notes=_nhNotes.filter(n=>n.entityId===_nhNotesEntityId);
+  const notes=nhNotesFor(_nhNotesEntityId);
   if(!notes.length){el.innerHTML='<div style="font-size:11px;color:#a89060;font-style:italic;padding:8px 0">No notes yet. Start logging below.</div>';return;}
   el.innerHTML=notes.map(n=>`<div class="nh-note-entry" id="nhe-${n.id}">
     <div class="nh-note-entry-top">

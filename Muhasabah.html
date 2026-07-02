@@ -10292,7 +10292,14 @@ function nhOpenNotes(entityId,entityName){
     });
   });
 }
-function nhCloseNotes(){document.getElementById('nhNotesBg').classList.remove('open');_nhNotesEntityId=null;}
+function nhCloseNotes(){
+  document.getElementById('nhNotesBg').classList.remove('open');
+  _nhNotesEntityId=null;
+  // Safety net, same as Stage Manager's "Done" button — guarantees the card preview behind this
+  // modal is correct on close even if some future note function forgets to render after saving.
+  if(_nhTab==='contacts') nhRenderContacts();
+  else nhRenderCrm();
+}
 function nhRenderNotesList(){
   const el=document.getElementById('nhNotesList');
   if(!el)return;
@@ -10342,6 +10349,9 @@ async function nhSaveNoteEdit(nid){
   note.text=text;
   await nhSet(nhWsKey('notes'),_nhNotes);
   nhRenderNotesList();
+  // Refresh note previews in the background — same as nhDeleteNote/nhAddNote below
+  if(_nhTab==='contacts') nhRenderContacts();
+  else nhRenderCrm();
 }
 async function nhAddNote(){
   const ta=document.getElementById('nhNotesInput');
@@ -10469,7 +10479,7 @@ async function nhRenameStage(id,newName){
   if(trimmed===s.name)return;
   s.name=trimmed;
   await nhSet(nhWsKey('stages'),_nhStages);
-  nhRenderCrmFilters();
+  nhRenderCrm();
 }
 
 /* Drag-and-drop for stage reorder */
@@ -10503,6 +10513,7 @@ async function nhDrop(e,targetId){
   _nhStages.splice(ti,0,src);
   await nhSet(nhWsKey('stages'),_nhStages);
   nhRenderSmList();
+  nhRenderCrm();
 }
 function nhDragEnd(){
   _nhDragSrc=null;
@@ -10518,6 +10529,7 @@ async function nhAddStage(){
   await nhSet(nhWsKey('stages'),_nhStages);
   input.value='';
   nhRenderSmList();
+  nhRenderCrm();
 }
 async function nhDelStage(id){
   const s=_nhStages.find(x=>x.id===id);
@@ -10529,7 +10541,7 @@ async function nhDelStage(id){
   _nhStages=_nhStages.filter(s=>s.id!==id);
   await Promise.all([nhSet(nhWsKey('stages'),_nhStages),nhSet(nhWsKey('deals'),_nhDeals)]);
   nhRenderSmList();
-  nhRenderCrmFilters();
+  nhRenderCrm();
 }
 /* ── Deal drag-and-drop (mouse + touch) ── */
 let _nhDragDealId=null;

@@ -216,6 +216,7 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-sf.ov-pill.on{border-color:var(--red);background:#1a1610;color:var(--red);}
 .nh-manage-btn{flex:0 0 auto;background:#1a1610;border:1px solid #2a2010;color:#a89060;padding:5px 12px;border-radius:20px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;margin-left:auto;white-space:nowrap;}
 .nh-manage-btn:hover{border-color:var(--gold-dim);color:#f0e4c0;}
+.nh-manage-btn.on{border-color:var(--gold);color:var(--gold);background:#2a2010;}
 
 /* Kanban accordion */
 .nh-kanban{display:flex;flex-direction:column;gap:8px;}
@@ -247,6 +248,13 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 
 /* Deal cards */
 .nh-deal{background:#1a1610;border:1px solid #2a2010;border-radius:6px;padding:12px 14px;transition:border-color .2s;cursor:grab;touch-action:none;}
+.nh-deal.bulk{cursor:pointer;}
+.nh-deal.checked{border-color:var(--gold);background:#211b10;}
+.nh-deal-check{width:15px;height:15px;margin-right:8px;vertical-align:middle;accent-color:var(--gold);cursor:pointer;}
+.nh-bulk-bar{display:none;flex-wrap:wrap;gap:10px;align-items:center;background:#1a1610;border:1px solid var(--gold-dim);border-radius:8px;padding:10px 14px;margin-bottom:14px;}
+.nh-bulk-bar.on{display:flex;}
+.nh-bulk-count{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:.5px;flex:0 0 auto;}
+.nh-bulk-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:1 1 auto;}
 .nh-deal.dragging{opacity:.3;border-style:dashed !important;cursor:grabbing;}
 .nh-col.drop-target{border-color:var(--gold) !important;}
 .nh-col.drop-target .nh-col-hd{background:rgba(200,169,110,.08);}
@@ -421,6 +429,10 @@ body.light-mode .nh-sf-cnt{background:#e8e2d6!important;color:#5a5750!important;
 body.light-mode .nh-sf.on .nh-sf-cnt{background:rgba(154,114,40,.15)!important;color:#9a7228!important;}
 body.light-mode .nh-manage-btn{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#9a9590!important;}
 body.light-mode .nh-manage-btn:hover{border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-manage-btn.on{background:#fdf5dc!important;border-color:#9a7228!important;color:#9a7228!important;}
+body.light-mode .nh-deal.checked{background:#fdf5dc!important;border-color:#9a7228!important;}
+body.light-mode .nh-bulk-bar{background:#f0ede6!important;border-color:#9a7228!important;}
+body.light-mode .nh-bulk-count{color:#9a7228!important;}
 body.light-mode .nh-col{background:#f0ede6!important;border-color:#d4cfc5!important;}
 body.light-mode .nh-col-hd:hover{background:#e8e2d6!important;}
 body.light-mode .nh-col-body{border-color:#d4cfc5!important;}
@@ -8712,6 +8724,8 @@ let _nhDragSrc=null;
 let _nhCbTags=[];
 let _nhCbExtraFields=[];
 let _nhCalOpenDates=new Set();
+let _nhBulkMode=false;
+let _nhSelectedDeals=new Set();
 
 /* ── Workspace state ── */
 let _nhWorkspaces=[];   // [{id, name, createdAt}]
@@ -9875,6 +9889,7 @@ async function nhCbDelete(id,evt){
 /* ══ CRM ══ */
 function nhRenderCrm(){
   nhRenderCrmFilters();
+  nhRenderBulkBar();
   nhRenderKanban();
 }
 
@@ -9892,6 +9907,7 @@ function nhRenderCrmFilters(){
   opts+=`<option value="noaction"${_nhCrmFil==='noaction'?' selected':''}>⚪ No Action (${noActionCnt})</option>`;
   opts+=`<option value="calendar"${_nhCrmFil==='calendar'?' selected':''}>📅 Calendar</option>`;
   el.innerHTML=`<select class="nh-crm-fil-select" id="nhCrmFilSelect" onchange="nhSetFil(this.value)">${opts}</select>
+    <span class="nh-manage-btn${_nhBulkMode?' on':''}" onclick="nhToggleBulkMode()">${_nhBulkMode?'✕ Cancel Select':'☑ Select'}</span>
     <span class="nh-manage-btn" onclick="nhOpenStageMgr()">⚙ Stages</span>`;
 }
 
@@ -10053,11 +10069,13 @@ function nhDealHTML(d,showStage){
   const lastNote=noteList.length?noteList[noteList.length-1]:null;
   const recentNotes=noteList.slice(-5);
   const stageBadge=showStage?`<span class="nh-stage-badge" style="border-color:${nhStageColor(d.stageId)};color:${nhStageColor(d.stageId)}"><span class="nh-col-dot" style="background:${nhStageColor(d.stageId)}"></span>${nhStageName(d.stageId)}</span>`:'';
-  return `<div class="nh-deal${ov?' ov':''}" id="nhd-${d.id}"
+  const checked=_nhSelectedDeals.has(d.id);
+  const checkbox=_nhBulkMode?`<input type="checkbox" class="nh-deal-check" ${checked?'checked':''} onclick="event.stopPropagation();nhToggleDealSelect('${d.id}')">`:'';
+  return `<div class="nh-deal${ov?' ov':''}${_nhBulkMode?' bulk':''}${checked?' checked':''}" id="nhd-${d.id}"
     onpointerdown="nhDealPointerDown(event,'${d.id}')">
     <div class="nh-deal-top">
       <div>
-        <div class="nh-deal-name"><div class="nh-cb-avatar ${contactType==='company'?'company':'person'}" style="display:inline-flex;margin-right:8px;vertical-align:middle;">${contactType==='company'?'🏢':'👤'}</div>${d.contactName||'—'}</div>
+        <div class="nh-deal-name">${checkbox}<div class="nh-cb-avatar ${contactType==='company'?'company':'person'}" style="display:inline-flex;margin-right:8px;vertical-align:middle;">${contactType==='company'?'🏢':'👤'}</div>${d.contactName||'—'}</div>
         <div class="nh-deal-co">${subLine}</div>
       </div>
       <div class="nh-deal-right">
@@ -10083,6 +10101,68 @@ function nhDealHTML(d,showStage){
       </div>
     </div>
   </div>`;
+}
+
+function nhToggleBulkMode(){
+  _nhBulkMode=!_nhBulkMode;
+  if(!_nhBulkMode)_nhSelectedDeals.clear();
+  nhRenderCrm();
+}
+function nhToggleDealSelect(id){
+  if(_nhSelectedDeals.has(id))_nhSelectedDeals.delete(id);else _nhSelectedDeals.add(id);
+  const card=document.getElementById('nhd-'+id);
+  if(card){
+    const nowChecked=_nhSelectedDeals.has(id);
+    card.classList.toggle('checked',nowChecked);
+    const cb=card.querySelector('.nh-deal-check');
+    if(cb)cb.checked=nowChecked;
+  }
+  nhRenderBulkBar();
+}
+function nhBulkClearSelection(){
+  _nhSelectedDeals.clear();
+  nhRenderCrm();
+}
+function nhRenderBulkBar(){
+  const el=document.getElementById('nhBulkBar');
+  if(!el)return;
+  if(!_nhBulkMode){el.innerHTML='';el.classList.remove('on');return;}
+  el.classList.add('on');
+  const n=_nhSelectedDeals.size;
+  const stageOpts=_nhStages.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  el.innerHTML=`<div class="nh-bulk-count">${n} selected</div>
+    <div class="nh-bulk-actions">
+      <select id="nhBulkStageSelect" class="nh-crm-fil-select" style="flex:0 0 auto;width:150px;">${stageOpts}</select>
+      <button class="nh-sm-btn done" ${n?'':'disabled'} onclick="nhBulkApplyStage()">Move Stage</button>
+      <input type="hidden" id="nhBulkDateInput">
+      <button type="button" class="nh-cal-trigger" id="nhBulkDateInputBtn" style="width:auto;padding:8px 12px;" onclick="nhOpenCalPicker('nhBulkDateInput')">Pick a date</button>
+      <button class="nh-sm-btn done" ${n?'':'disabled'} onclick="nhBulkApplyDate()">Set Date</button>
+      <button class="nh-sm-btn" ${n?'':'disabled'} onclick="nhBulkClearSelection()">Clear Selection</button>
+    </div>`;
+}
+async function nhBulkApplyStage(){
+  if(!_nhSelectedDeals.size)return;
+  const stageId=document.getElementById('nhBulkStageSelect')?.value;
+  if(!stageId)return;
+  const n=_nhSelectedDeals.size;
+  if(!await nhConfirm(`Move ${n} contact${n>1?'s':''} to this stage?`,'Bulk Move Stage','Move'))return;
+  _nhDeals.forEach(d=>{if(_nhSelectedDeals.has(d.id))d.stageId=stageId;});
+  await nhSet(nhWsKey('deals'),_nhDeals);
+  _nhSelectedDeals.clear();
+  nhRenderCrm();nhRenderToday();
+  mhsbToast(`✓ Stage updated for ${n} contact${n>1?'s':''}`,'success');
+}
+async function nhBulkApplyDate(){
+  if(!_nhSelectedDeals.size)return;
+  const dateStr=document.getElementById('nhBulkDateInput')?.value;
+  if(!dateStr){mhsbToast('Pick a date first.','warn');return;}
+  const n=_nhSelectedDeals.size;
+  if(!await nhConfirm(`Set next action date for ${n} contact${n>1?'s':''}?`,'Bulk Set Date','Set Date'))return;
+  _nhDeals.forEach(d=>{if(_nhSelectedDeals.has(d.id))d.nextAction=dateStr;});
+  await nhSet(nhWsKey('deals'),_nhDeals);
+  _nhSelectedDeals.clear();
+  nhRenderCrm();nhRenderToday();
+  mhsbToast(`✓ Next action date set for ${n} contact${n>1?'s':''}`,'success');
 }
 
 function nhToggleCol(id){
@@ -10603,8 +10683,12 @@ let _nhGhostEl=null;
 let _nhDragOverStage=null;
 
 function nhDealPointerDown(e, dealId){
-  // Ignore if clicking a button/link inside the card
-  if(e.target.closest('button,a')) return;
+  // Ignore if clicking a button/link/checkbox inside the card
+  if(e.target.closest('button,a,input')) return;
+  if(_nhBulkMode){
+    nhToggleDealSelect(dealId);
+    return;
+  }
   _nhDragDealId=dealId;
   // Create ghost
   const card=document.getElementById('nhd-'+dealId);
@@ -10816,6 +10900,7 @@ async function nhSmDone(){
         <input class="nh-search" id="nhCrmSearch" type="text" placeholder="" oninput="nhDebouncedRenderCrm()">
       </div>
       <div class="nh-crm-filters" id="nhCrmFil"></div>
+      <div class="nh-bulk-bar" id="nhBulkBar"></div>
       <div class="nh-kanban" id="nhKanban"></div>
     </div>
 

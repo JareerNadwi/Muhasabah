@@ -58,16 +58,17 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-today.on{display:block;}
 .nh-today-title{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
 .nh-today-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 1.5s ease-in-out infinite;}
-.nh-today-chips{display:flex;flex-wrap:wrap;gap:6px;}
-.nh-today-caret{margin-left:auto;font-size:9px;transition:transform .15s;}
+.nh-today-chips{display:flex;flex-direction:column;gap:12px;}
+.nh-today-caret{margin-left:auto;font-size:15px;line-height:1;transition:transform .15s;background:var(--red);color:#141008;width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .nh-today.collapsed .nh-today-title{margin-bottom:0;}
 .nh-today.collapsed .nh-today-chips{display:none;}
 .nh-today.collapsed .nh-today-caret{transform:rotate(-90deg);}
-.nh-chip{display:inline-flex;align-items:center;gap:5px;background:#1a1610;border:1px solid var(--red);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--red);cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s;}
-.nh-chip:hover{border-color:var(--red);color:var(--red);}
+.nh-today-group-label{font-size:10px;font-weight:700;color:var(--red);letter-spacing:.5px;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid rgba(224,85,85,.3);margin-bottom:6px;}
+.nh-chip{display:block;width:100%;box-sizing:border-box;background:#1a1610;border:1px solid var(--red);border-radius:6px;padding:6px 12px;font-size:11px;color:var(--red);cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;}
+.nh-chip:last-child{margin-bottom:0;}
+.nh-chip:hover{background:#241a1a;border-color:var(--red);color:var(--red);}
 .nh-chip-company{font-size:9px;opacity:.7;}
 .nh-chip-action{font-size:9px;opacity:.85;font-style:italic;}
-.nh-chip-days{font-size:9px;font-weight:700;background:var(--red);color:#141008;border-radius:10px;padding:1px 7px;letter-spacing:.3px;flex-shrink:0;}
 
 /* Nav tabs */
 .nh-nav{display:flex;margin-bottom:16px;border:1px solid #2a2010;border-radius:8px;overflow:hidden;}
@@ -9430,12 +9431,19 @@ function nhRenderToday(){
   el.classList.add('on');
   el.classList.toggle('collapsed',_nhTodayCollapsed);
   if(label)label.textContent=`OVERDUE (${due.length})`;
-  chips.innerHTML=due.map(d=>{
+  const groups=[];
+  due.forEach(d=>{
     const diff=nhDaysDiff(d.nextAction);
-    const daysTag=diff===0?'Today':`${diff}d overdue`;
-    return `<span class="nh-chip" onclick="nhScrollDeal('${d.id}')">
-    <span class="nh-chip-days">${daysTag}</span> ${d.contactName||'—'} <span class="nh-chip-company">${d.company?'· '+d.company:''}</span>${d.nextActionNote?` <span class="nh-chip-action">— ${d.nextActionNote}</span>`:''}
-  </span>`;
+    let g=groups.find(g=>g.diff===diff);
+    if(!g){g={diff,items:[]};groups.push(g);}
+    g.items.push(d);
+  });
+  chips.innerHTML=groups.map(g=>{
+    const groupLabel=g.diff===0?'Today':`${g.diff}d overdue`;
+    const rows=g.items.map(d=>`<span class="nh-chip" onclick="nhScrollDeal('${d.id}')">
+      ${d.contactName||'—'} <span class="nh-chip-company">${d.company?'· '+d.company:''}</span>${d.nextActionNote?` <span class="nh-chip-action">— ${d.nextActionNote}</span>`:''}
+    </span>`).join('');
+    return `<div class="nh-today-group"><div class="nh-today-group-label">${groupLabel}</div>${rows}</div>`;
   }).join('');
 }
 

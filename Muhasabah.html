@@ -8852,7 +8852,7 @@ const NH_TERMINAL_STAGE_IDS=new Set([NH_CLOSED_STAGE.id,NH_LOST_STAGE.id]);
 
 /* ── Utils ── */
 function nhId(){return '_'+Date.now()+Math.random().toString(36).slice(2,6);}
-function nhToday(){return new Date().toISOString().slice(0,10);}
+function nhToday(){const t=new Date();return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;}
 
 /* ── Custom confirm dialog (replaces native confirm()) ── */
 let _nhPromptResolver=null;

@@ -58,11 +58,11 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-today.on{display:block;}
 .nh-today-title{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
 .nh-today-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 1.5s ease-in-out infinite;}
-.nh-today-chips{display:flex;flex-direction:column;gap:12px;max-height:260px;overflow-y:auto;padding-right:4px;}
+.nh-today-chips{display:flex;flex-direction:column;gap:12px;max-height:260px;overflow-y:auto;padding-right:4px;overscroll-behavior:contain;}
 .nh-today-chips::-webkit-scrollbar{width:5px;}
 .nh-today-chips::-webkit-scrollbar-track{background:transparent;}
 .nh-today-chips::-webkit-scrollbar-thumb{background:var(--red);border-radius:3px;opacity:.5;}
-.nh-today-caret{margin-left:auto;font-size:15px;line-height:1;transition:transform .15s;background:var(--red);color:#141008;width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nh-today-caret{margin-left:auto;font-size:11px;line-height:1;transition:transform .15s;background:var(--red);color:#141008;width:15px;height:15px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .nh-today.collapsed .nh-today-title{margin-bottom:0;}
 .nh-today.collapsed .nh-today-chips{display:none;}
 .nh-today.collapsed .nh-today-caret{transform:rotate(-90deg);}

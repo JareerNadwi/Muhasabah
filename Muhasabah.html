@@ -9038,6 +9038,12 @@ function closeContactBook(){
   _nhSharedQ='';
   document.getElementById('netHubOverlay').classList.remove('active');
   document.body.classList.remove('overlay-open');
+  _nhTodayCollapsed=true;
+  try{localStorage.setItem('nhTodayCollapsed','true');}catch(e){}
+  const today=document.getElementById('nhToday');
+  if(today)today.classList.add('collapsed');
+  const chips=document.getElementById('nhTodayChips');
+  if(chips)chips.scrollTop=0;
 }
 
 /* ── Import Contacts from Excel ── */

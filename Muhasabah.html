@@ -56,13 +56,18 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 /* Today dashboard */
 .nh-today{background:#141008;border:2px solid var(--red);border-radius:8px;padding:12px 16px;margin-bottom:16px;display:none;}
 .nh-today.on{display:block;}
-.nh-today-title{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.nh-today-title{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
 .nh-today-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 1.5s ease-in-out infinite;}
 .nh-today-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.nh-today-caret{margin-left:auto;font-size:9px;transition:transform .15s;}
+.nh-today.collapsed .nh-today-title{margin-bottom:0;}
+.nh-today.collapsed .nh-today-chips{display:none;}
+.nh-today.collapsed .nh-today-caret{transform:rotate(-90deg);}
 .nh-chip{display:inline-flex;align-items:center;gap:5px;background:#1a1610;border:1px solid var(--red);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--red);cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s;}
 .nh-chip:hover{border-color:var(--red);color:var(--red);}
 .nh-chip-company{font-size:9px;opacity:.7;}
 .nh-chip-action{font-size:9px;opacity:.85;font-style:italic;}
+.nh-chip-days{font-size:9px;font-weight:700;background:var(--red);color:#141008;border-radius:10px;padding:1px 7px;letter-spacing:.3px;flex-shrink:0;}
 
 /* Nav tabs */
 .nh-nav{display:flex;margin-bottom:16px;border:1px solid #2a2010;border-radius:8px;overflow:hidden;}
@@ -9409,16 +9414,29 @@ function nhExportExcel(){
 }
 
 /* ── Today dashboard ── */
+let _nhTodayCollapsed=(()=>{try{return localStorage.getItem('nhTodayCollapsed')!=='false';}catch(e){return true;}})(); // defaults collapsed
+function nhToggleToday(){
+  _nhTodayCollapsed=!_nhTodayCollapsed;
+  try{localStorage.setItem('nhTodayCollapsed',_nhTodayCollapsed?'true':'false');}catch(e){}
+  document.getElementById('nhToday').classList.toggle('collapsed',_nhTodayCollapsed);
+}
 function nhRenderToday(){
   const el=document.getElementById('nhToday');
   const chips=document.getElementById('nhTodayChips');
+  const label=document.getElementById('nhTodayLabel');
   if(!el||!chips)return;
-  const due=_nhDeals.filter(nhIsOverdue);
+  const due=_nhDeals.filter(nhIsOverdue).sort((a,b)=>nhDaysDiff(b.nextAction)-nhDaysDiff(a.nextAction));
   if(!due.length){el.classList.remove('on');return;}
   el.classList.add('on');
-  chips.innerHTML=due.map(d=>`<span class="nh-chip" onclick="nhScrollDeal('${d.id}')">
-    ${d.contactName||'—'} <span class="nh-chip-company">${d.company?'· '+d.company:''}</span>${d.nextActionNote?` <span class="nh-chip-action">— ${d.nextActionNote}</span>`:''}
-  </span>`).join('');
+  el.classList.toggle('collapsed',_nhTodayCollapsed);
+  if(label)label.textContent=`OVERDUE (${due.length})`;
+  chips.innerHTML=due.map(d=>{
+    const diff=nhDaysDiff(d.nextAction);
+    const daysTag=diff===0?'Today':`${diff}d overdue`;
+    return `<span class="nh-chip" onclick="nhScrollDeal('${d.id}')">
+    <span class="nh-chip-days">${daysTag}</span> ${d.contactName||'—'} <span class="nh-chip-company">${d.company?'· '+d.company:''}</span>${d.nextActionNote?` <span class="nh-chip-action">— ${d.nextActionNote}</span>`:''}
+  </span>`;
+  }).join('');
 }
 
 function nhScrollDeal(id){
@@ -10717,7 +10735,7 @@ async function nhSmDone(){
 
     <!-- Today's action dashboard -->
     <div class="nh-today" id="nhToday">
-      <div class="nh-today-title"><span class="nh-today-dot"></span> CONTACT TODAY</div>
+      <div class="nh-today-title" onclick="nhToggleToday()"><span class="nh-today-dot"></span> <span id="nhTodayLabel">OVERDUE</span><span class="nh-today-caret">▾</span></div>
       <div class="nh-today-chips" id="nhTodayChips"></div>
     </div>
 

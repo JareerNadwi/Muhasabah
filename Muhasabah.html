@@ -64,9 +64,12 @@ body.light-mode #netHubOverlay{background:#ffffff!important;}
 .nh-today.collapsed .nh-today-chips{display:none;}
 .nh-today.collapsed .nh-today-caret{transform:rotate(-90deg);}
 .nh-today-group-label{font-size:10px;font-weight:700;color:var(--red);letter-spacing:.5px;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid rgba(224,85,85,.3);margin-bottom:6px;}
+.nh-today-group-label.noaction{color:var(--gold);border-bottom-color:rgba(200,169,110,.3);}
 .nh-chip{display:block;width:100%;box-sizing:border-box;background:#1a1610;border:1px solid var(--red);border-radius:6px;padding:6px 12px;font-size:11px;color:var(--red);cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;}
 .nh-chip:last-child{margin-bottom:0;}
 .nh-chip:hover{background:#241a1a;border-color:var(--red);color:var(--red);}
+.nh-chip.noaction{border-color:var(--gold-dim);color:var(--gold);}
+.nh-chip.noaction:hover{background:#211b10;border-color:var(--gold-dim);color:var(--gold);}
 .nh-chip-company{font-size:9px;opacity:.7;}
 .nh-chip-action{font-size:9px;opacity:.85;font-style:italic;}
 
@@ -9427,10 +9430,11 @@ function nhRenderToday(){
   const label=document.getElementById('nhTodayLabel');
   if(!el||!chips)return;
   const due=_nhDeals.filter(nhIsOverdue).sort((a,b)=>nhDaysDiff(b.nextAction)-nhDaysDiff(a.nextAction));
-  if(!due.length){el.classList.remove('on');return;}
+  const noAction=_nhDeals.filter(nhIsNoAction);
+  if(!due.length&&!noAction.length){el.classList.remove('on');return;}
   el.classList.add('on');
   el.classList.toggle('collapsed',_nhTodayCollapsed);
-  if(label)label.textContent=`OVERDUE (${due.length})`;
+  if(label)label.textContent=`OVERDUE (${due.length}) · NO ACTION (${noAction.length})`;
   const groups=[];
   due.forEach(d=>{
     const diff=nhDaysDiff(d.nextAction);
@@ -9438,13 +9442,20 @@ function nhRenderToday(){
     if(!g){g={diff,items:[]};groups.push(g);}
     g.items.push(d);
   });
-  chips.innerHTML=groups.map(g=>{
+  let html=groups.map(g=>{
     const groupLabel=g.diff===0?'Today':`${g.diff}d overdue`;
     const rows=g.items.map(d=>`<span class="nh-chip" onclick="nhScrollDeal('${d.id}')">
       ${d.contactName||'—'} <span class="nh-chip-company">${d.company?'· '+d.company:''}</span>${d.nextActionNote?` <span class="nh-chip-action">— ${d.nextActionNote}</span>`:''}
     </span>`).join('');
     return `<div class="nh-today-group"><div class="nh-today-group-label">${groupLabel}</div>${rows}</div>`;
   }).join('');
+  if(noAction.length){
+    const rows=noAction.map(d=>`<span class="nh-chip noaction" onclick="nhScrollDeal('${d.id}')">
+      ${d.contactName||'—'} <span class="nh-chip-company">${d.company?'· '+d.company:''}</span>
+    </span>`).join('');
+    html+=`<div class="nh-today-group"><div class="nh-today-group-label noaction">No Action Set</div>${rows}</div>`;
+  }
+  chips.innerHTML=html;
 }
 
 function nhScrollDeal(id){

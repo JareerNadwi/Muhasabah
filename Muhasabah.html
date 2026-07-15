@@ -120,9 +120,9 @@ body.light-mode .nh-search-scope:hover{border-color:#9a7228!important;}
 .nh-field input,.nh-field select,.nh-field textarea{width:100%;background:#1a1610!important;border:1px solid #2a2010!important;color:#f0e4c0!important;padding:8px 11px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;outline:none;-webkit-appearance:none;appearance:none;box-sizing:border-box;}
 .nh-field input:focus,.nh-field select:focus,.nh-field textarea:focus{border-color:var(--gold-dim);}
 .nh-extra-field-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
-.nh-extra-field-row select,.nh-extra-label-input,.nh-extra-type-input{flex:0 0 110px!important;width:110px!important;min-width:0;box-sizing:border-box;}
-.nh-field .nh-extra-field-row select,.nh-field .nh-extra-type-input{background:#1a1610!important;border:1px solid #c9a84c!important;color:#c9a84c!important;font-weight:600!important;background-image:none!important;cursor:pointer;}
-body.light-mode .nh-field .nh-extra-field-row select,body.light-mode .nh-field .nh-extra-type-input{background:#fdf5dc!important;border:2px solid #9a7228!important;color:#7a5010!important;font-weight:700!important;background-image:none!important;}
+.nh-extra-field-row select,.nh-extra-label-input{flex:0 0 110px!important;width:110px!important;min-width:0;box-sizing:border-box;}
+.nh-field .nh-extra-field-row select{background:#1a1610!important;border:1px solid #c9a84c!important;color:#c9a84c!important;font-weight:600!important;background-image:none!important;cursor:pointer;}
+body.light-mode .nh-field .nh-extra-field-row select{background:#fdf5dc!important;border:2px solid #9a7228!important;color:#7a5010!important;font-weight:700!important;background-image:none!important;}
 .nh-extra-field-row input{flex:1;min-width:0;}
 .nh-extra-field-x{cursor:pointer;font-size:13px;color:#a89060;flex-shrink:0;padding:0 2px;}
 .nh-extra-field-x:hover{color:var(--red);}
@@ -9618,16 +9618,13 @@ function nhFavImg(fav){return fav?`<img src="${fav}" width="13" height="13" styl
 function nhRenderExtraFields(){
   const wrap=document.getElementById('nhCbExtraFields');
   if(!wrap)return;
-  const listEl=document.getElementById('nhExtraFieldTypeList');
-  if(listEl&&!listEl.childElementCount){
-    listEl.innerHTML=NH_PRESET_FIELDS.map(pr=>`<option value="${pr.label.replace(/"/g,'&quot;')}">`).join('');
-  }
   wrap.innerHTML=_nhCbExtraFields.map((f,i)=>{
     const isCustom=f.type==='custom';
     const p=nhPresetByType(f.type);
+    const selectOpts=NH_PRESET_FIELDS.map(pr=>`<option value="${pr.type}"${f.type===pr.type?' selected':''}>${pr.label}</option>`).join('');
     const typeControl=isCustom
       ? `<input type="text" placeholder="Label" value="${(f.label||'').replace(/"/g,'&quot;')}" oninput="nhExtraFieldChanged(${i},'label',this.value)" class="nh-extra-label-input" style="flex:0 0 110px;width:110px;">`
-      : `<input type="text" list="nhExtraFieldTypeList" value="${(p.label||'').replace(/"/g,'&quot;')}" placeholder="Type to search…" autocomplete="off" class="nh-extra-type-input" oninput="nhExtraFieldTypeInput(${i},this.value)" onblur="nhRenderExtraFields()" style="flex:0 0 110px;width:110px;">`;
+      : `<select onchange="nhExtraFieldChanged(${i},'type',this.value)" style="flex:0 0 110px;width:110px;">${selectOpts}</select>`;
     const ph=isCustom?'URL or value':(p.ph||'Value');
     return `<div class="nh-extra-field-row" style="flex-wrap:nowrap;gap:5px;align-items:center;">
       ${typeControl}
@@ -9635,10 +9632,6 @@ function nhRenderExtraFields(){
       <span class="nh-extra-field-x" onclick="nhRemoveExtraField(${i})">✕</span>
     </div>`;
   }).join('');
-}
-function nhExtraFieldTypeInput(i,val){
-  const match=NH_PRESET_FIELDS.find(p=>p.label.toLowerCase()===String(val).trim().toLowerCase());
-  if(match) nhExtraFieldChanged(i,'type',match.type);
 }
 function nhAddExtraField(){
   _nhCbExtraFields.push({type:'phone',value:'',label:''});
@@ -10796,7 +10789,6 @@ async function nhSmDone(){
     <div class="nh-field">
       <label>Extra Information Fields</label>
       <div id="nhCbExtraFields"></div>
-      <datalist id="nhExtraFieldTypeList"></datalist>
       <button type="button" class="nh-cal-trigger" id="nhCbAddExtraBtn" onclick="nhAddExtraField()" style="margin-top:6px;text-align:center;">＋ Add Extra Field</button>
     </div>
     <div class="nh-field" id="nhCbStageField">

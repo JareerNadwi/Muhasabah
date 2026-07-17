@@ -1522,7 +1522,7 @@ body.overlay-open{overflow:hidden;}
       <p style="margin-bottom:12px;">110 verses via the built-in reader. Proportional per verse. Reciting on Fridays is a confirmed Sunnah. Full completion = +10%.</p>
 
       <p style="margin-bottom:4px;color:var(--text);">💛 Sadaqah — up to +10%</p>
-      <p style="margin-bottom:12px;">Log your donation amount with the +/− buttons. Goal is 50,000 units (your local currency). Proportional up to +10%. No amount is too small.</p>
+      <p style="margin-bottom:12px;">Log your donation amount with the +/− buttons. Goal is 1,000 units (your local currency). Proportional up to +10%. No amount is too small.</p>
 
       <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">🌙 / ☀️ THEME</p>
       <p style="margin-bottom:0;">Toggle between dark and light/warm mode with the moon/sun button in the header.</p>
@@ -1934,7 +1934,7 @@ body.overlay-open{overflow:hidden;}
           <span class="step-label-base">+500</span>
         </div>
       </div>
-      <div class="sub-label">Max +10% At 50,000 Money Donated</div>
+      <div class="sub-label">Max +10% At 1,000 Money Donated</div>
       <button class="qr-open-btn" style="margin-top:8px;" onclick="openArticle('sadaqah')">💛 Open Sadaqah Article</button>
     </div>
 
@@ -2184,7 +2184,7 @@ body.overlay-open{overflow:hidden;}
    Zikr extra     +2.5% per extra 1500 zikr
    Tahajjud extra +5% per extra 4 rakat
    Zikr Book      +10% max at 22 pages
-   Sadaqah        +10% max at 50,000 units
+   Sadaqah        +10% max at 1,000 units
 ══════════════════════════════════════════════════════════ */
 
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -2803,8 +2803,8 @@ function scoreDay(data){
   const skRatio = data['surahKahf_pdfRatio'];
   bonus += skRatio !== undefined ? Math.min(skRatio * 10, 10) : (data.surahKahf==='yes'?10:0);
 
-  // Sadaqah: max +10% at 50,000 units
-  bonus+=Math.min((parseInt(data.sadaqahUnits)||0)*(10/50000),10);
+  // Sadaqah: max +10% at 1,000 units
+  bonus+=Math.min((parseInt(data.sadaqahUnits)||0)*(10/1000),10);
 
   bonus=Math.min(bonus,50);
   bonus=Math.round(bonus*10)/10;
@@ -2892,7 +2892,7 @@ function bonusScore(data,key){
       const r = data['zikrBook_bonusRatio'];
       return r !== undefined ? Math.min(Math.round(r * 10 * 10) / 10, 10) : (data.zikrBook==='yes'?10:0);
     }
-    case 'sadaqah':     return Math.min(Math.round((parseInt(data.sadaqahUnits)||0)*(10/50000)*10)/10,10);
+    case 'sadaqah':     return Math.min(Math.round((parseInt(data.sadaqahUnits)||0)*(10/1000)*10)/10,10);
     case 'surahKahf': {
       const r = data['surahKahf_pdfRatio'];
       return r !== undefined ? Math.min(Math.round(r * 10 * 10) / 10, 10) : (data.surahKahf==='yes'?10:0);

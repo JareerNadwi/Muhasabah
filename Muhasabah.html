@@ -8720,6 +8720,7 @@ function nhDebouncedRenderCrm(){clearTimeout(_nhSearchTimer);_nhSearchTimer=setT
 let _nhCrmFil='all';
 let _nhOpenCols=new Set();
 let _nhSharedQ='';
+let _nhSharedScope='all';
 let _nhDragSrc=null;
 let _nhCbTags=[];
 let _nhCbExtraFields=[];
@@ -9038,6 +9039,7 @@ async function openContactBook(){
   await nhWsLoad(_nhActiveWs);
   _nhTab = 'contacts';
   _nhSharedQ='';
+  _nhSharedScope='all';
   const cbS=document.getElementById('nhCbSearch');if(cbS)cbS.value='';
   const crmS=document.getElementById('nhCrmSearch');if(crmS)crmS.value='';
   document.getElementById('netHubOverlay').classList.add('active');
@@ -9050,6 +9052,7 @@ async function openContactBook(){
 function closeContactBook(){
   nhWsSave();
   _nhSharedQ='';
+  _nhSharedScope='all';
   const cbS=document.getElementById('nhCbSearch');if(cbS)cbS.value='';
   const crmS=document.getElementById('nhCrmSearch');if(crmS)crmS.value='';
   const cbScope=document.getElementById('nhCbSearchScope');if(cbScope)cbScope.value='all';
@@ -9514,10 +9517,14 @@ function nhShowTab(tab){
   if(tab==='contacts'){
     const el=document.getElementById('nhCbSearch');
     if(el&&el.value!==_nhSharedQ)el.value=_nhSharedQ;
+    const sc=document.getElementById('nhCbSearchScope');
+    if(sc&&sc.value!==_nhSharedScope)sc.value=_nhSharedScope;
     nhRenderContacts();
   } else {
     const el=document.getElementById('nhCrmSearch');
     if(el&&el.value!==_nhSharedQ)el.value=_nhSharedQ;
+    const sc=document.getElementById('nhCrmSearchScope');
+    if(sc&&sc.value!==_nhSharedScope)sc.value=_nhSharedScope;
     _nhCrmFil='all'; _nhOpenCols=new Set(); nhRenderCrm();
   }
 }
@@ -9530,7 +9537,9 @@ function nhRenderContacts(resetPage){
   const searchEl=document.getElementById('nhCbSearch');
   if(searchEl&&searchEl.value!==_nhSharedQ)_nhSharedQ=searchEl.value;
   const q=_nhSharedQ.toLowerCase();
-  const scope=document.getElementById('nhCbSearchScope')?.value||'all';
+  const scopeEl=document.getElementById('nhCbSearchScope');
+  if(scopeEl&&scopeEl.value!==_nhSharedScope)_nhSharedScope=scopeEl.value;
+  const scope=_nhSharedScope;
   const typeFilter=document.getElementById('nhCbTypeFilter')?.value||'all';
   let list=[..._nhContacts].sort((a,b)=>(a.name||'').localeCompare(b.name||''));
   if(typeFilter!=='all') list=list.filter(c=>(c.type||'person')===typeFilter);
@@ -9931,7 +9940,9 @@ function nhRenderKanban(){
   const searchEl=document.getElementById('nhCrmSearch');
   if(searchEl&&searchEl.value!==_nhSharedQ)_nhSharedQ=searchEl.value;
   const _crmQ=_nhSharedQ.toLowerCase().trim();
-  const _crmScope=document.getElementById('nhCrmSearchScope')?.value||'all';
+  const crmScopeEl=document.getElementById('nhCrmSearchScope');
+  if(crmScopeEl&&crmScopeEl.value!==_nhSharedScope)_nhSharedScope=crmScopeEl.value;
+  const _crmScope=_nhSharedScope;
   const el=document.getElementById('nhKanban');
   if(!el)return;
 

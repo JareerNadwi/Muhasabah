@@ -9050,6 +9050,10 @@ async function openContactBook(){
 function closeContactBook(){
   nhWsSave();
   _nhSharedQ='';
+  const cbS=document.getElementById('nhCbSearch');if(cbS)cbS.value='';
+  const crmS=document.getElementById('nhCrmSearch');if(crmS)crmS.value='';
+  const cbScope=document.getElementById('nhCbSearchScope');if(cbScope)cbScope.value='all';
+  const crmScope=document.getElementById('nhCrmSearchScope');if(crmScope)crmScope.value='all';
   document.getElementById('netHubOverlay').classList.remove('active');
   document.body.classList.remove('overlay-open');
   _nhTodayCollapsed=true;
@@ -9948,7 +9952,7 @@ function nhRenderKanban(){
       if(_crmScope==='country') return country.includes(_crmQ);
       if(_crmScope==='contact') return contact_info.includes(_crmQ);
       if(_crmScope==='tags') return tags.includes(_crmQ);
-      return name.includes(_crmQ)||role.includes(_crmQ)||company.includes(_crmQ)||country.includes(_crmQ)||tags.includes(_crmQ)||extraVals.includes(_crmQ);
+      return name.includes(_crmQ)||role.includes(_crmQ)||company.includes(_crmQ)||country.includes(_crmQ)||tags.includes(_crmQ)||contact_info.includes(_crmQ);
     }).sort((a,b)=>(a.contactName||'').localeCompare(b.contactName||''));
     el.innerHTML=sResults.length?sResults.map(d=>nhDealHTML(d,true)).join(''):'<div class="nh-empty">No results found.</div>';
     return;

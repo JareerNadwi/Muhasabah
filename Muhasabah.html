@@ -9051,12 +9051,41 @@ async function openContactBook(){
 }
 function closeContactBook(){
   nhWsSave();
+
+  // Close any nested modals that might still be open, resetting their own state too
+  try{nhCloseNotes();}catch(e){}
+  try{nhCloseMarkDone();}catch(e){}
+  try{nhCloseCalPicker();}catch(e){}
+  try{nhClosePhonePicker();}catch(e){}
+  try{nhCloseSmBg();}catch(e){}
+
+  // Reset every session/view-state variable to its default. Actual data
+  // (_nhContacts, _nhDeals, _nhStages, _nhNotes, _nhDismissedTags, _nhWorkspaces)
+  // and the last-used workspace (_nhActiveWs, a saved preference, not a UI toggle)
+  // are intentionally left alone.
+  clearTimeout(_nhSearchTimer);_nhSearchTimer=null;
+  _nhTab='contacts';
+  _nhCbEditId=null;_nhCrmEditId=null;
+  _nhCrmFil='all';
+  _nhOpenCols=new Set();
   _nhSharedQ='';
   _nhSharedScope='all';
+  _nhDragSrc=null;
+  _nhCbTags=[];
+  _nhCbExtraFields=[];
+  _nhCalOpenDates=new Set();
+  _nhBulkMode=false;
+  _nhSelectedDeals=new Set();
+  _nhCbPage=0;
+  _nhDragDealId=null;_nhGhostEl=null;_nhDragOverStage=null;
+
+  // Reset the DOM controls that aren't redrawn from a JS variable on every render
   const cbS=document.getElementById('nhCbSearch');if(cbS)cbS.value='';
   const crmS=document.getElementById('nhCrmSearch');if(crmS)crmS.value='';
   const cbScope=document.getElementById('nhCbSearchScope');if(cbScope)cbScope.value='all';
   const crmScope=document.getElementById('nhCrmSearchScope');if(crmScope)crmScope.value='all';
+  const cbType=document.getElementById('nhCbTypeFilter');if(cbType)cbType.value='all';
+
   document.getElementById('netHubOverlay').classList.remove('active');
   document.body.classList.remove('overlay-open');
   _nhTodayCollapsed=true;

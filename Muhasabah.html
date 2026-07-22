@@ -8721,6 +8721,7 @@ let _nhCrmFil='all';
 let _nhOpenCols=new Set();
 let _nhSharedQ='';
 let _nhSharedScope='all';
+let _nhSharedType='all';
 let _nhDragSrc=null;
 let _nhCbTags=[];
 let _nhCbExtraFields=[];
@@ -9040,6 +9041,7 @@ async function openContactBook(){
   _nhTab = 'contacts';
   _nhSharedQ='';
   _nhSharedScope='all';
+  _nhSharedType='all';
   const cbS=document.getElementById('nhCbSearch');if(cbS)cbS.value='';
   const crmS=document.getElementById('nhCrmSearch');if(crmS)crmS.value='';
   document.getElementById('netHubOverlay').classList.add('active');
@@ -9070,6 +9072,7 @@ function closeContactBook(){
   _nhOpenCols=new Set();
   _nhSharedQ='';
   _nhSharedScope='all';
+  _nhSharedType='all';
   _nhDragSrc=null;
   _nhCbTags=[];
   _nhCbExtraFields=[];
@@ -9085,6 +9088,7 @@ function closeContactBook(){
   const cbScope=document.getElementById('nhCbSearchScope');if(cbScope)cbScope.value='all';
   const crmScope=document.getElementById('nhCrmSearchScope');if(crmScope)crmScope.value='all';
   const cbType=document.getElementById('nhCbTypeFilter');if(cbType)cbType.value='all';
+  const crmType=document.getElementById('nhCrmTypeFilter');if(crmType)crmType.value='all';
 
   document.getElementById('netHubOverlay').classList.remove('active');
   document.body.classList.remove('overlay-open');
@@ -9548,12 +9552,16 @@ function nhShowTab(tab){
     if(el&&el.value!==_nhSharedQ)el.value=_nhSharedQ;
     const sc=document.getElementById('nhCbSearchScope');
     if(sc&&sc.value!==_nhSharedScope)sc.value=_nhSharedScope;
+    const ty=document.getElementById('nhCbTypeFilter');
+    if(ty&&ty.value!==_nhSharedType)ty.value=_nhSharedType;
     nhRenderContacts();
   } else {
     const el=document.getElementById('nhCrmSearch');
     if(el&&el.value!==_nhSharedQ)el.value=_nhSharedQ;
     const sc=document.getElementById('nhCrmSearchScope');
     if(sc&&sc.value!==_nhSharedScope)sc.value=_nhSharedScope;
+    const ty=document.getElementById('nhCrmTypeFilter');
+    if(ty&&ty.value!==_nhSharedType)ty.value=_nhSharedType;
     _nhCrmFil='all'; _nhOpenCols=new Set(); nhRenderCrm();
   }
 }
@@ -9569,7 +9577,9 @@ function nhRenderContacts(resetPage){
   const scopeEl=document.getElementById('nhCbSearchScope');
   if(scopeEl&&scopeEl.value!==_nhSharedScope)_nhSharedScope=scopeEl.value;
   const scope=_nhSharedScope;
-  const typeFilter=document.getElementById('nhCbTypeFilter')?.value||'all';
+  const typeEl=document.getElementById('nhCbTypeFilter');
+  if(typeEl&&typeEl.value!==_nhSharedType)_nhSharedType=typeEl.value;
+  const typeFilter=_nhSharedType;
   let list=[..._nhContacts].sort((a,b)=>(a.name||'').localeCompare(b.name||''));
   if(typeFilter!=='all') list=list.filter(c=>(c.type||'person')===typeFilter);
   if(q){
@@ -9938,11 +9948,18 @@ function nhRenderCrm(){
 function nhRenderCrmFilters(){
   const el=document.getElementById('nhCrmFil');
   if(!el)return;
-  const ovCnt=_nhDeals.filter(nhIsOverdue).length;
-  const noActionCnt=_nhDeals.filter(nhIsNoAction).length;
-  let opts=`<option value="all"${_nhCrmFil==='all'?' selected':''}>All (${_nhDeals.length})</option>`;
+  const crmTypeEl=document.getElementById('nhCrmTypeFilter');
+  if(crmTypeEl&&crmTypeEl.value!==_nhSharedType)_nhSharedType=crmTypeEl.value;
+  const _crmType=_nhSharedType;
+  const dealsT=_crmType==='all'?_nhDeals:_nhDeals.filter(d=>{
+    const c=_nhContacts.find(x=>x.id===d.contactId);
+    return (c?.type||d.contactType||'person')===_crmType;
+  });
+  const ovCnt=dealsT.filter(nhIsOverdue).length;
+  const noActionCnt=dealsT.filter(nhIsNoAction).length;
+  let opts=`<option value="all"${_nhCrmFil==='all'?' selected':''}>All (${dealsT.length})</option>`;
   _nhStages.forEach(s=>{
-    const cnt=_nhDeals.filter(d=>d.stageId===s.id).length;
+    const cnt=dealsT.filter(d=>d.stageId===s.id).length;
     opts+=`<option value="${s.id}"${_nhCrmFil===s.id?' selected':''}>${s.name} (${cnt})</option>`;
   });
   opts+=`<option value="ov"${_nhCrmFil==='ov'?' selected':''}>🔴 Overdue (${ovCnt})</option>`;
@@ -9972,12 +9989,20 @@ function nhRenderKanban(){
   const crmScopeEl=document.getElementById('nhCrmSearchScope');
   if(crmScopeEl&&crmScopeEl.value!==_nhSharedScope)_nhSharedScope=crmScopeEl.value;
   const _crmScope=_nhSharedScope;
+  const crmTypeEl=document.getElementById('nhCrmTypeFilter');
+  if(crmTypeEl&&crmTypeEl.value!==_nhSharedType)_nhSharedType=crmTypeEl.value;
+  const _crmType=_nhSharedType;
   const el=document.getElementById('nhKanban');
   if(!el)return;
 
+  const _nhDealsF=_crmType==='all'?_nhDeals:_nhDeals.filter(d=>{
+    const c=_nhContacts.find(x=>x.id===d.contactId);
+    return (c?.type||d.contactType||'person')===_crmType;
+  });
+
   // Search active — flat list, no stages
   if(_crmQ){
-    const sResults=[..._nhDeals].filter(d=>{
+    const sResults=[..._nhDealsF].filter(d=>{
       const c=_nhContacts.find(x=>x.id===d.contactId);
       const name=(d.contactName||'').toLowerCase();
       const role=(c?.role||d.role||'').toLowerCase();
@@ -10001,7 +10026,7 @@ function nhRenderKanban(){
   // Flat list views — no stage columns
   if(_nhCrmFil==='ov'||_nhCrmFil==='noaction'){
     const pred=_nhCrmFil==='ov'?nhIsOverdue:nhIsNoAction;
-    let deals=_nhDeals.filter(pred).sort((a,b)=>{
+    let deals=_nhDealsF.filter(pred).sort((a,b)=>{
       if(_nhCrmFil==='ov'){
         const da=nhDaysDiff(a.nextAction),db=nhDaysDiff(b.nextAction);
         return db-da||(a.contactName||'').localeCompare(b.contactName||'');
@@ -10015,7 +10040,7 @@ function nhRenderKanban(){
 
   // Calendar view — agenda list grouped by date
   if(_nhCrmFil==='calendar'){
-    const scheduled=_nhDeals.filter(d=>d.nextAction&&!NH_TERMINAL_STAGE_IDS.has(d.stageId));
+    const scheduled=_nhDealsF.filter(d=>d.nextAction&&!NH_TERMINAL_STAGE_IDS.has(d.stageId));
     const byDate={};
     scheduled.forEach(d=>{
       (byDate[d.nextAction]=byDate[d.nextAction]||[]).push(d);
@@ -10056,7 +10081,7 @@ function nhRenderKanban(){
     return;
   }
 
-  let deals=[..._nhDeals];
+  let deals=[..._nhDealsF];
   if(_nhCrmFil!=='all') deals=deals.filter(d=>d.stageId===_nhCrmFil);
 
 
@@ -10908,6 +10933,11 @@ async function nhSmDone(){
     <!-- Contact Book Section -->
     <div class="nh-section on" data-sec="contacts">
       <div class="nh-controls">
+        <select class="nh-search-scope" id="nhCbTypeFilter" onchange="nhRenderContacts()" style="min-width:90px;">
+          <option value="all">All</option>
+          <option value="person">👤 People</option>
+          <option value="company">🏢 Companies</option>
+        </select>
         <select class="nh-search-scope" id="nhCbSearchScope" onchange="nhRenderContacts()">
           <option value="all">All Fields</option>
           <option value="name">Name</option>
@@ -10918,11 +10948,6 @@ async function nhSmDone(){
           <option value="tags">Tags</option>
         </select>
         <input class="nh-search" id="nhCbSearch" type="text" placeholder="" oninput="nhDebouncedRenderContacts()">
-        <select class="nh-search-scope" id="nhCbTypeFilter" onchange="nhRenderContacts()" style="min-width:90px;">
-          <option value="all">All</option>
-          <option value="person">👤 People</option>
-          <option value="company">🏢 Companies</option>
-        </select>
         <button class="nh-add-btn" onclick="nhCbEdit(null,'person')">＋ Person</button>
         <button class="nh-add-btn" onclick="nhCbEdit(null,'company')">＋ Company</button>
       </div>
@@ -10932,6 +10957,11 @@ async function nhSmDone(){
     <!-- CRM Section -->
     <div class="nh-section" data-sec="crm">
       <div class="nh-controls">
+        <select class="nh-search-scope" id="nhCrmTypeFilter" onchange="nhRenderCrm()" style="min-width:90px;">
+          <option value="all">All</option>
+          <option value="person">👤 People</option>
+          <option value="company">🏢 Companies</option>
+        </select>
         <select class="nh-search-scope" id="nhCrmSearchScope" onchange="nhRenderCrm()">
           <option value="all">All Fields</option>
           <option value="name">Name</option>

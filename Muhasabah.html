@@ -510,7 +510,7 @@ body.light-mode .nh-crm-section-head{color:#9a9590!important;border-color:#d4cfc
   display:flex;align-items:center;justify-content:center;
   background:linear-gradient(135deg,#1a1200,#0f1a0f,#1a1200);
   border:1px solid var(--gold-dim);border-radius:8px;
-  padding:10px 20px;position:relative;overflow:hidden;
+  padding:10px 20px;position:relative;
   animation:bannerGlow 3s ease-in-out infinite;
   min-width:0;flex:1;margin:0 24px;
 }
@@ -522,6 +522,7 @@ body.light-mode .nh-crm-section-head{color:#9a9590!important;border-color:#d4cfc
   content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
   background:linear-gradient(90deg,transparent,rgba(200,169,110,.08),transparent);
   animation:shimmer 4s ease-in-out infinite;
+  border-radius:8px;overflow:hidden;pointer-events:none;
 }
 @keyframes shimmer{0%{left:-100%;}100%{left:200%;}}
 .contact-inner{display:flex;align-items:center;gap:10px;}
@@ -532,7 +533,7 @@ body.light-mode .nh-crm-section-head{color:#9a9590!important;border-color:#d4cfc
 }
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.7);}}
 .contact-text{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;}
-.contact-line1,.contact-line2{font-size:11px;color:var(--text-dim);letter-spacing:.4px;white-space:nowrap;}
+.contact-line1,.contact-line2{font-size:11px;color:var(--text-dim);letter-spacing:.4px;white-space:normal;}
 .contact-sep{color:var(--text-muted);font-size:11px;}
 .contact-num{
   font-family:'DM Mono',monospace;font-size:12px;font-weight:500;
@@ -2308,12 +2309,17 @@ body.overlay-open{overflow:hidden;}
     if(window.mhsbToast) mhsbToast('Shortcut downloaded.', 'success');
   };
 
-  // Hide the install button entirely if already running as an installed app
+  // Once already installed, "Install App" no longer makes sense — but the
+  // button must stay, because it's the only door to Offline Content
+  // management. Repurpose it instead of hiding it.
   window.mhsbIsStandalone = isStandalone;
   if(isStandalone){
     document.addEventListener('DOMContentLoaded', function(){
       var btn = document.getElementById('pwaInstallBtn');
-      if(btn) btn.style.display = 'none';
+      if(btn){
+        btn.innerHTML = '&#x1F4E5; Offline Content';
+        btn.setAttribute('onclick', 'openOfflineModal()');
+      }
     });
   }
 

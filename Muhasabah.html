@@ -6,6 +6,12 @@
 <meta name="format-detection" content="telephone=no">
 <title>Muhasabah — Daily Tracker</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBkMGYwZSIvPgogIDwhLS0gQ3Jlc2NlbnQgbW9vbiAtLT4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxMCIgZmlsbD0iI2M4YTk2ZSIvPgogIDxjaXJjbGUgY3g9IjIwIiBjeT0iMTMiIHI9IjgiIGZpbGw9IiMwZDBmMGUiLz4KICA8IS0tIFNtYWxsIHN0YXIgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSIyMywxMCAyMy42LDExLjggMjUuNSwxMS44IDI0LDEyLjkgMjQuNiwxNC43IDIzLDEzLjYgMjEuNCwxNC43IDIyLDEyLjkgMjAuNSwxMS44IDIyLjQsMTEuOCIgZmlsbD0iI2M4YTk2ZSIvPgo8L3N2Zz4K">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d0f0e">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Muhasabah">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=Literata:ital,opsz,wght@0,7..72,300;0,7..72,400;0,7..72,500;1,7..72,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -1359,6 +1365,7 @@ body.overlay-open{overflow:hidden;}
   <div class="header-right">
     <button class="back-btn" id="backBtn" onclick="showCalendar()">← Calendar</button>
     <button class="dark-toggle" id="darkToggle" onclick="toggleDarkMode()" title="Toggle light/dark mode">🌙</button>
+    <button class="export-btn" id="pwaInstallBtn" onclick="openInstallModal()" style="border-color:var(--green);color:var(--green-bright);">&#x1F4F2; Install App</button>
     <button class="export-btn" onclick="openReadMe()" style="border-color:var(--purple);color:var(--purple-bright);animation:readMeGlow 2.5s ease-in-out infinite;">&#x1F4D6; Read Me</button>
     <button class="export-btn" onclick="exportData()">&#x2191; Export</button>
     <button class="import-btn" onclick="openImportModal()">&#x2193; Import</button>
@@ -1435,6 +1442,84 @@ body.overlay-open{overflow:hidden;}
       <button class="btn-donate" onclick="supportDonate()">💛 I'll Donate</button>
       <button class="btn-later" onclick="supportLater()">Remind Me In 7 Days</button>
       <button class="btn-never" onclick="supportNever()">Never Show This Again</button>
+    </div>
+  </div>
+</div>
+
+<!-- Install App Modal -->
+<div class="modal-overlay" id="installModal" onclick="if(event.target===this)closeInstallModal()">
+  <div class="modal" style="max-width:460px;border-color:var(--green);text-align:left;max-height:85vh;overflow-y:auto;padding:0;">
+    <div style="position:sticky;top:0;z-index:10;background:var(--surface);border-bottom:1px solid var(--green);padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <h3 style="color:var(--green-bright);margin:0 0 2px;">&#x1F4F2; Install Muhasabah</h3>
+        <p style="color:var(--text-muted);font-size:10px;letter-spacing:.5px;margin:0;">RUN IT LIKE A NATIVE APP, OFFLINE</p>
+      </div>
+      <button class="qr-close" onclick="closeInstallModal()" style="flex-shrink:0;padding:3px 10px;font-size:9px;">✕ Close</button>
+    </div>
+    <div style="padding:20px 18px 24px;color:var(--text-dim);font-size:11px;line-height:1.8;">
+
+      <p style="margin-bottom:16px;">Add Muhasabah to your home screen or desktop for instant, offline access — no browser bar, no address to type.</p>
+
+      <!-- Option 1: Native install prompt (Chrome/Edge/Android) -->
+      <div id="pwaDirectInstallBlock" style="display:none;padding:14px;border:1px solid var(--green);border-radius:var(--radius);background:rgba(74,124,89,.08);margin-bottom:14px;">
+        <p style="color:var(--green-bright);font-size:10px;letter-spacing:1px;margin-bottom:6px;font-weight:700;">&#x2B07; DIRECT INSTALL</p>
+        <p style="margin-bottom:10px;">Your browser can install this instantly.</p>
+        <button class="btn-donate" onclick="triggerPwaInstall()" style="width:100%;">Install Application</button>
+      </div>
+
+      <!-- Option 2: Desktop shortcut -->
+      <div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;">
+        <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;font-weight:700;">&#x1F5A5; WINDOWS &amp; MAC SHORTCUT</p>
+        <p style="margin-bottom:10px;">Downloads a shortcut file — double-click it to jump straight into Muhasabah in your browser.</p>
+        <button class="btn-later" onclick="downloadDesktopShortcut()" style="width:100%;">Download Desktop Shortcut</button>
+      </div>
+
+      <!-- Option 3: Manual instructions -->
+      <div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius);">
+        <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:10px;font-weight:700;">&#x1F4F1; MOBILE HOME SCREEN</p>
+        <p style="margin-bottom:2px;"><strong style="color:var(--text);">iPhone / iPad (Safari):</strong></p>
+        <p style="margin-bottom:10px;">Tap the Share icon at the bottom, scroll down, then tap "Add to Home Screen".</p>
+        <p style="margin-bottom:2px;"><strong style="color:var(--text);">Android (Chrome):</strong></p>
+        <p style="margin:0;">Tap the ⋮ menu top-right, then tap "Install app" or "Add to Home screen".</p>
+      </div>
+
+      <!-- Option 4: Full offline data -->
+      <div style="padding:14px;border:1px solid var(--border);border-radius:var(--radius);margin-top:14px;">
+        <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;font-weight:700;">&#x1F4E5; FULL OFFLINE DATA (~35 MB)</p>
+        <p style="margin-bottom:10px;">Download the complete Quran, Hadith and language data so every reader works with zero internet.</p>
+        <button class="btn-later" onclick="closeInstallModal();setTimeout(openOfflineModal,150);" style="width:100%;">Manage Offline Content</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Offline Content Precache Modal -->
+<div class="modal-overlay" id="offlinePrecacheModal">
+  <div class="modal" style="max-width:420px;border-color:var(--gold);text-align:left;padding:0;">
+    <div style="padding:18px 18px 14px;border-bottom:1px solid var(--border);">
+      <h3 style="color:var(--gold);margin:0 0 4px;">&#x1F4E5; Save Everything for Offline Use?</h3>
+      <p style="color:var(--text-muted);font-size:10px;letter-spacing:.5px;margin:0;">QURAN, HADITH &amp; LANGUAGE DATA — ~35 MB</p>
+    </div>
+    <div style="padding:18px;color:var(--text-dim);font-size:11px;line-height:1.8;">
+      <p style="margin-bottom:16px;">Muhasabah can download the full Quran, Hadith, and language-learning data now so every reader works with no internet later. This is about 35 MB — on mobile data that may take a moment and use part of your data plan. You can always do this later from the Install App menu instead.</p>
+
+      <div id="offlinePromptButtons" style="display:flex;gap:10px;">
+        <button class="btn-donate" onclick="offlineDownloadNow()" style="flex:1;">Download Now</button>
+        <button class="btn-later" onclick="offlineSkipForNow()" style="flex:1;">Skip, I'll Do It Later</button>
+      </div>
+
+      <div id="offlineProgressBlock" style="display:none;">
+        <div style="height:8px;border-radius:4px;background:var(--surface2);overflow:hidden;margin-bottom:10px;">
+          <div id="offlineProgressBar" style="height:100%;width:0%;background:var(--gold);transition:width .2s ease;"></div>
+        </div>
+        <p id="offlineProgressLabel" style="color:var(--text);font-family:'DM Mono',monospace;font-size:11px;margin:0;">Starting download…</p>
+      </div>
+
+      <div id="offlineDoneBlock" style="display:none;">
+        <p style="color:var(--green-bright);margin-bottom:12px;">&#x2713; Offline content is already saved on this device.</p>
+        <button class="btn-later" onclick="offlineDownloadNow()" style="width:100%;">Re-download / Refresh Offline Content</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2162,6 +2247,209 @@ body.overlay-open{overflow:hidden;}
       setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},260);
     },dur);
   };
+})();
+
+/* ── PWA Install ── */
+(function(){
+  var deferredPrompt = null;
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true; // iOS Safari
+
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    var block = document.getElementById('pwaDirectInstallBlock');
+    if(block) block.style.display = 'block';
+  });
+
+  window.addEventListener('appinstalled', function(){
+    deferredPrompt = null;
+    if(window.mhsbToast) mhsbToast('Muhasabah installed. Launch it from your home screen.', 'success');
+    var btn = document.getElementById('pwaInstallBtn');
+    if(btn) btn.style.display = 'none';
+  });
+
+  window.openInstallModal = function(){
+    document.getElementById('installModal').classList.add('active');
+  };
+  window.closeInstallModal = function(){
+    document.getElementById('installModal').classList.remove('active');
+  };
+
+  window.triggerPwaInstall = async function(){
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    var choice = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById('pwaDirectInstallBlock').style.display = 'none';
+    closeInstallModal();
+    if(choice.outcome === 'accepted' && window.mhsbToast) mhsbToast('Installing Muhasabah…', 'success');
+  };
+
+  window.downloadDesktopShortcut = function(){
+    var pageUrl = window.location.href.split('#')[0].split('?')[0];
+    var urlContent = '[InternetShortcut]\r\nURL=' + pageUrl + '\r\n';
+    var blob = new Blob([urlContent], {type:'text/plain'});
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = 'Muhasabah.url';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    closeInstallModal();
+    if(window.mhsbToast) mhsbToast('Shortcut downloaded.', 'success');
+  };
+
+  // Hide the install button entirely if already running as an installed app
+  window.mhsbIsStandalone = isStandalone;
+  if(isStandalone){
+    document.addEventListener('DOMContentLoaded', function(){
+      var btn = document.getElementById('pwaInstallBtn');
+      if(btn) btn.style.display = 'none';
+    });
+  }
+
+  // Register service worker for offline support
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(err){
+        console.warn('Service worker registration failed:', err);
+      });
+    });
+  }
+})();
+
+/* ── Offline Content Precache (Quran, Hadith, Language data) ── */
+window.mhsbOfflinePrecache = (function(){
+  var CACHE_NAME = 'muhasabah-v1'; // must match sw.js CACHE_VERSION
+  var FILES = [
+    {path:'Asmaul Husna.json', bytes:17738},
+    {path:'Book.json', bytes:739327},
+    {path:'Hadith Bukhari.json', bytes:3274928},
+    {path:'Imdadia Hafezi Quran.pdf', bytes:16109693},
+    {path:'Language Learner AR.json', bytes:3251613},
+    {path:'Language Learner BN.json', bytes:1947930},
+    {path:'Language Learner EN.json', bytes:948487},
+    {path:'Language Learner HI.json', bytes:1887272},
+    {path:'Language Learner UR.json', bytes:2682777},
+    {path:'Quran Arabic.json', bytes:1571900},
+    {path:'Quran English.json', bytes:1073728},
+    {path:'Quran Transliteration.json', bytes:874627},
+    {path:'Zikr Evening.json', bytes:56161},
+    {path:'Zikr From Book.json', bytes:96753},
+    {path:'Zikr Morning.json', bytes:56176},
+    {path:'Zikr.json', bytes:1401}
+  ];
+  var TOTAL_BYTES = FILES.reduce(function(s,f){ return s+f.bytes; }, 0);
+
+  function fmtMB(bytes){ return (bytes/1048576).toFixed(1); }
+
+  // Downloads every file, streaming each one chunk-by-chunk so progress
+  // moves smoothly even during the large PDF, instead of jumping in
+  // big steps. Skips files already sitting in the cache from normal use.
+  async function downloadAll(onProgress){
+    if(!('caches' in window)) throw new Error('Cache Storage not supported in this browser');
+    var cache = await caches.open(CACHE_NAME);
+    var loaded = 0;
+    onProgress(0, TOTAL_BYTES);
+
+    for (var i = 0; i < FILES.length; i++){
+      var f = FILES[i];
+      var url = encodeURI('./' + f.path);
+
+      var already = await cache.match(url);
+      if(already){
+        loaded += f.bytes;
+        onProgress(Math.min(loaded, TOTAL_BYTES), TOTAL_BYTES);
+        continue;
+      }
+
+      var res = await fetch(url);
+      if(!res.ok) throw new Error('Failed to fetch ' + f.path + ' (' + res.status + ')');
+
+      if(!res.body || !res.body.getReader){
+        // Fallback for browsers without streaming body support
+        var blobFallback = await res.clone().blob();
+        await cache.put(url, new Response(blobFallback, {headers: res.headers}));
+        loaded += f.bytes;
+        onProgress(Math.min(loaded, TOTAL_BYTES), TOTAL_BYTES);
+        continue;
+      }
+
+      var reader = res.body.getReader();
+      var chunks = [];
+      while(true){
+        var chunk = await reader.read();
+        if(chunk.done) break;
+        chunks.push(chunk.value);
+        loaded += chunk.value.length;
+        onProgress(Math.min(loaded, TOTAL_BYTES), TOTAL_BYTES);
+      }
+      var blob = new Blob(chunks);
+      await cache.put(url, new Response(blob, {headers: res.headers}));
+    }
+  }
+
+  return { downloadAll: downloadAll, TOTAL_BYTES: TOTAL_BYTES, fmtMB: fmtMB };
+})();
+
+(function(){
+  function setPhase(phase){
+    document.getElementById('offlinePromptButtons').style.display = phase === 'prompt' ? 'flex' : 'none';
+    document.getElementById('offlineProgressBlock').style.display = phase === 'progress' ? 'block' : 'none';
+    document.getElementById('offlineDoneBlock').style.display = phase === 'done' ? 'block' : 'none';
+  }
+
+  window.openOfflineModal = function(){
+    var status = localStorage.getItem('mhsb_offline_status');
+    setPhase(status === 'done' ? 'done' : 'prompt');
+    document.getElementById('offlinePrecacheModal').classList.add('active');
+  };
+  window.closeOfflineModal = function(){
+    document.getElementById('offlinePrecacheModal').classList.remove('active');
+  };
+
+  window.offlineSkipForNow = function(){
+    localStorage.setItem('mhsb_offline_status', 'skipped');
+    closeOfflineModal();
+    if(window.mhsbToast) mhsbToast('You can download offline content anytime from Install App.', 'info');
+  };
+
+  window.offlineDownloadNow = function(){
+    setPhase('progress');
+    var bar = document.getElementById('offlineProgressBar');
+    var label = document.getElementById('offlineProgressLabel');
+
+    mhsbOfflinePrecache.downloadAll(function(loaded, total){
+      var pct = Math.min(100, Math.round((loaded/total)*100));
+      bar.style.width = pct + '%';
+      label.textContent = 'Downloading offline content: ' + mhsbOfflinePrecache.fmtMB(loaded) + ' of ' + mhsbOfflinePrecache.fmtMB(total) + ' MB (' + pct + '%)';
+    }).then(function(){
+      localStorage.setItem('mhsb_offline_status', 'done');
+      if(window.mhsbToast) mhsbToast('All content saved for offline use.', 'success');
+      setPhase('done');
+    }).catch(function(err){
+      console.warn('Offline precache interrupted:', err);
+      label.textContent = 'Download interrupted — check your connection and try again.';
+      if(window.mhsbToast) mhsbToast('Offline download interrupted. Try again when your connection is stable.', 'error');
+      setPhase('prompt');
+    });
+  };
+
+  // Prompt once, on first-ever load — but only for people who've actually
+  // installed the app. A casual visitor just checking the site in a normal
+  // browser tab shouldn't get hit with a "download 35MB?" popup; that only
+  // makes sense once someone has committed to using this as their app.
+  document.addEventListener('DOMContentLoaded', function(){
+    var status = localStorage.getItem('mhsb_offline_status');
+    if(!status && window.mhsbIsStandalone){
+      setTimeout(function(){
+        if(!document.querySelector('.modal-overlay.active')) openOfflineModal();
+      }, 1800);
+    }
+  });
 })();
 
 /* ══════════════════════════════════════════════════════════

@@ -512,7 +512,7 @@ body.light-mode .nh-crm-section-head{color:#9a9590!important;border-color:#d4cfc
   border:1px solid var(--gold-dim);border-radius:8px;
   padding:10px 20px;position:relative;
   animation:bannerGlow 3s ease-in-out infinite;
-  min-width:0;flex:1;margin:0 24px;
+  min-width:280px;flex:1;margin:0 24px;
 }
 @keyframes bannerGlow{
   0%,100%{box-shadow:0 0 8px rgba(200,169,110,.15),inset 0 0 20px rgba(200,169,110,.03);}
@@ -570,6 +570,27 @@ a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 .export-btn:hover{background:#1a1500;border-color:var(--gold);}
 .import-btn{background:var(--surface2);border:1px solid var(--purple);color:var(--purple-bright);padding:7px 14px;border-radius:var(--radius);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;transition:all .2s;}
 .import-btn:hover{background:#1a102a;border-color:var(--purple-bright);}
+
+/* ── Header Menu Dropdown ── */
+.hdr-menu-wrap{position:relative;}
+.hdr-menu-dropdown{
+  display:none;position:absolute;top:calc(100% + 8px);right:0;
+  background:var(--surface);border:1px solid var(--gold-dim);border-radius:10px;
+  min-width:200px;padding:6px;z-index:200;
+  box-shadow:0 12px 32px rgba(0,0,0,.5);
+  flex-direction:column;gap:2px;
+}
+.hdr-menu-dropdown.open{display:flex;}
+.hdr-menu-dropdown button{
+  background:transparent;border:none;text-align:left;
+  padding:9px 12px;border-radius:6px;cursor:pointer;
+  font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.6px;
+  color:var(--text-dim);transition:background .15s;
+}
+.hdr-menu-dropdown button:hover{background:var(--surface2);color:var(--text);}
+.hdr-menu-sep{height:1px;background:var(--border);margin:5px 4px;}
+body.light-mode .hdr-menu-dropdown{background:#fdfaf3;border-color:var(--gold-dim);box-shadow:0 12px 32px rgba(0,0,0,.15);}
+body.light-mode .hdr-menu-dropdown button:hover{background:#f0e9d8;}
 
 /* ── Modal ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:999;align-items:center;justify-content:center;overscroll-behavior:contain;}
@@ -1366,12 +1387,20 @@ body.overlay-open{overflow:hidden;}
   <div class="header-right">
     <button class="back-btn" id="backBtn" onclick="showCalendar()">← Calendar</button>
     <button class="dark-toggle" id="darkToggle" onclick="toggleDarkMode()" title="Toggle light/dark mode">🌙</button>
-    <button class="export-btn" id="pwaInstallBtn" onclick="openInstallModal()" style="border-color:var(--green);color:var(--green-bright);">&#x1F4F2; Install App</button>
-    <button class="export-btn" onclick="openReadMe()" style="border-color:var(--purple);color:var(--purple-bright);animation:readMeGlow 2.5s ease-in-out infinite;">&#x1F4D6; Read Me</button>
-    <button class="export-btn" onclick="exportData()">&#x2191; Export</button>
-    <button class="import-btn" onclick="openImportModal()">&#x2193; Import</button>
-    <button class="export-btn ov-nav-btn" onclick="openOverview()">📊 Overview</button>
-    <button class="reset-btn" onclick="openResetModal()">Reset All Data</button>
+    <div class="hdr-menu-wrap" id="hdrMenuWrap">
+      <button class="export-btn" id="hdrMenuBtn" onclick="toggleHdrMenu(event)" style="display:flex;align-items:center;gap:6px;">
+        &#9776; Menu
+      </button>
+      <div class="hdr-menu-dropdown" id="hdrMenuDropdown">
+        <button onclick="closeHdrMenu();openInstallModal();" id="pwaInstallBtn" style="color:var(--green-bright);">&#x1F4F2; Install App</button>
+        <button onclick="closeHdrMenu();openReadMe();" style="color:var(--purple-bright);">&#x1F4D6; Read Me</button>
+        <button onclick="closeHdrMenu();exportData();">&#x2191; Export</button>
+        <button onclick="closeHdrMenu();openImportModal();">&#x2193; Import</button>
+        <button onclick="closeHdrMenu();openOverview();">📊 Overview</button>
+        <div class="hdr-menu-sep"></div>
+        <button onclick="closeHdrMenu();openResetModal();" style="color:#c05a5a;">Reset All Data</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1550,9 +1579,18 @@ body.overlay-open{overflow:hidden;}
       <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">📅 NAVIGATION & DATA</p>
       <p style="margin-bottom:16px;">Tap any date on the calendar to open that day. Past days can be edited freely until you open today — once you enter the current date, yesterday locks permanently. Data is stored on your device via IndexedDB. Export regularly as a backup; Import to restore or move to another device.</p>
 
+      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">&#9776; MENU</p>
+      <p style="margin-bottom:16px;">Read Me, Export, Import, Overview, and Reset All Data now live under the <strong style="color:var(--text);">☰ Menu</strong> button in the top-right, instead of sitting as separate buttons across the header.</p>
+
+      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">&#x1F4F2; INSTALL THE APP</p>
+      <p style="margin-bottom:16px;">Menu → <strong style="color:var(--text);">Install App</strong> adds Muhasabah to your phone's home screen or your computer's desktop, so it opens full-screen like a native app instead of a browser tab. On Chrome/Android it installs directly; on iPhone/Safari it walks you through the manual "Add to Home Screen" steps, since Apple doesn't allow the direct method. There's also a desktop shortcut option for Windows/Mac. Once installed, this same button turns into <strong style="color:var(--text);">📥 Offline Content</strong> — see below.</p>
+
+      <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">&#x1F4E5; OFFLINE CONTENT</p>
+      <p style="margin-bottom:16px;">The Quran, Hadith, and language-learning data together are about 35 MB. After installing, you'll be asked once whether to download all of it now for full offline access — or skip it and only download things as you actually open them. If you skip, you can come back anytime via Menu → Install App → <strong style="color:var(--text);">Manage Offline Content</strong>, no matter how much later.</p>
+
       <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:6px;">📊 SCORING</p>
       <p style="margin-bottom:8px;"><strong style="color:var(--text);">Core Score</strong> is capped at 100%. <strong style="color:var(--text);">Bonus Score</strong> is capped at 50% and stacks on top — your total can reach 150%. A Perfect Day (100% core) appears in green on the calendar. All scores update live.</p>
-      <p style="margin-bottom:16px;">The <strong style="color:var(--text);">📊 Overview</strong> button in the header gives you a daily summary, monthly averages, and a full-year breakdown — with per-habit progress for every period.</p>
+      <p style="margin-bottom:16px;">The <strong style="color:var(--text);">📊 Overview</strong> option under the ☰ Menu gives you a daily summary, monthly averages, and a full-year breakdown — with per-habit progress for every period.</p>
 
       <p style="color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:10px;">🕌 CORE GOALS — 100% MAX</p>
 
@@ -2237,6 +2275,24 @@ body.overlay-open{overflow:hidden;}
 
 
 <script>
+/* ── Header Menu Dropdown ── */
+(function(){
+  window.toggleHdrMenu = function(e){
+    if(e) e.stopPropagation();
+    document.getElementById('hdrMenuDropdown').classList.toggle('open');
+  };
+  window.closeHdrMenu = function(){
+    document.getElementById('hdrMenuDropdown').classList.remove('open');
+  };
+  document.addEventListener('click', function(e){
+    var wrap = document.getElementById('hdrMenuWrap');
+    if(wrap && !wrap.contains(e.target)) closeHdrMenu();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeHdrMenu();
+  });
+})();
+
 /* ── Toast notification system ── */
 (function(){
   var _toastQ=[];var _running=false;
@@ -2273,7 +2329,10 @@ body.overlay-open{overflow:hidden;}
     deferredPrompt = null;
     if(window.mhsbToast) mhsbToast('Muhasabah installed. Launch it from your home screen.', 'success');
     var btn = document.getElementById('pwaInstallBtn');
-    if(btn) btn.style.display = 'none';
+    if(btn){
+      btn.innerHTML = '&#x1F4E5; Offline Content';
+      btn.setAttribute('onclick', 'closeHdrMenu();openOfflineModal();');
+    }
   });
 
   window.openInstallModal = function(){
@@ -2318,7 +2377,7 @@ body.overlay-open{overflow:hidden;}
       var btn = document.getElementById('pwaInstallBtn');
       if(btn){
         btn.innerHTML = '&#x1F4E5; Offline Content';
-        btn.setAttribute('onclick', 'openOfflineModal()');
+        btn.setAttribute('onclick', 'closeHdrMenu();openOfflineModal();');
       }
     });
   }

@@ -1495,11 +1495,14 @@ body.overlay-open{overflow:hidden;}
 </div>
 
 <!-- Offline Content Precache Modal -->
-<div class="modal-overlay" id="offlinePrecacheModal">
+<div class="modal-overlay" id="offlinePrecacheModal" onclick="if(event.target===this)closeOfflineModal()">
   <div class="modal" style="max-width:420px;border-color:var(--gold);text-align:left;padding:0;">
-    <div style="padding:18px 18px 14px;border-bottom:1px solid var(--border);">
-      <h3 style="color:var(--gold);margin:0 0 4px;">&#x1F4E5; Save Everything for Offline Use?</h3>
-      <p style="color:var(--text-muted);font-size:10px;letter-spacing:.5px;margin:0;">QURAN, HADITH &amp; LANGUAGE DATA — ~35 MB</p>
+    <div style="padding:18px 18px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+      <div>
+        <h3 style="color:var(--gold);margin:0 0 4px;">&#x1F4E5; Save Everything for Offline Use?</h3>
+        <p style="color:var(--text-muted);font-size:10px;letter-spacing:.5px;margin:0;">QURAN, HADITH &amp; LANGUAGE DATA — ~35 MB</p>
+      </div>
+      <button class="qr-close" onclick="closeOfflineModal()" style="flex-shrink:0;padding:3px 10px;font-size:9px;">✕ Close</button>
     </div>
     <div style="padding:18px;color:var(--text-dim);font-size:11px;line-height:1.8;">
       <p style="margin-bottom:16px;">Muhasabah can download the full Quran, Hadith, and language-learning data now so every reader works with no internet later. This is about 35 MB — on mobile data that may take a moment and use part of your data plan. You can always do this later from the Install App menu instead.</p>
@@ -1518,7 +1521,10 @@ body.overlay-open{overflow:hidden;}
 
       <div id="offlineDoneBlock" style="display:none;">
         <p style="color:var(--green-bright);margin-bottom:12px;">&#x2713; Offline content is already saved on this device.</p>
-        <button class="btn-later" onclick="offlineDownloadNow()" style="width:100%;">Re-download / Refresh Offline Content</button>
+        <div style="display:flex;gap:10px;">
+          <button class="btn-later" onclick="offlineDownloadNow()" style="flex:1;">Re-download / Refresh</button>
+          <button class="btn-donate" onclick="closeOfflineModal()" style="flex:1;">Close</button>
+        </div>
       </div>
     </div>
   </div>

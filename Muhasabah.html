@@ -826,12 +826,8 @@ select option{background:#1c1f1c;}
   .header-title{font-size:16px !important;}
   .header-sub{font-size:8px !important;letter-spacing:1px !important;}
   .header-right{
-    width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;
-    padding-bottom:4px;gap:6px;flex-wrap:nowrap;
+    width:100%;flex-wrap:wrap;gap:6px;
   }
-  .header-right::-webkit-scrollbar{height:3px;}
-  .header-right::-webkit-scrollbar-track{background:transparent;}
-  .header-right::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
   .back-btn,.export-btn,.import-btn,.reset-btn,.dark-toggle{
     flex-shrink:0;font-size:9px;padding:5px 9px;white-space:nowrap;letter-spacing:0.5px;
   }
@@ -841,6 +837,11 @@ select option{background:#1c1f1c;}
   .daily-header{gap:6px !important;flex-wrap:wrap !important;}
   .daily-pct-display{font-size:13px !important;}
   .daily-bonus-display,.daily-total-display{font-size:11px !important;}
+
+  /* ── Counter rows (Sadaqah/Zikr/Tahajjud "X Today" pill) ── */
+  .qr-pages-today{font-size:11px;min-width:0;}
+  .stepper-row{gap:4px !important;}
+  .step-btn{min-width:36px;padding:0 6px;}
 
   /* ── Quran / PDF reader topbar ── */
   .qr-topbar{padding:8px 12px;gap:6px;}
@@ -944,7 +945,7 @@ button:focus,button:focus-visible{outline:none;}
   font-size:11px;letter-spacing:1px;transition:all .2s;
 }
 .qr-open-btn:hover{background:linear-gradient(135deg,#152010,#253525);box-shadow:0 0 12px rgba(74,124,89,.2);}
-.qr-pages-today{font-size:13px;color:var(--text-dim);background:var(--surface2);height:36px;line-height:36px;padding:0 10px;border-radius:var(--radius);text-align:center;letter-spacing:.5px;}
+.qr-pages-today{font-size:13px;color:var(--text-dim);background:var(--surface2);min-height:36px;display:flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:var(--radius);text-align:center;letter-spacing:.5px;line-height:1.3;}
 .qr-session-badge{
   margin-top:8px;font-size:10px;color:var(--text-muted);letter-spacing:.5px;
   background:var(--surface2);padding:5px 8px;border-radius:3px;line-height:1.6;
@@ -7906,7 +7907,7 @@ async function pwSend() {
       <div id="lrConjPanel" style="background:#1a1610;border-left:3px solid #c9a84c;border-radius:0 8px 8px 0;padding:18px 20px;">
         <div id="lrLabelConj" style="font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:12px;font-family:'DM Mono',monospace;">Conjugation</div>
         <div style="overflow-x:auto;">
-          <table id="lrConjTable" style="width:100%;border-collapse:collapse;min-width:360px;"></table>
+          <table id="lrConjTable" style="border-collapse:collapse;"></table>
         </div>
       </div>
 
@@ -8348,9 +8349,9 @@ function lrRender() {
 
     let html = '';
     if (isAr) {
-      const tdP   = `font-size:13px;color:${tdPColor};padding:6px 8px;border-bottom:1px solid ${cellBorder};font-family:'Amiri',serif;direction:rtl;text-align:center;`;
-      const tdAr  = `font-size:17px;color:${tdArColor};padding:6px 8px;border-bottom:1px solid ${cellBorder};font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;`;
-      const tdDim = `font-size:15px;color:${tdDimColor};padding:6px 8px;border-bottom:1px solid ${cellBorder};font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;`;
+      const tdP   = `font-size:13px;color:${tdPColor};padding:6px 8px;border-bottom:1px solid ${cellBorder};font-family:'Amiri',serif;direction:rtl;text-align:center;white-space:nowrap;`;
+      const tdAr  = `font-size:17px;color:${tdArColor};padding:6px 8px;border-bottom:1px solid ${cellBorder};font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;white-space:nowrap;`;
+      const tdDim = `font-size:15px;color:${tdDimColor};padding:6px 8px;border-bottom:1px solid ${cellBorder};font-family:'Amiri',serif;direction:rtl;text-align:center;line-height:1.8;white-space:nowrap;`;
       html = '<tr>'
         + '<th style="'+thS+'">ضمير</th>'
         + '<th style="'+thS+'">ماضي</th>'
@@ -8372,8 +8373,8 @@ function lrRender() {
     } else if (_lrLang === 'ur' && typeof lang.conj === 'object' && !Array.isArray(lang.conj)) {
       const urFont = "'Amiri',serif";
       const thSU = `font-size:0.9rem;letter-spacing:0;color:${thColor};padding:7px 8px;text-align:center;font-weight:400;font-family:${urFont};border-bottom:1px solid ${rowBorder};white-space:nowrap;direction:rtl;`;
-      const tdP  = `font-size:14px;color:${tdPColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${urFont};text-align:center;direction:rtl;line-height:1.8;`;
-      const tdF  = `font-size:15px;color:${tdFColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${urFont};text-align:center;direction:rtl;line-height:1.8;`;
+      const tdP  = `font-size:14px;color:${tdPColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${urFont};text-align:center;direction:rtl;line-height:1.8;white-space:nowrap;`;
+      const tdF  = `font-size:15px;color:${tdFColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${urFont};text-align:center;direction:rtl;line-height:1.8;white-space:nowrap;`;
       const hdrs = ['ضمیر','ماضی','حال','مستقبل'];
       html = '<tr>' + hdrs.map(h=>`<th style="${thSU}">${h}</th>`).join('') + '</tr>';
       if (lang.conj.conjNote) {
@@ -8401,8 +8402,8 @@ function lrRender() {
       const hdrs = CONJ_HDRS[_lrLang] || CONJ_HDRS.en;
       const thSL = `font-size:${thFSize};letter-spacing:0.05em;color:${thColor};padding:7px 8px;text-align:center;font-weight:400;font-family:${thFont};border-bottom:1px solid ${rowBorder};white-space:nowrap;direction:${thDir};`;
       html = '<tr>' + hdrs.map(h=>`<th style="${thSL}">${h}</th>`).join('') + '</tr>';
-      const tdP = `font-size:12px;color:${tdPColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${thFont};text-align:center;direction:${thDir};`;
-      const tdF = `font-size:${isUr?'15px':'12px'};color:${tdFColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${thFont};text-align:center;direction:${thDir};`;
+      const tdP = `font-size:12px;color:${tdPColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${thFont};text-align:center;direction:${thDir};white-space:nowrap;`;
+      const tdF = `font-size:${isUr?'15px':'12px'};color:${tdFColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${thFont};text-align:center;direction:${thDir};white-space:nowrap;`;
       for (const row of lang.conj) {
         html += '<tr>'
           + '<td style="'+tdP+'">'+(row.pronoun||row.person||'—')+'</td>'
@@ -8419,8 +8420,8 @@ function lrRender() {
       const hdrs = CONJ_HDRS_BN[_lrLang] || { person:'Person', past:'Past', present:'Present', future:'Future' };
       const cellFont = "'Literata',Georgia,serif";
       const thSB = `font-size:0.72rem;letter-spacing:0;color:${thColor};padding:7px 8px;text-align:center;font-weight:400;font-family:${cellFont};border-bottom:1px solid ${rowBorder};white-space:nowrap;`;
-      const tdP  = `font-size:12px;color:${tdPColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${cellFont};text-align:center;`;
-      const tdF  = `font-size:13px;color:${tdFColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${cellFont};text-align:center;`;
+      const tdP  = `font-size:12px;color:${tdPColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${cellFont};text-align:center;white-space:nowrap;`;
+      const tdF  = `font-size:13px;color:${tdFColor};padding:5px 8px;border-bottom:1px solid ${cellBorder};font-family:${cellFont};text-align:center;white-space:nowrap;`;
       html = '<tr>'
         + `<th style="${thSB}">${hdrs.person}</th>`
         + `<th style="${thSB}">${hdrs.past}</th>`
@@ -8438,8 +8439,8 @@ function lrRender() {
       }
     }
     conjTable.innerHTML = html;
-    conjTable.style.tableLayout = 'fixed';
-    conjTable.style.width = '100%';
+    conjTable.style.tableLayout = 'auto';
+    conjTable.style.width = 'auto';
     conjTable.parentElement.style.overflowX = 'auto';
   } else {
     conjPanel.style.display = 'none';

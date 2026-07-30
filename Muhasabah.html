@@ -176,7 +176,7 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 
 /* ── CONTACT BOOK ── */
 .nh-cb-list{display:flex;flex-direction:column;gap:10px;}
-.nh-cb-card{background:#141008;border:1px solid #2a2010;border-radius:8px;padding:14px 16px;transition:border-color .2s;}
+.nh-cb-card{--card-bg:#141008;background:#141008;border:1px solid #2a2010;border-radius:8px;padding:14px 16px;transition:border-color .2s;}
 .nh-cb-card:hover{border-color:var(--gold-dim);}
 .nh-cb-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px;}
 .nh-cb-name{font-family:'Instrument Serif',serif;font-size:16px;color:#f0e4c0;}
@@ -247,7 +247,7 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-cal-row.open .nh-col-chev{transform:rotate(180deg);}
 
 /* Deal cards */
-.nh-deal{background:#1a1610;border:1px solid #2a2010;border-radius:6px;padding:12px 14px;transition:border-color .2s;cursor:grab;touch-action:none;}
+.nh-deal{--card-bg:#1a1610;background:#1a1610;border:1px solid #2a2010;border-radius:6px;padding:12px 14px;transition:border-color .2s;cursor:grab;touch-action:none;}
 .nh-deal.bulk{cursor:pointer;}
 .nh-deal.checked{border-color:var(--gold);background:#211b10;}
 .nh-deal-check{width:15px;height:15px;margin-right:8px;vertical-align:middle;accent-color:var(--gold);cursor:pointer;}
@@ -272,7 +272,10 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-next-date.soon{color:var(--gold);}
 .nh-next-action-note{font-family:'DM Mono',monospace;font-size:10px;color:#e0d4b0;background:rgba(200,169,110,.06);border:1px solid #2a2010;border-radius:var(--radius);padding:5px 9px;margin:6px 0 0;}
 .nh-deal-bottom{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
-.nh-deal-notes-stack{display:flex;flex-direction:column;gap:6px;width:100%;}
+.nh-deal-notes-stack{display:flex;flex-direction:column;gap:6px;width:100%;max-height:108px;overflow-y:auto;scrollbar-width:thin;}
+.nh-notes-wrap{position:relative;}
+.nh-notes-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:16px;background:linear-gradient(to bottom,var(--card-bg,#1a1610),transparent);pointer-events:none;opacity:0;transition:opacity .15s;z-index:1;}
+.nh-notes-wrap.has-scroll::before{opacity:1;}
 .nh-deal-note-row{font-size:11px;color:#a89060;font-style:italic;line-height:1.5;word-break:break-word;}
 .nh-deal-note-row .nh-note-date{font-style:normal;color:#7a6a40;font-size:10px;margin-right:6px;white-space:nowrap;}
 .nh-deal-note-empty{font-size:10px;color:#5a4e30;font-style:italic;}
@@ -390,7 +393,7 @@ body.light-mode .nh-field input,body.light-mode .nh-field select,body.light-mode
 }
 body.light-mode .nh-field label{color:#9a9590!important;}
 body.light-mode .nh-field select option{background:#ffffff!important;color:#1a1a18!important;}
-body.light-mode .nh-cb-card{background:#f0ede6!important;border-color:#d4cfc5!important;}
+body.light-mode .nh-cb-card{--card-bg:#f0ede6;background:#f0ede6!important;border-color:#d4cfc5!important;}
 body.light-mode .nh-cb-card:hover{border-color:#9a7228!important;}
 body.light-mode .nh-sm-btn{background:#e8e2d6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .nh-sm-btn:hover{border-color:#9a7228!important;color:#1a1a18!important;}
@@ -444,7 +447,7 @@ body.light-mode .nh-cal-row-hd:hover{background:#e8e2d6!important;}
 body.light-mode .nh-cal-row-body{border-color:#d4cfc5!important;}
 body.light-mode .nh-cal-row-date{color:#1a1a18!important;}
 body.light-mode .nh-cal-row-date.urg{color:var(--red)!important;}
-body.light-mode .nh-deal{background:#e8e2d6!important;border-color:#d4cfc5!important;}
+body.light-mode .nh-deal{--card-bg:#e8e2d6;background:#e8e2d6!important;border-color:#d4cfc5!important;}
 body.light-mode .nh-deal:hover{border-color:#9a7228!important;}
 body.light-mode .nh-deal.ov{background:#fdf0f0!important;border-color:var(--red)!important;}
 body.light-mode .nh-ov-tag{background:#fdf0f0!important;border-color:var(--red)!important;color:var(--red)!important;}
@@ -8954,6 +8957,23 @@ function nhCalDateLabel(ds,diff){
 }
 function nhStageName(id){return(_nhStages.find(s=>s.id===id)||{name:'—'}).name;}
 function nhStageColor(id){return(_nhStages.find(s=>s.id===id)||{color:'#6a7080'}).color;}
+// Logs a stage transition as a note entry ("Old Stage > New Stage") on the deal's linked entity.
+// Silently does nothing if the stage didn't actually change, so callers can call this unconditionally.
+function nhLogStageChange(deal,oldStageId,newStageId){
+  if(!deal||!oldStageId||!newStageId||oldStageId===newStageId)return;
+  const entityId=deal.contactId||deal.id;
+  _nhNotes.push({id:nhId(),entityId,date:nhToday(),text:`${nhStageName(oldStageId)} > ${nhStageName(newStageId)}`});
+}
+// After (re)rendering cards, scrolls each note stack to its most recent note and shows the
+// top fade gradient on any stack whose notes overflow the visible area (i.e. is scrollable).
+function nhRefreshNoteStacks(container){
+  if(!container)return;
+  container.querySelectorAll('.nh-deal-notes-stack').forEach(s=>{
+    s.scrollTop=s.scrollHeight;
+    const wrap=s.closest('.nh-notes-wrap');
+    if(wrap)wrap.classList.toggle('has-scroll',s.scrollHeight>s.clientHeight+1);
+  });
+}
 
 function nhLinkBtns(obj,contactRef){
   let h='';
@@ -9613,8 +9633,8 @@ function nhRenderContacts(resetPage){
     const deal=_nhDeals.find(d=>d.contactId===c.id);
     const stageBadge=deal?`<span class="nh-stage-badge" style="border-color:${nhStageColor(deal.stageId)};color:${nhStageColor(deal.stageId)}"><span class="nh-col-dot" style="background:${nhStageColor(deal.stageId)}"></span>${nhStageName(deal.stageId)}</span>`:'';
     const noteList=nhNotesFor(c.id);
-    const recentNotes=noteList.slice(-5);
-    const notesHtml=`<div class="nh-deal-notes-stack">${recentNotes.length?recentNotes.map(n=>`<div class="nh-deal-note-row"><span class="nh-note-date">${n.date}</span>${n.text}</div>`).join(''):'<div class="nh-deal-note-empty">No notes yet</div>'}</div>`;
+    const recentNotes=noteList;
+    const notesHtml=`<div class="nh-notes-wrap"><div class="nh-deal-notes-stack">${recentNotes.length?recentNotes.map(n=>`<div class="nh-deal-note-row"><span class="nh-note-date">${n.date}</span>${n.text}</div>`).join(''):'<div class="nh-deal-note-empty">No notes yet</div>'}</div></div>`;
     return `<div class="nh-cb-card">
       <div class="nh-cb-card-top">
         <div style="display:flex;align-items:flex-start;flex:1;min-width:0;">
@@ -9637,6 +9657,7 @@ function nhRenderContacts(resetPage){
     </div>`;
   };
   el.innerHTML=visible.map(renderCard).join('')+(hasMore?`<div style="text-align:center;padding:16px 0;"><button class="nh-add-btn" onclick="_nhCbPage++;nhRenderContacts(false)">Load more (${total-end} remaining)</button></div>`:'');
+  nhRefreshNoteStacks(el);
 }
 
 /* ── Shared modal helper: open + reset scroll to top ── */
@@ -10020,6 +10041,7 @@ function nhRenderKanban(){
       return name.includes(_crmQ)||role.includes(_crmQ)||company.includes(_crmQ)||country.includes(_crmQ)||tags.includes(_crmQ)||contact_info.includes(_crmQ);
     }).sort((a,b)=>(a.contactName||'').localeCompare(b.contactName||''));
     el.innerHTML=sResults.length?sResults.map(d=>nhDealHTML(d,true)).join(''):'<div class="nh-empty">No results found.</div>';
+    nhRefreshNoteStacks(el);
     return;
   }
 
@@ -10035,6 +10057,7 @@ function nhRenderKanban(){
     });
     el.innerHTML=deals.length?deals.map(d=>nhDealHTML(d,true)).join(''):
       `<div class="nh-empty">${_nhCrmFil==='ov'?'No overdue deals.':'Every active contact has a next action assigned. Nice.'}</div>`;
+    nhRefreshNoteStacks(el);
     return;
   }
 
@@ -10078,6 +10101,7 @@ function nhRenderKanban(){
       h+=todayAndFuture.map(renderDateRow).join('');
     }
     el.innerHTML=h||'<div class="nh-empty">No next actions scheduled.</div>';
+    nhRefreshNoteStacks(el);
     return;
   }
 
@@ -10116,6 +10140,7 @@ function nhRenderKanban(){
   });
   if(!h) h='<div class="nh-empty">No deals yet.</div>';
   el.innerHTML=h;
+  nhRefreshNoteStacks(el);
 }
 
 function nhDealHTML(d,showStage){
@@ -10136,7 +10161,7 @@ function nhDealHTML(d,showStage){
   const tags=(contact?.tags||[]).map(t=>`<span class="nh-tag">${t}</span>`).join('');
   const noteList=nhNotesFor(d.contactId||d.id);
   const lastNote=noteList.length?noteList[noteList.length-1]:null;
-  const recentNotes=noteList.slice(-5);
+  const recentNotes=noteList;
   const stageBadge=showStage?`<span class="nh-stage-badge" style="border-color:${nhStageColor(d.stageId)};color:${nhStageColor(d.stageId)}"><span class="nh-col-dot" style="background:${nhStageColor(d.stageId)}"></span>${nhStageName(d.stageId)}</span>`:'';
   const checked=_nhSelectedDeals.has(d.id);
   const checkbox=_nhBulkMode?`<input type="checkbox" class="nh-deal-check" ${checked?'checked':''} onclick="event.stopPropagation();nhToggleDealSelect('${d.id}')">`:'';
@@ -10157,8 +10182,10 @@ function nhDealHTML(d,showStage){
     ${links?`<div class="nh-links">${links}</div>`:''}
     ${tags?`<div class="nh-tags">${tags}</div>`:''}
     <div class="nh-deal-bottom">
-      <div class="nh-deal-notes-stack">
-        ${recentNotes.length?recentNotes.map(n=>`<div class="nh-deal-note-row"><span class="nh-note-date">${n.date}</span>${n.text}</div>`).join(''):'<div class="nh-deal-note-empty">No notes yet</div>'}
+      <div class="nh-notes-wrap">
+        <div class="nh-deal-notes-stack">
+          ${recentNotes.length?recentNotes.map(n=>`<div class="nh-deal-note-row"><span class="nh-note-date">${n.date}</span>${n.text}</div>`).join(''):'<div class="nh-deal-note-empty">No notes yet</div>'}
+        </div>
       </div>
       <div class="nh-deal-btns">
         ${ov?`<button class="nh-sm-btn done" onclick="nhOpenMarkDone('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}','done')" >✓ Mark Done</button>`:''}
@@ -10215,8 +10242,8 @@ async function nhBulkApplyStage(){
   if(!stageId)return;
   const n=_nhSelectedDeals.size;
   if(!await nhConfirm(`Move ${n} contact${n>1?'s':''} to this stage?`,'Bulk Move Stage','Move'))return;
-  _nhDeals.forEach(d=>{if(_nhSelectedDeals.has(d.id))d.stageId=stageId;});
-  await nhSet(nhWsKey('deals'),_nhDeals);
+  _nhDeals.forEach(d=>{if(_nhSelectedDeals.has(d.id)){nhLogStageChange(d,d.stageId,stageId);d.stageId=stageId;}});
+  await Promise.all([nhSet(nhWsKey('deals'),_nhDeals),nhSet(nhWsKey('notes'),_nhNotes)]);
   _nhSelectedDeals.clear();
   nhRenderCrm();nhRenderToday();
   mhsbToast(`✓ Stage updated for ${n} contact${n>1?'s':''}`,'success');
@@ -10248,6 +10275,7 @@ function nhToggleCol(id){
         return ao-bo||(a.contactName||'').localeCompare(b.contactName||'');
       });
       body.innerHTML=deals.map(d=>nhDealHTML(d)).join('');
+      nhRefreshNoteStacks(body);
     } else {
       body.innerHTML='';
     }
@@ -10446,11 +10474,14 @@ async function nhCrmSave(){
   const deal=_nhDeals.find(x=>x.id===_nhCrmEditId);
   if(!deal)return;
   // Only update pipeline-controlled fields
-  deal.stageId=g('nhCrmFStage')||deal.stageId;
+  const newStageId=g('nhCrmFStage')||deal.stageId;
+  const oldStageId=deal.stageId;
+  deal.stageId=newStageId;
   const nextActionVal=g('nhCrmFNextAction');
   deal.nextAction=nextActionVal;
   deal.nextActionNote=nextActionVal?g('nhCrmFNextActionNote'):'';
-  await nhSet(nhWsKey('deals'),_nhDeals);
+  nhLogStageChange(deal,oldStageId,newStageId);
+  await Promise.all([nhSet(nhWsKey('deals'),_nhDeals),nhSet(nhWsKey('notes'),_nhNotes)]);
   nhCrmCloseModal();nhRenderCrm();nhRenderToday();
 }
 async function nhCrmDelete(id){
@@ -10471,7 +10502,7 @@ async function nhCrmDelete(id){
     nhSet(nhWsKey('notes'),_nhNotes),
   ]);
   nhRenderCrm();nhRenderToday();
-  if(_nhTab==='contacts') nhRenderContacts();
+  if(_nhTab==='contacts') nhRenderContacts(false);
 }
 
 /* ══ SHARED NOTES ══ */
@@ -10500,7 +10531,7 @@ function nhCloseNotes(){
   _nhNotesEntityId=null;
   // Safety net, same as Stage Manager's "Done" button — guarantees the card preview behind this
   // modal is correct on close even if some future note function forgets to render after saving.
-  if(_nhTab==='contacts') nhRenderContacts();
+  if(_nhTab==='contacts') nhRenderContacts(false);
   else nhRenderCrm();
 }
 function nhRenderNotesList(){
@@ -10529,7 +10560,7 @@ async function nhDeleteNote(nid){
   await nhSet(nhWsKey('notes'),_nhNotes);
   nhRenderNotesList();
   // Refresh note previews in the background
-  if(_nhTab==='contacts') nhRenderContacts();
+  if(_nhTab==='contacts') nhRenderContacts(false);
   else nhRenderCrm();
 }
 function nhEditNoteToggle(nid){
@@ -10553,7 +10584,7 @@ async function nhSaveNoteEdit(nid){
   await nhSet(nhWsKey('notes'),_nhNotes);
   nhRenderNotesList();
   // Refresh note previews in the background — same as nhDeleteNote/nhAddNote below
-  if(_nhTab==='contacts') nhRenderContacts();
+  if(_nhTab==='contacts') nhRenderContacts(false);
   else nhRenderCrm();
 }
 async function nhAddNote(){
@@ -10567,7 +10598,7 @@ async function nhAddNote(){
   const el=document.getElementById('nhNotesList');
   if(el) el.scrollTop=el.scrollHeight;
   // Refresh note counts in the background
-  if(_nhTab==='contacts') nhRenderContacts();
+  if(_nhTab==='contacts') nhRenderContacts(false);
   else nhRenderCrm();
 }
 
@@ -10626,8 +10657,8 @@ async function nhMarkDoneSubmitNote(){
     deal.nextAction='';
     deal.nextActionNote='';
     const chosenStage=document.getElementById('nhMarkDoneStage').value;
-    if(chosenStage)deal.stageId=chosenStage;
-    await nhSet(nhWsKey('deals'),_nhDeals);
+    if(chosenStage){nhLogStageChange(deal,deal.stageId,chosenStage);deal.stageId=chosenStage;}
+    await Promise.all([nhSet(nhWsKey('deals'),_nhDeals),nhSet(nhWsKey('notes'),_nhNotes)]);
     nhCloseMarkDone();
     nhRenderCrm();
     nhRenderToday();
@@ -10640,10 +10671,10 @@ async function nhMarkDoneConfirm(){
   const deal=_nhDeals.find(d=>d.id===_nhMarkDoneId);
   if(!deal)return;
   const chosenStage=document.getElementById('nhMarkDoneStage').value;
-  if(chosenStage)deal.stageId=chosenStage;
+  if(chosenStage){nhLogStageChange(deal,deal.stageId,chosenStage);deal.stageId=chosenStage;}
   deal.nextAction=dateVal;
   deal.nextActionNote=noteVal;
-  await nhSet(nhWsKey('deals'),_nhDeals);
+  await Promise.all([nhSet(nhWsKey('deals'),_nhDeals),nhSet(nhWsKey('notes'),_nhNotes)]);
   nhCloseMarkDone();
   nhRenderCrm();
   nhRenderToday();
@@ -10818,9 +10849,10 @@ async function nhDealPointerUp(e){
   if(!stageId)return;
   const deal=_nhDeals.find(d=>d.id===dealId);
   if(!deal||deal.stageId===stageId)return;
+  nhLogStageChange(deal,deal.stageId,stageId);
   deal.stageId=stageId;
   _nhOpenCols.add(stageId);
-  await nhSet(nhWsKey('deals'),_nhDeals);
+  await Promise.all([nhSet(nhWsKey('deals'),_nhDeals),nhSet(nhWsKey('notes'),_nhNotes)]);
   nhRenderCrm();
   nhRenderToday();
   setTimeout(()=>{

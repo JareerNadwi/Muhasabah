@@ -541,7 +541,13 @@ body.light-mode .nh-crm-section-head{color:#9a9590!important;border-color:#d4cfc
 }
 a.contact-num:hover{color:#fff;text-shadow:0 0 20px rgba(200,169,110,1);}
 @media(max-width:900px){.contact-banner{margin:0 12px;padding:8px 12px;}.contact-sep{display:none;}.contact-text{flex-direction:column;gap:4px;align-items:flex-start;}}
-@media(max-width:600px){.contact-banner{display:none;}}
+@media(max-width:600px){
+  .contact-banner{margin:0;width:100%;padding:8px 12px;}
+  .contact-inner{width:100%;justify-content:center;}
+  .contact-text{flex-direction:column;align-items:center;gap:3px;}
+  .contact-line1,.contact-line2{white-space:normal;text-align:center;font-size:10px;}
+  .contact-num{font-size:10.5px;}
+}
 .header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:10px;}
 .header-title{font-family:'Amiri',serif;font-size:22px;color:var(--gold);}
 .header-sub{font-size:10px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
@@ -840,8 +846,9 @@ select option{background:#1c1f1c;}
 
   /* ── Counter rows (Sadaqah/Zikr/Tahajjud "X Today" pill) ── */
   .qr-pages-today{font-size:11px;min-width:0;}
-  .stepper-row{gap:4px !important;}
+  .stepper-row{gap:4px !important;flex-wrap:wrap !important;}
   .step-btn{min-width:36px;padding:0 6px;}
+  .stepper-row .qr-pages-today{flex:1 1 100% !important;order:-1;margin-bottom:4px;}
 
   /* ── Quran / PDF reader topbar ── */
   .qr-topbar{padding:8px 12px;gap:6px;}

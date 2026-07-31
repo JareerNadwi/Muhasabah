@@ -2684,8 +2684,19 @@ let qrRendering  = false;
 let qrScale      = 1.5;
 let qrZoomLevel  = 0;   // incremental zoom: 0 = default, +1 = +25%, etc.
 
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+// Guarded: if the pdf.js CDN script fails to load for any reason (flaky
+// connection, a firewall/ad-blocker on this network, CDN downtime), this
+// used to throw here unguarded — and because it's uncaught at the top
+// level of this script block, it silently killed EVERYTHING after it in
+// this same block: calendar rendering, event bindings, all of it, with
+// no visible error. Now it degrades gracefully instead: the PDF-based
+// Quran reader won't work, but the rest of the app keeps functioning.
+if (typeof pdfjsLib !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+} else {
+  console.warn('pdfjsLib failed to load from CDN — the PDF Quran reader will be unavailable, but the rest of the app will continue working normally.');
+}
 
 /* PDF page = Quran page (no offset) */
 function pdfToQuranPage(pdfPage){ return pdfPage; }

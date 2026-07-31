@@ -41,7 +41,7 @@ body.light-mode .mhsb-toast.error{background:#fdf0f0;border-color:var(--red);col
 body.light-mode .mhsb-toast.warn{background:#fdf8ee;border-color:#b08040;color:#8a5a10;}
 body{-webkit-overflow-scrolling:touch;touch-action:manipulation;overscroll-behavior-y:none;overflow-x:hidden;}
 body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
-.lr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;overflow-y:auto;padding:16px;box-sizing:border-box;}
+.lr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;overflow-y:auto;overflow-x:hidden;padding:16px;box-sizing:border-box;}
 .lr-overlay.active{display:block;}
 
 
@@ -1385,7 +1385,7 @@ body.light-mode #overviewOverlay{background:#f5f0e8!important;}
 .ov-meta-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-top:3px;}
 
 /* ── Body scroll lock when any overlay is active ── */
-body.overlay-open{overflow:hidden;}
+body.overlay-open{overflow:hidden;position:fixed;left:0;right:0;width:100%;}
 /* Box-shadow animations are expensive to repaint every frame. They were
    still running continuously behind open readers/modals — invisible, but
    still competing with scroll compositing for the main thread, which is
@@ -4232,7 +4232,7 @@ async function getExportHandle(){
   return null;
 }
 
-async function triggerExport(outObj){
+async function triggerExport(outObj, allowRename){
   const json=JSON.stringify(outObj,null,2);
   const handle=await getExportHandle();
   if(handle){
@@ -4248,20 +4248,25 @@ async function triggerExport(outObj){
   }
   // Fallback: trigger download to Downloads folder.
   // Mobile browsers (iOS Safari, Chrome Android) have no File System Access
-  // API at all — there is no way for a web page to overwrite a specific file
-  // in the Downloads folder there, that's a platform limitation, not
-  // something fixable in JS. So instead of every export silently becoming
-  // "Muhasabah (1).json", "Muhasabah (2).json"... use a dated filename, so
-  // multiple exports become meaningful dated backups instead of confusing
-  // clutter. (On desktop, most exports go through the FSA handle above and
-  // genuinely overwrite in place — this path is mainly mobile.)
-  const dateStr = new Date().toISOString().slice(0,10);
+  // API at all — there is no way for a web page to silently overwrite a
+  // specific file in the Downloads folder there, so the browser/OS may
+  // still suffix a repeat filename with (1), (2)... that's a platform
+  // limitation, not something fixable from JS. What we CAN do is default to
+  // the same name every time and let the person rename it if they want to,
+  // rather than silently renaming it for them.
+  let filename = 'Muhasabah.json';
+  if(allowRename){
+    const chosen = window.prompt('Save as:', filename);
+    if(chosen === null) return; // cancelled — no download
+    filename = chosen.trim() || filename;
+    if(!/\.json$/i.test(filename)) filename += '.json';
+  }
   const blob=new Blob([json],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url;a.download='Muhasabah_'+dateStr+'.json';a.click();
+  a.href=url;a.download=filename;a.click();
   URL.revokeObjectURL(url);
-  mhsbToast('✓ Exported to Downloads as Muhasabah_'+dateStr+'.json','success');
+  mhsbToast('✓ Exported to Downloads as '+filename,'success');
 }
 
 /* ── Auto-Export (triggered by Save Day) ── */
@@ -4269,7 +4274,7 @@ async function autoExport(){
   const allData=await getAllStoredData();
   if(Object.keys(allData).length===0) return;
   const out={version:2,exported:new Date().toISOString(),data:allData};
-  await triggerExport(out);
+  await triggerExport(out); // silent — no rename prompt on every Save Day
 }
 
 /* ── Manual Export ── */
@@ -4277,7 +4282,7 @@ async function exportData(){
   const allData=await getAllStoredData();
   if(Object.keys(allData).length===0){mhsbToast('No data to export yet.','warn');return;}
   const out={version:2,exported:new Date().toISOString(),data:allData};
-  await triggerExport(out);
+  await triggerExport(out, true); // manual export — offer rename
 }
 
 /* ── Support Modal ── */
@@ -5413,12 +5418,12 @@ function openOverview(){
   _ovCurrentDK    = todayKey();
   _ovCurrentMonth = new Date().getMonth();
   document.getElementById('overviewOverlay').classList.add('active');
-  document.body.classList.add('overlay-open');
+  lockBodyScroll();
   ovSwitchTab('daily');
 }
 function closeOverview(){
   document.getElementById('overviewOverlay').classList.remove('active');
-  document.body.classList.remove('overlay-open');
+  unlockBodyScroll();
 }
 
 function ovSwitchTab(tab){
@@ -5626,11 +5631,34 @@ function ovRenderYearly(){
   `;
 }
 
-/* ── Scroll lock: prevent background scroll when any overlay is open ── */
+/* ── Scroll lock: prevent background scroll when any overlay is open ──
+   Plain `overflow:hidden` on body does NOT reliably block background
+   touch-scroll on iOS Safari — it's a known leak. The fix that actually
+   holds is pinning body with position:fixed at its current scroll offset,
+   then restoring that offset on unlock. Centralized here so every overlay
+   (including ones like the AI Post Writer that never toggled the class
+   directly, only reachable via the class-change fallback below) gets the
+   same reliable lock. */
+var _mhsbScrollLockY = 0;
+var _mhsbScrollLocked = false;
+function lockBodyScroll(){
+  if(_mhsbScrollLocked) return;
+  _mhsbScrollLocked = true;
+  _mhsbScrollLockY = window.scrollY || window.pageYOffset || 0;
+  document.body.style.top = (-_mhsbScrollLockY) + 'px';
+  document.body.classList.add('overlay-open');
+}
+function unlockBodyScroll(){
+  if(!_mhsbScrollLocked) return;
+  _mhsbScrollLocked = false;
+  document.body.classList.remove('overlay-open');
+  document.body.style.top = '';
+  window.scrollTo(0, _mhsbScrollLockY);
+}
 (function(){
   function updateBodyLock(){
     var anyActive = document.querySelector('.modal-overlay.active, .quran-reader-overlay.active, .lr-overlay.active, #netHubOverlay.active');
-    document.body.classList.toggle('overlay-open', !!anyActive);
+    if(anyActive) lockBodyScroll(); else unlockBodyScroll();
   }
   var mo = new MutationObserver(updateBodyLock);
   mo.observe(document.body, {subtree:true, attributes:true, attributeFilter:['class']});
@@ -6065,7 +6093,7 @@ function renderBookBadge(dk) {
 </div>
 
 <!-- SALAH ARTICLE OVERLAY -->
-<div class="modal-overlay" id="salahArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+<div class="modal-overlay" id="salahArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;overflow-x:hidden;">
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
@@ -6245,7 +6273,7 @@ function closeSalahArticle(){
 </script>
 
 <!-- THE NIGHT PRAYER — TAHAJJUD ARTICLE OVERLAY -->
-<div class="modal-overlay" id="tahajjudArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+<div class="modal-overlay" id="tahajjudArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;overflow-x:hidden;">
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🌙 The Night Prayer — Tahajjud</div>
@@ -6307,7 +6335,7 @@ function closeSalahArticle(){
   </div>
 </div>
 <!-- SAWM — THE FAST ARTICLE OVERLAY -->
-<div class="modal-overlay" id="sawmArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+<div class="modal-overlay" id="sawmArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;overflow-x:hidden;">
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🌙 Sawm — The Fast</div>
@@ -6362,7 +6390,7 @@ function closeSalahArticle(){
   </div>
 </div>
 <!-- SUNNAH SALAH — THE CONFIRMED PRAYERS ARTICLE OVERLAY -->
-<div class="modal-overlay" id="sunnahSalahArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+<div class="modal-overlay" id="sunnahSalahArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;overflow-x:hidden;">
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🌿 Sunnah Salah — The Confirmed Prayers</div>
@@ -6407,7 +6435,7 @@ function closeSalahArticle(){
   </div>
 </div>
 <!-- NAFL SALAH — THE SUPEREROGATORY PRAYER ARTICLE OVERLAY -->
-<div class="modal-overlay" id="naflSalahArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+<div class="modal-overlay" id="naflSalahArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;overflow-x:hidden;">
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">✨ Nafl Salah — The Supererogatory Prayer</div>
@@ -6462,7 +6490,7 @@ function closeSalahArticle(){
   </div>
 </div>
 <!-- SADAQAH — VOLUNTARY CHARITY ARTICLE OVERLAY -->
-<div class="modal-overlay" id="sadaqahArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+<div class="modal-overlay" id="sadaqahArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;overflow-x:hidden;">
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">💛 Sadaqah — Voluntary Charity</div>
@@ -6525,7 +6553,7 @@ function closeSalahArticle(){
 </div>
 
 <!-- ZIKR ARTICLE OVERLAY -->
-<div class="modal-overlay" id="zikrArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+<div class="modal-overlay" id="zikrArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;overflow-x:hidden;">
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
 
     <!-- Header -->
@@ -6682,7 +6710,7 @@ document.addEventListener('keydown', function(e){
 </script>
 
 <!-- EXERCISE ARTICLE OVERLAY -->
-<div class="modal-overlay" id="exerciseArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+<div class="modal-overlay" id="exerciseArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;overflow-x:hidden;">
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🏃 Exercise — The Body's Right</div>
@@ -6832,7 +6860,7 @@ function calcBMI(){
 <!-- ══════════════════════════════════════════════════════
      TAFAKKUR — DELIBERATE REFLECTION ARTICLE OVERLAY
 ══════════════════════════════════════════════════════ -->
-<div class="modal-overlay" id="tafakkurArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;">
+<div class="modal-overlay" id="tafakkurArticleOverlay" style="padding:16px;align-items:flex-start;overflow-y:auto;overflow-x:hidden;">
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a2010;background:#141008;flex-shrink:0;">
       <div style="font-family:'Amiri',serif;font-size:17px;color:#c9a84c;">🌿 Tafakkur — Deliberate Reflection</div>
@@ -7680,7 +7708,7 @@ loadDayData = function(dk) {
 </script>
 
 <!-- ── AI Post Writer Modal ── -->
-<div id="postWriterOverlay" class="modal-overlay" style="z-index:1100;padding:16px;align-items:flex-start;overflow-y:auto;" onclick="if(event.target===this)closePostWriter()">
+<div id="postWriterOverlay" class="modal-overlay" style="z-index:1100;padding:16px;align-items:flex-start;overflow-y:auto;overflow-x:hidden;" onclick="if(event.target===this)closePostWriter()">
   <div style="display:flex;flex-direction:column;width:100%;max-width:720px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;min-height:560px;">
 
     <!-- Header -->
@@ -7770,7 +7798,7 @@ loadDayData = function(dk) {
 </div>
 
 <!-- ── Get Key Modal ── -->
-<div id="getKeyOverlay" class="modal-overlay" style="z-index:1200;padding:16px;align-items:flex-start;overflow-y:auto;" onclick="if(event.target===this)closeGetKeyModal()">
+<div id="getKeyOverlay" class="modal-overlay" style="z-index:1200;padding:16px;align-items:flex-start;overflow-y:auto;overflow-x:hidden;" onclick="if(event.target===this)closeGetKeyModal()">
   <div id="gkmCard" style="display:flex;flex-direction:column;width:100%;max-width:600px;margin:auto;background:#0d0b08;border:1px solid #2a2010;border-radius:10px;overflow:hidden;margin-top:20px;margin-bottom:20px;">
 
     <!-- Header -->
@@ -8037,7 +8065,9 @@ function openPostWriter() {
   }
   // Load the active calendar date's chat (fresh, no leftovers)
   pwLoadActiveDate();
-  document.getElementById('pwInput').focus();
+  // Deliberately NOT auto-focusing pwInput here — forcing focus on open
+  // pops the keyboard immediately before the user has asked for it. Let
+  // them tap the box themselves.
 }
 
 function closePostWriter() {
@@ -8537,9 +8567,10 @@ function lrSyncBtns() {
   // Title
   const title = document.getElementById('lrTitle');
   if (title) title.textContent = ui.title;
-  // Save & Exit button
-  const closeBtn = document.querySelector('#langOverlay .qr-close');
-  if (closeBtn) closeBtn.textContent = ui.saveExit;
+  // Save & Exit button — deliberately NOT re-translated per language. Every
+  // other reader in the app keeps this button fixed as "✕ Save & Exit" in
+  // English; translating it here was the one thing making it change size
+  // and shift position depending on which language happened to be active.
   // Dua footer
   const dua = document.getElementById('lrDua');
   if (dua) { dua.textContent = ui.dua; dua.style.direction = ui.rtl ? 'rtl' : 'ltr'; }
@@ -9044,7 +9075,7 @@ async function openLanguageReader() {
   const overlay = document.getElementById('langOverlay');
   overlay.classList.add('active');
   overlay.scrollTop = 0;
-  document.body.classList.add('overlay-open');
+  lockBodyScroll();
   reThemeIfLight();
   const _lrDK = currentDateKey || todayKey();
   document.getElementById('lrDoneNote').style.display = (getCached(_lrDK).language === 'yes') ? 'block' : 'none';
@@ -9080,7 +9111,7 @@ async function openLanguageReader() {
 }
 function closeLanguageReader() {
   document.getElementById('langOverlay').classList.remove('active');
-  document.body.classList.remove('overlay-open');
+  unlockBodyScroll();
   // Reset tashkil toggle — always off at next open
   window._lrShowHarakah = false;
   const harakahBtn = document.getElementById('lrHarakahBtn');
@@ -9477,7 +9508,7 @@ async function openContactBook(){
   const cbS=document.getElementById('nhCbSearch');if(cbS)cbS.value='';
   const crmS=document.getElementById('nhCrmSearch');if(crmS)crmS.value='';
   document.getElementById('netHubOverlay').classList.add('active');
-  document.body.classList.add('overlay-open');
+  lockBodyScroll();
   reThemeIfLight();
   nhWsRenderBar();
   nhShowTab(_nhTab);
@@ -9523,7 +9554,7 @@ function closeContactBook(){
   const crmType=document.getElementById('nhCrmTypeFilter');if(crmType)crmType.value='all';
 
   document.getElementById('netHubOverlay').classList.remove('active');
-  document.body.classList.remove('overlay-open');
+  unlockBodyScroll();
   _nhTodayCollapsed=true;
   try{localStorage.setItem('nhTodayCollapsed','true');}catch(e){}
   const today=document.getElementById('nhToday');
@@ -11551,7 +11582,7 @@ async function nhSmDone(){
     </div>
     <div class="nh-field" id="nhMarkDoneNoteField">
       <label>What did you do?</label>
-      <textarea class="nh-note-textarea" id="nhMarkDoneNote" style="min-height:100px;pointer-events:auto;touch-action:auto;"></textarea>
+      <textarea class="nh-note-textarea" id="nhMarkDoneNote" style="min-height:100px;pointer-events:auto;touch-action:manipulation;"></textarea>
     </div>
     <button class="nh-note-submit" id="nhMarkDoneNoteBtn" onclick="nhMarkDoneSubmitNote()" style="width:100%;margin-bottom:0;">Save &amp; Set Next Action →</button>
     <div class="nh-markdone-next" id="nhMarkDoneNext">

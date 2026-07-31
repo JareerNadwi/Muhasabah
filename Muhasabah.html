@@ -860,25 +860,27 @@ select option{background:#1c1f1c;}
   .view{padding:12px;}
 
   /* iOS zooms the whole page in when a focused input's font is under 16px —
-     this is Apple's own behavior, not something JS can override, so every
-     text field needs to actually render at 16px+ on mobile regardless of
-     what its class specifies elsewhere. */
-  input,textarea,select{font-size:16px !important;}
+     this is Apple's own behavior, not something JS can override. This only
+     applies to typed text fields though (input/textarea) — a <select>
+     opens the native OS picker on tap, no in-page text cursor involved, so
+     it was never actually part of this problem and can stay compact. */
+  input,textarea{font-size:16px !important;}
 
   /* ── Networking Hub: these two toolbars were hard-set to never wrap,
      so on a narrow phone they just overflowed past the screen edge
      with no way to reach what spilled off. ── */
   .nh-controls{flex-wrap:wrap;justify-content:flex-end;}
   .nh-search{min-width:140px;order:-1;flex:1 1 100%;}
+  .nh-controls-break{flex-basis:100%;height:0;}
   .nh-crm-filters{flex-wrap:wrap;justify-content:flex-end;}
 
-  /* Type/field filter selects were forced to 16px (see rule above, for
-     iOS) but kept their original narrow fixed width designed for 11px
-     text — so the box stayed the same size while the text inside it
-     got bigger, making it look cramped and oversized. Widen the boxes
-     to match instead of the text getting cut off or overflowing. */
-  .nh-search-scope{width:150px !important;padding:8px 10px;}
-  .nh-crm-fil-select{min-width:170px;}
+  /* Type/field filter selects and the deal-card stage select now match
+     the size of the Notes/Edit/Del buttons on the card, per request —
+     selects don't need the 16px iOS protection (see above), so this is
+     safe. */
+  .nh-search-scope{width:120px !important;padding:6px 8px;font-size:10px !important;}
+  .nh-crm-fil-select{min-width:130px;font-size:10px !important;}
+  select.nh-search-scope{font-size:10px !important;} /* deal-card stage select reuses this class */
   .nh-add-btn{padding:9px 12px;}
 
   /* ── Networking Hub: stage list items need room for the up/down
@@ -11467,6 +11469,7 @@ async function nhSmDone(){
           <option value="tags">Tags</option>
         </select>
         <input class="nh-search" id="nhCbSearch" type="text" placeholder="" oninput="nhDebouncedRenderContacts()">
+        <div class="nh-controls-break"></div>
         <button class="nh-add-btn" onclick="nhCbEdit(null,'person')">＋ Person</button>
         <button class="nh-add-btn" onclick="nhCbEdit(null,'company')">＋ Company</button>
       </div>

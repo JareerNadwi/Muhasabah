@@ -1385,7 +1385,8 @@ body.light-mode #overviewOverlay{background:#f5f0e8!important;}
 .ov-meta-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-top:3px;}
 
 /* ── Body scroll lock when any overlay is active ── */
-body.overlay-open{overflow:hidden;position:fixed;left:0;right:0;width:100%;}
+body.overlay-open{overflow:hidden;}
+body.overlay-open-touch{position:fixed;left:0;right:0;width:100%;}
 /* Box-shadow animations are expensive to repaint every frame. They were
    still running continuously behind open readers/modals — invisible, but
    still competing with scroll compositing for the main thread, which is
@@ -5633,27 +5634,40 @@ function ovRenderYearly(){
 
 /* ── Scroll lock: prevent background scroll when any overlay is open ──
    Plain `overflow:hidden` on body does NOT reliably block background
-   touch-scroll on iOS Safari — it's a known leak. The fix that actually
-   holds is pinning body with position:fixed at its current scroll offset,
-   then restoring that offset on unlock. Centralized here so every overlay
-   (including ones like the AI Post Writer that never toggled the class
-   directly, only reachable via the class-change fallback below) gets the
-   same reliable lock. */
+   touch-scroll on iOS Safari — it's a known leak, fixed by pinning body
+   with position:fixed at its current offset. But that same technique
+   takes body out of normal flow, and on desktop where body is the only
+   thing giving the page its scrollable height, that broke scrolling
+   entirely. So: position:fixed only kicks in on touch devices, where it's
+   actually needed; desktop keeps the simpler overflow:hidden that already
+   worked. Restore also explicitly forces an instant jump — the page has
+   scroll-behavior:smooth globally, which was making the restore visibly
+   animate from the top instead of landing silently back in place. */
 var _mhsbScrollLockY = 0;
 var _mhsbScrollLocked = false;
+var _mhsbIsTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 function lockBodyScroll(){
   if(_mhsbScrollLocked) return;
   _mhsbScrollLocked = true;
-  _mhsbScrollLockY = window.scrollY || window.pageYOffset || 0;
-  document.body.style.top = (-_mhsbScrollLockY) + 'px';
+  if(_mhsbIsTouch){
+    _mhsbScrollLockY = window.scrollY || window.pageYOffset || 0;
+    document.body.style.top = (-_mhsbScrollLockY) + 'px';
+    document.body.classList.add('overlay-open-touch');
+  }
   document.body.classList.add('overlay-open');
 }
 function unlockBodyScroll(){
   if(!_mhsbScrollLocked) return;
   _mhsbScrollLocked = false;
   document.body.classList.remove('overlay-open');
-  document.body.style.top = '';
-  window.scrollTo(0, _mhsbScrollLockY);
+  if(_mhsbIsTouch){
+    document.body.classList.remove('overlay-open-touch');
+    document.body.style.top = '';
+    var _prevScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.scrollTo({top:_mhsbScrollLockY, left:0, behavior:'instant'});
+    document.documentElement.style.scrollBehavior = _prevScrollBehavior;
+  }
 }
 (function(){
   function updateBodyLock(){

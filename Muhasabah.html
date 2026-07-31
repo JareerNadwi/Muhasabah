@@ -253,7 +253,7 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-cal-row.open .nh-col-chev{transform:rotate(180deg);}
 
 /* Deal cards */
-.nh-deal{--card-bg:#1a1610;background:#1a1610;border:1px solid #2a2010;border-radius:6px;padding:12px 14px;transition:border-color .2s;cursor:grab;touch-action:none;}
+.nh-deal{--card-bg:#1a1610;background:#1a1610;border:1px solid #2a2010;border-radius:6px;padding:12px 14px;transition:border-color .2s;}
 .nh-deal.bulk{cursor:pointer;}
 .nh-deal.checked{border-color:var(--gold);background:#211b10;}
 .nh-deal-check{width:15px;height:15px;margin-right:8px;vertical-align:middle;accent-color:var(--gold);cursor:pointer;}
@@ -324,6 +324,10 @@ body.light-mode .nh-confirm-msg{color:#3a3630!important;}
 .nh-sm-item.drag-over{border-color:var(--gold);}
 .nh-sm-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
 .nh-sm-grip{color:#a89060;font-size:12px;cursor:grab;padding:0 2px;flex-shrink:0;}
+.nh-sm-reorder{display:flex;flex-direction:column;gap:1px;flex-shrink:0;}
+.nh-sm-arrow{background:none;border:1px solid #2a2010;color:#a89060;cursor:pointer;font-size:9px;line-height:1;padding:2px 5px;border-radius:3px;}
+.nh-sm-arrow:disabled{opacity:.25;cursor:default;}
+.nh-sm-arrow:not(:disabled):hover{background:#1a1610;color:var(--gold);}
 .nh-sm-name{flex:1;font-family:'DM Mono',monospace;font-size:12px;color:#f0e4c0;background:transparent;border:1px solid transparent;border-radius:var(--radius);padding:3px 6px;outline:none;min-width:0;}
 .nh-sm-name:hover{border-color:#2a2010;}
 .nh-sm-name:focus{border-color:var(--gold-dim);background:#141008;}
@@ -864,9 +868,22 @@ select option{background:#1c1f1c;}
   /* ── Networking Hub: these two toolbars were hard-set to never wrap,
      so on a narrow phone they just overflowed past the screen edge
      with no way to reach what spilled off. ── */
-  .nh-controls{flex-wrap:wrap;}
-  .nh-search{min-width:140px;}
-  .nh-crm-filters{flex-wrap:wrap;}
+  .nh-controls{flex-wrap:wrap;justify-content:flex-end;}
+  .nh-search{min-width:140px;order:-1;flex:1 1 100%;}
+  .nh-crm-filters{flex-wrap:wrap;justify-content:flex-end;}
+
+  /* Type/field filter selects were forced to 16px (see rule above, for
+     iOS) but kept their original narrow fixed width designed for 11px
+     text — so the box stayed the same size while the text inside it
+     got bigger, making it look cramped and oversized. Widen the boxes
+     to match instead of the text getting cut off or overflowing. */
+  .nh-search-scope{width:150px !important;padding:8px 10px;}
+  .nh-crm-fil-select{min-width:170px;}
+  .nh-add-btn{padding:9px 12px;}
+
+  /* ── Networking Hub: stage list items need room for the up/down
+     buttons next to the name field on a narrow screen. ── */
+  .nh-sm-item{flex-wrap:nowrap;}
 
   /* ── Main header ── */
   .header{
@@ -10596,8 +10613,8 @@ function nhDealHTML(d,showStage){
   const stageBadge=showStage?`<span class="nh-stage-badge" style="border-color:${nhStageColor(d.stageId)};color:${nhStageColor(d.stageId)}"><span class="nh-col-dot" style="background:${nhStageColor(d.stageId)}"></span>${nhStageName(d.stageId)}</span>`:'';
   const checked=_nhSelectedDeals.has(d.id);
   const checkbox=_nhBulkMode?`<input type="checkbox" class="nh-deal-check" ${checked?'checked':''} onclick="event.stopPropagation();nhToggleDealSelect('${d.id}')">`:'';
-  return `<div class="nh-deal${ov?' ov':''}${_nhBulkMode?' bulk':''}${checked?' checked':''}" id="nhd-${d.id}"
-    onpointerdown="nhDealPointerDown(event,'${d.id}')">
+  const stageOptions=_nhStages.map(s=>`<option value="${s.id}"${s.id===d.stageId?' selected':''}>${s.name}</option>`).join('');
+  return `<div class="nh-deal${ov?' ov':''}${_nhBulkMode?' bulk':''}${checked?' checked':''}" id="nhd-${d.id}">
     <div class="nh-deal-top">
       <div>
         <div class="nh-deal-name">${checkbox}<div class="nh-cb-avatar ${contactType==='company'?'company':'person'}" style="display:inline-flex;margin-right:8px;vertical-align:middle;">${contactType==='company'?'🏢':'👤'}</div>${d.contactName||'—'}</div>
@@ -10619,6 +10636,7 @@ function nhDealHTML(d,showStage){
         </div>
       </div>
       <div class="nh-deal-btns">
+        <select class="nh-search-scope" style="width:auto;min-width:110px;" onclick="event.stopPropagation();" onchange="event.stopPropagation();nhChangeDealStage('${d.id}',this.value)">${stageOptions}</select>
         ${ov?`<button class="nh-sm-btn done" onclick="nhOpenMarkDone('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}','done')" >✓ Mark Done</button>`:''}
         ${ov?`<button class="nh-sm-btn done" onclick="nhOpenMarkDone('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}','assign')" >✓ Mark Done &amp; Assign Next</button>`:''}
         ${(!ov&&nhIsNoAction(d))?`<button class="nh-sm-btn done" onclick="nhOpenMarkDone('${d.id}','${(d.contactName||'').replace(/'/g,"\\'")}','assign_only')" >→ Assign Next</button>`:''}
@@ -10628,6 +10646,18 @@ function nhDealHTML(d,showStage){
       </div>
     </div>
   </div>`;
+}
+
+async function nhChangeDealStage(dealId,newStageId){
+  const deal=_nhDeals.find(d=>d.id===dealId);
+  if(!deal||deal.stageId===newStageId)return;
+  nhLogStageChange(deal,deal.stageId,newStageId);
+  deal.stageId=newStageId;
+  _nhOpenCols.add(newStageId);
+  await Promise.all([nhSet(nhWsKey('deals'),_nhDeals),nhSet(nhWsKey('notes'),_nhNotes)]);
+  nhRenderCrm();
+  nhRenderToday();
+  if(window.mhsbToast) mhsbToast('Moved to '+nhStageName(newStageId),'success');
 }
 
 function nhToggleBulkMode(){
@@ -11118,7 +11148,10 @@ function nhCloseSmBg(){document.getElementById('nhSmBg').classList.remove('open'
 function nhRenderSmList(){
   const el=document.getElementById('nhSmList');
   if(!el)return;
-  el.innerHTML=_nhStages.map((s,i)=>`<div class="nh-sm-item" draggable="true"
+  el.innerHTML=_nhStages.map((s,i)=>{
+    const movableUp = i>0 && !s.fixed && !_nhStages[i-1].fixed;
+    const movableDown = i<_nhStages.length-1 && !s.fixed && !_nhStages[i+1].fixed;
+    return `<div class="nh-sm-item" draggable="true"
       ondragstart="nhDragStart(event,'${s.id}')"
       ondragover="nhDragOver(event,'${s.id}')"
       ondrop="nhDrop(event,'${s.id}')"
@@ -11130,8 +11163,31 @@ function nhRenderSmList(){
       onchange="nhRenameStage('${s.id}',this.value)"
       onkeydown="if(event.key==='Enter')this.blur()"
       onmousedown="event.stopPropagation()">
+    ${!s.fixed?`<span class="nh-sm-reorder">
+      <button class="nh-sm-arrow" onclick="nhMoveStageUp('${s.id}')" ${movableUp?'':'disabled'} title="Move up">▲</button>
+      <button class="nh-sm-arrow" onclick="nhMoveStageDown('${s.id}')" ${movableDown?'':'disabled'} title="Move down">▼</button>
+    </span>`:''}
     ${s.fixed?'<span class="nh-sm-fixed">FIXED</span>':'<button class="nh-sm-del" onclick="nhDelStage(\''+s.id+'\')" title="Delete">✕</button>'}
-  </div>`).join('');
+  </div>`;
+  }).join('');
+}
+async function nhMoveStageUp(id){
+  const i=_nhStages.findIndex(s=>s.id===id);
+  if(i<=0||_nhStages[i].fixed||_nhStages[i-1].fixed)return;
+  const [s]=_nhStages.splice(i,1);
+  _nhStages.splice(i-1,0,s);
+  await nhSet(nhWsKey('stages'),_nhStages);
+  nhRenderSmList();
+  nhRenderCrm();
+}
+async function nhMoveStageDown(id){
+  const i=_nhStages.findIndex(s=>s.id===id);
+  if(i<0||i>=_nhStages.length-1||_nhStages[i].fixed||_nhStages[i+1].fixed)return;
+  const [s]=_nhStages.splice(i,1);
+  _nhStages.splice(i+1,0,s);
+  await nhSet(nhWsKey('stages'),_nhStages);
+  nhRenderSmList();
+  nhRenderCrm();
 }
 async function nhRenameStage(id,newName){
   const s=_nhStages.find(x=>x.id===id);

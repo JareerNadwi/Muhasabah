@@ -26,7 +26,7 @@
   --radius:6px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
+html{scroll-behavior:smooth;overflow-x:hidden;}
 /* ── Toast Notifications ── */
 #mhsb-toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;}
 .mhsb-toast{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.4px;padding:10px 18px;border-radius:var(--radius);border:1px solid;max-width:340px;text-align:center;opacity:0;transform:translateY(10px);transition:opacity .22s ease,transform .22s ease;pointer-events:none;white-space:pre-line;line-height:1.5;}
@@ -39,7 +39,7 @@ body.light-mode .mhsb-toast.info{background:#fdf8ee;border-color:var(--gold-dim)
 body.light-mode .mhsb-toast.success{background:#edf7f0;border-color:var(--green);color:var(--green-bright);}
 body.light-mode .mhsb-toast.error{background:#fdf0f0;border-color:var(--red);color:#8b2a2a;}
 body.light-mode .mhsb-toast.warn{background:#fdf8ee;border-color:#b08040;color:#8a5a10;}
-body{-webkit-overflow-scrolling:touch;}
+body{-webkit-overflow-scrolling:touch;touch-action:manipulation;overscroll-behavior-y:none;overflow-x:hidden;}
 body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
 .lr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;overflow-y:auto;padding:16px;box-sizing:border-box;}
 .lr-overlay.active{display:block;}
@@ -510,9 +510,9 @@ body.light-mode .nh-crm-section-head{color:#9a9590!important;border-color:#d4cfc
   display:flex;align-items:center;justify-content:center;
   background:linear-gradient(135deg,#1a1200,#0f1a0f,#1a1200);
   border:1px solid var(--gold-dim);border-radius:8px;
-  padding:10px 20px;position:relative;
+  padding:10px 20px;position:relative;overflow:hidden;
   animation:bannerGlow 3s ease-in-out infinite;
-  min-width:280px;flex:1;margin:0 24px;
+  min-width:280px;flex:1;margin:0 24px;will-change:box-shadow;
 }
 @keyframes bannerGlow{
   0%,100%{box-shadow:0 0 8px rgba(200,169,110,.15),inset 0 0 20px rgba(200,169,110,.03);}
@@ -522,7 +522,7 @@ body.light-mode .nh-crm-section-head{color:#9a9590!important;border-color:#d4cfc
   content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
   background:linear-gradient(90deg,transparent,rgba(200,169,110,.08),transparent);
   animation:shimmer 4s ease-in-out infinite;
-  border-radius:8px;overflow:hidden;pointer-events:none;
+  pointer-events:none;
 }
 @keyframes shimmer{0%{left:-100%;}100%{left:200%;}}
 .contact-inner{display:flex;align-items:center;gap:10px;}
@@ -667,7 +667,7 @@ body.light-mode .hdr-menu-dropdown button:hover{background:#f0e9d8;}
 .day-cell.future{opacity:.3;cursor:not-allowed;}
 .day-cell.perfect{background:#182a1c;border-color:var(--green)!important;}
 .day-cell.perfect .day-num{color:var(--green-bright);}
-.day-cell.best-day{background:var(--surface2);border-color:var(--purple-bright)!important;animation:bestDayGlow 2.5s ease-in-out infinite;}
+.day-cell.best-day{background:var(--surface2);border-color:var(--purple-bright)!important;animation:bestDayGlow 2.5s ease-in-out infinite;will-change:box-shadow;}
 .day-cell.best-day .day-num{color:var(--purple-bright);}
 @keyframes bestDayGlow{
   0%,100%{box-shadow:0 0 5px rgba(154,106,191,.25),0 0 0 1px rgba(154,106,191,.2);}
@@ -854,6 +854,19 @@ select option{background:#1c1f1c;}
   .goals-grid{grid-template-columns:1fr;}
   .stats-row{grid-template-columns:repeat(2,1fr);}
   .view{padding:12px;}
+
+  /* iOS zooms the whole page in when a focused input's font is under 16px —
+     this is Apple's own behavior, not something JS can override, so every
+     text field needs to actually render at 16px+ on mobile regardless of
+     what its class specifies elsewhere. */
+  input,textarea,select{font-size:16px !important;}
+
+  /* ── Networking Hub: these two toolbars were hard-set to never wrap,
+     so on a narrow phone they just overflowed past the screen edge
+     with no way to reach what spilled off. ── */
+  .nh-controls{flex-wrap:wrap;}
+  .nh-search{min-width:140px;}
+  .nh-crm-filters{flex-wrap:wrap;}
 
   /* ── Main header ── */
   .header{
@@ -1373,6 +1386,14 @@ body.light-mode #overviewOverlay{background:#f5f0e8!important;}
 
 /* ── Body scroll lock when any overlay is active ── */
 body.overlay-open{overflow:hidden;}
+/* Box-shadow animations are expensive to repaint every frame. They were
+   still running continuously behind open readers/modals — invisible, but
+   still competing with scroll compositing for the main thread, which is
+   exactly the "page running while scrolling" jank inside article readers. */
+body.overlay-open .contact-banner,
+body.overlay-open .contact-banner::before,
+body.overlay-open .contact-pulse,
+body.overlay-open .contact-num{animation-play-state:paused;}
 </style>
 </head>
 <body>
@@ -1494,7 +1515,7 @@ body.overlay-open{overflow:hidden;}
         <h3 style="color:var(--green-bright);margin:0 0 2px;">&#x1F4F2; Install Muhasabah</h3>
         <p style="color:var(--text-muted);font-size:10px;letter-spacing:.5px;margin:0;">RUN IT LIKE A NATIVE APP, OFFLINE</p>
       </div>
-      <button class="qr-close" onclick="closeInstallModal()" style="flex-shrink:0;padding:3px 10px;font-size:9px;">✕ Close</button>
+      <button class="qr-close" onclick="closeInstallModal()" style="flex-shrink:0;">✕ Close</button>
     </div>
     <div style="padding:20px 18px 24px;color:var(--text-dim);font-size:11px;line-height:1.8;">
 
@@ -1542,7 +1563,7 @@ body.overlay-open{overflow:hidden;}
         <h3 style="color:var(--gold);margin:0 0 4px;">&#x1F4E5; Save Everything for Offline Use?</h3>
         <p style="color:var(--text-muted);font-size:10px;letter-spacing:.5px;margin:0;">QURAN, HADITH &amp; LANGUAGE DATA — ~35 MB</p>
       </div>
-      <button class="qr-close" onclick="closeOfflineModal()" style="flex-shrink:0;padding:3px 10px;font-size:9px;">✕ Close</button>
+      <button class="qr-close" onclick="closeOfflineModal()" style="flex-shrink:0;">✕ Close</button>
     </div>
     <div style="padding:18px;color:var(--text-dim);font-size:11px;line-height:1.8;">
       <p style="margin-bottom:16px;">Muhasabah can download the full Quran, Hadith, and language-learning data now so every reader works with no internet later. This is about 35 MB — on mobile data that may take a moment and use part of your data plan. You can always do this later from the Install App menu instead.</p>
@@ -1578,7 +1599,7 @@ body.overlay-open{overflow:hidden;}
         <h3 style="color:var(--purple-bright);margin:0 0 2px;">📖 Read Me</h3>
         <p style="color:var(--text-muted);font-size:10px;letter-spacing:.5px;margin:0;">HOW TO USE MUHASABAH</p>
       </div>
-      <button class="qr-close" onclick="closeReadMe()" style="flex-shrink:0;padding:3px 10px;font-size:9px;">✕ Close</button>
+      <button class="qr-close" onclick="closeReadMe()" style="flex-shrink:0;">✕ Close</button>
     </div>
     <div style="padding:20px 18px 24px;">
     <div style="color:var(--text-dim);font-size:11px;line-height:1.9;">
@@ -4225,13 +4246,22 @@ async function triggerExport(outObj){
       _fsFileHandle=null; // handle went stale — fall through to download
     }
   }
-  // Fallback: trigger download to Downloads folder
+  // Fallback: trigger download to Downloads folder.
+  // Mobile browsers (iOS Safari, Chrome Android) have no File System Access
+  // API at all — there is no way for a web page to overwrite a specific file
+  // in the Downloads folder there, that's a platform limitation, not
+  // something fixable in JS. So instead of every export silently becoming
+  // "Muhasabah (1).json", "Muhasabah (2).json"... use a dated filename, so
+  // multiple exports become meaningful dated backups instead of confusing
+  // clutter. (On desktop, most exports go through the FSA handle above and
+  // genuinely overwrite in place — this path is mainly mobile.)
+  const dateStr = new Date().toISOString().slice(0,10);
   const blob=new Blob([json],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url;a.download='Muhasabah.json';a.click();
+  a.href=url;a.download='Muhasabah_'+dateStr+'.json';a.click();
   URL.revokeObjectURL(url);
-  mhsbToast('✓ Exported to Downloads as Muhasabah.json','success');
+  mhsbToast('✓ Exported to Downloads as Muhasabah_'+dateStr+'.json','success');
 }
 
 /* ── Auto-Export (triggered by Save Day) ── */
@@ -4751,6 +4781,7 @@ function renderHadith(idx, reviewMode){
     else refEl.textContent = '';
   }
   document.getElementById('hadithPrevBtn').disabled = idx === 0;
+  document.getElementById('hadithContent').scrollTop = 0;
   const btn = document.getElementById('hadithNextBtn');
   const isLast = reviewMode ? idx === _hadithData.length - 1 : idx === HADITHS_PER_DAY - 1;
   if(reviewMode){
@@ -4976,6 +5007,7 @@ function renderTafsirVerse(idx, reviewMode){
   if(translitEl){ translitEl.textContent = v.translit || ''; translitEl.parentElement.style.display = v.translit ? 'block' : 'none'; }
   document.getElementById('tafsirText').textContent     = v.meaning;
   document.getElementById('tafsirPrevBtn').disabled     = idx === 0;
+  document.getElementById('tafsirContent').scrollTop = 0;
   const btn = document.getElementById('tafsirNextBtn');
   const isLast = reviewMode ? idx === _tafsirSlice.length - 1 : idx === VERSES_PER_DAY - 1;
   if(reviewMode){
@@ -5163,6 +5195,7 @@ function renderSurahVerse(idx){
   if(trEl && trWrap){ trEl.textContent = v.translit || ''; trWrap.style.display = v.translit ? 'block' : 'none'; }
   document.getElementById('svText').textContent = v.meaning;
   document.getElementById('svPrevBtn').disabled = idx === 0;
+  document.getElementById('svContent').scrollTop = 0;
   const isLast = idx === total - 1;
   const btn = document.getElementById('svNextBtn');
   if(_svCompleted && isLast){
@@ -5717,6 +5750,7 @@ function _renderBookSlide(book) {
   const nextBtn    = document.getElementById('bookNextBtn');
   const prevBtn    = document.getElementById('bookPrevBtn');
   const pill       = document.getElementById('bookProgressPill');
+  document.getElementById('bookContent').scrollTop = 0;
 
   if (cur === -1) {
     introSlide.style.display  = 'block';
@@ -6953,6 +6987,7 @@ function _asmaulRenderSlide(){
   const nextBtn  = document.getElementById("asmaulNextBtn");
   const pill     = document.getElementById("asmaulProgressPill");
   const pageDisp = document.getElementById("asmaulPageDisplay");
+  document.getElementById("asmaulContent").scrollTop = 0;
 
   const isLast    = _asmaulSlide >= ASMAUL_TOTAL_SLIDES - 1;
 

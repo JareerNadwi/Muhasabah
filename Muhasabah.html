@@ -26,7 +26,7 @@
   --radius:6px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;overflow-x:hidden;}
+html{scroll-behavior:smooth;}
 /* ── Toast Notifications ── */
 #mhsb-toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;}
 .mhsb-toast{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.4px;padding:10px 18px;border-radius:var(--radius);border:1px solid;max-width:340px;text-align:center;opacity:0;transform:translateY(10px);transition:opacity .22s ease,transform .22s ease;pointer-events:none;white-space:pre-line;line-height:1.5;}
@@ -39,7 +39,7 @@ body.light-mode .mhsb-toast.info{background:#fdf8ee;border-color:var(--gold-dim)
 body.light-mode .mhsb-toast.success{background:#edf7f0;border-color:var(--green);color:var(--green-bright);}
 body.light-mode .mhsb-toast.error{background:#fdf0f0;border-color:var(--red);color:#8b2a2a;}
 body.light-mode .mhsb-toast.warn{background:#fdf8ee;border-color:#b08040;color:#8a5a10;}
-body{-webkit-overflow-scrolling:touch;touch-action:manipulation;overscroll-behavior-y:none;overflow-x:hidden;}
+body{-webkit-overflow-scrolling:touch;touch-action:manipulation;overscroll-behavior-y:none;}
 body{font-family:'Literata',Georgia,serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
 .lr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;overflow-y:auto;overflow-x:hidden;padding:16px;box-sizing:border-box;}
 .lr-overlay.active{display:block;}
@@ -5429,12 +5429,12 @@ function openOverview(){
   _ovCurrentDK    = todayKey();
   _ovCurrentMonth = new Date().getMonth();
   document.getElementById('overviewOverlay').classList.add('active');
-  lockBodyScroll();
+  document.body.classList.add('overlay-open');
   ovSwitchTab('daily');
 }
 function closeOverview(){
   document.getElementById('overviewOverlay').classList.remove('active');
-  unlockBodyScroll();
+  document.body.classList.remove('overlay-open');
 }
 
 function ovSwitchTab(tab){
@@ -5642,37 +5642,11 @@ function ovRenderYearly(){
   `;
 }
 
-/* ── Scroll lock: prevent background scroll when any overlay is open ──
-   Two earlier approaches both broke real scrolling (overflow:hidden alone
-   leaks on iOS; position:fixed fixes that but removes body from normal
-   flow, which broke scrolling entirely on some devices). This version
-   never touches body's layout or position at all, so it can't break
-   scrolling that way: it just selectively blocks the touchmove gesture
-   when the touch starts outside whatever overlay is currently open,
-   and lets it through untouched when it starts inside one (so the
-   overlay's own internal overflow-y:auto scrolls exactly as normal). */
-var _mhsbScrollLocked = false;
-function lockBodyScroll(){
-  if(_mhsbScrollLocked) return;
-  _mhsbScrollLocked = true;
-  document.body.classList.add('overlay-open');
-}
-function unlockBodyScroll(){
-  if(!_mhsbScrollLocked) return;
-  _mhsbScrollLocked = false;
-  document.body.classList.remove('overlay-open');
-}
-document.addEventListener('touchmove', function(e){
-  if(!_mhsbScrollLocked) return;
-  var insideOpenOverlay = e.target.closest(
-    '.modal-overlay.active, .lr-overlay.active, #netHubOverlay.active, .quran-reader-overlay.active'
-  );
-  if(!insideOpenOverlay) e.preventDefault();
-}, {passive:false});
+/* ── Scroll lock: prevent background scroll when any overlay is open ── */
 (function(){
   function updateBodyLock(){
     var anyActive = document.querySelector('.modal-overlay.active, .quran-reader-overlay.active, .lr-overlay.active, #netHubOverlay.active');
-    if(anyActive) lockBodyScroll(); else unlockBodyScroll();
+    document.body.classList.toggle('overlay-open', !!anyActive);
   }
   var mo = new MutationObserver(updateBodyLock);
   mo.observe(document.body, {subtree:true, attributes:true, attributeFilter:['class']});
@@ -9089,7 +9063,7 @@ async function openLanguageReader() {
   const overlay = document.getElementById('langOverlay');
   overlay.classList.add('active');
   overlay.scrollTop = 0;
-  lockBodyScroll();
+  document.body.classList.add('overlay-open');
   reThemeIfLight();
   const _lrDK = currentDateKey || todayKey();
   document.getElementById('lrDoneNote').style.display = (getCached(_lrDK).language === 'yes') ? 'block' : 'none';
@@ -9125,7 +9099,7 @@ async function openLanguageReader() {
 }
 function closeLanguageReader() {
   document.getElementById('langOverlay').classList.remove('active');
-  unlockBodyScroll();
+  document.body.classList.remove('overlay-open');
   // Reset tashkil toggle — always off at next open
   window._lrShowHarakah = false;
   const harakahBtn = document.getElementById('lrHarakahBtn');
@@ -9522,7 +9496,7 @@ async function openContactBook(){
   const cbS=document.getElementById('nhCbSearch');if(cbS)cbS.value='';
   const crmS=document.getElementById('nhCrmSearch');if(crmS)crmS.value='';
   document.getElementById('netHubOverlay').classList.add('active');
-  lockBodyScroll();
+  document.body.classList.add('overlay-open');
   reThemeIfLight();
   nhWsRenderBar();
   nhShowTab(_nhTab);
@@ -9568,7 +9542,7 @@ function closeContactBook(){
   const crmType=document.getElementById('nhCrmTypeFilter');if(crmType)crmType.value='all';
 
   document.getElementById('netHubOverlay').classList.remove('active');
-  unlockBodyScroll();
+  document.body.classList.remove('overlay-open');
   _nhTodayCollapsed=true;
   try{localStorage.setItem('nhTodayCollapsed','true');}catch(e){}
   const today=document.getElementById('nhToday');

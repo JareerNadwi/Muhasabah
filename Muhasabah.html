@@ -10616,7 +10616,7 @@ function nhDealHTML(d,showStage){
   const checked=_nhSelectedDeals.has(d.id);
   const checkbox=_nhBulkMode?`<input type="checkbox" class="nh-deal-check" ${checked?'checked':''} onclick="event.stopPropagation();nhToggleDealSelect('${d.id}')">`:'';
   const stageOptions=_nhStages.map(s=>`<option value="${s.id}"${s.id===d.stageId?' selected':''}>${s.name}</option>`).join('');
-  return `<div class="nh-deal${ov?' ov':''}${_nhBulkMode?' bulk':''}${checked?' checked':''}" id="nhd-${d.id}">
+  return `<div class="nh-deal${ov?' ov':''}${_nhBulkMode?' bulk':''}${checked?' checked':''}" id="nhd-${d.id}" onclick="nhDealCardClick(event,'${d.id}')">
     <div class="nh-deal-top">
       <div>
         <div class="nh-deal-name">${checkbox}<div class="nh-cb-avatar ${contactType==='company'?'company':'person'}" style="display:inline-flex;margin-right:8px;vertical-align:middle;">${contactType==='company'?'🏢':'👤'}</div>${d.contactName||'—'}</div>
@@ -11270,6 +11270,14 @@ async function nhDelStage(id){
 let _nhDragDealId=null;
 let _nhGhostEl=null;
 let _nhDragOverStage=null;
+
+function nhDealCardClick(e, dealId){
+  // Tap-anywhere-to-select in bulk mode. Kept separate from nhDealPointerDown
+  // so it doesn't touch the (currently unwired) drag-and-drop path.
+  if(!_nhBulkMode) return;
+  if(e.target.closest('button,a,input,select')) return;
+  nhToggleDealSelect(dealId);
+}
 
 function nhDealPointerDown(e, dealId){
   // Ignore if clicking a button/link/checkbox inside the card

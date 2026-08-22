@@ -3332,6 +3332,7 @@ function buildCalendar(){
   const grid=document.getElementById('monthsGrid');
   grid.innerHTML='';
   const today=todayKey();
+  const devMode=document.body.classList.contains('dev-mode');
   let bestScore=0,bestDayKey=null;
   all2026Keys().forEach(dk=>{
     const d=getCached(dk);
@@ -3346,7 +3347,7 @@ function buildCalendar(){
     DAYS_SHORT.forEach(d=>{html+=`<div class="day-header">${d}</div>`;});
     for(let d=1;d<=daysInMonth;d++){
       const dk=mkDK(2026,m,d);
-      const isFuture=dk>today,isToday=dk===today;
+      const isFuture=!devMode&&dk>today,isToday=dk===today;
       const dayData=getCached(dk),hasData=Object.keys(dayData).length>0;
       const sc=hasData?scoreDay(dayData):{core:0,bonus:0,total:0};
       let cls='day-cell';
@@ -3823,6 +3824,9 @@ document.addEventListener('DOMContentLoaded', function(){
 function toggleDevMode(){
   const on = document.body.classList.toggle('dev-mode');
   try { localStorage.setItem('_muh_dev_mode', on ? '1' : '0'); } catch(e) {}
+  // Future/past date access depends on this flag — rebuild the calendar so
+  // it reflects the change immediately instead of only after a refresh.
+  buildCalendar();
   // When turning off, re-evaluate lock for current day
   if(!on && currentDateKey) openDay(currentDateKey);
   console.log('Dev mode:', on ? 'ON' : 'OFF');

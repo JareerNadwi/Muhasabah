@@ -3819,10 +3819,16 @@ document.addEventListener('DOMContentLoaded', function(){
 /* ── Dev mode ── */
 function toggleDevMode(){
   const on = document.body.classList.toggle('dev-mode');
+  try { localStorage.setItem('_muh_dev_mode', on ? '1' : '0'); } catch(e) {}
   // When turning off, re-evaluate lock for current day
   if(!on && currentDateKey) openDay(currentDateKey);
   console.log('Dev mode:', on ? 'ON' : 'OFF');
 }
+// Restore dev mode state across refreshes/reopens — otherwise it silently
+// resets to off every time the page reloads, re-locking yesterday.
+try {
+  if(localStorage.getItem('_muh_dev_mode') === '1') document.body.classList.add('dev-mode');
+} catch(e) {}
 document.addEventListener('keydown', function(e){
   if(e.ctrlKey && e.shiftKey && e.key === 'D'){
     e.preventDefault();

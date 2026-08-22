@@ -1447,6 +1447,7 @@ body.overlay-open .contact-num{animation-play-state:paused;}
         <button onclick="closeHdrMenu();exportData();">&#x2191; Export</button>
         <button onclick="closeHdrMenu();openImportModal();">&#x2193; Import</button>
         <button onclick="closeHdrMenu();openOverview();">📊 Overview</button>
+        <button onclick="closeHdrMenu();openGoalSettingsModal();" style="color:var(--gold);">⚙️ Goal Settings</button>
         <div class="hdr-menu-sep"></div>
         <button onclick="closeHdrMenu();openResetModal();" style="color:#c05a5a;">Reset All Data</button>
       </div>
@@ -1513,7 +1514,7 @@ body.overlay-open .contact-num{animation-play-state:paused;}
 <div class="modal-overlay" id="supportModal">
   <div class="modal support-modal">
     <h3>❤️ Enjoying Muhasabah?</h3>
-    <p>This tracker is free and always will be InShaAllah. If it's helping your daily practice, consider supporting its development.</p>
+    <p>If Muhasabah is helping your daily practice, consider supporting its development.</p>
     <div class="support-bkash">
       <div class="num"><span>01829</span><span>624608</span></div>
       <div class="lbl" style="color:var(--text-dim);">bKash &nbsp;·&nbsp; Nagad</div>
@@ -1522,6 +1523,46 @@ body.overlay-open .contact-num{animation-play-state:paused;}
       <button class="btn-donate" onclick="supportDonate()">💛 I'll Donate</button>
       <button class="btn-later" onclick="supportLater()">Remind Me In 7 Days</button>
       <button class="btn-never" onclick="supportNever()">Never Show This Again</button>
+    </div>
+  </div>
+</div>
+
+<!-- Goal Settings Modal -->
+<div class="modal-overlay" id="goalSettingsModal" onclick="if(event.target===this)closeGoalSettingsModal()">
+  <div class="modal" style="max-width:440px;text-align:left;">
+    <h3 style="color:var(--gold);">⚙️ Goal Settings</h3>
+    <p>Salah, Quran, Tahajjud, Zikr, Hadith, and the rest of the daily readers always count. These six are situational — turn off whatever doesn't fit your life right now. Whatever stays on shares the full 100% between them, so your daily score always adds up to 100%.</p>
+    <div id="goalSettingsNotice" style="display:none;font-size:12px;color:var(--gold);background:var(--surface2);border:1px solid var(--gold-dim);border-radius:6px;padding:8px 12px;margin-bottom:14px;"></div>
+    <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:6px;">
+      <label style="display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--border);cursor:pointer;">
+        <input type="checkbox" id="goalToggle_exercise" style="width:16px;height:16px;accent-color:var(--gold);">
+        <span>🏃 Exercise</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--border);cursor:pointer;">
+        <input type="checkbox" id="goalToggle_books" style="width:16px;height:16px;accent-color:var(--gold);">
+        <span>📕 Book Reading</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--border);cursor:pointer;">
+        <input type="checkbox" id="goalToggle_language" style="width:16px;height:16px;accent-color:var(--gold);">
+        <span>🗣 Language</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--border);cursor:pointer;">
+        <input type="checkbox" id="goalToggle_tafakkur" style="width:16px;height:16px;accent-color:var(--gold);">
+        <span>🤲 Tafakkur</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--border);cursor:pointer;">
+        <input type="checkbox" id="goalToggle_writing" style="width:16px;height:16px;accent-color:var(--gold);">
+        <span>✍️ Writing</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;padding:10px 4px;cursor:pointer;">
+        <input type="checkbox" id="goalToggle_networking" style="width:16px;height:16px;accent-color:var(--gold);">
+        <span>🤝 Networking</span>
+      </label>
+    </div>
+    <p style="font-size:11px;color:var(--text-muted);margin-bottom:16px;">Changes take effect after midnight tonight — today stays scored exactly as it already is, and every past day keeps the score it was originally logged with.</p>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeGoalSettingsModal()">Cancel</button>
+      <button class="modal-confirm" style="background:#2a2210;border-color:var(--gold);color:var(--gold);" onclick="saveGoalSettings()">Save</button>
     </div>
   </div>
 </div>
@@ -3134,76 +3175,27 @@ function all2026Keys(toToday=true){
 
 /* ── Scoring ── */
 function scoreDay(data){
+  // Effective weight table for this specific day: a locked/past day uses
+  // the config it was actually saved under (_weightSnapshot); today (or any
+  // day without a snapshot yet, e.g. legacy records) uses the live config.
+  // Each entry is that goal's share of the 100% core total right now —
+  // toggled-off goals get 0, and everything else is redistributed
+  // proportionally by computeWeightTable().
+  const weights = (data && data._weightSnapshot) ? data._weightSnapshot : computeWeightTable(_goalConfig.active);
+
   let core=0;
-
-  // Salah 10% (5 × 2%)
-  const salahs=data.salahs||{};
-  SALAHS.forEach(s=>{
-    const v=salahs[s]||'';
-    if(v==="jamaah")        core+=2;
-    else if(v==='munfarid') core+=1.5;
-    else if(v==='qaza')     core+=0.5;
+  OV_CORE_HABITS.forEach(h=>{
+    const w = weights[h.key] || 0;
+    if(w > 0) core += (goalScore(data,h.key)/100) * w;
   });
+  core=Math.min(core,100);
 
-  // Quran 10% — PDF reader wins over manual Yes/No
+  // Raw values still needed below for "extra beyond goal" bonus math
   const qRaw = data.quranPdfJuzz !== undefined
     ? parseFloat(data.quranPdfJuzz) || 0
     : (data.quran==='yes' ? 1 : 0);
-  core+=Math.min(qRaw*10,10);
-
-  // Tahajjud 10% (goal = 4 rakat)
   const tah=parseInt(data.tahajjudRakat)||0;
-  core+=Math.min((tah/4)*10,10);
-
-  // Zikr 5% (goal = 1500)
   const zikr=parseInt(data.zikrCount)||0;
-  core+=Math.min((zikr/1500)*5,5);
-
-  // Hadith 5% — manual wins over reader ratio
-  const hdManual = parseInt(data.hadithManual) || 0;
-  const hdRatio  = data['hadith_ratio'];
-  const hdCount  = hdManual > 0 ? hdManual : (hdRatio !== undefined ? Math.round(hdRatio * 5) : 0);
-  core += Math.min((hdCount / 5) * 5, 5);
-
-  // Yes/No core goals — 5% each
-  // zikrMorning and zikrEvening use PDF ratio if available, else yes/no
-  const yn=(k,w)=>{if(data[k]==='yes')core+=w;};
-  // Tafsir 5% — manual wins over reader ratio
-  const tfManual = parseInt(data.tafsirManual) || 0;
-  const tfRatio  = data['tafsir_ratio'];
-  const tfCount  = tfManual > 0 ? tfManual : (tfRatio !== undefined ? Math.round(tfRatio * 17) : 0);
-  core += Math.min((tfCount / 17) * 5, 5);
-  // asmaul 5% — proportional if PDF used, else yes/no
-  const azRatio = data['asmaul_pdfRatio'];
-  core += azRatio !== undefined ? Math.min(azRatio * 5, 5) : (data.asmaul==='yes'?5:0);
-
-  // zikrMorning 5% — proportional if PDF used, else yes/no
-  const zmRatio = data['zikrMorning_pdfRatio'];
-  core += zmRatio !== undefined ? Math.min(zmRatio * 5, 5) : (data.zikrMorning==='yes'?5:0);
-
-  // zikrEvening 5% — proportional if PDF used, else yes/no
-  const zeRatio = data['zikrEvening_pdfRatio'];
-  core += zeRatio !== undefined ? Math.min(zeRatio * 5, 5) : (data.zikrEvening==='yes'?5:0);
-
-  // surahWaqiah 5% — proportional if PDF used, else yes/no
-  const swRatio = data['surahWaqiah_pdfRatio'];
-  core += swRatio !== undefined ? Math.min(swRatio * 5, 5) : (data.surahWaqiah==='yes'?5:0);
-
-  // surahMulk 5% — proportional if PDF used, else yes/no
-  const smRatio = data['surahMulk_pdfRatio'];
-  core += smRatio !== undefined ? Math.min(smRatio * 5, 5) : (data.surahMulk==='yes'?5:0);
-  // books 5% — proportional via book_ratio
-  const bkRatio = data['book_ratio'];
-  core += bkRatio !== undefined ? Math.min(bkRatio * 5, 5) : (data.books === 'yes' ? 5 : 0);
-  yn('exercise',5);
-  // language 5% — proportional via language_ratio
-  const langRatio = data['language_ratio'];
-  core += langRatio !== undefined ? Math.min(langRatio * 5, 5) : (data.language==='yes' ? 5 : 0);
-  yn('writingLinkedin',2.5); yn('writingFacebook',2.5);
-  yn('netConnected',2.5); yn('netCommented',2.5);
-  yn('tafakkur',5);
-
-  core=Math.min(core,100);
 
   // ── Bonus ──
   let bonus=0;
@@ -3458,6 +3450,7 @@ function openDay(dk){
   buildSalahGrid();
   buildQuranSelector();
   loadDayData(dk);
+  applyGoalCardVisibility();
   try { lrUpdateGoalBadge(); } catch(e) {}
   window.scrollTo({top:0,behavior:'instant'});
 }
@@ -3731,6 +3724,11 @@ function refreshReadTodayDisplays(){
 
 function collectData(){
   const data={...getCached(currentDateKey)};
+  // Lock in today's weight config permanently on first save. Every later
+  // save for this same day reuses the existing snapshot (it's already on
+  // `data` via the spread above), so opening this day again next year still
+  // scores it exactly as it was scored the day it was logged.
+  if(!data._weightSnapshot) data._weightSnapshot = computeWeightTable(_goalConfig.active);
   ['zikrCount','tahajjudRakat','sunnahRakat','naflRakat','zikrBookPages','sadaqahUnits','hadithManual','tafsirManual']
     .forEach(id=>{data[id]=document.getElementById(id).value;});
   data.quranJuzz      =document.getElementById('quranJuzz').value;
@@ -4475,7 +4473,11 @@ function closeReadMe(){
 (async()=>{
   await migrateFromLocalStorage();
   await preloadCache();
+  const goalChangeJustApplied = await loadGoalConfig();
   buildCalendar();
+  if(goalChangeJustApplied && window.mhsbToast){
+    mhsbToast('Your goal changes are now active.', 'info');
+  }
   // Keep subheader stuck directly below the main header at all times
   const hdr = document.querySelector('.header');
   const sub = document.getElementById('calendarSubheader');
@@ -5440,6 +5442,93 @@ const OV_BONUS_HABITS = [
   { key:'sadaqah',     icon:'💛', label:'Sadaqah',          weight:10 },
 ];
 
+/* ══════════════════════════════════════════════════════════
+   Goal Flexibility — togglable core goals
+   6 situational goals can be turned off per user. Weight of a
+   disabled goal is redistributed proportionally across whatever
+   stays active, so core always totals 100%. Changes are staged
+   and only take effect starting the next calendar day — today's
+   entry keeps scoring against whatever config was live when it
+   was first saved, via the _weightSnapshot stamped onto that
+   day's record at save time. Locked past days already can't be
+   edited, so they keep whatever snapshot they were saved with.
+══════════════════════════════════════════════════════════ */
+const TOGGLEABLE_GOAL_KEYS = ['exercise','books','language','tafakkur','writing','networking'];
+const FIXED_CORE_KEYS = OV_CORE_HABITS.map(h=>h.key).filter(k=>!TOGGLEABLE_GOAL_KEYS.includes(k));
+
+let _goalConfig = { active: TOGGLEABLE_GOAL_KEYS.slice(), pending: null };
+
+function computeWeightTable(activeToggleKeys){
+  const activeSet = new Set(FIXED_CORE_KEYS.concat(activeToggleKeys||[]));
+  const totalWeight = OV_CORE_HABITS.reduce((s,h)=>s + (activeSet.has(h.key) ? h.weight : 0), 0) || 1;
+  const table = {};
+  OV_CORE_HABITS.forEach(h=>{
+    table[h.key] = activeSet.has(h.key) ? (h.weight/totalWeight)*100 : 0;
+  });
+  return table;
+}
+
+/* Loads saved config, and — if a staged change's effective date has
+   arrived — promotes it to live and clears the pending flag. Returns
+   true when a change just went live, so the caller can toast it once. */
+async function loadGoalConfig(){
+  try{
+    const stored = await getStore('_goalConfig');
+    if(stored && Array.isArray(stored.active)) _goalConfig = stored;
+  }catch(e){}
+  if(_goalConfig.pending && _goalConfig.pending.effectiveDate <= todayKey()){
+    _goalConfig.active = _goalConfig.pending.active;
+    _goalConfig.pending = null;
+    await setStore('_goalConfig', _goalConfig);
+    return true;
+  }
+  return false;
+}
+
+async function stageGoalConfigChange(newActiveList){
+  const t = new Date(); t.setDate(t.getDate()+1);
+  const effectiveDate = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+  _goalConfig.pending = { active: newActiveList, effectiveDate };
+  await setStore('_goalConfig', _goalConfig);
+}
+
+function applyGoalCardVisibility(){
+  TOGGLEABLE_GOAL_KEYS.forEach(k=>{
+    const card = document.getElementById('card-'+k);
+    if(card) card.style.display = _goalConfig.active.includes(k) ? '' : 'none';
+  });
+}
+
+/* ── Goal Settings modal ── */
+function openGoalSettingsModal(){
+  const source = _goalConfig.pending ? _goalConfig.pending.active : _goalConfig.active;
+  TOGGLEABLE_GOAL_KEYS.forEach(k=>{
+    const cb = document.getElementById('goalToggle_'+k);
+    if(cb) cb.checked = source.includes(k);
+  });
+  updateGoalSettingsNotice();
+  document.getElementById('goalSettingsModal').classList.add('active');
+}
+function closeGoalSettingsModal(){
+  document.getElementById('goalSettingsModal').classList.remove('active');
+}
+function updateGoalSettingsNotice(){
+  const notice = document.getElementById('goalSettingsNotice');
+  if(!notice) return;
+  if(_goalConfig.pending){
+    notice.textContent = `⏳ A change is scheduled — takes effect ${_goalConfig.pending.effectiveDate} (after midnight tonight).`;
+    notice.style.display = '';
+  } else {
+    notice.style.display = 'none';
+  }
+}
+async function saveGoalSettings(){
+  const newActive = TOGGLEABLE_GOAL_KEYS.filter(k=>document.getElementById('goalToggle_'+k)?.checked);
+  await stageGoalConfigChange(newActive);
+  if(window.mhsbToast) mhsbToast('Saved — takes effect after midnight tonight.', 'info');
+  closeGoalSettingsModal();
+}
+
 let _ovCurrentDK  = null;
 let _ovCurrentMonth = null; // 0-indexed
 let _ovActiveTab  = 'daily';
@@ -5473,9 +5562,28 @@ function ovBarColor(pct){
   if(pct >= 50) return 'var(--gold-dim)';
   return 'var(--red)';
 }
+/* Was this specific goal actually in play on this day? Fixed core goals
+   (Salah, Quran, etc.) are always active. Toggleable ones read the day's
+   own locked-in snapshot — or the live config, for a day with none yet
+   (e.g. today, before its first save). */
+function isGoalActiveOnDay(dk, key){
+  if(!TOGGLEABLE_GOAL_KEYS.includes(key)) return true;
+  const data = getCached(dk);
+  const weights = (data && data._weightSnapshot) ? data._weightSnapshot : computeWeightTable(_goalConfig.active);
+  return (weights[key] || 0) > 0;
+}
+/* Averages a per-goal score across only the days that goal was active.
+   Returns null (not 0) if it was never active across the given days —
+   callers should drop the row rather than show a misleading 0%. */
+function ovHabitAvgActiveOnly(loggedDays, key, scoreFn){
+  const activeDays = loggedDays.filter(dk => isGoalActiveOnDay(dk, key));
+  if(activeDays.length === 0) return null;
+  return Math.round(activeDays.reduce((a,dk)=>a+scoreFn(dk),0) / activeDays.length);
+}
 function ovHabitRows(habits, dataFn){
   return habits.map(h=>{
     const pct = dataFn(h.key);
+    if(pct === null) return '';
     const color = ovBarColor(pct);
     return `<div class="ov-habit-row">
       <div class="ov-habit-icon">${h.icon}</div>
@@ -5528,7 +5636,7 @@ function ovRenderDaily(){
       </div>
     </div>
     <div class="ov-section">Core Habits</div>
-    <div class="ov-habits">${ovHabitRows(OV_CORE_HABITS, k => goalScore(data, k))}</div>
+    <div class="ov-habits">${ovHabitRows(OV_CORE_HABITS, k => isGoalActiveOnDay(_ovCurrentDK, k) ? goalScore(data, k) : null)}</div>
     <div class="ov-section">Bonus Habits</div>
     <div class="ov-habits">${ovHabitRows(OV_BONUS_HABITS, k => {
       const raw = bonusScore(data, k);
@@ -5564,8 +5672,8 @@ function ovRenderMonthly(){
   const avgBonus = Math.round(scores.reduce((a,s)=>a+s.bonus,0) / scores.length * 10) / 10;
   const avgTotal = Math.round(scores.reduce((a,s)=>a+s.total,0) / scores.length * 10) / 10;
 
-  // Per-habit averages
-  const coreAvg = k => Math.round(logged.reduce((a,dk)=>a+goalScore(getCached(dk),k),0)/logged.length);
+  // Per-habit averages — toggleable goals only average over days they were actually active
+  const coreAvg = k => ovHabitAvgActiveOnly(logged, k, dk => goalScore(getCached(dk), k));
   const bonusAvg = k => {
     const max = OV_BONUS_HABITS.find(h=>h.key===k)?.weight || 10;
     return Math.round(logged.reduce((a,dk)=>a+(bonusScore(getCached(dk),k)/max)*100,0)/logged.length);
@@ -5623,7 +5731,7 @@ function ovRenderYearly(){
   const [by,bm,bd] = bestDay.split('-').map(Number);
   const bestLabel = new Date(by,bm-1,bd).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 
-  const coreAvg  = k => Math.round(logged.reduce((a,dk)=>a+goalScore(getCached(dk),k),0)/logged.length);
+  const coreAvg  = k => ovHabitAvgActiveOnly(logged, k, dk => goalScore(getCached(dk), k));
   const bonusAvg = k => {
     const max = OV_BONUS_HABITS.find(h=>h.key===k)?.weight || 10;
     return Math.round(logged.reduce((a,dk)=>a+(bonusScore(getCached(dk),k)/max)*100,0)/logged.length);

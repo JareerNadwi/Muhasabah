@@ -2803,6 +2803,27 @@ function qrPageFromHistory(){
   return null;
 }
 
+/* Is there any recorded Quran reading at all, on any day? */
+function qrHasAnySession(){
+  return Object.keys(_cache).some(k =>
+    /^\d{4}-\d{2}-\d{2}$/.test(k) && _cache[k] && Array.isArray(_cache[k].quranSessions) && _cache[k].quranSessions.length > 0);
+}
+
+/* Where should the reader resume? The stored pointer, unless it is stale.
+   A pointer is stale when it says "you read up to page N" but NO reading is
+   recorded anywhere any more (every day that held it has been reset) and the
+   position was not set by hand via "Set it". Trusting it would open on page
+   N+1 and never count the pages before it. If the pointer is missing, fall
+   back to the logged history. Returns the last page finished, or null. */
+async function qrResolveResumePage(){
+  let p = await getQrLastPage();
+  if(p >= QR_LAST_PAGE) p = null;                                  // finished → start again
+  const jumps = Array.isArray(_cache['_qr_jumps']) ? _cache['_qr_jumps'] : [];
+  if(p && !qrHasAnySession() && !jumps.includes(p + 1)) p = null;  // stale pointer
+  if(!p) p = qrPageFromHistory();
+  return p;
+}
+
 /* Furthest page (short of the very end) ever logged — used only to pre-fill
    the "set resume page" prompt. */
 function qrFurthestLoggedPage(){
@@ -2855,9 +2876,7 @@ async function openQuranReader(){
   // The stored pointer is the fast path; if it is missing (cleared, or never
   // restored from an older backup) rebuild it from the logged sessions instead
   // of silently falling back to page 1.
-  let lastPage = await getQrLastPage();
-  if(lastPage >= QR_LAST_PAGE) lastPage = null;   // finished (app closed on the last page) → start again
-  if(!lastPage) lastPage = qrPageFromHistory();
+  const lastPage = await qrResolveResumePage();
   qrCurPage = lastPage ? Math.min(lastPage + 1, QR_LAST_PAGE) : QR_FIRST_PAGE;
   qrStartPage = qrCurPage;
   qrSessionId   = Date.now();
@@ -4303,8 +4322,15 @@ async function confirmDayReset(){
     const laterDayRead = Object.keys(_cache).some(k =>
       /^\d{4}-\d{2}-\d{2}$/.test(k) && k > _resetDK && _cache[k] && (_cache[k].quranSessions||[]).length);
     if(!laterDayRead){
-      const before = (parseInt(_daySessions[0].start,10) || 1) - 1;
-      await setQrLastPage(before >= 1 ? before : qrPageFromHistory());
+      // Rewind to where THIS day began — but only to a page whose reading is
+      // still on record (or that was set by hand). If the day before was also
+      // reset, "the page before today" no longer exists → start from page 1.
+      const firstStart = parseInt(_daySessions[0].start,10) || 1;
+      const jumps = Array.isArray(_cache['_qr_jumps']) ? _cache['_qr_jumps'] : [];
+      let target = null;
+      if(firstStart > 1 && jumps.includes(firstStart)) target = firstStart - 1;   // deliberate "Set it" position
+      else target = qrPageFromHistory();                                          // remaining recorded history
+      await setQrLastPage(target);
     }
   }
 

@@ -1870,6 +1870,7 @@ body.overlay-open .contact-num{animation-play-state:paused;}
       </div>
       <div class="sub-label">Goal: 1 Full Juzz = Full <span id="subw-quran">10</span>% Core &nbsp;·&nbsp; Every Extra Juzz = +5% Bonus</div>
       <button class="qr-open-btn" onclick="openQuranReader()">📖 Open Quran Reader</button>
+      <button onclick="setQuranResumePage()" style="display:block;margin:6px auto 0;background:none;border:none;color:var(--text-muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.5px;text-decoration:underline;cursor:pointer;">Wrong starting page? Set it</button>
       <div class="qr-session-badge" id="quranSessionBadge" style="display:none;"></div>
     </div>
 
@@ -2711,6 +2712,14 @@ const JUZZ_RANGES = [
   [586,610],     // Juzz 30 (25 pages)
 ];
 
+/* Page position inside its juzz, from the real ranges above
+   (Juzz 1 = 21 pages, Juzz 29 = 24, Juzz 30 = 25, all others 20). */
+function pageInJuzz(page){
+  const j = pageToJuzz(page);
+  const [s,e] = JUZZ_RANGES[j];
+  return { juzz:j, idx:page - s + 1, total:e - s + 1 };
+}
+
 /* Get juzz number (1-30) for a given page */
 function pageToJuzz(page){
   for(let j=1;j<=30;j++){
@@ -2743,6 +2752,9 @@ function pagesReadToJuzz(pagesRead, startPage){
 let qrPdfDoc     = null;
 let qrCurPage    = 1;    // current PDF page number
 let qrStartPage  = null; // PDF page at session open
+let qrSessionId   = null; // unique id of the current reader session
+let qrSessionDK   = null; // day the current session belongs to
+let qrSessionBase = 0;    // that day's Quran juzz total BEFORE this session
 let qrRendering  = false;
 let qrScale      = 1.5;
 let qrZoomLevel  = 0;   // incremental zoom: 0 = default, +1 = +25%, etc.
@@ -2773,6 +2785,60 @@ function nearestQuarterOption(val){
   return sel.options[best].value;
 }
 
+/* Where did the user's own logged sessions leave off? Every closed reader
+   session is stored on its day (quranSessions: {start,end,...}), so the
+   position can be rebuilt from history whenever the separate resume pointer
+   (_qr_lastpage) is missing. Returns the last page read, or null when there is
+   no history or the last session finished the Quran (→ start again at page 1). */
+function qrPageFromHistory(){
+  const dks = Object.keys(_cache).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).sort();
+  for(let i=dks.length-1;i>=0;i--){
+    const d = _cache[dks[i]];
+    const ss = d && d.quranSessions;
+    if(Array.isArray(ss) && ss.length){
+      const end = parseInt(ss[ss.length-1].end,10);
+      if(end > 0) return end >= QR_LAST_PAGE ? null : end;
+    }
+  }
+  return null;
+}
+
+/* Furthest page (short of the very end) ever logged — used only to pre-fill
+   the "set resume page" prompt. */
+function qrFurthestLoggedPage(){
+  let best = 0;
+  Object.keys(_cache).forEach(k=>{
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(k)) return;
+    const ss = _cache[k] && _cache[k].quranSessions;
+    if(Array.isArray(ss)) ss.forEach(x=>{
+      const e = parseInt(x.end,10);
+      if(e > best && e < QR_LAST_PAGE) best = e;
+    });
+  });
+  return best || null;
+}
+
+/* Manual correction: tell the reader which page you last finished. Only moves
+   the resume pointer — it never touches sessions or scores. */
+async function setQuranResumePage(){
+  const hint = qrFurthestLoggedPage();
+  const msg = 'Last Quran page you finished (1–' + (QR_LAST_PAGE-1) + ')?\n'
+            + 'The reader will open on the next page.'
+            + (hint ? '\n\nYour logged history reaches page ' + hint + ' (Juzz ' + pageToJuzz(hint) + ').' : '');
+  const ans = window.prompt(msg, hint ? String(hint) : '');
+  if(ans === null) return;
+  const n = parseInt(ans,10);
+  if(!(n >= 1 && n < QR_LAST_PAGE)){
+    if(window.mhsbToast) mhsbToast('Enter a page between 1 and ' + (QR_LAST_PAGE-1) + '.','warn');
+    return;
+  }
+  await setQrLastPage(n);
+  const jumps = (Array.isArray(_cache['_qr_jumps']) ? _cache['_qr_jumps'] : []).concat(n+1);
+  _cache['_qr_jumps'] = jumps;
+  await setPdfLastPage('_qr_jumps', jumps);
+  if(window.mhsbToast) mhsbToast('Quran will resume at page ' + (n+1) + ' (Juzz ' + pageToJuzz(n+1) + ').','info');
+}
+
 async function openQuranReader(){
   const overlay = document.getElementById('quranReaderOverlay');
   overlay.classList.add('active');
@@ -2786,9 +2852,17 @@ async function openQuranReader(){
   const zl = document.getElementById('qrZoomLabel'); if(zl) zl.textContent='100%';
 
   // Determine start page: resume from NEXT page after last saved position
-  const lastPage = await getQrLastPage();
+  // The stored pointer is the fast path; if it is missing (cleared, or never
+  // restored from an older backup) rebuild it from the logged sessions instead
+  // of silently falling back to page 1.
+  let lastPage = await getQrLastPage();
+  if(lastPage >= QR_LAST_PAGE) lastPage = null;   // finished (app closed on the last page) → start again
+  if(!lastPage) lastPage = qrPageFromHistory();
   qrCurPage = lastPage ? Math.min(lastPage + 1, QR_LAST_PAGE) : QR_FIRST_PAGE;
   qrStartPage = qrCurPage;
+  qrSessionId   = Date.now();
+  qrSessionDK   = currentDateKey;
+  qrSessionBase = parseFloat(getCached(currentDateKey).quranPdfJuzz) || 0;
 
   updateSessionInfo();
 
@@ -2844,8 +2918,10 @@ async function qrRenderPage(pdfPageNum){
 
     const qPage = pdfToQuranPage(pdfPageNum);
     const juzz  = pageToJuzz(qPage);
-    document.getElementById('qrPageDisplay').textContent =
-      `Page ${qPage} / 610  ·  Juzz ${juzz}`;
+    const pj = pageInJuzz(qPage);
+    document.getElementById('qrPageDisplay').innerHTML =
+      `<span>Page ${qPage} / 610  ·  Juzz ${juzz}</span>`
+      + `<span style="display:block;font-size:.85em;opacity:.7;margin-top:2px;">Juzz ${juzz}  ·  Page ${pj.idx} / ${pj.total}</span>`;
     document.getElementById('qrInfoBar').textContent =
       `Emdadia Hafezi  ·  Quran Page ${qPage}  ·  Juzz ${juzz}`;
 
@@ -2855,6 +2931,7 @@ async function qrRenderPage(pdfPageNum){
 
     updateSessionInfo();
     await setQrLastPage(pdfPageNum);
+    try{ await qrPersistSession(); }catch(err){ console.warn('Quran session autosave failed', err); }
   }catch(e){
     if(e && e.name !== 'RenderingCancelledException'){
       document.getElementById('qrLoading').innerHTML='<span style="color:#c05050;">⚠ Error Rendering Page</span>';
@@ -2902,7 +2979,7 @@ function renderQuranBadge(dayData){
   }
   badge.style.display = 'block';
   const total = parseFloat(dayData.quranPdfJuzz) || 0;
-  const sessionCount = dayData.quranSessions.length;
+  const sessionCount = dayData.quranSessions.filter(x=>!x.recovered).length;
   const totalPagesToday = dayData.quranSessions.reduce((s,x)=>s+x.pages,0);
   const cycles = [];
   let _cycle = [];
@@ -2925,6 +3002,90 @@ function renderQuranBadge(dayData){
     `<span style="color:${color};">📖 Today: ${sessionCount} Session${sessionCount !== 1 ? 's' : ''} &nbsp;·&nbsp; ${statusTxt}</span>`
     + `<br><span style="font-size:9px;color:#a89060;">${totalLine}</span>`
     + `<br><span style="font-size:9px;color:#a89060;">Last Session: Pages ${last.start}–${last.end} (${last.pages} Pages)</span>`;
+  const _gaps = qrFindGaps(dayData);
+  if(_gaps.length && !document.body.classList.contains('past-day-locked')){
+    const _n = _gaps.reduce((t,g)=>t+g.pages,0);
+    badge.innerHTML += `<br><span onclick="qrCountMissedPages()" style="font-size:9px;color:#d4a840;text-decoration:underline;cursor:pointer;">⚠ ${_n} page${_n!==1?'s were':' was'} shown but never counted — tap to add</span>`;
+  }
+}
+
+/* Writes the CURRENT reader session into its day's record. Runs after every
+   page turn (and once more on Save & Exit), so pages can never be counted as
+   unread just because the reader was left another way — closed tab, refresh,
+   swiped-away PWA, browser killing a background page. Before this, a session
+   was only recorded when "Save & Exit" was tapped, while the resume position
+   advanced on every page turn: skipped exits left pages that were shown but
+   never counted (e.g. page range 1–13 but only 6 pages credited).
+   Idempotent: it replaces this session's own entry each time. */
+async function qrPersistSession(){
+  if(!qrSessionDK || !qrStartPage || !qrPdfDoc) return;
+  const dk = qrSessionDK;
+  const dayData = {...getCached(dk)};
+  const sessions = Array.isArray(dayData.quranSessions) ? dayData.quranSessions.slice() : [];
+  const at = sessions.findIndex(x => x.sid === qrSessionId);
+  if(at >= 0) sessions.splice(at, 1);
+
+  const pagesRead = Math.max(0, qrCurPage - qrStartPage + 1);
+  let sessionJuzz = 0;
+  if(pagesRead > 0){
+    sessionJuzz = pagesReadToJuzz(pagesRead, qrStartPage);
+    sessions.push({sid:qrSessionId, start:pdfToQuranPage(qrStartPage), end:pdfToQuranPage(qrCurPage), pages:pagesRead, juzz:sessionJuzz});
+    dayData.quranJuzz = String(pageToJuzz(pdfToQuranPage(qrStartPage)));
+  }
+  const total = Math.round((qrSessionBase + sessionJuzz) * 1000) / 1000;
+  dayData.quranSessions = sessions;
+  dayData.quranPdfJuzz  = total;
+  if(total >= 1) dayData.quran = 'yes';
+
+  _cache[dk] = dayData;
+  await setStore(dk, dayData);
+}
+
+/* Pages that fall BETWEEN two sessions of the same day — they were shown on
+   screen (the resume position moved past them) but no session was ever saved
+   for them. Pages skipped on purpose via "Set it" are excluded (_qr_jumps). */
+function qrFindGaps(dayData){
+  const ss = (dayData && dayData.quranSessions) || [];
+  const jumps = Array.isArray(_cache['_qr_jumps']) ? _cache['_qr_jumps'] : [];
+  const gaps = [];
+  for(let i=0;i<ss.length-1;i++){
+    const a = ss[i], b = ss[i+1];
+    if(a.end >= QR_LAST_PAGE) continue;          // finished & restarted, not a gap
+    const start = a.end + 1, end = b.start - 1;
+    if(end >= start && !jumps.includes(b.start)) gaps.push({at:i+1, start, end, pages:end-start+1});
+  }
+  return gaps;
+}
+
+/* One-tap repair for a day that already has uncounted pages. Asks first. */
+async function qrCountMissedPages(){
+  if(!currentDateKey || document.body.classList.contains('past-day-locked')) return;
+  const dayData = {...getCached(currentDateKey)};
+  const gaps = qrFindGaps(dayData);
+  if(!gaps.length) return;
+  const n = gaps.reduce((t,g)=>t+g.pages,0);
+  const list = gaps.map(g=>g.start===g.end ? 'page '+g.start : 'pages '+g.start+'–'+g.end).join(', ');
+  if(!window.confirm('Count ' + n + ' page' + (n!==1?'s':'') + ' that were shown but never saved?\n\n' + list)) return;
+
+  const sessions = dayData.quranSessions.slice();
+  let extra = 0;
+  gaps.slice().reverse().forEach(g=>{
+    const j = pagesReadToJuzz(g.pages, g.start);
+    extra += j;
+    sessions.splice(g.at, 0, {start:g.start, end:g.end, pages:g.pages, juzz:j, recovered:true});
+  });
+  dayData.quranSessions = sessions;
+  dayData.quranPdfJuzz  = Math.round(((parseFloat(dayData.quranPdfJuzz)||0) + extra) * 1000) / 1000;
+  if(dayData.quranPdfJuzz >= 1) dayData.quran = 'yes';
+  _cache[currentDateKey] = dayData;
+  await setStore(currentDateKey, dayData);
+
+  renderQuranBadge(dayData);
+  const pagesToday = document.getElementById('quranPagesToday');
+  const tp = sessions.reduce((t,x)=>t+x.pages,0);
+  if(pagesToday) pagesToday.textContent = tp + ' Page' + (tp!==1?'s':'') + ' Read Today';
+  await saveAndRefresh();
+  if(window.mhsbToast) mhsbToast('Added ' + n + ' page' + (n!==1?'s':'') + ' to today.','success');
 }
 
 async function closeQuranReader(){
@@ -2936,39 +3097,12 @@ async function closeQuranReader(){
   const zo = document.getElementById('qrZoomOut'); if(zo){ zo.style.display=''; zo.disabled=true; }
   const zl = document.getElementById('qrZoomLabel'); if(zl) zl.textContent='100%';
 
-  if(!qrStartPage || !currentDateKey) return;
+  if(!qrStartPage || !currentDateKey || qrSessionDK !== currentDateKey) return;
   if(!qrPdfDoc) return; // PDF never loaded — nothing was read
 
-  const pagesRead = Math.max(0, qrCurPage - qrStartPage + 1);
-  if(pagesRead === 0) return;
-
-  const sessionJuzz    = pagesReadToJuzz(pagesRead, qrStartPage);
-  const startQuranPage = pdfToQuranPage(qrStartPage);
-  const endQuranPage   = pdfToQuranPage(qrCurPage);
-
-  // Accumulate today's total — add this session on top of any earlier sessions today
-  const dayData = {...getCached(currentDateKey)};
-  const prevJuzz = parseFloat(dayData.quranPdfJuzz) || 0;
-
-  // If goal (1 juzz) was already reached in a previous session today, don't reset/recalculate
-  // Still record the session for display but don't subtract from accumulated juzz
-  const todayTotal = Math.round((prevJuzz + sessionJuzz) * 1000) / 1000;
-
-  dayData.quranPdfJuzz    = todayTotal;
-  dayData.quranJuzz       = String(pageToJuzz(startQuranPage));
-  // Track sessions list for badge display
-  if(!dayData.quranSessions) dayData.quranSessions = [];
-  dayData.quranSessions.push({start: startQuranPage, end: endQuranPage, pages: pagesRead, juzz: sessionJuzz});
-
-  // Auto-flip to "yes" once a full juzz has been reached today — scoring still
-  // falls back to this when quranPdfJuzz is undefined, so it's kept exactly
-  // as before even though there's no longer a button reflecting it.
-  if (todayTotal >= 1) {
-    dayData.quran = 'yes';
-  }
-
-  _cache[currentDateKey] = dayData;
-  await setStore(currentDateKey, dayData);
+  // Final write of this session (pages were already autosaved on each turn).
+  await qrPersistSession();
+  const dayData = getCached(currentDateKey);
 
   // If last page reached, reset global position so next open starts from page 1
   if(qrCurPage >= QR_LAST_PAGE){
@@ -4154,11 +4288,25 @@ function openDayResetModal(){
 function closeDayResetModal(){document.getElementById('dayResetModal').classList.remove('active');}
 async function confirmDayReset(){
   if(!currentDateKey) return;
-  await deleteStore(currentDateKey);
-  delete _cache[currentDateKey];
+  const _resetDK = currentDateKey;
+  const _daySessions = (getCached(_resetDK).quranSessions || []).slice();
+  await deleteStore(_resetDK);
+  delete _cache[_resetDK];
 
-  // Clear Quran reader's global resume position so next open starts from page 1
-  await setQrLastPage(null);
+  // Quran resume position is GLOBAL — resetting a day must only undo what THAT
+  // day added, never the whole Quran position.
+  //  • day had no Quran reading → position is left exactly as it is
+  //  • a later day has already moved the position on → left as it is
+  //  • otherwise → rewind to the page just before this day's first session,
+  //    or (if that was the very start) to wherever the remaining history ends
+  if(_daySessions.length){
+    const laterDayRead = Object.keys(_cache).some(k =>
+      /^\d{4}-\d{2}-\d{2}$/.test(k) && k > _resetDK && _cache[k] && (_cache[k].quranSessions||[]).length);
+    if(!laterDayRead){
+      const before = (parseInt(_daySessions[0].start,10) || 1) - 1;
+      await setQrLastPage(before >= 1 ? before : qrPageFromHistory());
+    }
+  }
 
   // Clear Zikr From Book resume index for this day
   await setPdfLastPage(ZIKR_BOOK_IDX_KEY, null);
@@ -4462,6 +4610,21 @@ async function confirmImport(){
     await setStore(dk,dayData);
     count++;
   }
+  // Goal config after a restore. A backup that contains _goalConfig brings its
+  // own settings. A backup from before Goal Flexibility existed has none — it
+  // belongs to an existing user, so all optional goals stay ON (otherwise a
+  // freshly-installed device, which starts with them OFF, would silently
+  // re-score the old days without a saved weight snapshot).
+  try{
+    const hasCfg  = Object.prototype.hasOwnProperty.call(pendingImportData,'_goalConfig');
+    const hasDays = Object.keys(pendingImportData).some(k=>/^\d{4}-\d{2}-\d{2}$/.test(k));
+    if(hasCfg){
+      await loadGoalConfig();
+    } else if(hasDays && !_goalConfig.userSet && _goalConfig.active.length===0){
+      _goalConfig = { active: TOGGLEABLE_GOAL_KEYS.slice(), pending: null };
+      await setStore('_goalConfig', _goalConfig);
+    }
+  }catch(e){}
   closeImportModal();
   if(currentDateKey) loadDayData(currentDateKey);
   else buildCalendar();
@@ -5485,10 +5648,28 @@ function computeWeightTable(activeToggleKeys){
    arrived — promotes it to live and clears the pending flag. Returns
    true when a change just went live, so the caller can toast it once. */
 async function loadGoalConfig(){
+  let stored = null, readOk = false;
   try{
-    const stored = await getStore('_goalConfig');
-    if(stored && Array.isArray(stored.active)) _goalConfig = stored;
+    stored = await getStore('_goalConfig');
+    readOk = true;
   }catch(e){}
+  if(stored && Array.isArray(stored.active)){
+    _goalConfig = stored;
+  } else if(readOk){
+    // No saved config yet. Two very different people land here:
+    //  • a brand-new user (no day records at all) → the 6 optional goals start
+    //    switched OFF; they can turn on whichever they want in Goal Settings.
+    //  • an existing user who simply never opened Goal Settings (they have day
+    //    records already) → keep every goal ON, exactly as it has always been.
+    // The result is written straight away, so a new user who logs their first
+    // day tomorrow is never mistaken for an existing one.
+    // (Only seeds after a SUCCESSFUL read — a transient IndexedDB error must
+    // never overwrite a config that is really there.)
+    const hasHistory = Object.keys(_cache).some(k =>
+      /^\d{4}-\d{2}-\d{2}$/.test(k) && _cache[k] && typeof _cache[k]==='object' && Object.keys(_cache[k]).length>0);
+    _goalConfig = { active: hasHistory ? TOGGLEABLE_GOAL_KEYS.slice() : [], pending: null };
+    try{ await setStore('_goalConfig', _goalConfig); }catch(e){}
+  }
   if(_goalConfig.pending && _goalConfig.pending.effectiveDate <= todayKey()){
     _goalConfig.active = _goalConfig.pending.active;
     _goalConfig.pending = null;
@@ -5502,6 +5683,7 @@ async function stageGoalConfigChange(newActiveList){
   const t = new Date(); t.setDate(t.getDate()+1);
   const effectiveDate = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
   _goalConfig.pending = { active: newActiveList, effectiveDate };
+  _goalConfig.userSet = true; // a deliberate choice — never auto-reset by an import
   await setStore('_goalConfig', _goalConfig);
 }
 

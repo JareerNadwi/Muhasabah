@@ -2824,19 +2824,43 @@ async function qrResolveResumePage(){
   return p;
 }
 
-/* Furthest page (short of the very end) ever logged — used only to pre-fill
-   the "set resume page" prompt. */
+/* Furthest page reached in the CURRENT round of the Quran. Sessions are read
+   in date order; a session that reaches the last page closes a round, so a
+   finished khatm never counts against the next one. Returns 0 if none. */
 function qrFurthestLoggedPage(){
+  const dks = Object.keys(_cache).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).sort();
   let best = 0;
-  Object.keys(_cache).forEach(k=>{
-    if(!/^\d{4}-\d{2}-\d{2}$/.test(k)) return;
+  dks.forEach(k=>{
     const ss = _cache[k] && _cache[k].quranSessions;
-    if(Array.isArray(ss)) ss.forEach(x=>{
-      const e = parseInt(x.end,10);
-      if(e > best && e < QR_LAST_PAGE) best = e;
+    if(!Array.isArray(ss)) return;
+    ss.forEach(x=>{
+      const e = parseInt(x.end,10) || 0;
+      if(e >= QR_LAST_PAGE) best = 0;          // round finished → start counting again
+      else if(e > best) best = e;
     });
   });
-  return best || null;
+  return best;
+}
+
+/* Guard against a false restart. If the reader is about to open far behind the
+   furthest page already logged in this round (e.g. history reaches page 241 but
+   the saved position says page 1 because a lost position made a session start
+   from the beginning), ask instead of silently continuing from the low page.
+   "Keep" is remembered, so it asks once per furthest-page, not on every open. */
+async function qrConfirmResume(p){
+  const F = qrFurthestLoggedPage();
+  const ack = parseInt(_cache['_qr_ack'],10) || 0;
+  if(F > 0 && F - (p||0) > 20 && F > ack){
+    const cur = (p||0) + 1;
+    const msg = 'Your logged reading reaches page ' + F + ' (Juzz ' + pageToJuzz(F) + '), '
+              + 'but the reader would open on page ' + cur + '.\n\n'
+              + 'OK = resume from page ' + (F+1) + '\n'
+              + 'Cancel = keep page ' + cur;
+    if(window.confirm(msg)){ await setQrLastPage(F); return F; }
+    _cache['_qr_ack'] = F;
+    await setPdfLastPage('_qr_ack', F);
+  }
+  return p;
 }
 
 /* Manual correction: tell the reader which page you last finished. Only moves
@@ -2854,6 +2878,8 @@ async function setQuranResumePage(){
     return;
   }
   await setQrLastPage(n);
+  _cache['_qr_ack'] = qrFurthestLoggedPage();
+  await setPdfLastPage('_qr_ack', _cache['_qr_ack']);
   const jumps = (Array.isArray(_cache['_qr_jumps']) ? _cache['_qr_jumps'] : []).concat(n+1);
   _cache['_qr_jumps'] = jumps;
   await setPdfLastPage('_qr_jumps', jumps);
@@ -2876,7 +2902,8 @@ async function openQuranReader(){
   // The stored pointer is the fast path; if it is missing (cleared, or never
   // restored from an older backup) rebuild it from the logged sessions instead
   // of silently falling back to page 1.
-  const lastPage = await qrResolveResumePage();
+  let lastPage = await qrResolveResumePage();
+  lastPage = await qrConfirmResume(lastPage);
   qrCurPage = lastPage ? Math.min(lastPage + 1, QR_LAST_PAGE) : QR_FIRST_PAGE;
   qrStartPage = qrCurPage;
   qrSessionId   = Date.now();

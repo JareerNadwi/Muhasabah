@@ -923,7 +923,7 @@ select option{background:#1c1f1c;}
   /* ── Quran / PDF reader topbar ── */
   .qr-topbar{padding:8px 12px;gap:6px;}
   .qr-title{font-size:13px;}
-  .qr-close{padding:5px 10px;font-size:10px;}
+  .qr-close,.qr-setstart{padding:5px 10px;font-size:10px;}
   .qr-session-info{font-size:9px;}
 
   /* ── Quran / PDF bottom nav — wrap into 2 rows ── */
@@ -973,6 +973,13 @@ select option{background:#1c1f1c;}
   font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;transition:all .2s;
 }
 .qr-close:hover{border-color:#c05050;color:#c05050;}
+.qr-top-actions{display:flex;align-items:center;gap:8px;}
+.qr-setstart{
+  background:#1a1610;border:1px solid #2a2010;color:#c5b98a;
+  padding:6px 14px;border-radius:var(--radius);cursor:pointer;
+  font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;transition:all .2s;
+}
+.qr-setstart:hover{border-color:var(--gold-dim);color:var(--gold);}
 .qr-canvas-wrap{
   flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;
   background:#1a1610;position:relative;
@@ -1035,6 +1042,8 @@ body.light-mode .qr-title{color:#1a1a18!important;}
 body.light-mode .qr-info{color:#5a5750!important;}
 body.light-mode .qr-close{background:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .qr-close:hover{border-color:#c05050!important;color:#c05050!important;}
+body.light-mode .qr-setstart{background:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
+body.light-mode .qr-setstart:hover{border-color:#9a7228!important;color:#9a7228!important;}
 body.light-mode .qr-canvas-wrap,body.light-mode .qr-loading{background:#ffffff!important;color:#5a5750!important;}
 body.light-mode .qr-nav{background:#f0ede6!important;border-color:#d4cfc5!important;color:#5a5750!important;}
 body.light-mode .qr-nav:hover:not(:disabled){border-color:#9a7228!important;color:#9a7228!important;}
@@ -1870,7 +1879,6 @@ body.overlay-open .contact-num{animation-play-state:paused;}
       </div>
       <div class="sub-label">Goal: 1 Full Juzz = Full <span id="subw-quran">10</span>% Core &nbsp;·&nbsp; Every Extra Juzz = +5% Bonus</div>
       <button class="qr-open-btn" onclick="openQuranReader()">📖 Open Quran Reader</button>
-      <button onclick="setQuranResumePage()" style="display:block;margin:6px auto 0;background:none;border:none;color:var(--text-muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.5px;text-decoration:underline;cursor:pointer;">Wrong starting page? Set it</button>
       <div class="qr-session-badge" id="quranSessionBadge" style="display:none;"></div>
     </div>
 
@@ -2352,7 +2360,10 @@ body.overlay-open .contact-num{animation-play-state:paused;}
       <div class="qr-info" id="qrInfoBar">Emdadia Hafezi Edition</div>
     </div>
     <div class="qr-session-info" id="qrSessionInfo"></div>
-    <button class="qr-close" onclick="closeQuranReader()">✕ Save & Exit</button>
+    <div class="qr-top-actions">
+      <button class="qr-setstart" onclick="qrSetStartPage()" title="Change the page this session starts from">⇥ Set Start Page</button>
+      <button class="qr-close" onclick="closeQuranReader()">✕ Save & Exit</button>
+    </div>
   </div>
   <div class="qr-canvas-wrap">
     <div class="qr-loading" id="qrLoading">Loading Quran…</div>
@@ -2812,7 +2823,7 @@ function qrHasAnySession(){
 /* Where should the reader resume? The stored pointer, unless it is stale.
    A pointer is stale when it says "you read up to page N" but NO reading is
    recorded anywhere any more (every day that held it has been reset) and the
-   position was not set by hand via "Set it". Trusting it would open on page
+   position was not set by hand via "Set Start Page". Trusting it would open on page
    N+1 and never count the pages before it. If the pointer is missing, fall
    back to the logged history. Returns the last page finished, or null. */
 async function qrResolveResumePage(){
@@ -2864,29 +2875,50 @@ async function qrConfirmResume(p){
   return p;
 }
 
-/* Manual correction: choose the page the reader opens on next (1–610).
-   Only moves the resume position — never touches sessions or scores.
-   Internally the position is "last page finished", so opening on page 1 is
-   stored as 0 — an explicit "start from the beginning" that the history
-   fallback must not override (null means "unknown", 0 means "page 1"). */
-async function setQuranResumePage(){
+/* Manual correction, used from inside the reader ("⇥ Set Start Page"): jump to
+   a Quran page (1–610) and make it where this session starts, so the pages
+   before it are not counted. Pages already read in this session keep their
+   credit — they are saved as their own session and a new one begins at the
+   chosen page. If nothing has been read yet, the auto-counted opening page is
+   simply replaced. The chosen page goes into _qr_jumps so the gap between it
+   and any earlier session is not flagged as "never counted", and _qr_ack so
+   the false-restart guard never second-guesses a deliberate choice. */
+async function qrSetStartPage(){
+  if(!qrPdfDoc || !qrSessionDK || qrRendering) return;
   const furthest = qrFurthestLoggedPage();
-  const msg = 'Which Quran page should the reader open on? (1–' + QR_LAST_PAGE + ')'
+  const msg = 'Start this session from which Quran page? (1–' + QR_LAST_PAGE + ')'
             + (furthest ? '\n\nYour logged reading reaches page ' + furthest + ' (Juzz ' + pageToJuzz(furthest) + ').' : '');
-  const ans = window.prompt(msg, String(furthest ? Math.min(furthest + 1, QR_LAST_PAGE) : 1));
+  const def = furthest ? Math.min(furthest + 1, QR_LAST_PAGE) : qrCurPage;
+  const ans = window.prompt(msg, String(def));
   if(ans === null) return;
-  const start = parseInt(ans,10);
-  if(!(start >= 1 && start <= QR_LAST_PAGE)){
+  const target = parseInt(ans,10);
+  if(!(target >= 1 && target <= QR_LAST_PAGE)){
     if(window.mhsbToast) mhsbToast('Enter a page between 1 and ' + QR_LAST_PAGE + '.','warn');
     return;
   }
-  await setQrLastPage(start - 1);
-  _cache['_qr_ack'] = furthest;       // a deliberate choice — never second-guess it
-  await setPdfLastPage('_qr_ack', furthest);
-  const jumps = (Array.isArray(_cache['_qr_jumps']) ? _cache['_qr_jumps'] : []).concat(start);
+  if(target === qrStartPage && qrCurPage === qrStartPage) return;   // already there
+
+  await qrPersistSession();                       // bank what has been read so far
+  if(qrCurPage > qrStartPage){                    // real reading happened → new session
+    qrSessionId   = Date.now();
+    qrSessionBase = parseFloat(getCached(qrSessionDK).quranPdfJuzz) || 0;
+  }
+  qrStartPage = target;
+  qrCurPage   = target;
+  qrZoomLevel = 0;
+  const zi = document.getElementById('qrZoomIn');  if(zi){ zi.disabled = false; }
+  const zo = document.getElementById('qrZoomOut'); if(zo){ zo.disabled = true; }
+  const zl = document.getElementById('qrZoomLabel'); if(zl) zl.textContent = '100%';
+
+  const jumps = (Array.isArray(_cache['_qr_jumps']) ? _cache['_qr_jumps'] : []).concat(target);
   _cache['_qr_jumps'] = jumps;
   await setPdfLastPage('_qr_jumps', jumps);
-  if(window.mhsbToast) mhsbToast('Quran will open on page ' + start + ' (Juzz ' + pageToJuzz(start) + ').','info');
+
+  await qrRenderPage(qrCurPage);                  // also saves position + this session
+  const f2 = qrFurthestLoggedPage();
+  _cache['_qr_ack'] = f2;
+  await setPdfLastPage('_qr_ack', f2);
+  if(window.mhsbToast) mhsbToast('Session now starts on page ' + target + ' (Juzz ' + pageToJuzz(target) + ').','info');
 }
 
 async function openQuranReader(){
@@ -3092,7 +3124,7 @@ async function qrPersistSession(){
 
 /* Pages that fall BETWEEN two sessions of the same day — they were shown on
    screen (the resume position moved past them) but no session was ever saved
-   for them. Pages skipped on purpose via "Set it" are excluded (_qr_jumps). */
+   for them. Pages skipped on purpose via "Set Start Page" are excluded (_qr_jumps). */
 function qrFindGaps(dayData){
   const ss = (dayData && dayData.quranSessions) || [];
   const jumps = Array.isArray(_cache['_qr_jumps']) ? _cache['_qr_jumps'] : [];
@@ -4358,7 +4390,7 @@ async function confirmDayReset(){
       const firstStart = parseInt(_daySessions[0].start,10) || 1;
       const jumps = Array.isArray(_cache['_qr_jumps']) ? _cache['_qr_jumps'] : [];
       let target = null;
-      if(jumps.includes(firstStart)) target = firstStart - 1;                     // deliberate "Set it" position
+      if(jumps.includes(firstStart)) target = firstStart - 1;                     // deliberate "Set Start Page" position
       else target = qrPageFromHistory();                                          // remaining recorded history
       await setQrLastPage(target);
     }

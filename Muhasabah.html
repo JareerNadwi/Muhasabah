@@ -2817,6 +2817,7 @@ function qrHasAnySession(){
    back to the logged history. Returns the last page finished, or null. */
 async function qrResolveResumePage(){
   let p = await getQrLastPage();
+  if(p === 0) return 0;                                            // deliberately set to page 1
   if(p >= QR_LAST_PAGE) p = null;                                  // finished → start again
   const jumps = Array.isArray(_cache['_qr_jumps']) ? _cache['_qr_jumps'] : [];
   if(p && !qrHasAnySession() && !jumps.includes(p + 1)) p = null;  // stale pointer
@@ -2863,27 +2864,29 @@ async function qrConfirmResume(p){
   return p;
 }
 
-/* Manual correction: tell the reader which page you last finished. Only moves
-   the resume pointer — it never touches sessions or scores. */
+/* Manual correction: choose the page the reader opens on next (1–610).
+   Only moves the resume position — never touches sessions or scores.
+   Internally the position is "last page finished", so opening on page 1 is
+   stored as 0 — an explicit "start from the beginning" that the history
+   fallback must not override (null means "unknown", 0 means "page 1"). */
 async function setQuranResumePage(){
-  const hint = qrFurthestLoggedPage();
-  const msg = 'Last Quran page you finished (1–' + (QR_LAST_PAGE-1) + ')?\n'
-            + 'The reader will open on the next page.'
-            + (hint ? '\n\nYour logged history reaches page ' + hint + ' (Juzz ' + pageToJuzz(hint) + ').' : '');
-  const ans = window.prompt(msg, hint ? String(hint) : '');
+  const furthest = qrFurthestLoggedPage();
+  const msg = 'Which Quran page should the reader open on? (1–' + QR_LAST_PAGE + ')'
+            + (furthest ? '\n\nYour logged reading reaches page ' + furthest + ' (Juzz ' + pageToJuzz(furthest) + ').' : '');
+  const ans = window.prompt(msg, String(furthest ? Math.min(furthest + 1, QR_LAST_PAGE) : 1));
   if(ans === null) return;
-  const n = parseInt(ans,10);
-  if(!(n >= 1 && n < QR_LAST_PAGE)){
-    if(window.mhsbToast) mhsbToast('Enter a page between 1 and ' + (QR_LAST_PAGE-1) + '.','warn');
+  const start = parseInt(ans,10);
+  if(!(start >= 1 && start <= QR_LAST_PAGE)){
+    if(window.mhsbToast) mhsbToast('Enter a page between 1 and ' + QR_LAST_PAGE + '.','warn');
     return;
   }
-  await setQrLastPage(n);
-  _cache['_qr_ack'] = qrFurthestLoggedPage();
-  await setPdfLastPage('_qr_ack', _cache['_qr_ack']);
-  const jumps = (Array.isArray(_cache['_qr_jumps']) ? _cache['_qr_jumps'] : []).concat(n+1);
+  await setQrLastPage(start - 1);
+  _cache['_qr_ack'] = furthest;       // a deliberate choice — never second-guess it
+  await setPdfLastPage('_qr_ack', furthest);
+  const jumps = (Array.isArray(_cache['_qr_jumps']) ? _cache['_qr_jumps'] : []).concat(start);
   _cache['_qr_jumps'] = jumps;
   await setPdfLastPage('_qr_jumps', jumps);
-  if(window.mhsbToast) mhsbToast('Quran will resume at page ' + (n+1) + ' (Juzz ' + pageToJuzz(n+1) + ').','info');
+  if(window.mhsbToast) mhsbToast('Quran will open on page ' + start + ' (Juzz ' + pageToJuzz(start) + ').','info');
 }
 
 async function openQuranReader(){
@@ -4355,7 +4358,7 @@ async function confirmDayReset(){
       const firstStart = parseInt(_daySessions[0].start,10) || 1;
       const jumps = Array.isArray(_cache['_qr_jumps']) ? _cache['_qr_jumps'] : [];
       let target = null;
-      if(firstStart > 1 && jumps.includes(firstStart)) target = firstStart - 1;   // deliberate "Set it" position
+      if(jumps.includes(firstStart)) target = firstStart - 1;                     // deliberate "Set it" position
       else target = qrPageFromHistory();                                          // remaining recorded history
       await setQrLastPage(target);
     }

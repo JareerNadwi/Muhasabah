@@ -11003,6 +11003,7 @@ function nhRenderKanban(){
           ${s.name}
         </div>
         <div class="nh-col-meta">
+          ${(_nhBulkMode&&sDeals.length)?`<button type="button" class="nh-sm-btn" style="padding:3px 9px;font-size:11px;" onclick="event.stopPropagation();nhSelectStage('${s.id}')">${sDeals.every(d=>_nhSelectedDeals.has(d.id))?'Deselect all':'Select all'}</button>`:''}
           <span class="nh-col-cnt${ovCnt?' urg':''}">${sDeals.length}${ovCnt?' · '+ovCnt+' overdue':''}</span>
           <span class="nh-col-chev">▼</span>
         </div>
@@ -11120,8 +11121,44 @@ function nhRenderBulkBar(){
       <input type="hidden" id="nhBulkDateInput">
       <button type="button" class="nh-cal-trigger" id="nhBulkDateInputBtn" style="width:auto;padding:8px 12px;" onclick="nhOpenCalPicker('nhBulkDateInput')">Pick a date</button>
       <button class="nh-sm-btn done" ${n?'':'disabled'} onclick="nhBulkApplyDate()">Set Date</button>
+      <button class="nh-sm-btn danger" ${n?'':'disabled'} onclick="nhBulkClearDate()">Clear Date</button>
+      <button class="nh-sm-btn" onclick="nhBulkSelectAllVisible()">Select All</button>
       <button class="nh-sm-btn" ${n?'':'disabled'} onclick="nhBulkClearSelection()">Clear Selection</button>
     </div>`;
+}
+function nhBulkTypeFiltered(){
+  const t=_nhSharedType||'all';
+  return t==='all'?_nhDeals:_nhDeals.filter(d=>{
+    const c=_nhContacts.find(x=>x.id===d.contactId);
+    return (c?.type||d.contactType||'person')===t;
+  });
+}
+function nhSelectStage(stageId){
+  const ids=nhBulkTypeFiltered().filter(d=>d.stageId===stageId).map(d=>d.id);
+  if(!ids.length)return;
+  const allSel=ids.every(id=>_nhSelectedDeals.has(id));
+  ids.forEach(id=>{if(allSel)_nhSelectedDeals.delete(id);else _nhSelectedDeals.add(id);});
+  if(!allSel)_nhOpenCols.add(stageId);
+  nhRenderCrm();
+}
+function nhBulkSelectAllVisible(){
+  const cards=document.querySelectorAll('#nhKanban .nh-deal');
+  if(cards.length){
+    cards.forEach(c=>{if(c.id&&c.id.startsWith('nhd-'))_nhSelectedDeals.add(c.id.slice(4));});
+  }else{
+    nhBulkTypeFiltered().forEach(d=>{if(_nhCrmFil==='all'||d.stageId===_nhCrmFil)_nhSelectedDeals.add(d.id);});
+  }
+  nhRenderCrm();
+}
+async function nhBulkClearDate(){
+  if(!_nhSelectedDeals.size)return;
+  const n=_nhSelectedDeals.size;
+  if(!await nhConfirm(`Clear next action date for ${n} contact${n>1?'s':''}?`,'Bulk Clear Date','Clear Date'))return;
+  _nhDeals.forEach(d=>{if(_nhSelectedDeals.has(d.id)){d.nextAction='';d.nextActionNote='';}});
+  await nhSet(nhWsKey('deals'),_nhDeals);
+  _nhSelectedDeals.clear();
+  nhRenderCrm();nhRenderToday();
+  mhsbToast(`✓ Date cleared for ${n} contact${n>1?'s':''}`,'success');
 }
 async function nhBulkApplyStage(){
   if(!_nhSelectedDeals.size)return;
